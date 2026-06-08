@@ -27,17 +27,41 @@
   color: #333333;
 }
 
-.cambiar-contrasena-field input {
-  padding: 10px 12px;
+.password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.password-wrapper input {
+  width: 100%;
+  padding: 10px 80px 10px 12px;
   border: 1px solid #cccccc;
   border-radius: 4px;
   font-size: 14px;
   outline: none;
   transition: border-color 0.15s ease;
+  box-sizing: border-box;
 }
 
-.cambiar-contrasena-field input:focus {
+.password-wrapper input:focus {
   border-color: #111111;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #666666;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+}
+
+.toggle-password:hover {
+  color: #111111;
 }
 
 .cambiar-contrasena-error {

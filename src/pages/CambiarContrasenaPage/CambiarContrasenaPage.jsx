@@ -3,6 +3,33 @@ import { useNavigate } from 'react-router-dom';
 import { changePassword, logout } from '../../services/authService';
 import './CambiarContrasenaPage.css';
 
+function PasswordField({ id, label, value, onChange, autoComplete }) {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="cambiar-contrasena-field">
+      <label htmlFor={id}>{label}</label>
+      <div className="password-wrapper">
+        <input
+          id={id}
+          type={show ? 'text' : 'password'}
+          value={value}
+          onChange={onChange}
+          required
+          autoComplete={autoComplete}
+        />
+        <button
+          type="button"
+          className="toggle-password"
+          onClick={() => setShow((v) => !v)}
+          aria-label={show ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+        >
+          {show ? 'Ocultar' : 'Mostrar'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function CambiarContrasenaPage() {
   const [actual, setActual] = useState('');
   const [nueva, setNueva] = useState('');
@@ -35,39 +62,27 @@ function CambiarContrasenaPage() {
     <div className="cambiar-contrasena-page">
       <h1 className="cambiar-contrasena-title">Cambiar contraseña</h1>
       <form onSubmit={handleSubmit} className="cambiar-contrasena-form">
-        <div className="cambiar-contrasena-field">
-          <label htmlFor="actual">Contraseña actual</label>
-          <input
-            id="actual"
-            type="password"
-            value={actual}
-            onChange={(e) => setActual(e.target.value)}
-            required
-            autoComplete="current-password"
-          />
-        </div>
-        <div className="cambiar-contrasena-field">
-          <label htmlFor="nueva">Nueva contraseña</label>
-          <input
-            id="nueva"
-            type="password"
-            value={nueva}
-            onChange={(e) => setNueva(e.target.value)}
-            required
-            autoComplete="new-password"
-          />
-        </div>
-        <div className="cambiar-contrasena-field">
-          <label htmlFor="confirmar">Confirmar nueva contraseña</label>
-          <input
-            id="confirmar"
-            type="password"
-            value={confirmar}
-            onChange={(e) => setConfirmar(e.target.value)}
-            required
-            autoComplete="new-password"
-          />
-        </div>
+        <PasswordField
+          id="actual"
+          label="Contraseña actual"
+          value={actual}
+          onChange={(e) => setActual(e.target.value)}
+          autoComplete="current-password"
+        />
+        <PasswordField
+          id="nueva"
+          label="Nueva contraseña"
+          value={nueva}
+          onChange={(e) => setNueva(e.target.value)}
+          autoComplete="new-password"
+        />
+        <PasswordField
+          id="confirmar"
+          label="Confirmar nueva contraseña"
+          value={confirmar}
+          onChange={(e) => setConfirmar(e.target.value)}
+          autoComplete="new-password"
+        />
         {error && (
           <p className="cambiar-contrasena-error" role="alert">
             {error}

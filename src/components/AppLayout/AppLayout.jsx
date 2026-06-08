@@ -2,6 +2,7 @@ import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { logout } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
 import texto from '../../assets/texto.png';
+import logoSocio from '../../assets/logo_socio.png';
 import './AppLayout.css';
 
 function AppLayout() {
@@ -28,16 +29,20 @@ function AppLayout() {
       <div className="app-body">
         <nav className="app-sidebar">
           <NavLink to="/dashboard" className={({ isActive }) => isActive ? 'sidebar-link active' : 'sidebar-link'}>
+            <img src={logoSocio} alt="" className="sidebar-icon" />
             Dashboard
           </NavLink>
           <NavLink to="/socios" className={({ isActive }) => isActive ? 'sidebar-link active' : 'sidebar-link'}>
+            <img src={logoSocio} alt="" className="sidebar-icon" />
             Socios
           </NavLink>
           <NavLink to="/cambiar-contrasena" className={({ isActive }) => isActive ? 'sidebar-link active' : 'sidebar-link'}>
+            <img src={logoSocio} alt="" className="sidebar-icon" />
             Cambiar contraseña
           </NavLink>
           {role === 'superAdmin' && (
             <NavLink to="/usuarios" className={({ isActive }) => isActive ? 'sidebar-link active' : 'sidebar-link'}>
+              <img src={logoSocio} alt="" className="sidebar-icon" />
               Usuarios
             </NavLink>
           )}
