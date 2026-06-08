@@ -82,6 +82,7 @@
   border: 1px solid #b7dfc8;
   border-radius: 4px;
   padding: 8px 12px;
+  align-items: center;
 }
 
 .cambiar-contrasena-button {
