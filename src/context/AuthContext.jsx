@@ -6,18 +6,25 @@ const AuthContext = createContext(null);
 
 export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [role, setRole] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+    const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {
       setUser(currentUser);
+      if (currentUser) {
+        const tokenResult = await currentUser.getIdTokenResult();
+        setRole(tokenResult.claims.role ?? null);
+      } else {
+        setRole(null);
+      }
       setTimeout(() => setLoading(false), 1500);
     });
     return unsubscribe;
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, loading, role }}>
       {children}
     </AuthContext.Provider>
   );
