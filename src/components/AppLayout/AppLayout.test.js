@@ -67,6 +67,26 @@ describe('AppLayout', () => {
     expect(screen.queryByRole('link', { name: /cambiar contraseña/i })).not.toBeInTheDocument();
   });
 
+  test('hacer click en el contenido principal cierra el sidebar si está abierto', () => {
+    renderLayout('admin');
+    const sidebar = document.querySelector('.app-sidebar');
+    expect(sidebar).not.toHaveClass('hidden');
+
+    fireEvent.click(screen.getByRole('main'));
+    expect(sidebar).toHaveClass('hidden');
+  });
+
+  test('hacer click en el contenido principal no abre el sidebar si está cerrado', () => {
+    renderLayout('admin');
+    const sidebar = document.querySelector('.app-sidebar');
+
+    fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
+    expect(sidebar).toHaveClass('hidden');
+
+    fireEvent.click(screen.getByRole('main'));
+    expect(sidebar).toHaveClass('hidden');
+  });
+
   test('llama a logout y redirige al login al hacer clic en cerrar sesión', async () => {
     authService.logout.mockResolvedValueOnce();
     renderLayout('admin');

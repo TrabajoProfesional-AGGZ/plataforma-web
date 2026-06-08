@@ -83,7 +83,7 @@ function AppLayout() {
           )}
         </nav>
 
-        <main className="app-content">
+        <main className="app-content" onClick={() => setSidebarOpen(false)}>
           <Outlet />
         </main>
       </div>
