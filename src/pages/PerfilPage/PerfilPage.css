@@ -105,3 +105,31 @@
 .perfil-cambiar-button:hover {
   background-color: #333333;
 }
+
+.perfil-password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.perfil-password-input {
+  width: 100%;
+  padding-right: 80px;
+  box-sizing: border-box;
+}
+
+.perfil-toggle-password {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #666666;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+}
+
+.perfil-toggle-password:hover {
+  color: #111111;
+}

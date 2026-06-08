@@ -1,10 +1,119 @@
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { changePassword, logout } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
 import './PerfilPage.css';
 
+function PasswordField({ id, label, value, onChange, autoComplete }) {
+  const [show, setShow] = useState(false);
+  return (
+    <div className="modal-field">
+      <label className="modal-label" htmlFor={id}>{label}</label>
+      <div className="perfil-password-wrapper">
+        <input
+          id={id}
+          type={show ? 'text' : 'password'}
+          className="modal-input perfil-password-input"
+          value={value}
+          onChange={onChange}
+          required
+          autoComplete={autoComplete}
+        />
+        <button
+          type="button"
+          className="perfil-toggle-password"
+          onClick={() => setShow((v) => !v)}
+          aria-label={show ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+        >
+          {show ? 'Ocultar' : 'Mostrar'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function CambiarContrasenaModal({ onClose }) {
+  const [actual, setActual] = useState('');
+  const [nueva, setNueva] = useState('');
+  const [confirmar, setConfirmar] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') onClose();
+    }
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [onClose]);
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    setError('');
+    if (nueva !== confirmar) {
+      setError('Las contraseñas nuevas no coinciden');
+      return;
+    }
+    setLoading(true);
+    try {
+      await changePassword(actual, nueva);
+      await logout();
+      navigate('/', { state: { passwordChanged: true } });
+    } catch {
+      setError('Contraseña actual incorrecta o error al cambiar contraseña');
+      setLoading(false);
+    }
+  }
+
+  return (
+    <div className="modal-overlay" onClick={onClose}>
+      <div className="modal" onClick={(e) => e.stopPropagation()}>
+        <h2 className="modal-title">Cambiar contraseña</h2>
+        <form onSubmit={handleSubmit}>
+          <PasswordField
+            id="actual"
+            label="Contraseña actual"
+            value={actual}
+            onChange={(e) => setActual(e.target.value)}
+            autoComplete="current-password"
+          />
+          <PasswordField
+            id="nueva"
+            label="Nueva contraseña"
+            value={nueva}
+            onChange={(e) => setNueva(e.target.value)}
+            autoComplete="new-password"
+          />
+          <PasswordField
+            id="confirmar"
+            label="Confirmar nueva contraseña"
+            value={confirmar}
+            onChange={(e) => setConfirmar(e.target.value)}
+            autoComplete="new-password"
+          />
+          {error && (
+            <p className="modal-error" role="alert">{error}</p>
+          )}
+          <div className="modal-actions">
+            <button type="button" className="modal-button-cancel" onClick={onClose}>
+              Cancelar
+            </button>
+            <button type="submit" className="modal-button-submit" disabled={loading}>
+              {loading ? 'Guardando...' : 'Cambiar contraseña'}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+}
+
 function PerfilPage() {
   const { user, role } = useAuth();
-  const navigate = useNavigate();
+  const [modalOpen, setModalOpen] = useState(false);
+
+  const cerrarModal = useCallback(() => setModalOpen(false), []);
 
   return (
     <div className="perfil-page">
@@ -27,10 +136,11 @@ function PerfilPage() {
         </div>
       </div>
       <div className="perfil-actions">
-        <button className="perfil-cambiar-button" onClick={() => navigate('/cambiar-contrasena')}>
+        <button className="perfil-cambiar-button" onClick={() => setModalOpen(true)}>
           Cambiar contraseña
         </button>
       </div>
+      {modalOpen && <CambiarContrasenaModal onClose={cerrarModal} />}
     </div>
   );
 }
