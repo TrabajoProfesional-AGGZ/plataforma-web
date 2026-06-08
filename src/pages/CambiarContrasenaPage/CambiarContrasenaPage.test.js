@@ -1,12 +1,23 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import CambiarContrasenaPage from './CambiarContrasenaPage';
 import * as authService from '../../services/authService';
 
 jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../services/authService');
 
+const mockNavigate = jest.fn();
+jest.mock('react-router-dom', () => ({
+  ...jest.requireActual('react-router-dom'),
+  useNavigate: () => mockNavigate,
+}));
+
 function renderPage() {
-  return render(<CambiarContrasenaPage />);
+  return render(
+    <MemoryRouter>
+      <CambiarContrasenaPage />
+    </MemoryRouter>
+  );
 }
 
 describe('CambiarContrasenaPage', () => {
@@ -34,8 +45,9 @@ describe('CambiarContrasenaPage', () => {
     expect(authService.changePassword).not.toHaveBeenCalled();
   });
 
-  test('llama a changePassword y muestra mensaje de éxito', async () => {
+  test('llama a changePassword y logout, luego redirige al login', async () => {
     authService.changePassword.mockResolvedValueOnce();
+    authService.logout.mockResolvedValueOnce();
     renderPage();
 
     fireEvent.change(screen.getByLabelText('Contraseña actual'), { target: { value: 'actual123' } });
@@ -45,7 +57,8 @@ describe('CambiarContrasenaPage', () => {
 
     await waitFor(() => {
       expect(authService.changePassword).toHaveBeenCalledWith('actual123', 'nueva456');
-      expect(screen.getByRole('status')).toHaveTextContent(/actualizada correctamente/i);
+      expect(authService.logout).toHaveBeenCalledTimes(1);
+      expect(mockNavigate).toHaveBeenCalledWith('/', { state: { passwordChanged: true } });
     });
   });
 
@@ -60,6 +73,7 @@ describe('CambiarContrasenaPage', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent(/incorrecta/i);
+      expect(authService.logout).not.toHaveBeenCalled();
     });
   });
 });

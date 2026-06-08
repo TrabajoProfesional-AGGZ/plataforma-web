@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { changePassword } from '../../services/authService';
+import { useNavigate } from 'react-router-dom';
+import { changePassword, logout } from '../../services/authService';
 import './CambiarContrasenaPage.css';
 
 function CambiarContrasenaPage() {
@@ -7,13 +8,12 @@ function CambiarContrasenaPage() {
   const [nueva, setNueva] = useState('');
   const [confirmar, setConfirmar] = useState('');
   const [error, setError] = useState('');
-  const [exito, setExito] = useState(false);
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   async function handleSubmit(e) {
     e.preventDefault();
     setError('');
-    setExito(false);
 
     if (nueva !== confirmar) {
       setError('Las contraseñas nuevas no coinciden');
@@ -23,13 +23,10 @@ function CambiarContrasenaPage() {
     setLoading(true);
     try {
       await changePassword(actual, nueva);
-      setExito(true);
-      setActual('');
-      setNueva('');
-      setConfirmar('');
+      await logout();
+      navigate('/', { state: { passwordChanged: true } });
     } catch {
       setError('Contraseña actual incorrecta o error al cambiar contraseña');
-    } finally {
       setLoading(false);
     }
   }
@@ -74,11 +71,6 @@ function CambiarContrasenaPage() {
         {error && (
           <p className="cambiar-contrasena-error" role="alert">
             {error}
-          </p>
-        )}
-        {exito && (
-          <p className="cambiar-contrasena-exito" role="status">
-            Contraseña actualizada correctamente
           </p>
         )}
         <button type="submit" className="cambiar-contrasena-button" disabled={loading}>

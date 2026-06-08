@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { login } from '../../services/authService';
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen';
 import logoConTexto from '../../assets/logo_con_texto.png';
@@ -12,6 +12,8 @@ function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [redirecting, setRedirecting] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
+  const passwordChanged = location.state?.passwordChanged ?? false;
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -58,6 +60,11 @@ function LoginPage() {
               autoComplete="current-password"
             />
           </div>
+          {passwordChanged && (
+            <p className="login-success" role="status">
+              Contraseña actualizada correctamente
+            </p>
+          )}
           {error && (
             <p className="login-error" role="alert">
               {error}

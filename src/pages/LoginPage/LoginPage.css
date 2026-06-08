@@ -56,6 +56,16 @@
   box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.1);
 }
 
+.login-success {
+  background-color: #f0faf5;
+  color: #1a7a4a;
+  font-size: 13px;
+  padding: 10px 14px;
+  border-radius: 4px;
+  margin: 0;
+  border: 1px solid #b7dfc8;
+}
+
 .login-error {
   background-color: #fdf0ef;
   color: #c0392b;
