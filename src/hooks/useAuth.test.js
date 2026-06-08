@@ -15,10 +15,11 @@ jest.mock('firebase/auth', () => ({
 }));
 
 describe('useAuth', () => {
-  test('retorna user y loading del contexto', () => {
+  test('retorna user, loading y role del contexto', () => {
     const wrapper = ({ children }) => <AuthProvider>{children}</AuthProvider>;
     const { result } = renderHook(() => useAuth(), { wrapper });
     expect(result.current).toHaveProperty('user');
     expect(result.current).toHaveProperty('loading');
+    expect(result.current).toHaveProperty('role');
   });
 });

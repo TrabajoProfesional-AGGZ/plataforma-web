@@ -34,3 +34,7 @@ Thumbs.db
 
 # Claude
 CLAUDE.md
+
+# Firebase Admin SDK key (NUNCA commitear)
+serviceAccountKey.json
+scripts/serviceAccountKey.json

@@ -6,9 +6,9 @@ import * as authService from '../../services/authService';
 jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../services/authService');
 
-const renderLoginPage = () =>
+const renderLoginPage = (initialState = {}) =>
   render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[{ pathname: '/', state: initialState }]}>
       <LoginPage />
     </MemoryRouter>
   );
@@ -24,6 +24,16 @@ describe('LoginPage', () => {
   test('no muestra el mensaje de error en el estado inicial', () => {
     renderLoginPage();
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+  });
+
+  test('muestra cartel de éxito cuando se llega desde cambio de contraseña', () => {
+    renderLoginPage({ passwordChanged: true });
+    expect(screen.getByRole('status')).toHaveTextContent(/contraseña actualizada correctamente/i);
+  });
+
+  test('no muestra cartel de éxito en una visita normal', () => {
+    renderLoginPage();
+    expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
   test('muestra "Credenciales incorrectas" cuando el login falla', async () => {
