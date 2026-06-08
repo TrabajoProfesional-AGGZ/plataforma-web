@@ -36,7 +36,11 @@ function AppLayout() {
           onClick={() => setSidebarOpen((v) => !v)}
           aria-label="Alternar menú lateral"
         >
-          <img src={logoSocio} alt="" className="app-header-logo-icon" />
+          <img
+            src={logoSocio}
+            alt=""
+            className={`app-header-logo-icon${sidebarOpen ? ' logo-rotated' : ''}`}
+          />
         </button>
         <img src={texto} alt="SocioUnido" className="app-header-logo" />
         <div className="app-header-right">
