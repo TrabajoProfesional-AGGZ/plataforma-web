@@ -1,0 +1,15 @@
+.socios-page {
+  max-width: 800px;
+}
+
+.socios-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #111111;
+  margin: 0 0 12px 0;
+}
+
+.socios-placeholder {
+  color: #888888;
+  font-size: 15px;
+}
