@@ -1,4 +1,4 @@
-import { getUsers, updateUserRole } from './usuariosService';
+import { getUsers, updateUserRole, createUser } from './usuariosService';
 
 const mockGetIdToken = jest.fn();
 jest.mock('../firebase', () => ({
@@ -61,6 +61,45 @@ describe('usuariosService', () => {
       fetch.mockResolvedValueOnce({ ok: false });
       await expect(updateUserRole('uid123', 'admin')).rejects.toThrow(
         'Error al actualizar rol'
+      );
+    });
+  });
+
+  describe('createUser', () => {
+    test('hace POST al endpoint correcto con email, password y rol', async () => {
+      fetch.mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({ uid: 'nuevo-uid' }),
+      });
+
+      await createUser('nuevo@club.com', 'pass123', 'admin');
+
+      expect(fetch).toHaveBeenCalledWith(
+        'http://localhost:8080/admin/users',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({ email: 'nuevo@club.com', password: 'pass123', role: 'admin' }),
+          headers: expect.objectContaining({
+            Authorization: 'Bearer mock-token',
+            'Content-Type': 'application/json',
+          }),
+        })
+      );
+    });
+
+    test('retorna los datos del usuario creado', async () => {
+      const nuevoUsuario = { uid: 'nuevo-uid', email: 'nuevo@club.com', role: 'admin' };
+      fetch.mockResolvedValueOnce({ ok: true, json: async () => nuevoUsuario });
+
+      const result = await createUser('nuevo@club.com', 'pass123', 'admin');
+
+      expect(result).toEqual(nuevoUsuario);
+    });
+
+    test('lanza error cuando la respuesta no es ok', async () => {
+      fetch.mockResolvedValueOnce({ ok: false });
+      await expect(createUser('x@x.com', 'pass', 'admin')).rejects.toThrow(
+        'Error al crear usuario'
       );
     });
   });

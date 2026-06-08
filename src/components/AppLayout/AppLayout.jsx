@@ -10,7 +10,7 @@ function AppLayout() {
   const { user, role } = useAuth();
   const navigate = useNavigate();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const dropdownRef = useRef(null);
 
   useEffect(() => {
@@ -42,7 +42,13 @@ function AppLayout() {
             className={`app-header-logo-icon${sidebarOpen ? ' logo-rotated' : ''}`}
           />
         </button>
-        <img src={texto} alt="SocioUnido" className="app-header-logo" />
+        <button
+          className="app-header-logo-button"
+          onClick={() => navigate('/dashboard')}
+          aria-label="Ir al dashboard"
+        >
+          <img src={texto} alt="SocioUnido" className="app-header-logo" />
+        </button>
         <div className="app-header-right">
           <div className="app-user-dropdown" ref={dropdownRef}>
             <button
@@ -83,7 +89,7 @@ function AppLayout() {
           )}
         </nav>
 
-        <main className="app-content">
+        <main className="app-content" onClick={() => setSidebarOpen(false)}>
           <Outlet />
         </main>
       </div>

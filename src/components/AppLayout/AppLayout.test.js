@@ -67,6 +67,42 @@ describe('AppLayout', () => {
     expect(screen.queryByRole('link', { name: /cambiar contraseña/i })).not.toBeInTheDocument();
   });
 
+  test('el logo de texto es un botón visible en el header', () => {
+    renderLayout('admin');
+    expect(screen.getByRole('button', { name: /ir al dashboard/i })).toBeInTheDocument();
+  });
+
+  test('hacer click en el logo de texto navega a /dashboard', () => {
+    renderLayout('admin');
+    fireEvent.click(screen.getByRole('button', { name: /ir al dashboard/i }));
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
+  });
+
+  test('el sidebar arranca cerrado al iniciar sesión', () => {
+    renderLayout('admin');
+    expect(document.querySelector('.app-sidebar')).toHaveClass('hidden');
+  });
+
+  test('hacer click en el contenido principal cierra el sidebar si está abierto', () => {
+    renderLayout('admin');
+    const sidebar = document.querySelector('.app-sidebar');
+
+    fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
+    expect(sidebar).not.toHaveClass('hidden');
+
+    fireEvent.click(screen.getByRole('main'));
+    expect(sidebar).toHaveClass('hidden');
+  });
+
+  test('hacer click en el contenido principal no abre el sidebar si está cerrado', () => {
+    renderLayout('admin');
+    const sidebar = document.querySelector('.app-sidebar');
+    expect(sidebar).toHaveClass('hidden');
+
+    fireEvent.click(screen.getByRole('main'));
+    expect(sidebar).toHaveClass('hidden');
+  });
+
   test('llama a logout y redirige al login al hacer clic en cerrar sesión', async () => {
     authService.logout.mockResolvedValueOnce();
     renderLayout('admin');
