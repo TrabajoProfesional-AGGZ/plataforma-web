@@ -1,3 +1,13 @@
 .dashboard-main {
   flex: 1;
+  display: flex;
+  justify-content: center;
+  padding-top: 64px;
+}
+
+.dashboard-title {
+  font-size: 36px;
+  font-weight: 700;
+  color: #111111;
+  margin: 0;
 }
