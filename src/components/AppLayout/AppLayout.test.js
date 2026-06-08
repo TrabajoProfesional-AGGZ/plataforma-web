@@ -78,9 +78,16 @@ describe('AppLayout', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
   });
 
+  test('el sidebar arranca cerrado al iniciar sesión', () => {
+    renderLayout('admin');
+    expect(document.querySelector('.app-sidebar')).toHaveClass('hidden');
+  });
+
   test('hacer click en el contenido principal cierra el sidebar si está abierto', () => {
     renderLayout('admin');
     const sidebar = document.querySelector('.app-sidebar');
+
+    fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
     expect(sidebar).not.toHaveClass('hidden');
 
     fireEvent.click(screen.getByRole('main'));
@@ -90,8 +97,6 @@ describe('AppLayout', () => {
   test('hacer click en el contenido principal no abre el sidebar si está cerrado', () => {
     renderLayout('admin');
     const sidebar = document.querySelector('.app-sidebar');
-
-    fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
     expect(sidebar).toHaveClass('hidden');
 
     fireEvent.click(screen.getByRole('main'));
