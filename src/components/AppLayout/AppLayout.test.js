@@ -67,6 +67,17 @@ describe('AppLayout', () => {
     expect(screen.queryByRole('link', { name: /cambiar contraseña/i })).not.toBeInTheDocument();
   });
 
+  test('el logo de texto es un botón visible en el header', () => {
+    renderLayout('admin');
+    expect(screen.getByRole('button', { name: /ir al dashboard/i })).toBeInTheDocument();
+  });
+
+  test('hacer click en el logo de texto navega a /dashboard', () => {
+    renderLayout('admin');
+    fireEvent.click(screen.getByRole('button', { name: /ir al dashboard/i }));
+    expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
+  });
+
   test('hacer click en el contenido principal cierra el sidebar si está abierto', () => {
     renderLayout('admin');
     const sidebar = document.querySelector('.app-sidebar');
