@@ -16,12 +16,39 @@ function estadoConfig(estado) {
   return ESTADO_CONFIG[estado] ?? ESTADO_DEFAULT;
 }
 
+const ICONOS_ORDEN = { asc: ' ↑', desc: ' ↓', none: ' ↕' };
+
 function SociosPage() {
   const [dni, setDni] = useState('');
   const [modo, setModo] = useState('idle'); // idle | socio | lista | no-encontrado
   const [resultado, setResultado] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [orden, setOrden] = useState({ campo: null, dir: 'asc' });
+
+  function toggleOrden(campo) {
+    setOrden(prev => {
+      if (prev.campo !== campo) return { campo, dir: 'asc' };
+      if (prev.dir === 'asc') return { campo, dir: 'desc' };
+      return { campo: null, dir: 'asc' };
+    });
+  }
+
+  function iconoOrden(campo) {
+    if (orden.campo !== campo) return ICONOS_ORDEN.none;
+    return ICONOS_ORDEN[orden.dir];
+  }
+
+  function aplicarOrden(socios) {
+    if (!orden.campo) return socios;
+    return [...socios].sort((a, b) => {
+      const va = String(a[orden.campo] ?? '').toLowerCase();
+      const vb = String(b[orden.campo] ?? '').toLowerCase();
+      if (va < vb) return orden.dir === 'asc' ? -1 : 1;
+      if (va > vb) return orden.dir === 'asc' ? 1 : -1;
+      return 0;
+    });
+  }
 
   async function handleBuscar(e) {
     e.preventDefault();
@@ -50,6 +77,7 @@ function SociosPage() {
     setLoading(true);
     setError(null);
     setDni('');
+    setOrden({ campo: null, dir: 'asc' });
     try {
       const socios = await getSocios();
       setResultado(socios);
@@ -67,14 +95,13 @@ function SociosPage() {
 
   return (
     <div className="socios-page">
-      <h1 className="socios-title">Socios</h1>
-
+      <h1 className="socios-title">Consultar Socios</h1>
       <div className="socios-toolbar">
-        <form className="socios-search-form" onSubmit={handleBuscar}>
+        <form className="socios-search-form" onSubmit={handleBuscar}>      
           <input
             className="socios-search-input"
             type="text"
-            placeholder="Buscar por DNI"
+            placeholder="Buscar por N° de socio"
             value={dni}
             onChange={(e) => setDni(e.target.value)}
           />
@@ -121,7 +148,7 @@ function SociosPage() {
               </div>
               <div className="socios-card-row">
                 <span className="socios-card-label">Nombre</span>
-                <span>{resultado.nombre} {resultado.apellido}</span>
+                <span>{resultado.apellido} {resultado.nombre}</span>
               </div>
               <div className="socios-card-row">
                 <span className="socios-card-label">Categoría</span>
@@ -143,19 +170,31 @@ function SociosPage() {
           <table className="socios-table">
             <thead>
               <tr>
-                <th>N° Socio</th>
-                <th>Nombre</th>
-                <th>Categoría</th>
-                <th>Estado</th>
+                <th className="socios-th-sort" onClick={() => toggleOrden('id_socio')}>
+                  N° Socio{iconoOrden('id_socio')}
+                </th>
+                <th className="socios-th-sort" onClick={() => toggleOrden('apellido')}>
+                  Apellido{iconoOrden('apellido')}
+                </th>
+                <th className="socios-th-sort" onClick={() => toggleOrden('nombre')}>
+                  Nombre{iconoOrden('nombre')}
+                </th>
+                <th className="socios-th-sort" onClick={() => toggleOrden('categoria')}>
+                  Categoría{iconoOrden('categoria')}
+                </th>
+                <th className="socios-th-sort" onClick={() => toggleOrden('estado')}>
+                  Estado{iconoOrden('estado')}
+                </th>
               </tr>
             </thead>
             <tbody>
-              {resultado.map((s) => {
+              {aplicarOrden(resultado).map((s) => {
                 const cfg = estadoConfig(s.estado);
                 return (
                   <tr key={s.id_socio}>
                     <td>{s.id_socio}</td>
-                    <td>{s.nombre} {s.apellido}</td>
+                    <td>{s.apellido}</td>
+                    <td>{s.nombre}</td>
                     <td>{s.categoria}</td>
                     <td>
                       <span

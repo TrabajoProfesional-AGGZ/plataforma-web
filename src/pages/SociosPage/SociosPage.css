@@ -153,6 +153,16 @@
   font-weight: 500;
 }
 
+.socios-th-sort {
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.socios-th-sort:hover {
+  color: #111111;
+}
+
 .socios-table td {
   padding: 10px 14px;
   border-bottom: 1px solid #f5f5f5;

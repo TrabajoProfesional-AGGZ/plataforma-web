@@ -43,7 +43,8 @@ describe('SociosPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
 
     await waitFor(() => {
-      expect(screen.getByText('Juan Pérez')).toBeInTheDocument();
+      expect(screen.getByText(/Pérez/)).toBeInTheDocument();
+      expect(screen.getByText(/Juan/)).toBeInTheDocument();
       expect(screen.getAllByText('Al día').length).toBeGreaterThan(0);
     });
     expect(getSocioPorDni).toHaveBeenCalledWith('12345678');
@@ -109,7 +110,8 @@ describe('SociosPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
 
     await waitFor(() => {
-      expect(screen.getAllByText('Juan Pérez').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Pérez').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Juan').length).toBeGreaterThan(0);
       expect(screen.getByRole('table')).toBeInTheDocument();
     });
     expect(getSocios).toHaveBeenCalled();
