@@ -23,7 +23,7 @@ describe('SociosPage', () => {
   test('renderiza el título, el campo de búsqueda y los botones', () => {
     render(<SociosPage />);
     expect(screen.getByRole('heading', { name: /socios/i })).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/buscar por dni/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/buscar por n° de socio/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /buscar/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /ver todos/i })).toBeInTheDocument();
   });
@@ -37,7 +37,7 @@ describe('SociosPage', () => {
     getSocioPorDni.mockResolvedValueOnce(socioMock);
     render(<SociosPage />);
 
-    fireEvent.change(screen.getByPlaceholderText(/buscar por dni/i), {
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
       target: { value: '12345678' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
@@ -54,7 +54,7 @@ describe('SociosPage', () => {
     getSocioPorDni.mockRejectedValueOnce(new Error('no-encontrado'));
     render(<SociosPage />);
 
-    fireEvent.change(screen.getByPlaceholderText(/buscar por dni/i), {
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
       target: { value: '99999999' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
@@ -68,7 +68,7 @@ describe('SociosPage', () => {
     getSocioPorDni.mockRejectedValueOnce(new Error('Error al obtener socio'));
     render(<SociosPage />);
 
-    fireEvent.change(screen.getByPlaceholderText(/buscar por dni/i), {
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
       target: { value: '12345678' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
@@ -82,7 +82,7 @@ describe('SociosPage', () => {
     getSocioPorDni.mockRejectedValueOnce(new Error('servicio-no-disponible'));
     render(<SociosPage />);
 
-    fireEvent.change(screen.getByPlaceholderText(/buscar por dni/i), {
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
       target: { value: '12345678' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));

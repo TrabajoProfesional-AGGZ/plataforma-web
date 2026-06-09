@@ -40,7 +40,7 @@ function DashboardPage() {
       <div className="dashboard-grid">
         {secciones.map(s => (
           <button
-            key={s.path}
+            key={s.titulo}
             className="dashboard-card"
             onClick={() => navigate(s.path)}
           >

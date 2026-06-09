@@ -17,21 +17,21 @@ describe('DashboardPage', () => {
     jest.clearAllMocks();
   });
 
-  test('renderiza el título y la tarjeta de Socios para admin', () => {
+  test('renderiza el título y las tarjetas visibles para admin', () => {
     useAuth.mockReturnValue({ role: 'admin' });
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
     expect(screen.getByRole('heading', { name: /panel principal/i })).toBeInTheDocument();
     expect(screen.getByText('Socios')).toBeInTheDocument();
-    expect(screen.queryByText('Usuarios')).not.toBeInTheDocument();
+    expect(screen.queryByText('Usuarios Administrativos')).not.toBeInTheDocument();
   });
 
-  test('renderiza la tarjeta de Usuarios para superAdmin', () => {
+  test('renderiza la tarjeta de Usuarios Administrativos para superAdmin', () => {
     useAuth.mockReturnValue({ role: 'superAdmin' });
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
     expect(screen.getByText('Socios')).toBeInTheDocument();
-    expect(screen.getByText('Usuarios')).toBeInTheDocument();
+    expect(screen.getByText('Usuarios Administrativos')).toBeInTheDocument();
   });
 
   test('navega a /socios al hacer click en la tarjeta de Socios', () => {
@@ -42,11 +42,11 @@ describe('DashboardPage', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/socios');
   });
 
-  test('navega a /usuarios al hacer click en la tarjeta de Usuarios', () => {
+  test('navega a /usuarios al hacer click en la tarjeta de Usuarios Administrativos', () => {
     useAuth.mockReturnValue({ role: 'superAdmin' });
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
-    fireEvent.click(screen.getByText('Usuarios').closest('button'));
+    fireEvent.click(screen.getByText('Usuarios Administrativos').closest('button'));
     expect(mockNavigate).toHaveBeenCalledWith('/usuarios');
   });
 });
