@@ -17,7 +17,7 @@ describe('LoginPage', () => {
   test('renderiza los campos de email, contraseña y el botón de ingresar', () => {
     renderLoginPage();
     expect(screen.getByLabelText(/email/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/contraseña/i)).toBeInTheDocument();
+    expect(screen.getByLabelText('Contraseña')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /ingresar/i })).toBeInTheDocument();
   });
 
@@ -43,7 +43,7 @@ describe('LoginPage', () => {
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: 'test@test.com' },
     });
-    fireEvent.change(screen.getByLabelText(/contraseña/i), {
+    fireEvent.change(screen.getByLabelText('Contraseña'), {
       target: { value: 'wrongpassword' },
     });
     fireEvent.click(screen.getByRole('button', { name: /ingresar/i }));
@@ -62,7 +62,7 @@ describe('LoginPage', () => {
     fireEvent.change(screen.getByLabelText(/email/i), {
       target: { value: 'test@test.com' },
     });
-    fireEvent.change(screen.getByLabelText(/contraseña/i), {
+    fireEvent.change(screen.getByLabelText('Contraseña'), {
       target: { value: 'password' },
     });
     fireEvent.click(screen.getByRole('button', { name: /ingresar/i }));

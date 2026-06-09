@@ -7,7 +7,7 @@
 
 .app-header {
   background-color: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
+  border-bottom: 1px solid #4a4a4a;
   padding: 0 32px;
   height: 80px;
   display: flex;
@@ -17,24 +17,105 @@
   flex-shrink: 0;
 }
 
-.app-header-logo {
-  height: 120px;
+.app-sidebar-toggle {
+  position: absolute;
+  left: 32px;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  opacity: 0.85;
+  transition: opacity 0.15s ease;
+}
+
+.app-sidebar-toggle:hover {
+  opacity: 1;
+}
+
+.app-header-logo-icon {
+  height: 70px;
   width: auto;
+  display: block;
+  transition: transform 0.4s ease-in-out;
+}
+
+.logo-rotated {
+  transform: rotate(45deg);
+}
+
+.app-header-logo-button {
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
-}
-
-.app-header-user {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 8px;
 }
 
-.app-header-user-info {
-  font-size: 11px;
-  color: #888888;
+.app-header-logo {
+  height: 120px;
+  width: auto;
+}
+
+.app-header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.app-user-dropdown {
+  position: relative;
+}
+
+.app-email-button {
+  background: none;
+  border: none;
+  color: #4a4a4a;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 4px;
+  transition: background-color 0.15s ease;
+}
+
+.app-email-button:hover {
+  background-color: #f5f5f5;
+}
+
+.app-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  background-color: #ffffff;
+  border: 1px solid #4a4a4a;
+  border-radius: 6px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  min-width: 140px;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.app-dropdown-item {
+  display: block;
+  width: 100%;
+  padding: 10px 16px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-size: 14px;
+  color: #4a4a4a;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.app-dropdown-item:hover {
+  background-color: #f5f5f5;
 }
 
 .app-logout-button {
@@ -60,22 +141,33 @@
 }
 
 .app-sidebar {
-  width: 220px;
+  width: 260px;
   background-color: #ffffff;
-  border-right: 1px solid #e0e0e0;
+  border-right: 1px solid #4a4a4a;
   padding: 24px 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
   flex-shrink: 0;
+  overflow: hidden;
+  transition: width 0.6s ease;
+}
+
+.app-sidebar.hidden {
+  width: 0;
+  padding: 0;
+  border-right: none;
+  transition: 0.6s ease;
 }
 
 .sidebar-link {
-  display: block;
-  padding: 10px 24px;
-  color: #444444;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 24px;
+  color: #4a4a4a;
   text-decoration: none;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: 500;
   border-left: 3px solid transparent;
   transition: background-color 0.15s ease, color 0.15s ease;
@@ -89,10 +181,18 @@
 .sidebar-link.active {
   border-left-color: #111111;
   color: #111111;
-  background-color: #f0f0f0;
+  background-color: #f5f5f5;
 }
 
 .app-content {
   flex: 1;
   padding: 32px;
+}
+
+.app-page-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-height: 300px;
 }

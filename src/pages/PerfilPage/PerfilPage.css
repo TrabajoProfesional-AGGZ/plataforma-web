@@ -1,0 +1,135 @@
+.perfil-page {
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.perfil-title {
+  font-size: 32px;
+  font-weight: 700;
+  color: #111111;
+  margin: 0 0 28px 0;
+  text-align: center;
+}
+
+.perfil-card {
+  background-color: #ffffff;
+  border: 1px solid #4a4a4a;
+  border-radius: 8px;
+  padding: 24px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 28px;
+}
+
+.perfil-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: #f5f5f5;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4a4a4a;
+}
+
+.perfil-avatar svg {
+  width: 44px;
+  height: 44px;
+}
+
+.perfil-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  flex: 1;
+}
+
+.perfil-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.perfil-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: #4a4a4a;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.perfil-value {
+  font-size: 16px;
+  color: #111111;
+}
+
+.perfil-rol-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 500;
+  align-self: flex-start;
+}
+
+.perfil-rol-admin {
+  background-color: #e8f0fe;
+  color: #1a56db;
+}
+
+.perfil-rol-superAdmin {
+  background-color: #fef3cd;
+  color: #92400e;
+}
+
+.perfil-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 16px;
+}
+
+.perfil-cambiar-button {
+  padding: 10px 20px;
+  background-color: #111111;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.perfil-cambiar-button:hover {
+  background-color: #4a4a4a;
+}
+
+.perfil-password-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.perfil-password-input {
+  width: 100%;
+  padding-right: 80px;
+  box-sizing: border-box;
+}
+
+.perfil-toggle-password {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  color: #4a4a4a;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0;
+}
+
+.perfil-toggle-password:hover {
+  color: #111111;
+}
