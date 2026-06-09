@@ -13,7 +13,7 @@
 
 .perfil-card {
   background-color: #ffffff;
-  border: 1px solid #e0e0e0;
+  border: 1px solid #4a4a4a;
   border-radius: 8px;
   padding: 24px;
   display: flex;
@@ -26,12 +26,12 @@
   width: 80px;
   height: 80px;
   border-radius: 50%;
-  background-color: #e8e8e8;
+  background-color: #f5f5f5;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #aaaaaa;
+  color: #4a4a4a;
 }
 
 .perfil-avatar svg {
@@ -55,7 +55,7 @@
 .perfil-label {
   font-size: 12px;
   font-weight: 600;
-  color: #888888;
+  color: #4a4a4a;
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
@@ -103,7 +103,7 @@
 }
 
 .perfil-cambiar-button:hover {
-  background-color: #333333;
+  background-color: #4a4a4a;
 }
 
 .perfil-password-wrapper {
@@ -123,7 +123,7 @@
   right: 12px;
   background: none;
   border: none;
-  color: #666666;
+  color: #4a4a4a;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;

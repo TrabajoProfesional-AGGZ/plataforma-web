@@ -24,7 +24,7 @@
 .cambiar-contrasena-field label {
   font-size: 14px;
   font-weight: 500;
-  color: #333333;
+  color: #4a4a4a;
 }
 
 .password-wrapper {
@@ -36,7 +36,7 @@
 .password-wrapper input {
   width: 100%;
   padding: 10px 80px 10px 12px;
-  border: 1px solid #cccccc;
+  border: 1px solid #4a4a4a;
   border-radius: 4px;
   font-size: 14px;
   outline: none;
@@ -53,7 +53,7 @@
   right: 12px;
   background: none;
   border: none;
-  color: #666666;
+  color: #4a4a4a;
   font-size: 12px;
   font-weight: 500;
   cursor: pointer;
@@ -99,7 +99,7 @@
 }
 
 .cambiar-contrasena-button:hover:not(:disabled) {
-  background-color: #333333;
+  background-color: #4a4a4a;
 }
 
 .cambiar-contrasena-button:disabled {
