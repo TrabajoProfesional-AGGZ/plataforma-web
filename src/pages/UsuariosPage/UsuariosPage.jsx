@@ -83,8 +83,8 @@ function UsuariosPage() {
 
   return (
     <div className="usuarios-page">
+      <h1 className="usuarios-title">Consultar Usuarios</h1>
       <div className="usuarios-header">
-        <h1 className="usuarios-title">Usuarios</h1>
         <button className="usuarios-crear-button" onClick={abrirModal}>
           Crear usuario
         </button>
