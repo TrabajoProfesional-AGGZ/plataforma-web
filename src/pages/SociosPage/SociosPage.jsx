@@ -7,10 +7,10 @@ import logoAmarillo from '../../assets/logo-amarillo.png';
 import './SociosPage.css';
 
 const ESTADO_CONFIG = {
-  'Al día': { logo: logoVerde,    bg: '#e6f4ea', border: '#c3e6cb' },
-  'Moroso': { logo: logoRojo,     bg: '#fdecea', border: '#f5c6cb' },
+  'Al día': { logo: logoVerde,    bg: '#8ac98ab0', border: '#0D6E0D' },
+  'Moroso': { logo: logoRojo,     bg: '#f0b2b2d2', border: '#A01414' },
 };
-const ESTADO_DEFAULT = { logo: logoAmarillo, bg: '#fef9e7', border: '#fde68a' };
+const ESTADO_DEFAULT = { logo: logoAmarillo, bg: '#f4ecb5ee', border: '#9A6200' };
 
 function estadoConfig(estado) {
   return ESTADO_CONFIG[estado] ?? ESTADO_DEFAULT;
@@ -158,7 +158,10 @@ function SociosPage() {
                     <td>{s.nombre} {s.apellido}</td>
                     <td>{s.categoria}</td>
                     <td>
-                      <span className="socios-estado-cell">
+                      <span
+                        className="socios-estado-cell"
+                        style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}
+                      >
                         <img src={cfg.logo} alt="" className="socios-estado-logo" />
                         {s.estado}
                       </span>
