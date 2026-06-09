@@ -188,3 +188,11 @@
   flex: 1;
   padding: 32px;
 }
+
+.app-page-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  min-height: 300px;
+}

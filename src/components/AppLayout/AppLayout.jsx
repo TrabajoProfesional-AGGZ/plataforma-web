@@ -1,5 +1,5 @@
-import { useRef, useEffect, useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { useRef, useEffect, useLayoutEffect, useState } from 'react';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { logout } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
 import texto from '../../assets/texto.png';
@@ -9,9 +9,22 @@ import './AppLayout.css';
 function AppLayout() {
   const { user, role } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [navigating, setNavigating] = useState(false);
   const dropdownRef = useRef(null);
+  const isFirstRender = useRef(true);
+
+  useLayoutEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    setNavigating(true);
+    const timer = setTimeout(() => setNavigating(false), 700);
+    return () => clearTimeout(timer);
+  }, [location.pathname]);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -90,7 +103,13 @@ function AppLayout() {
         </nav>
 
         <main className="app-content" onClick={() => setSidebarOpen(false)}>
-          <Outlet />
+          {navigating ? (
+            <div className="app-page-loading">
+              <img src={logoSocio} alt="" className="loading-logo" />
+            </div>
+          ) : (
+            <Outlet />
+          )}
         </main>
       </div>
     </div>
