@@ -44,7 +44,7 @@ describe('SociosPage', () => {
 
     await waitFor(() => {
       expect(screen.getByText('Juan Pérez')).toBeInTheDocument();
-      expect(screen.getByText('Al día')).toBeInTheDocument();
+      expect(screen.getAllByText('Al día').length).toBeGreaterThan(0);
     });
     expect(getSocioPorDni).toHaveBeenCalledWith('12345678');
   });

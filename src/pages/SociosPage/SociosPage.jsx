@@ -1,12 +1,20 @@
 import { useState } from 'react';
 import { getSocios, getSocioPorDni } from '../../services/sociosService';
 import logo from '../../assets/logo_socio.png';
+import logoVerde from '../../assets/logo-verde.png';
+import logoRojo from '../../assets/logo-rojo.png';
+import logoAmarillo from '../../assets/logo-amarillo.png';
 import './SociosPage.css';
 
-const ESTADO_CLASE = {
-  'Al día': 'al-dia',
-  'Moroso': 'moroso',
+const ESTADO_CONFIG = {
+  'Al día': { logo: logoVerde,    bg: '#e6f4ea', border: '#c3e6cb' },
+  'Moroso': { logo: logoRojo,     bg: '#fdecea', border: '#f5c6cb' },
 };
+const ESTADO_DEFAULT = { logo: logoAmarillo, bg: '#fef9e7', border: '#fde68a' };
+
+function estadoConfig(estado) {
+  return ESTADO_CONFIG[estado] ?? ESTADO_DEFAULT;
+}
 
 function SociosPage() {
   const [dni, setDni] = useState('');
@@ -98,28 +106,35 @@ function SociosPage() {
         <p className="socios-no-encontrado">No se encontró ningún socio con ese DNI.</p>
       )}
 
-      {!loading && modo === 'socio' && resultado && (
-        <div className="socios-card">
-          <div className="socios-card-row">
-            <span className="socios-card-label">N° Socio</span>
-            <span>{resultado.id_socio}</span>
+      {!loading && modo === 'socio' && resultado && (() => {
+        const cfg = estadoConfig(resultado.estado);
+        return (
+          <div
+            className="socios-card"
+            style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}
+          >
+            <img src={cfg.logo} alt="" className="socios-card-logo" />
+            <div className="socios-card-data">
+              <div className="socios-card-row">
+                <span className="socios-card-label">N° Socio</span>
+                <span>{resultado.id_socio}</span>
+              </div>
+              <div className="socios-card-row">
+                <span className="socios-card-label">Nombre</span>
+                <span>{resultado.nombre} {resultado.apellido}</span>
+              </div>
+              <div className="socios-card-row">
+                <span className="socios-card-label">Categoría</span>
+                <span>{resultado.categoria}</span>
+              </div>
+              <div className="socios-card-row">
+                <span className="socios-card-label">Estado</span>
+                <span>{resultado.estado}</span>
+              </div>
+            </div>
           </div>
-          <div className="socios-card-row">
-            <span className="socios-card-label">Nombre</span>
-            <span>{resultado.nombre} {resultado.apellido}</span>
-          </div>
-          <div className="socios-card-row">
-            <span className="socios-card-label">Categoría</span>
-            <span>{resultado.categoria}</span>
-          </div>
-          <div className="socios-card-row">
-            <span className="socios-card-label">Estado</span>
-            <span className={`socios-estado socios-estado-${ESTADO_CLASE[resultado.estado] ?? 'otro'}`}>
-              {resultado.estado}
-            </span>
-          </div>
-        </div>
-      )}
+        );
+      })()}
 
       {!loading && modo === 'lista' && Array.isArray(resultado) && (
         resultado.length === 0 ? (
@@ -135,18 +150,22 @@ function SociosPage() {
               </tr>
             </thead>
             <tbody>
-              {resultado.map((s) => (
-                <tr key={s.id_socio}>
-                  <td>{s.id_socio}</td>
-                  <td>{s.nombre} {s.apellido}</td>
-                  <td>{s.categoria}</td>
-                  <td>
-                    <span className={`socios-estado socios-estado-${ESTADO_CLASE[s.estado] ?? 'otro'}`}>
-                      {s.estado}
-                    </span>
-                  </td>
-                </tr>
-              ))}
+              {resultado.map((s) => {
+                const cfg = estadoConfig(s.estado);
+                return (
+                  <tr key={s.id_socio}>
+                    <td>{s.id_socio}</td>
+                    <td>{s.nombre} {s.apellido}</td>
+                    <td>{s.categoria}</td>
+                    <td>
+                      <span className="socios-estado-cell">
+                        <img src={cfg.logo} alt="" className="socios-estado-logo" />
+                        {s.estado}
+                      </span>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         )

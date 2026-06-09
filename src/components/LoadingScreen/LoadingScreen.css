@@ -14,11 +14,11 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1;   scale: 1; }
-  50%      { opacity: 0.3; scale: 1; }
+  0%, 100% { opacity: 1;   scale: 0.8; }
+  50%      { opacity: 0.3; scale: 0.8; }
 }
 
 @keyframes spin {
-  from { rotate: 0deg; }
-  to   { rotate: 360deg; }
+  from { rotate: 0deg; scale: 0.8}
+  to   { rotate: 360deg; scale: 0.8}
 }
