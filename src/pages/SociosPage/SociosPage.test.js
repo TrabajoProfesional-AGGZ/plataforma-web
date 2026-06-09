@@ -77,6 +77,31 @@ describe('SociosPage', () => {
     });
   });
 
+  test('muestra mensaje de servicio no disponible cuando el backend devuelve 500 en búsqueda', async () => {
+    getSocioPorDni.mockRejectedValueOnce(new Error('servicio-no-disponible'));
+    render(<SociosPage />);
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por dni/i), {
+      target: { value: '12345678' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/el servicio no está disponible/i)).toBeInTheDocument();
+    });
+  });
+
+  test('muestra mensaje de servicio no disponible cuando el backend devuelve 500 en ver todos', async () => {
+    getSocios.mockRejectedValueOnce(new Error('servicio-no-disponible'));
+    render(<SociosPage />);
+
+    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/el servicio no está disponible/i)).toBeInTheDocument();
+    });
+  });
+
   test('muestra la lista de socios al hacer click en Ver todos', async () => {
     getSocios.mockResolvedValueOnce([socioMock]);
     render(<SociosPage />);

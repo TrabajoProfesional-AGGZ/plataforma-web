@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { getSocios, getSocioPorDni } from '../../services/sociosService';
+import logo from '../../assets/logo_socio.png';
 import './SociosPage.css';
 
 const ESTADO_CLASE = {
@@ -27,6 +28,8 @@ function SociosPage() {
       if (err.message === 'no-encontrado') {
         setModo('no-encontrado');
         setResultado(null);
+      } else if (err.message === 'servicio-no-disponible') {
+        setError('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
       } else {
         setError('Error al buscar el socio. Intentá de nuevo.');
       }
@@ -43,8 +46,12 @@ function SociosPage() {
       const socios = await getSocios();
       setResultado(socios);
       setModo('lista');
-    } catch {
-      setError('Error al obtener los socios. Intentá de nuevo.');
+    } catch (err) {
+      if (err.message === 'servicio-no-disponible') {
+        setError('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
+      } else {
+        setError('Error al obtener los socios. Intentá de nuevo.');
+      }
     } finally {
       setLoading(false);
     }
@@ -80,7 +87,11 @@ function SociosPage() {
         </button>
       </div>
 
-      {loading && <p className="socios-loading">Cargando...</p>}
+      {loading && (
+        <div className="socios-search-loading">
+          <img src={logo} alt="" className="loading-logo" />
+        </div>
+      )}
       {error && <p className="socios-error">{error}</p>}
 
       {!loading && modo === 'no-encontrado' && (

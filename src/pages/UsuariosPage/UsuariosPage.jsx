@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { getUsers, updateUserRole, createUser } from '../../services/usuariosService';
+import logo from '../../assets/logo_socio.png';
 import './UsuariosPage.css';
 
 const FORM_INICIAL = { email: '', password: '', role: 'admin' };
@@ -153,7 +154,9 @@ function UsuariosPage() {
       )}
 
       {loading ? (
-        <p className="usuarios-loading">Cargando usuarios...</p>
+        <div className="usuarios-search-loading">
+          <img src={logo} alt="" className="loading-logo" />
+        </div>
       ) : (
         <table className="usuarios-tabla">
           <thead>

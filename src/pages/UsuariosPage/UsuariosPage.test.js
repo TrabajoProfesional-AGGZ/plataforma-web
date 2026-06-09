@@ -15,10 +15,10 @@ describe('UsuariosPage', () => {
     jest.clearAllMocks();
   });
 
-  test('muestra estado de carga al inicio', () => {
+  test('muestra animación de carga al inicio', () => {
     usuariosService.getUsers.mockReturnValue(new Promise(() => {}));
     render(<UsuariosPage />);
-    expect(screen.getByText(/cargando usuarios/i)).toBeInTheDocument();
+    expect(document.querySelector('.loading-logo')).toBeInTheDocument();
   });
 
   test('muestra la tabla de usuarios cuando la carga es exitosa', async () => {

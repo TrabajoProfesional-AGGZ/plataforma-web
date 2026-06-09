@@ -1,17 +1,20 @@
 .socios-page {
   max-width: 900px;
+  margin: 0 auto;
 }
 
 .socios-title {
-  font-size: 24px;
+  font-size: 32px;
   font-weight: 600;
   color: #111111;
-  margin: 0 0 20px 0;
+  margin: 0 0 24px 0;
+  text-align: center;
 }
 
 .socios-toolbar {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 12px;
   margin-bottom: 24px;
 }
@@ -19,12 +22,10 @@
 .socios-search-form {
   display: flex;
   gap: 8px;
-  flex: 1;
 }
 
 .socios-search-input {
-  flex: 1;
-  max-width: 300px;
+  width: 280px;
   padding: 8px 12px;
   border: 1px solid #4a4a4a;
   border-radius: 6px;
@@ -72,19 +73,26 @@
   cursor: not-allowed;
 }
 
-.socios-loading {
-  color: #4a4a4a;
-  font-size: 14px;
+.socios-search-loading {
+  display: flex;
+  justify-content: center;
+  padding: 48px 0;
 }
 
 .socios-error {
   color: #c0392b;
   font-size: 14px;
+  text-align: center;
+  background-color: #fdecea;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 10px 14px;
 }
 
 .socios-no-encontrado {
   color: #4a4a4a;
   font-size: 14px;
+  text-align: center;
 }
 
 /* Card socio individual */
