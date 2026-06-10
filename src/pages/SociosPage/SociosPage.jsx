@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
-import { getSocios, updateSocio, deleteSocio } from '../../services/sociosService';
+import { getSocios, deleteSocio } from '../../services/sociosService';
 import { CreateSocioForm } from '../../components/createForm/CreateSocioForm';
+import { EditSocioForm } from '../../components/editForm/EditSocioForm';
 import logo from '../../assets/logo_socio.png';
 import logoVerde from '../../assets/logo-verde.png';
 import logoRojo from '../../assets/logo-rojo.png';
@@ -25,18 +26,6 @@ function getValorOrden(socio, campo) {
 
 const ICONOS_ORDEN = { asc: ' ↑', desc: ' ↓', none: ' ↕' };
 
-function initFormEditar(socio) {
-  return {
-    nombre: socio.nombre ?? '',
-    apellido: socio.apellido ?? '',
-    fecha_nacimiento: socio.fecha_nacimiento ?? '',
-    nro_documento: socio.nro_documento ?? '',
-    genero: '',
-    email: socio.email ?? '',
-    telefono: socio.telefono ?? '',
-    direccion: '',
-  };
-}
 
 function SociosPage() {
   const [nroSocio, setNroSocio] = useState('');
@@ -52,7 +41,6 @@ function SociosPage() {
   const [crearModalOpen, setCrearModalOpen] = useState(false);
   const [editarModalOpen, setEditarModalOpen] = useState(false);
   const [eliminarModalOpen, setEliminarModalOpen] = useState(false);
-  const [formEditar, setFormEditar] = useState({});
   const [guardando, setGuardando] = useState(false);
   const [errorModal, setErrorModal] = useState('');
 
@@ -147,7 +135,6 @@ function SociosPage() {
   }
 
   function abrirEditar() {
-    setFormEditar(initFormEditar(resultado));
     setErrorModal('');
     setEditarModalOpen(true);
   }
@@ -155,29 +142,6 @@ function SociosPage() {
   function abrirEliminar() {
     setErrorModal('');
     setEliminarModalOpen(true);
-  }
-
-  async function handleEditar(e) {
-    e.preventDefault();
-    setGuardando(true);
-    setErrorModal('');
-    const updates = {};
-    Object.entries(formEditar).forEach(([k, v]) => {
-      if (v !== '') updates[k] = v;
-    });
-    try {
-      const socioActualizado = await updateSocio(resultado.id, updates);
-      setResultado(socioActualizado);
-      setEditarModalOpen(false);
-    } catch (err) {
-      if (err.message === 'servicio-no-disponible') {
-        setErrorModal('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
-      } else {
-        setErrorModal('Error al modificar el socio. Intentá de nuevo.');
-      }
-    } finally {
-      setGuardando(false);
-    }
   }
 
   async function handleEliminar() {
@@ -392,97 +356,12 @@ function SociosPage() {
       )}
 
       {/* Modal editar socio */}
-      {editarModalOpen && (
-        <div className="modal-overlay" onClick={() => setEditarModalOpen(false)}>
-          <div className="modal modal-wide" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Editar socio</h2>
-            <form onSubmit={handleEditar}>
-              <div className="modal-section">
-                <p className="modal-section-title">Datos personales</p>
-                <div className="modal-grid-2">
-                  <div className="modal-field">
-                    <label className="modal-label">Nombre</label>
-                    <input className="modal-input" type="text"
-                      placeholder="ej: Juan"
-                      value={formEditar.nombre}
-                      onChange={(e) => setFormEditar(p => ({ ...p, nombre: e.target.value }))} />
-                  </div>
-                  <div className="modal-field">
-                    <label className="modal-label">Apellido</label>
-                    <input className="modal-input" type="text"
-                      placeholder="ej: Pérez"
-                      value={formEditar.apellido}
-                      onChange={(e) => setFormEditar(p => ({ ...p, apellido: e.target.value }))} />
-                  </div>
-                </div>
-                <div className="modal-grid-2">
-                  <div className="modal-field">
-                    <label className="modal-label">Fecha de nacimiento</label>
-                    <input className="modal-input" type="date"
-                      value={formEditar.fecha_nacimiento}
-                      onChange={(e) => setFormEditar(p => ({ ...p, fecha_nacimiento: e.target.value }))} />
-                  </div>
-                  <div className="modal-field">
-                    <label className="modal-label">Género</label>
-                    <select className="modal-select"
-                      value={formEditar.genero}
-                      onChange={(e) => setFormEditar(p => ({ ...p, genero: e.target.value }))}>
-                      <option value="">— sin cambiar —</option>
-                      <option value="M">M</option>
-                      <option value="F">F</option>
-                      <option value="X">X</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
-              <div className="modal-section">
-                <p className="modal-section-title">Documento</p>
-                <div className="modal-field">
-                  <label className="modal-label">N° de documento</label>
-                  <input className="modal-input" type="text"
-                    placeholder="ej: 12345678"
-                    value={formEditar.nro_documento}
-                    onChange={(e) => setFormEditar(p => ({ ...p, nro_documento: e.target.value }))} />
-                </div>
-              </div>
-              <div className="modal-section">
-                <p className="modal-section-title">Contacto</p>
-                <div className="modal-field">
-                  <label className="modal-label">Email</label>
-                  <input className="modal-input" type="email"
-                    placeholder="ej: juan@example.com"
-                    value={formEditar.email}
-                    onChange={(e) => setFormEditar(p => ({ ...p, email: e.target.value }))} />
-                </div>
-                <div className="modal-grid-2">
-                  <div className="modal-field">
-                    <label className="modal-label">Teléfono</label>
-                    <input className="modal-input" type="text"
-                      placeholder="ej: 11-2222-3333"
-                      value={formEditar.telefono}
-                      onChange={(e) => setFormEditar(p => ({ ...p, telefono: e.target.value }))} />
-                  </div>
-                  <div className="modal-field">
-                    <label className="modal-label">Dirección</label>
-                    <input className="modal-input" type="text"
-                      placeholder="ej: Av. Corrientes 1234"
-                      value={formEditar.direccion}
-                      onChange={(e) => setFormEditar(p => ({ ...p, direccion: e.target.value }))} />
-                  </div>
-                </div>
-              </div>
-              {errorModal && <p className="modal-error" role="alert">{errorModal}</p>}
-              <div className="modal-actions">
-                <button type="button" className="modal-button-cancel" onClick={() => setEditarModalOpen(false)}>
-                  Cancelar
-                </button>
-                <button type="submit" className="modal-button-submit" disabled={guardando}>
-                  {guardando ? 'Guardando...' : 'Guardar'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+      {editarModalOpen && resultado && (
+        <EditSocioForm
+          socio={resultado}
+          onSuccess={(socioActualizado) => { setResultado(socioActualizado); setEditarModalOpen(false); }}
+          onCancel={() => setEditarModalOpen(false)}
+        />
       )}
 
       {/* Modal confirmar eliminación */}
