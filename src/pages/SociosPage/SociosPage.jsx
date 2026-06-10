@@ -51,6 +51,9 @@ function SociosPage() {
   const [error, setError] = useState(null);
   const [orden, setOrden] = useState({ campo: null, dir: 'asc' });
 
+  const [filtroEstado, setFiltroEstado] = useState('');
+  const [filtroAbierto, setFiltroAbierto] = useState(false);
+
   const [crearModalOpen, setCrearModalOpen] = useState(false);
   const [editarModalOpen, setEditarModalOpen] = useState(false);
   const [eliminarModalOpen, setEliminarModalOpen] = useState(false);
@@ -132,6 +135,8 @@ function SociosPage() {
     setError(null);
     setNroSocio('');
     setOrden({ campo: null, dir: 'asc' });
+    setFiltroEstado('');
+    setFiltroAbierto(false);
     try {
       const socios = await getSocios();
       setResultado(socios);
@@ -324,7 +329,40 @@ function SociosPage() {
       {!loading && modo === 'lista' && Array.isArray(resultado) && (
         resultado.length === 0 ? (
           <p className="socios-no-encontrado">No hay socios registrados.</p>
-        ) : (
+        ) : (() => {
+          const estadosUnicos = [...new Set(resultado.map(s => s.estado.nombre))].sort();
+          const listaFiltrada = filtroEstado
+            ? resultado.filter(s => s.estado.nombre === filtroEstado)
+            : resultado;
+          return (
+          <>
+            <div className="socios-filtros">
+              <button
+                className="socios-filtro-toggle"
+                type="button"
+                onClick={() => setFiltroAbierto(p => !p)}
+              >
+                Filtrar por
+              </button>
+              {filtroAbierto && (
+                <div className="socios-filtro-estado-wrapper">
+                  <select
+                    id="filtro-estado"
+                    className="socios-filtro-select"
+                    value={filtroEstado}
+                    onChange={(e) => setFiltroEstado(e.target.value)}
+                  >
+                    <option value="">Todos</option>
+                    {estadosUnicos.map(e => (
+                      <option key={e} value={e}>{e}</option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
+            {listaFiltrada.length === 0 ? (
+              <p className="socios-no-encontrado">No hay socios con ese estado.</p>
+            ) : (
           <table className="socios-table">
             <thead>
               <tr>
@@ -346,7 +384,7 @@ function SociosPage() {
               </tr>
             </thead>
             <tbody>
-              {aplicarOrden(resultado).map((s) => {
+              {aplicarOrden(listaFiltrada).map((s) => {
                 const cfg = estadoConfig(s.estado.nombre);
                 return (
                   <tr
@@ -372,7 +410,10 @@ function SociosPage() {
               })}
             </tbody>
           </table>
-        )
+            )}
+          </>
+          );
+        })()
       )}
 
       {/* Modal crear socio */}
