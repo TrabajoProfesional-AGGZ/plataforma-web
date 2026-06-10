@@ -100,6 +100,7 @@ export function CreateSocioForm({ onSuccess, onCancel }) {
   const [direction, setDirection] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
+  const [navGuard, setNavGuard] = useState(false);
 
   const {
     register,
@@ -111,8 +112,10 @@ export function CreateSocioForm({ onSuccess, onCancel }) {
   const goNext = async () => {
     const valid = await trigger(stepFields[step]);
     if (!valid) return;
+    setNavGuard(true);
     setDirection(1);
     setStep((s) => s + 1);
+    setTimeout(() => setNavGuard(false), 300);
   };
 
   const goBack = () => {
@@ -171,14 +174,14 @@ export function CreateSocioForm({ onSuccess, onCancel }) {
               transition={{ type: 'spring', stiffness: 180 }}
               className="csf-outer-card csf-success"
             >
-              <motion.img
-                src={logoVerde}
-                alt="SocioUnido"
-                className="csf-success-logo"
+              <motion.div
+                className="csf-success-logo-circle"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 transition={{ type: 'spring', stiffness: 220, delay: 0.1 }}
-              />
+              >
+                <img src={logoVerde} alt="SocioUnido" className="csf-success-logo" />
+              </motion.div>
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
@@ -265,7 +268,10 @@ export function CreateSocioForm({ onSuccess, onCancel }) {
 
               {/* Card */}
               <div className="csf-card">
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form
+                  onSubmit={handleSubmit(onSubmit)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' && step < STEPS.length) e.preventDefault(); }}
+                >
                   <AnimatePresence mode="wait" custom={direction}>
 
                     {step === 1 && (
@@ -455,7 +461,7 @@ export function CreateSocioForm({ onSuccess, onCancel }) {
                     ) : (
                       <motion.button
                         type="submit"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || navGuard}
                         whileHover={{ scale: 1.015 }}
                         whileTap={{ scale: 0.985 }}
                         className="csf-btn-submit"

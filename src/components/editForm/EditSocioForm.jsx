@@ -100,6 +100,7 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
   const [direction, setDirection] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
+  const [navGuard, setNavGuard] = useState(false);
 
   const {
     register,
@@ -123,8 +124,10 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
   const goNext = async () => {
     const valid = await trigger(stepFields[step]);
     if (!valid) return;
+    setNavGuard(true);
     setDirection(1);
     setStep((s) => s + 1);
+    setTimeout(() => setNavGuard(false), 300);
   };
 
   const goBack = () => {
@@ -452,7 +455,7 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
                     ) : (
                       <motion.button
                         type="submit"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || navGuard}
                         whileHover={{ scale: 1.015 }}
                         whileTap={{ scale: 0.985 }}
                         className="csf-btn-submit"
