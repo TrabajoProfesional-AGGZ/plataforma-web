@@ -53,6 +53,37 @@
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
 }
 
+.modal-wide {
+  max-width: 580px;
+}
+
+.modal-section {
+  padding-top: 16px;
+  margin-top: 4px;
+  border-top: 1px solid #f0f0f0;
+}
+
+.modal-section:first-of-type {
+  padding-top: 0;
+  margin-top: 0;
+  border-top: none;
+}
+
+.modal-section-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #4a4a4a;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  margin: 0 0 12px 0;
+}
+
+.modal-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
 .modal-title {
   font-size: 25px;
   font-weight: 600;

@@ -3,11 +3,20 @@ import SociosPage from './SociosPage';
 
 jest.mock('../../services/sociosService', () => ({
   getSocios: jest.fn(),
-  createSocio: jest.fn(),
   updateSocio: jest.fn(),
   deleteSocio: jest.fn(),
 }));
-import { getSocios, createSocio, updateSocio, deleteSocio } from '../../services/sociosService';
+import { getSocios, updateSocio, deleteSocio } from '../../services/sociosService';
+
+jest.mock('../../components/createForm/CreateSocioForm', () => ({
+  CreateSocioForm: ({ onSuccess, onCancel }) => (
+    <div>
+      <h1>Nuevo socio</h1>
+      <button onClick={onSuccess}>Confirmar creación</button>
+      <button onClick={onCancel}>Cancelar</button>
+    </div>
+  ),
+}));
 
 const socioMock = {
   id: 'a1b2c3d4-0000-0000-0000-000000000001',
@@ -200,61 +209,41 @@ describe('SociosPage', () => {
 
   // --- Modal crear ---
 
-  test('abre y cierra el modal de crear socio con el botón cancelar', async () => {
+  test('abre y cierra el formulario de creación con el botón cancelar', async () => {
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('button', { name: /crear socio/i })).not.toBeDisabled());
 
     fireEvent.click(screen.getByRole('button', { name: /crear socio/i }));
-    expect(screen.getByRole('heading', { name: /crear socio/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /nuevo socio/i })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /cancelar/i }));
-    expect(screen.queryByRole('heading', { name: /crear socio/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /nuevo socio/i })).not.toBeInTheDocument();
   });
 
-  test('cierra el modal de crear socio con la tecla ESC', async () => {
+  test('cierra el formulario de creación con la tecla ESC', async () => {
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('button', { name: /crear socio/i })).not.toBeDisabled());
 
     fireEvent.click(screen.getByRole('button', { name: /crear socio/i }));
-    expect(screen.getByRole('heading', { name: /crear socio/i })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /nuevo socio/i })).toBeInTheDocument();
 
     fireEvent.keyDown(document, { key: 'Escape' });
-    expect(screen.queryByRole('heading', { name: /crear socio/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: /nuevo socio/i })).not.toBeInTheDocument();
   });
 
-  test('crear socio exitoso cierra el modal y recarga la lista', async () => {
-    createSocio.mockResolvedValueOnce(socioMock);
+  test('crear socio exitoso cierra el formulario y recarga la lista', async () => {
     getSocios.mockResolvedValue([socioMock]);
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('button', { name: /crear socio/i })).not.toBeDisabled());
 
     fireEvent.click(screen.getByRole('button', { name: /crear socio/i }));
-    const modal = screen.getByRole('heading', { name: /crear socio/i }).closest('.modal');
+    expect(screen.getByRole('heading', { name: /nuevo socio/i })).toBeInTheDocument();
 
-    fireEvent.change(within(modal).getByLabelText(/^nombre$/i), { target: { value: 'Juan' } });
-    fireEvent.change(within(modal).getByLabelText(/^apellido$/i), { target: { value: 'Pérez' } });
-    fireEvent.change(within(modal).getByLabelText(/fecha de nacimiento/i), { target: { value: '1990-01-01' } });
-    fireEvent.change(within(modal).getByLabelText(/n° de documento/i), { target: { value: '12345678' } });
-    fireEvent.change(within(modal).getByLabelText(/email/i), { target: { value: 'juan@example.com' } });
-
-    fireEvent.click(within(modal).getByRole('button', { name: /^crear$/i }));
+    fireEvent.click(screen.getByRole('button', { name: /confirmar creación/i }));
 
     await waitFor(() => {
-      expect(createSocio).toHaveBeenCalled();
-      expect(screen.queryByRole('heading', { name: /crear socio/i })).not.toBeInTheDocument();
-    });
-  });
-
-  test('muestra error en modal al fallar la creación de un socio', async () => {
-    createSocio.mockRejectedValueOnce(new Error('Error al crear socio'));
-    render(<SociosPage />);
-    await waitFor(() => expect(screen.getByRole('button', { name: /crear socio/i })).not.toBeDisabled());
-
-    fireEvent.click(screen.getByRole('button', { name: /crear socio/i }));
-    fireEvent.click(screen.getByRole('button', { name: /^crear$/i }));
-
-    await waitFor(() => {
-      expect(screen.getByRole('alert')).toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: /nuevo socio/i })).not.toBeInTheDocument();
+      expect(getSocios).toHaveBeenCalledTimes(2);
     });
   });
 

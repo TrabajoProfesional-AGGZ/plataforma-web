@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getSocios, createSocio, updateSocio, deleteSocio } from '../../services/sociosService';
+import { getSocios, updateSocio, deleteSocio } from '../../services/sociosService';
+import { CreateSocioForm } from '../../components/createForm/CreateSocioForm';
 import logo from '../../assets/logo_socio.png';
 import logoVerde from '../../assets/logo-verde.png';
 import logoRojo from '../../assets/logo-rojo.png';
@@ -23,12 +24,6 @@ function getValorOrden(socio, campo) {
 }
 
 const ICONOS_ORDEN = { asc: ' ↑', desc: ' ↓', none: ' ↕' };
-
-const FORM_CREAR_INICIAL = {
-  nombre: '', apellido: '', fecha_nacimiento: '',
-  tipo_doc: 'DNI', nro_documento: '', genero: 'M',
-  email: '', telefono: '', direccion: '',
-};
 
 function initFormEditar(socio) {
   return {
@@ -57,7 +52,6 @@ function SociosPage() {
   const [crearModalOpen, setCrearModalOpen] = useState(false);
   const [editarModalOpen, setEditarModalOpen] = useState(false);
   const [eliminarModalOpen, setEliminarModalOpen] = useState(false);
-  const [formCrear, setFormCrear] = useState(FORM_CREAR_INICIAL);
   const [formEditar, setFormEditar] = useState({});
   const [guardando, setGuardando] = useState(false);
   const [errorModal, setErrorModal] = useState('');
@@ -152,12 +146,6 @@ function SociosPage() {
     }
   }
 
-  function abrirCrear() {
-    setFormCrear(FORM_CREAR_INICIAL);
-    setErrorModal('');
-    setCrearModalOpen(true);
-  }
-
   function abrirEditar() {
     setFormEditar(initFormEditar(resultado));
     setErrorModal('');
@@ -167,27 +155,6 @@ function SociosPage() {
   function abrirEliminar() {
     setErrorModal('');
     setEliminarModalOpen(true);
-  }
-
-  async function handleCrear(e) {
-    e.preventDefault();
-    setGuardando(true);
-    setErrorModal('');
-    try {
-      await createSocio(formCrear);
-      setCrearModalOpen(false);
-      handleVerTodos();
-    } catch (err) {
-      if (err.message === 'servicio-no-disponible') {
-        setErrorModal('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
-      } else if (err.message === 'socio-duplicado') {
-        setErrorModal('Ya existe un socio con ese documento o email.');
-      } else {
-        setErrorModal('Error al crear el socio. Verificá los datos e intentá de nuevo.');
-      }
-    } finally {
-      setGuardando(false);
-    }
   }
 
   async function handleEditar(e) {
@@ -255,7 +222,7 @@ function SociosPage() {
         <button className="socios-ver-todos-button" onClick={handleVerTodos} disabled={loading}>
           Ver todos
         </button>
-        <button className="socios-crear-button" onClick={abrirCrear} disabled={loading}>
+        <button className="socios-crear-button" onClick={() => setCrearModalOpen(true)} disabled={loading}>
           Crear socio
         </button>
       </div>
@@ -418,144 +385,91 @@ function SociosPage() {
 
       {/* Modal crear socio */}
       {crearModalOpen && (
-        <div className="modal-overlay" onClick={() => setCrearModalOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Crear socio</h2>
-            <form onSubmit={handleCrear}>
-              <div className="modal-field">
-                <label className="modal-label" htmlFor="crear-nombre">Nombre</label>
-                <input id="crear-nombre" className="modal-input" type="text" required
-                  value={formCrear.nombre}
-                  onChange={(e) => setFormCrear(p => ({ ...p, nombre: e.target.value }))} />
-              </div>
-              <div className="modal-field">
-                <label className="modal-label" htmlFor="crear-apellido">Apellido</label>
-                <input id="crear-apellido" className="modal-input" type="text" required
-                  value={formCrear.apellido}
-                  onChange={(e) => setFormCrear(p => ({ ...p, apellido: e.target.value }))} />
-              </div>
-              <div className="modal-field">
-                <label className="modal-label" htmlFor="crear-fecha">Fecha de nacimiento</label>
-                <input id="crear-fecha" className="modal-input" type="date" required
-                  value={formCrear.fecha_nacimiento}
-                  onChange={(e) => setFormCrear(p => ({ ...p, fecha_nacimiento: e.target.value }))} />
-              </div>
-              <div className="modal-field">
-                <label className="modal-label" htmlFor="crear-tipo-doc">Tipo de documento</label>
-                <select id="crear-tipo-doc" className="modal-select" required
-                  value={formCrear.tipo_doc}
-                  onChange={(e) => setFormCrear(p => ({ ...p, tipo_doc: e.target.value }))}>
-                  <option value="DNI">DNI</option>
-                  <option value="PAS">PAS</option>
-                  <option value="LE">LE</option>
-                </select>
-              </div>
-              <div className="modal-field">
-                <label className="modal-label" htmlFor="crear-nro-doc">N° de documento</label>
-                <input id="crear-nro-doc" className="modal-input" type="text" required
-                  value={formCrear.nro_documento}
-                  onChange={(e) => setFormCrear(p => ({ ...p, nro_documento: e.target.value }))} />
-              </div>
-              <div className="modal-field">
-                <label className="modal-label" htmlFor="crear-genero">Género</label>
-                <select id="crear-genero" className="modal-select" required
-                  value={formCrear.genero}
-                  onChange={(e) => setFormCrear(p => ({ ...p, genero: e.target.value }))}>
-                  <option value="M">M</option>
-                  <option value="F">F</option>
-                  <option value="X">X</option>
-                </select>
-              </div>
-              <div className="modal-field">
-                <label className="modal-label" htmlFor="crear-email">Email</label>
-                <input id="crear-email" className="modal-input" type="email" required
-                  value={formCrear.email}
-                  onChange={(e) => setFormCrear(p => ({ ...p, email: e.target.value }))} />
-              </div>
-              <div className="modal-field">
-                <label className="modal-label" htmlFor="crear-telefono">Teléfono</label>
-                <input id="crear-telefono" className="modal-input" type="text"
-                  value={formCrear.telefono}
-                  onChange={(e) => setFormCrear(p => ({ ...p, telefono: e.target.value }))} />
-              </div>
-              <div className="modal-field">
-                <label className="modal-label" htmlFor="crear-direccion">Dirección</label>
-                <input id="crear-direccion" className="modal-input" type="text"
-                  value={formCrear.direccion}
-                  onChange={(e) => setFormCrear(p => ({ ...p, direccion: e.target.value }))} />
-              </div>
-              {errorModal && <p className="modal-error" role="alert">{errorModal}</p>}
-              <div className="modal-actions">
-                <button type="button" className="modal-button-cancel" onClick={() => setCrearModalOpen(false)}>
-                  Cancelar
-                </button>
-                <button type="submit" className="modal-button-submit" disabled={guardando}>
-                  {guardando ? 'Creando...' : 'Crear'}
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <CreateSocioForm
+          onSuccess={() => { setCrearModalOpen(false); handleVerTodos(); }}
+          onCancel={() => setCrearModalOpen(false)}
+        />
       )}
 
       {/* Modal editar socio */}
       {editarModalOpen && (
         <div className="modal-overlay" onClick={() => setEditarModalOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
+          <div className="modal modal-wide" onClick={(e) => e.stopPropagation()}>
             <h2 className="modal-title">Editar socio</h2>
             <form onSubmit={handleEditar}>
-              <div className="modal-field">
-                <label className="modal-label">Nombre</label>
-                <input className="modal-input" type="text"
-                  value={formEditar.nombre}
-                  onChange={(e) => setFormEditar(p => ({ ...p, nombre: e.target.value }))} />
+              <div className="modal-section">
+                <p className="modal-section-title">Datos personales</p>
+                <div className="modal-grid-2">
+                  <div className="modal-field">
+                    <label className="modal-label">Nombre</label>
+                    <input className="modal-input" type="text"
+                      placeholder="ej: Juan"
+                      value={formEditar.nombre}
+                      onChange={(e) => setFormEditar(p => ({ ...p, nombre: e.target.value }))} />
+                  </div>
+                  <div className="modal-field">
+                    <label className="modal-label">Apellido</label>
+                    <input className="modal-input" type="text"
+                      placeholder="ej: Pérez"
+                      value={formEditar.apellido}
+                      onChange={(e) => setFormEditar(p => ({ ...p, apellido: e.target.value }))} />
+                  </div>
+                </div>
+                <div className="modal-grid-2">
+                  <div className="modal-field">
+                    <label className="modal-label">Fecha de nacimiento</label>
+                    <input className="modal-input" type="date"
+                      value={formEditar.fecha_nacimiento}
+                      onChange={(e) => setFormEditar(p => ({ ...p, fecha_nacimiento: e.target.value }))} />
+                  </div>
+                  <div className="modal-field">
+                    <label className="modal-label">Género</label>
+                    <select className="modal-select"
+                      value={formEditar.genero}
+                      onChange={(e) => setFormEditar(p => ({ ...p, genero: e.target.value }))}>
+                      <option value="">— sin cambiar —</option>
+                      <option value="M">M</option>
+                      <option value="F">F</option>
+                      <option value="X">X</option>
+                    </select>
+                  </div>
+                </div>
               </div>
-              <div className="modal-field">
-                <label className="modal-label">Apellido</label>
-                <input className="modal-input" type="text"
-                  value={formEditar.apellido}
-                  onChange={(e) => setFormEditar(p => ({ ...p, apellido: e.target.value }))} />
+              <div className="modal-section">
+                <p className="modal-section-title">Documento</p>
+                <div className="modal-field">
+                  <label className="modal-label">N° de documento</label>
+                  <input className="modal-input" type="text"
+                    placeholder="ej: 12345678"
+                    value={formEditar.nro_documento}
+                    onChange={(e) => setFormEditar(p => ({ ...p, nro_documento: e.target.value }))} />
+                </div>
               </div>
-              <div className="modal-field">
-                <label className="modal-label">Fecha de nacimiento</label>
-                <input className="modal-input" type="date"
-                  value={formEditar.fecha_nacimiento}
-                  onChange={(e) => setFormEditar(p => ({ ...p, fecha_nacimiento: e.target.value }))} />
-              </div>
-              <div className="modal-field">
-                <label className="modal-label">N° de documento</label>
-                <input className="modal-input" type="text"
-                  value={formEditar.nro_documento}
-                  onChange={(e) => setFormEditar(p => ({ ...p, nro_documento: e.target.value }))} />
-              </div>
-              <div className="modal-field">
-                <label className="modal-label">Género</label>
-                <select className="modal-select"
-                  value={formEditar.genero}
-                  onChange={(e) => setFormEditar(p => ({ ...p, genero: e.target.value }))}>
-                  <option value="">— sin cambiar —</option>
-                  <option value="M">M</option>
-                  <option value="F">F</option>
-                  <option value="X">X</option>
-                </select>
-              </div>
-              <div className="modal-field">
-                <label className="modal-label">Email</label>
-                <input className="modal-input" type="email"
-                  value={formEditar.email}
-                  onChange={(e) => setFormEditar(p => ({ ...p, email: e.target.value }))} />
-              </div>
-              <div className="modal-field">
-                <label className="modal-label">Teléfono</label>
-                <input className="modal-input" type="text"
-                  value={formEditar.telefono}
-                  onChange={(e) => setFormEditar(p => ({ ...p, telefono: e.target.value }))} />
-              </div>
-              <div className="modal-field">
-                <label className="modal-label">Dirección</label>
-                <input className="modal-input" type="text"
-                  value={formEditar.direccion}
-                  onChange={(e) => setFormEditar(p => ({ ...p, direccion: e.target.value }))} />
+              <div className="modal-section">
+                <p className="modal-section-title">Contacto</p>
+                <div className="modal-field">
+                  <label className="modal-label">Email</label>
+                  <input className="modal-input" type="email"
+                    placeholder="ej: juan@example.com"
+                    value={formEditar.email}
+                    onChange={(e) => setFormEditar(p => ({ ...p, email: e.target.value }))} />
+                </div>
+                <div className="modal-grid-2">
+                  <div className="modal-field">
+                    <label className="modal-label">Teléfono</label>
+                    <input className="modal-input" type="text"
+                      placeholder="ej: 11-2222-3333"
+                      value={formEditar.telefono}
+                      onChange={(e) => setFormEditar(p => ({ ...p, telefono: e.target.value }))} />
+                  </div>
+                  <div className="modal-field">
+                    <label className="modal-label">Dirección</label>
+                    <input className="modal-input" type="text"
+                      placeholder="ej: Av. Corrientes 1234"
+                      value={formEditar.direccion}
+                      onChange={(e) => setFormEditar(p => ({ ...p, direccion: e.target.value }))} />
+                  </div>
+                </div>
               </div>
               {errorModal && <p className="modal-error" role="alert">{errorModal}</p>}
               <div className="modal-actions">

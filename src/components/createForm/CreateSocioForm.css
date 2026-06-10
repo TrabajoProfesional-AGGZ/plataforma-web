@@ -1,0 +1,318 @@
+.csf-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 200;
+  padding: 24px 16px;
+}
+
+.csf-wrapper {
+  width: 100%;
+  max-width: 520px;
+}
+
+.csf-outer-card {
+  background-color: #f0f0f0;
+  border-radius: 20px;
+  padding: 28px 28px 24px;
+}
+
+/* Header */
+.csf-header {
+  margin-bottom: 24px;
+}
+
+.csf-header h1 {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 700;
+  color: #111111;
+  text-align: center;
+}
+
+.csf-header p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: #4a4a4a;
+  text-align: center;
+}
+
+/* Step indicators */
+.csf-steps {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.csf-step-item {
+  display: flex;
+  align-items: center;
+  flex: 1;
+}
+
+.csf-step-item:last-child {
+  flex: none;
+}
+
+.csf-step-meta {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.csf-step-bubble {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.csf-step-label {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: #4a4a4a;
+}
+
+.csf-step-label--active {
+  color: #111111;
+  font-weight: 600;
+}
+
+.csf-connector {
+  flex: 1;
+  height: 1px;
+  margin: 0 8px 20px;
+  border-radius: 999px;
+  overflow: hidden;
+  background-color: #e0e0e0;
+}
+
+.csf-connector-fill {
+  height: 100%;
+  border-radius: 999px;
+  background-color: #111111;
+}
+
+/* Progress bar */
+.csf-progress {
+  height: 4px;
+  border-radius: 999px;
+  overflow: hidden;
+  background-color: #e0e0e0;
+  margin-bottom: 28px;
+}
+
+.csf-progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background-color: #111111;
+}
+
+/* Card */
+.csf-card {
+  background-color: #ffffff;
+  border-radius: 16px;
+  padding: 32px;
+  box-shadow: 0 4px 40px rgba(0, 0, 0, 0.07);
+  overflow: hidden;
+}
+
+/* Fields */
+.csf-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.csf-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.csf-field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.csf-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #4a4a4a;
+}
+
+.csf-input,
+.csf-select {
+  width: 100%;
+  border-radius: 12px;
+  padding: 12px 16px;
+  outline: none;
+  font-size: 14px;
+  font-family: inherit;
+  color: #111111;
+  border: 2px solid transparent;
+  background-color: #f5f5f5;
+  transition: background-color 0.2s, border-color 0.2s;
+  box-sizing: border-box;
+}
+
+.csf-input:focus,
+.csf-select:focus {
+  background-color: #ffffff;
+  border-color: #111111;
+}
+
+.csf-input--error,
+.csf-select--error {
+  border-color: #c0392b;
+  background-color: #ffffff;
+}
+
+.csf-input::placeholder {
+  color: #c0c0c0;
+}
+
+.csf-select {
+  cursor: pointer;
+  appearance: none;
+}
+
+.csf-error {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  color: #c0392b;
+  overflow: hidden;
+}
+
+.csf-hint {
+  background-color: #f5f5f5;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  color: #4a4a4a;
+}
+
+/* Error global en el formulario */
+.csf-form-error {
+  background-color: #fdecea;
+  border: 1px solid #f5c6cb;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #c0392b;
+  text-align: center;
+}
+
+/* Navigation */
+.csf-nav {
+  display: flex;
+  margin-top: 32px;
+  gap: 12px;
+}
+
+.csf-nav--end {
+  justify-content: flex-end;
+}
+
+.csf-nav--between {
+  justify-content: space-between;
+}
+
+.csf-btn-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: 2px solid #e0e0e0;
+  background: transparent;
+  color: #4a4a4a;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.csf-btn-back:hover {
+  border-color: #4a4a4a;
+  color: #111111;
+}
+
+.csf-btn-next,
+.csf-btn-submit {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 12px;
+  border: none;
+  background-color: #111111;
+  color: #ffffff;
+  font-size: 14px;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.csf-btn-next:hover,
+.csf-btn-submit:hover:not(:disabled) {
+  background-color: #4a4a4a;
+}
+
+.csf-btn-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Spinner */
+.csf-spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid #ffffff;
+  border-top-color: transparent;
+  border-radius: 50%;
+  display: block;
+}
+
+/* Success */
+.csf-success {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  text-align: center;
+  max-width: 320px;
+  margin: 0 auto;
+}
+
+.csf-success-logo {
+  width: 90px;
+  height: auto;
+}
+
+.csf-success h2 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #111111;
+}
+
+.csf-success p {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: #4a4a4a;
+}
