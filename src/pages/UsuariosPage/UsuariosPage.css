@@ -146,6 +146,34 @@
   cursor: not-allowed;
 }
 
+.modal-button-danger {
+  background-color: #c0392b;
+  color: #ffffff;
+  border: none;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 500;
+  padding: 7px 16px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.modal-button-danger:hover:not(:disabled) {
+  background-color: #96281b;
+}
+
+.modal-button-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modal-confirmar-texto {
+  font-size: 15px;
+  color: #111111;
+  text-align: center;
+  margin: 0 0 24px 0;
+}
+
 .usuarios-error {
   color: #c0392b;
   font-size: 13px;

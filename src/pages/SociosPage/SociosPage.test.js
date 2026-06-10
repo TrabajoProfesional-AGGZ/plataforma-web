@@ -1,10 +1,13 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import SociosPage from './SociosPage';
 
 jest.mock('../../services/sociosService', () => ({
   getSocios: jest.fn(),
+  createSocio: jest.fn(),
+  updateSocio: jest.fn(),
+  deleteSocio: jest.fn(),
 }));
-import { getSocios } from '../../services/sociosService';
+import { getSocios, createSocio, updateSocio, deleteSocio } from '../../services/sociosService';
 
 const socioMock = {
   id: 'a1b2c3d4-0000-0000-0000-000000000001',
@@ -22,24 +25,36 @@ const socioMock = {
 describe('SociosPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    getSocios.mockResolvedValue([]);
   });
 
-  test('renderiza el título, el campo de búsqueda y los botones', () => {
+  test('renderiza el título, el campo de búsqueda y los botones', async () => {
     render(<SociosPage />);
     expect(screen.getByRole('heading', { name: /socios/i })).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/buscar por n° de socio/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /buscar/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /ver todos/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /crear socio/i })).toBeInTheDocument();
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
   });
 
-  test('el botón buscar está deshabilitado si el campo está vacío', () => {
+  test('el botón buscar está deshabilitado si el campo está vacío', async () => {
     render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
     expect(screen.getByRole('button', { name: /buscar/i })).toBeDisabled();
   });
 
-  test('muestra la card del socio al encontrarlo por N° de socio', async () => {
-    getSocios.mockResolvedValueOnce([socioMock]);
+  test('despliega el listado de socios al montar la página', async () => {
+    getSocios.mockResolvedValue([socioMock]);
     render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(screen.getAllByText('Pérez').length).toBeGreaterThan(0);
+  });
+
+  test('muestra la card del socio al encontrarlo por N° de socio', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
 
     fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
       target: { value: '1001' },
@@ -48,19 +63,34 @@ describe('SociosPage', () => {
 
     await waitFor(() => {
       expect(screen.getByText(/Pérez/)).toBeInTheDocument();
-      expect(screen.getByText(/Juan/)).toBeInTheDocument();
       expect(screen.getByText('12345678')).toBeInTheDocument();
       expect(screen.getByText('1990-01-01')).toBeInTheDocument();
       expect(screen.getByText('juan@example.com')).toBeInTheDocument();
       expect(screen.getByText('11-2222-3333')).toBeInTheDocument();
       expect(screen.getAllByText('Al día').length).toBeGreaterThan(0);
     });
-    expect(getSocios).toHaveBeenCalled();
+  });
+
+  test('muestra botones de editar y eliminar en la card del socio', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+      target: { value: '1001' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument();
+    });
   });
 
   test('muestra mensaje de no encontrado cuando el N° de socio no existe en la lista', async () => {
-    getSocios.mockResolvedValueOnce([socioMock]);
+    getSocios.mockResolvedValue([socioMock]);
     render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
 
     fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
       target: { value: '9999' },
@@ -73,8 +103,11 @@ describe('SociosPage', () => {
   });
 
   test('muestra mensaje de error ante un fallo inesperado en la búsqueda', async () => {
-    getSocios.mockRejectedValueOnce(new Error('Error al obtener socios'));
+    getSocios
+      .mockResolvedValueOnce([])
+      .mockRejectedValueOnce(new Error('Error al obtener socios'));
     render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
 
     fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
       target: { value: '1001' },
@@ -87,8 +120,11 @@ describe('SociosPage', () => {
   });
 
   test('muestra mensaje de servicio no disponible cuando el backend devuelve 500 en búsqueda', async () => {
-    getSocios.mockRejectedValueOnce(new Error('servicio-no-disponible'));
+    getSocios
+      .mockResolvedValueOnce([])
+      .mockRejectedValueOnce(new Error('servicio-no-disponible'));
     render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
 
     fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
       target: { value: '1001' },
@@ -101,8 +137,11 @@ describe('SociosPage', () => {
   });
 
   test('muestra mensaje de servicio no disponible cuando el backend devuelve 500 en ver todos', async () => {
-    getSocios.mockRejectedValueOnce(new Error('servicio-no-disponible'));
+    getSocios
+      .mockResolvedValueOnce([])
+      .mockRejectedValueOnce(new Error('servicio-no-disponible'));
     render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('button', { name: /ver todos/i })).not.toBeDisabled());
 
     fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
 
@@ -112,24 +151,33 @@ describe('SociosPage', () => {
   });
 
   test('muestra la lista de socios al hacer click en Ver todos', async () => {
-    getSocios.mockResolvedValueOnce([socioMock]);
+    getSocios.mockResolvedValue([socioMock]);
     render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
 
     fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
 
     await waitFor(() => {
       expect(screen.getAllByText('Pérez').length).toBeGreaterThan(0);
-      expect(screen.getAllByText('Juan').length).toBeGreaterThan(0);
       expect(screen.getByRole('table')).toBeInTheDocument();
     });
-    expect(getSocios).toHaveBeenCalled();
+  });
+
+  test('al hacer click en una fila de la tabla muestra la card del socio', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('1001'));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument();
+      expect(screen.getByText('juan@example.com')).toBeInTheDocument();
+    });
   });
 
   test('muestra mensaje cuando no hay socios registrados', async () => {
-    getSocios.mockResolvedValueOnce([]);
     render(<SociosPage />);
-
-    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/no hay socios registrados/i)).toBeInTheDocument();
@@ -137,13 +185,184 @@ describe('SociosPage', () => {
   });
 
   test('muestra mensaje de error si falla la carga de todos los socios', async () => {
-    getSocios.mockRejectedValueOnce(new Error('Error al obtener socios'));
+    getSocios
+      .mockResolvedValueOnce([])
+      .mockRejectedValueOnce(new Error('Error al obtener socios'));
     render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('button', { name: /ver todos/i })).not.toBeDisabled());
 
     fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/error al obtener los socios/i)).toBeInTheDocument();
+    });
+  });
+
+  // --- Modal crear ---
+
+  test('abre y cierra el modal de crear socio con el botón cancelar', async () => {
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('button', { name: /crear socio/i })).not.toBeDisabled());
+
+    fireEvent.click(screen.getByRole('button', { name: /crear socio/i }));
+    expect(screen.getByRole('heading', { name: /crear socio/i })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /cancelar/i }));
+    expect(screen.queryByRole('heading', { name: /crear socio/i })).not.toBeInTheDocument();
+  });
+
+  test('cierra el modal de crear socio con la tecla ESC', async () => {
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('button', { name: /crear socio/i })).not.toBeDisabled());
+
+    fireEvent.click(screen.getByRole('button', { name: /crear socio/i }));
+    expect(screen.getByRole('heading', { name: /crear socio/i })).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByRole('heading', { name: /crear socio/i })).not.toBeInTheDocument();
+  });
+
+  test('crear socio exitoso cierra el modal y recarga la lista', async () => {
+    createSocio.mockResolvedValueOnce(socioMock);
+    getSocios.mockResolvedValue([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('button', { name: /crear socio/i })).not.toBeDisabled());
+
+    fireEvent.click(screen.getByRole('button', { name: /crear socio/i }));
+    const modal = screen.getByRole('heading', { name: /crear socio/i }).closest('.modal');
+
+    fireEvent.change(within(modal).getByLabelText(/^nombre$/i), { target: { value: 'Juan' } });
+    fireEvent.change(within(modal).getByLabelText(/^apellido$/i), { target: { value: 'Pérez' } });
+    fireEvent.change(within(modal).getByLabelText(/fecha de nacimiento/i), { target: { value: '1990-01-01' } });
+    fireEvent.change(within(modal).getByLabelText(/n° de documento/i), { target: { value: '12345678' } });
+    fireEvent.change(within(modal).getByLabelText(/email/i), { target: { value: 'juan@example.com' } });
+
+    fireEvent.click(within(modal).getByRole('button', { name: /^crear$/i }));
+
+    await waitFor(() => {
+      expect(createSocio).toHaveBeenCalled();
+      expect(screen.queryByRole('heading', { name: /crear socio/i })).not.toBeInTheDocument();
+    });
+  });
+
+  test('muestra error en modal al fallar la creación de un socio', async () => {
+    createSocio.mockRejectedValueOnce(new Error('Error al crear socio'));
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('button', { name: /crear socio/i })).not.toBeDisabled());
+
+    fireEvent.click(screen.getByRole('button', { name: /crear socio/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^crear$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+  });
+
+  // --- Modal editar ---
+
+  test('abre el modal de editar con los campos pre-rellenados', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+      target: { value: '1001' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /editar/i }));
+
+    expect(screen.getByRole('heading', { name: /editar socio/i })).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Juan')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Pérez')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('juan@example.com')).toBeInTheDocument();
+  });
+
+  test('editar socio exitoso actualiza la card y cierra el modal', async () => {
+    const socioActualizado = { ...socioMock, nombre: 'Carlos' };
+    getSocios.mockResolvedValue([socioMock]);
+    updateSocio.mockResolvedValueOnce(socioActualizado);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+      target: { value: '1001' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /editar/i }));
+    const modal = screen.getByRole('heading', { name: /editar socio/i }).closest('.modal');
+    fireEvent.click(within(modal).getByRole('button', { name: /guardar/i }));
+
+    await waitFor(() => {
+      expect(updateSocio).toHaveBeenCalledWith(socioMock.id, expect.any(Object));
+      expect(screen.queryByRole('heading', { name: /editar socio/i })).not.toBeInTheDocument();
+      expect(screen.getByText(/Carlos/)).toBeInTheDocument();
+    });
+  });
+
+  // --- Modal eliminar ---
+
+  test('abre el modal de confirmación de eliminación', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+      target: { value: '1001' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
+
+    expect(screen.getByRole('heading', { name: /eliminar socio/i })).toBeInTheDocument();
+    expect(screen.getByText(/eliminar al socio N°/i)).toBeInTheDocument();
+  });
+
+  test('eliminar socio exitoso vuelve al estado inicial', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    deleteSocio.mockResolvedValueOnce(undefined);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+      target: { value: '1001' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
+    const modal = screen.getByRole('heading', { name: /eliminar socio/i }).closest('.modal');
+    fireEvent.click(within(modal).getByRole('button', { name: /eliminar/i }));
+
+    await waitFor(() => {
+      expect(deleteSocio).toHaveBeenCalledWith(socioMock.id);
+      expect(screen.queryByRole('heading', { name: /eliminar socio/i })).not.toBeInTheDocument();
+      expect(screen.queryByText('juan@example.com')).not.toBeInTheDocument();
+    });
+  });
+
+  test('muestra error en modal al fallar la eliminación', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    deleteSocio.mockRejectedValueOnce(new Error('Error al eliminar socio'));
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+      target: { value: '1001' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
+    const modal = screen.getByRole('heading', { name: /eliminar socio/i }).closest('.modal');
+    fireEvent.click(within(modal).getByRole('button', { name: /eliminar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
     });
   });
 });

@@ -68,9 +68,26 @@
 }
 
 .socios-search-button:disabled,
-.socios-ver-todos-button:disabled {
+.socios-ver-todos-button:disabled,
+.socios-crear-button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.socios-crear-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s;
+  background-color: #111111;
+  color: #ffffff;
+}
+
+.socios-crear-button:hover:not(:disabled) {
+  background-color: #4a4a4a;
 }
 
 .socios-search-loading {
@@ -103,10 +120,51 @@
   max-width: 520px;
   margin: 0 auto;
   display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.socios-card-inner {
+  display: flex;
   flex-direction: row;
   align-items: center;
-  text-align: left;
   gap: 28px;
+}
+
+.socios-card-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.socios-btn-eliminar,
+.socios-btn-editar {
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+  border: none;
+}
+
+.socios-btn-editar {
+  background-color: #111111;
+  color: #ffffff;
+}
+
+.socios-btn-editar:hover {
+  background-color: #4a4a4a;
+}
+
+.socios-btn-eliminar {
+  background-color: #c0392b;
+  color: #ffffff;
+  border: none;
+}
+
+.socios-btn-eliminar:hover {
+  background-color: #96281b;
 }
 
 .socios-card-logo {
