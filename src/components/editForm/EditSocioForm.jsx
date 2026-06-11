@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   User, CreditCard, Phone,
   ChevronRight, ChevronLeft,
   CheckCircle2, AlertCircle,
-  Calendar, Mail, MapPin,
+  Calendar, Mail, MapPin, Activity, Tag,
 } from 'lucide-react';
 import { updateSocio } from '../../services/sociosService';
+import { fetchEstadosSocio, fetchCategoriasSocio } from '../../services/catalogosService';
 import logoVerde from '../../assets/logo-verde.png';
 import '../createForm/CreateSocioForm.css';
 
@@ -18,7 +19,7 @@ const STEPS = [
 ];
 
 const stepFields = {
-  1: ['nombre', 'apellido', 'fecha_nacimiento', 'genero'],
+  1: ['nombre', 'apellido', 'fecha_nacimiento', 'genero', 'estado', 'categoria'],
   2: ['nro_documento'],
   3: ['email', 'telefono', 'direccion'],
 };
@@ -101,11 +102,19 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
   const [navGuard, setNavGuard] = useState(false);
+  const [catalogo, setCatalogo] = useState({ estados: [], categorias: [] });
+
+  useEffect(() => {
+    Promise.all([fetchEstadosSocio(), fetchCategoriasSocio()])
+      .then(([estados, categorias]) => setCatalogo({ estados, categorias }))
+      .catch(() => {});
+  }, []);
 
   const {
     register,
     handleSubmit,
     trigger,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     mode: 'onTouched',
@@ -114,12 +123,21 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
       apellido: socio.apellido ?? '',
       fecha_nacimiento: socio.fecha_nacimiento ?? '',
       genero: '',
+      estado: '',
+      categoria: '',
       nro_documento: socio.nro_documento ?? '',
       email: socio.email ?? '',
       telefono: socio.telefono ?? '',
       direccion: '',
     },
   });
+
+  useEffect(() => {
+    if (catalogo.estados.length > 0) {
+      setValue('estado', socio.estado?.nombre ?? '');
+      setValue('categoria', socio.categoria?.nombre ?? '');
+    }
+  }, [catalogo]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const goNext = async () => {
     const valid = await trigger(stepFields[step]);
@@ -331,6 +349,24 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
                               <option value="M">Masculino (M)</option>
                               <option value="F">Femenino (F)</option>
                               <option value="X">No binario (X)</option>
+                            </StyledSelect>
+                          </Field>
+                        </div>
+                        <div className="csf-grid-2">
+                          <Field label="Estado" icon={Activity} error={errors.estado?.message}>
+                            <StyledSelect {...register('estado')} error={!!errors.estado}>
+                              <option value="">— sin cambiar —</option>
+                              {catalogo.estados.map((e) => (
+                                <option key={e.id} value={e.nombre}>{e.nombre}</option>
+                              ))}
+                            </StyledSelect>
+                          </Field>
+                          <Field label="Categoría" icon={Tag} error={errors.categoria?.message}>
+                            <StyledSelect {...register('categoria')} error={!!errors.categoria}>
+                              <option value="">— sin cambiar —</option>
+                              {catalogo.categorias.map((c) => (
+                                <option key={c.id} value={c.nombre}>{c.nombre}</option>
+                              ))}
                             </StyledSelect>
                           </Field>
                         </div>
