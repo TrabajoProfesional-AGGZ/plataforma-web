@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Search, Plus } from 'lucide-react';
 import { fetchUsuarios, eliminarUsuario } from '../../services/usuariosService';
 import { fetchRoles } from '../../services/rolesService';
 import { CreateUserForm } from '../../components/createUserForm/CreateUserForm';
@@ -176,28 +177,36 @@ function UsuariosPage() {
       <h1 className="usuarios-title">Consultar Usuarios</h1>
 
       <div className="usuarios-toolbar">
-        <form className="usuarios-search-form" onSubmit={handleBuscar}>
-          <input
-            className="usuarios-search-input"
-            type="text"
-            placeholder="Buscar por nombre, apellido o email"
-            value={busqueda}
-            onChange={(e) => setBusqueda(e.target.value)}
-          />
-          <button
-            className="usuarios-search-button"
-            type="submit"
-            disabled={loading || !busqueda.trim()}
-          >
-            Buscar
+        <div className="usuarios-toolbar-left">
+          <form className="usuarios-search-form" onSubmit={handleBuscar}>
+            <div className="usuarios-search-container">
+              <Search size={16} aria-hidden="true" />
+              <input
+                className="usuarios-search-input"
+                type="text"
+                placeholder="Buscar por nombre, apellido o email"
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+              />
+            </div>
+            <button
+              className="usuarios-search-button"
+              type="submit"
+              disabled={loading || !busqueda.trim()}
+            >
+              Buscar
+            </button>
+          </form>
+        </div>
+        <div className="usuarios-toolbar-right">
+          <button className="usuarios-ver-todos-button" onClick={handleVerTodos} disabled={loading}>
+            Ver todos
           </button>
-        </form>
-        <button className="usuarios-ver-todos-button" onClick={handleVerTodos} disabled={loading}>
-          Ver todos
-        </button>
-        <button className="usuarios-crear-button" onClick={() => setCrearModalOpen(true)} disabled={loading}>
-          Crear usuario
-        </button>
+          <button className="usuarios-crear-button" onClick={() => setCrearModalOpen(true)} disabled={loading}>
+            <Plus size={15} aria-hidden="true" />
+            Crear usuario
+          </button>
+        </div>
       </div>
 
       {loading && (
@@ -235,61 +244,63 @@ function UsuariosPage() {
             )}
           </div>
 
-          {listaBase.length === 0 ? (
-            <p className="usuarios-no-encontrado">No hay usuarios registrados.</p>
-          ) : listaFiltrada.length === 0 ? (
-            <p className="usuarios-no-encontrado">No hay usuarios con los filtros seleccionados.</p>
-          ) : (
-            <table className="usuarios-tabla">
-              <thead>
-                <tr>
-                  <th className="usuarios-th-sort" onClick={() => toggleOrden('apellido')}>
-                    Apellido{iconoOrden('apellido')}
-                  </th>
-                  <th className="usuarios-th-sort" onClick={() => toggleOrden('nombre')}>
-                    Nombre{iconoOrden('nombre')}
-                  </th>
-                  <th className="usuarios-th-sort" onClick={() => toggleOrden('email')}>
-                    Email{iconoOrden('email')}
-                  </th>
-                  <th className="usuarios-th-sort" onClick={() => toggleOrden('rol')}>
-                    Rol{iconoOrden('rol')}
-                  </th>
-                  <th className="usuarios-th-sort" onClick={() => toggleOrden('estado')}>
-                    Estado{iconoOrden('estado')}
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {aplicarOrden(listaFiltrada).map((u) => {
-                  const cfg = estadoConfig(u.estado?.nombre);
-                  return (
-                    <tr
-                      key={u.id}
-                      className="usuarios-tr-clickable"
-                      onClick={() => { setResultado(u); setModo('usuario'); }}
-                    >
-                      <td>{u.apellido}</td>
-                      <td>{u.nombre}</td>
-                      <td>{u.email}</td>
-                      <td>
-                        <span className="usuarios-rol-badge">{u.rol?.nombre}</span>
-                      </td>
-                      <td>
-                        <span
-                          className="usuarios-estado-cell"
-                          style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}
-                        >
-                          <img src={cfg.logo} alt="" className="usuarios-estado-logo" />
-                          {u.estado?.nombre}
-                        </span>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          )}
+          <div className="usuarios-table-wrapper">
+            {listaBase.length === 0 ? (
+              <p className="usuarios-table-empty">No hay usuarios registrados.</p>
+            ) : listaFiltrada.length === 0 ? (
+              <p className="usuarios-table-empty">No hay usuarios con los filtros seleccionados.</p>
+            ) : (
+              <table className="usuarios-tabla">
+                <thead>
+                  <tr>
+                    <th className="usuarios-th-sort" onClick={() => toggleOrden('apellido')}>
+                      Apellido{iconoOrden('apellido')}
+                    </th>
+                    <th className="usuarios-th-sort" onClick={() => toggleOrden('nombre')}>
+                      Nombre{iconoOrden('nombre')}
+                    </th>
+                    <th className="usuarios-th-sort" onClick={() => toggleOrden('email')}>
+                      Email{iconoOrden('email')}
+                    </th>
+                    <th className="usuarios-th-sort" onClick={() => toggleOrden('rol')}>
+                      Rol{iconoOrden('rol')}
+                    </th>
+                    <th className="usuarios-th-sort" onClick={() => toggleOrden('estado')}>
+                      Estado{iconoOrden('estado')}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {aplicarOrden(listaFiltrada).map((u) => {
+                    const cfg = estadoConfig(u.estado?.nombre);
+                    return (
+                      <tr
+                        key={u.id}
+                        className="usuarios-tr-clickable"
+                        onClick={() => { setResultado(u); setModo('usuario'); }}
+                      >
+                        <td>{u.apellido}</td>
+                        <td>{u.nombre}</td>
+                        <td>{u.email}</td>
+                        <td>
+                          <span className="usuarios-rol-badge">{u.rol?.nombre}</span>
+                        </td>
+                        <td>
+                          <span
+                            className="usuarios-estado-cell"
+                            style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}
+                          >
+                            <img src={cfg.logo} alt="" className="usuarios-estado-logo" />
+                            {u.estado?.nombre}
+                          </span>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            )}
+          </div>
         </>
       )}
 
