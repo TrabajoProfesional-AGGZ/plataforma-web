@@ -40,6 +40,7 @@ function SociosPage() {
 
   const [filtroEstado, setFiltroEstado] = useState('');
   const [filtroAbierto, setFiltroAbierto] = useState(false);
+  const [filtroCategoria, setFiltroCategoria] = useState('');
 
   const [crearModalOpen, setCrearModalOpen] = useState(false);
   const [editarModalOpen, setEditarModalOpen] = useState(false);
@@ -122,6 +123,7 @@ function SociosPage() {
     setOrden({ campo: null, dir: 'asc' });
     setFiltroEstado('');
     setFiltroAbierto(false);
+    setFiltroCategoria('');
     try {
       const socios = await getSocios();
       setResultado(socios);
@@ -265,9 +267,12 @@ function SociosPage() {
           <p className="socios-no-encontrado">No hay socios registrados.</p>
         ) : (() => {
           const estadosUnicos = [...new Set(resultado.map(s => s.estado.nombre))].sort();
-          const listaFiltrada = filtroEstado
-            ? resultado.filter(s => s.estado.nombre === filtroEstado)
-            : resultado;
+          const categoriasUnicas = [...new Set(resultado.map(s => s.categoria.nombre))].sort();
+          const listaFiltrada = resultado.filter(s => {
+            const matchEstado = filtroEstado ? s.estado.nombre === filtroEstado : true;
+            const matchCategoria = filtroCategoria ? s.categoria.nombre === filtroCategoria : true;
+            return matchEstado && matchCategoria;
+          });
           return (
           <>
             <div className="socios-filtros">
@@ -279,23 +284,37 @@ function SociosPage() {
                 Filtrar por
               </button>
               {filtroAbierto && (
-                <div className="socios-filtro-estado-wrapper">
-                  <select
-                    id="filtro-estado"
-                    className="socios-filtro-select"
-                    value={filtroEstado}
-                    onChange={(e) => setFiltroEstado(e.target.value)}
-                  >
-                    <option value="">Todos</option>
-                    {estadosUnicos.map(e => (
-                      <option key={e} value={e}>{e}</option>
-                    ))}
-                  </select>
+                <div className="socios-filtros-dropdowns">
+                  <div className="socios-filtros-grupo">
+                    <select
+                      className="socios-filtro-select"
+                      value={filtroCategoria}
+                      onChange={(e) => setFiltroCategoria(e.target.value)}
+                    >
+                      <option value="">Categoría: Todas</option>
+                      {categoriasUnicas.map(c => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="socios-filtros-grupo">
+                    <select
+                      id="filtro-estado"
+                      className="socios-filtro-select"
+                      value={filtroEstado}
+                      onChange={(e) => setFiltroEstado(e.target.value)}
+                    >
+                      <option value="">Estado: Todos</option>
+                      {estadosUnicos.map(e => (
+                        <option key={e} value={e}>{e}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
               )}
             </div>
             {listaFiltrada.length === 0 ? (
-              <p className="socios-no-encontrado">No hay socios con ese estado.</p>
+              <p className="socios-no-encontrado">No hay socios con los filtros seleccionados.</p>
             ) : (
           <table className="socios-table">
             <thead>

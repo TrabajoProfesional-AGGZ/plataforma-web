@@ -283,6 +283,23 @@
   margin-bottom: 14px;
 }
 
+.socios-filtros-dropdowns {
+  display: flex;
+  flex-direction: row;
+}
+
+.socios-filtros-grupo {
+  width: 180px;
+  padding: 0 16px;
+  box-sizing: border-box;
+}
+
+.socios-filtros-grupo:last-child {
+  width: 185px;
+  padding: 0 32px;
+  box-sizing: border-box;
+}
+
 .socios-filtro-toggle {
   background: none;
   border: none;
@@ -292,12 +309,6 @@
   color: #111111;
   text-decoration: underline;
   cursor: pointer;
-}
-
-.socios-filtro-estado-wrapper {
-  width: 190px;
-  display: flex;
-  justify-content: center;
 }
 
 .socios-filtro-label {
@@ -315,6 +326,7 @@
   background-color: #ffffff;
   outline: none;
   cursor: pointer;
+  width: 100%;
 }
 
 .socios-filtro-select:focus {

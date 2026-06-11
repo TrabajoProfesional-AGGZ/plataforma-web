@@ -44,6 +44,19 @@ const socioMock = {
   estado: { nombre: 'Al día' },
 };
 
+const socioMock2 = {
+  id: 'a1b2c3d4-0000-0000-0000-000000000002',
+  nro_socio: '1002',
+  nombre: 'María',
+  apellido: 'García',
+  nro_documento: '87654321',
+  fecha_nacimiento: '1985-06-15',
+  email: 'maria@example.com',
+  telefono: null,
+  categoria: { nombre: 'Senior' },
+  estado: { nombre: 'Moroso' },
+};
+
 describe('SociosPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -339,6 +352,80 @@ describe('SociosPage', () => {
       expect(deleteSocio).toHaveBeenCalledWith(socioMock.id);
       expect(screen.queryByRole('heading', { name: /eliminar socio/i })).not.toBeInTheDocument();
       expect(screen.queryByText('juan@example.com')).not.toBeInTheDocument();
+    });
+  });
+
+  // --- Filtro por categoría ---
+
+  test('muestra el botón Filtrar por en la vista de lista', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(screen.getByRole('button', { name: /filtrar por/i })).toBeInTheDocument();
+  });
+
+  test('al hacer click en Filtrar por aparecen los selectores de categoría y estado', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+
+    expect(screen.getByDisplayValue('Categoría: Todas')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Estado: Todos')).toBeInTheDocument();
+  });
+
+  test('el selector de categoría muestra las opciones únicas disponibles', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+
+    expect(screen.getByRole('option', { name: 'Activo' })).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Senior' })).toBeInTheDocument();
+  });
+
+  test('filtrar por categoría muestra solo los socios de esa categoría', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByDisplayValue('Categoría: Todas'), { target: { value: 'Senior' } });
+
+    expect(screen.getByText('García')).toBeInTheDocument();
+    expect(screen.queryByText('Pérez')).not.toBeInTheDocument();
+  });
+
+  test('los filtros de categoría y estado se aplican en conjunto', async () => {
+    const socioMock3 = { ...socioMock2, id: 'id3', nro_socio: '1003', nombre: 'Pedro', apellido: 'López', estado: { nombre: 'Al día' } };
+    getSocios.mockResolvedValue([socioMock, socioMock2, socioMock3]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByDisplayValue('Categoría: Todas'), { target: { value: 'Senior' } });
+    fireEvent.change(screen.getByDisplayValue('Estado: Todos'), { target: { value: 'Moroso' } });
+
+    expect(screen.getByText('García')).toBeInTheDocument();
+    expect(screen.queryByText('Pérez')).not.toBeInTheDocument();
+    expect(screen.queryByText('López')).not.toBeInTheDocument();
+  });
+
+  test('los filtros se limpian al hacer click en Ver todos', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByDisplayValue('Categoría: Todas'), { target: { value: 'Senior' } });
+    expect(screen.queryByText('Pérez')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
+    await waitFor(() => {
+      expect(screen.getByText('Pérez')).toBeInTheDocument();
+      expect(screen.getByText('García')).toBeInTheDocument();
     });
   });
 
