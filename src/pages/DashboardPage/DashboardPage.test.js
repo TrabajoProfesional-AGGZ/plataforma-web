@@ -18,7 +18,7 @@ describe('DashboardPage', () => {
   });
 
   test('renderiza el título y las tarjetas visibles para admin', () => {
-    useAuth.mockReturnValue({ role: 'admin' });
+    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, role: 'admin' });
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
     expect(screen.getByRole('heading', { name: /panel principal/i })).toBeInTheDocument();
@@ -27,7 +27,7 @@ describe('DashboardPage', () => {
   });
 
   test('renderiza la tarjeta de Usuarios Administrativos para superAdmin', () => {
-    useAuth.mockReturnValue({ role: 'superAdmin' });
+    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, role: 'superAdmin' });
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
     expect(screen.getByText('Socios')).toBeInTheDocument();
@@ -35,7 +35,7 @@ describe('DashboardPage', () => {
   });
 
   test('navega a /socios al hacer click en la tarjeta de Socios', () => {
-    useAuth.mockReturnValue({ role: 'admin' });
+    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, role: 'admin' });
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
     fireEvent.click(screen.getByText('Socios').closest('button'));
@@ -43,7 +43,7 @@ describe('DashboardPage', () => {
   });
 
   test('navega a /usuarios al hacer click en la tarjeta de Usuarios Administrativos', () => {
-    useAuth.mockReturnValue({ role: 'superAdmin' });
+    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, role: 'superAdmin' });
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
     fireEvent.click(screen.getByText('Usuarios Administrativos').closest('button'));

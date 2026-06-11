@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Search, Plus } from 'lucide-react';
 import { getSocios, deleteSocio } from '../../services/sociosService';
 import { CreateSocioForm } from '../../components/createForm/CreateSocioForm';
 import { EditSocioForm } from '../../components/editForm/EditSocioForm';
@@ -172,28 +173,36 @@ function SociosPage() {
     <div className="socios-page">
       <h1 className="socios-title">Consultar Socios</h1>
       <div className="socios-toolbar">
-        <form className="socios-search-form" onSubmit={handleBuscar}>
-          <input
-            className="socios-search-input"
-            type="text"
-            placeholder="Buscar por N° de socio"
-            value={nroSocio}
-            onChange={(e) => setNroSocio(e.target.value)}
-          />
-          <button
-            className="socios-search-button"
-            type="submit"
-            disabled={loading || !nroSocio.trim()}
-          >
-            Buscar
+        <div className="socios-toolbar-left">
+          <form className="socios-search-form" onSubmit={handleBuscar}>
+            <div className="socios-search-container">
+              <Search size={16} aria-hidden="true" />
+              <input
+                className="socios-search-input"
+                type="text"
+                placeholder="Buscar por N° de socio"
+                value={nroSocio}
+                onChange={(e) => setNroSocio(e.target.value)}
+              />
+            </div>
+            <button
+              className="socios-search-button"
+              type="submit"
+              disabled={loading || !nroSocio.trim()}
+            >
+              Buscar
+            </button>
+          </form>
+        </div>
+        <div className="socios-toolbar-right">
+          <button className="socios-ver-todos-button" onClick={handleVerTodos} disabled={loading}>
+            Ver todos
           </button>
-        </form>
-        <button className="socios-ver-todos-button" onClick={handleVerTodos} disabled={loading}>
-          Ver todos
-        </button>
-        <button className="socios-crear-button" onClick={() => setCrearModalOpen(true)} disabled={loading}>
-          Crear socio
-        </button>
+          <button className="socios-crear-button" onClick={() => setCrearModalOpen(true)} disabled={loading}>
+            <Plus size={15} aria-hidden="true" />
+            Crear socio
+          </button>
+        </div>
       </div>
 
       {loading && (
@@ -262,18 +271,22 @@ function SociosPage() {
         );
       })()}
 
-      {!loading && modo === 'lista' && Array.isArray(resultado) && (
-        resultado.length === 0 ? (
-          <p className="socios-no-encontrado">No hay socios registrados.</p>
-        ) : (() => {
-          const estadosUnicos = [...new Set(resultado.map(s => s.estado.nombre))].sort();
-          const categoriasUnicas = [...new Set(resultado.map(s => s.categoria.nombre))].sort();
-          const listaFiltrada = resultado.filter(s => {
-            const matchEstado = filtroEstado ? s.estado.nombre === filtroEstado : true;
-            const matchCategoria = filtroCategoria ? s.categoria.nombre === filtroCategoria : true;
-            return matchEstado && matchCategoria;
-          });
+      {!loading && modo === 'lista' && Array.isArray(resultado) && (() => {
+        if (resultado.length === 0) {
           return (
+            <div className="socios-table-wrapper">
+              <p className="socios-table-empty">No hay socios registrados.</p>
+            </div>
+          );
+        }
+        const estadosUnicos = [...new Set(resultado.map(s => s.estado.nombre))].sort();
+        const categoriasUnicas = [...new Set(resultado.map(s => s.categoria.nombre))].sort();
+        const listaFiltrada = resultado.filter(s => {
+          const matchEstado = filtroEstado ? s.estado.nombre === filtroEstado : true;
+          const matchCategoria = filtroCategoria ? s.categoria.nombre === filtroCategoria : true;
+          return matchEstado && matchCategoria;
+        });
+        return (
           <>
             <div className="socios-filtros">
               <button
@@ -313,61 +326,62 @@ function SociosPage() {
                 </div>
               )}
             </div>
-            {listaFiltrada.length === 0 ? (
-              <p className="socios-no-encontrado">No hay socios con los filtros seleccionados.</p>
-            ) : (
-          <table className="socios-table">
-            <thead>
-              <tr>
-                <th className="socios-th-sort" onClick={() => toggleOrden('nro_socio')}>
-                  N° Socio{iconoOrden('nro_socio')}
-                </th>
-                <th className="socios-th-sort" onClick={() => toggleOrden('apellido')}>
-                  Apellido{iconoOrden('apellido')}
-                </th>
-                <th className="socios-th-sort" onClick={() => toggleOrden('nombre')}>
-                  Nombre{iconoOrden('nombre')}
-                </th>
-                <th className="socios-th-sort" onClick={() => toggleOrden('categoria')}>
-                  Categoría{iconoOrden('categoria')}
-                </th>
-                <th className="socios-th-sort" onClick={() => toggleOrden('estado')}>
-                  Estado{iconoOrden('estado')}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {aplicarOrden(listaFiltrada).map((s) => {
-                const cfg = estadoConfig(s.estado.nombre);
-                return (
-                  <tr
-                    key={s.id}
-                    className="socios-tr-clickable"
-                    onClick={() => { setResultado(s); setModo('socio'); }}
-                  >
-                    <td>{s.nro_socio}</td>
-                    <td>{s.apellido}</td>
-                    <td>{s.nombre}</td>
-                    <td>{s.categoria.nombre}</td>
-                    <td>
-                      <span
-                        className="socios-estado-cell"
-                        style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}
-                      >
-                        <img src={cfg.logo} alt="" className="socios-estado-logo" />
-                        {s.estado.nombre}
-                      </span>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-            )}
+            <div className="socios-table-wrapper">
+              {listaFiltrada.length === 0 ? (
+                <p className="socios-table-empty">No hay socios con los filtros seleccionados.</p>
+              ) : (
+                <table className="socios-table">
+                  <thead>
+                    <tr>
+                      <th className="socios-th-sort" onClick={() => toggleOrden('nro_socio')}>
+                        N° Socio{iconoOrden('nro_socio')}
+                      </th>
+                      <th className="socios-th-sort" onClick={() => toggleOrden('apellido')}>
+                        Apellido{iconoOrden('apellido')}
+                      </th>
+                      <th className="socios-th-sort" onClick={() => toggleOrden('nombre')}>
+                        Nombre{iconoOrden('nombre')}
+                      </th>
+                      <th className="socios-th-sort" onClick={() => toggleOrden('categoria')}>
+                        Categoría{iconoOrden('categoria')}
+                      </th>
+                      <th className="socios-th-sort" onClick={() => toggleOrden('estado')}>
+                        Estado{iconoOrden('estado')}
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {aplicarOrden(listaFiltrada).map((s) => {
+                      const cfg = estadoConfig(s.estado.nombre);
+                      return (
+                        <tr
+                          key={s.id}
+                          className="socios-tr-clickable"
+                          onClick={() => { setResultado(s); setModo('socio'); }}
+                        >
+                          <td>{s.nro_socio}</td>
+                          <td>{s.apellido}</td>
+                          <td>{s.nombre}</td>
+                          <td>{s.categoria.nombre}</td>
+                          <td>
+                            <span
+                              className="socios-estado-cell"
+                              style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}
+                            >
+                              <img src={cfg.logo} alt="" className="socios-estado-logo" />
+                              {s.estado.nombre}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )}
+            </div>
           </>
-          );
-        })()
-      )}
+        );
+      })()}
 
       {/* Modal crear socio */}
       {crearModalOpen && (
