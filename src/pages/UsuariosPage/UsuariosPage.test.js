@@ -34,6 +34,19 @@ jest.mock('../../components/editUserForm/EditUserForm', () => ({
   ),
 }));
 
+jest.mock('../../components/cambiarRolForm/CambiarRolForm', () => ({
+  CambiarRolForm: ({ usuario, onSuccess, onCancel }) => (
+    <div>
+      <h2>Cambiar rol</h2>
+      <span data-testid="cambiar-rol-usuario">{usuario.nombre}</span>
+      <button onClick={() => onSuccess({ ...usuario, rol: { nombre: 'PRESIDENTE', permisos: [] } })}>
+        Confirmar cambio de rol
+      </button>
+      <button onClick={onCancel}>Cancelar</button>
+    </div>
+  ),
+}));
+
 const usuarioMock = {
   id: 'uuid-0001',
   firebase_uid: 'firebase-uid-1',
@@ -346,9 +359,9 @@ describe('UsuariosPage', () => {
     });
   });
 
-  // --- Modal cambiar rol ---
+  // --- CambiarRolForm ---
 
-  test('abre el modal de cambio de rol con opciones cargadas', async () => {
+  test('abre el formulario de cambio de rol', async () => {
     fetchUsuarios.mockResolvedValue([usuarioMock]);
     render(<UsuariosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
@@ -358,16 +371,30 @@ describe('UsuariosPage', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /cambiar rol/i }));
 
+    expect(screen.getByRole('heading', { name: /cambiar rol/i })).toBeInTheDocument();
+    expect(screen.getByTestId('cambiar-rol-usuario')).toHaveTextContent('Carlos');
+  });
+
+  test('cambiar rol exitoso cierra el formulario y actualiza la card', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /cambiar rol/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /cambiar rol/i }));
+    await waitFor(() => expect(screen.getByRole('heading', { name: /cambiar rol/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /confirmar cambio de rol/i }));
+
     await waitFor(() => {
-      expect(screen.getByText(/nuevo rol/i)).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: 'ADMIN' })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: 'PRESIDENTE' })).toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: /cambiar rol/i })).not.toBeInTheDocument();
     });
   });
 
-  test('cambiar rol exitoso cierra el modal', async () => {
+  test('cancelar cambio de rol cierra el formulario', async () => {
     fetchUsuarios.mockResolvedValue([usuarioMock]);
-    cambiarRolUsuario.mockResolvedValue({ ...usuarioMock, rol: { nombre: 'PRESIDENTE', permisos: [] } });
     render(<UsuariosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
@@ -375,14 +402,10 @@ describe('UsuariosPage', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: /cambiar rol/i })).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /cambiar rol/i }));
-    await waitFor(() => expect(screen.getByLabelText(/nuevo rol/i)).toBeInTheDocument());
+    await waitFor(() => expect(screen.getByRole('heading', { name: /cambiar rol/i })).toBeInTheDocument());
 
-    fireEvent.change(screen.getByLabelText(/nuevo rol/i), { target: { value: 'PRESIDENTE' } });
-    fireEvent.click(screen.getByRole('button', { name: /confirmar/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^cancelar$/i }));
 
-    await waitFor(() => {
-      expect(cambiarRolUsuario).toHaveBeenCalledWith(usuarioMock.id, 'PRESIDENTE');
-      expect(screen.queryByLabelText(/nuevo rol/i)).not.toBeInTheDocument();
-    });
+    expect(screen.queryByRole('heading', { name: /cambiar rol/i })).not.toBeInTheDocument();
   });
 });

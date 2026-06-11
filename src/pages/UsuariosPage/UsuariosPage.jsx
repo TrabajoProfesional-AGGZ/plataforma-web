@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { fetchUsuarios, eliminarUsuario, cambiarRolUsuario } from '../../services/usuariosService';
+import { fetchUsuarios, eliminarUsuario } from '../../services/usuariosService';
 import { fetchRoles } from '../../services/rolesService';
 import { CreateUserForm } from '../../components/createUserForm/CreateUserForm';
 import { EditUserForm } from '../../components/editUserForm/EditUserForm';
+import { CambiarRolForm } from '../../components/cambiarRolForm/CambiarRolForm';
 import logo from '../../assets/logo_socio.png';
 import logoVerde from '../../assets/logo-verde.png';
 import logoAmarillo from '../../assets/logo-amarillo.png';
@@ -46,7 +47,6 @@ function UsuariosPage() {
   const [cambiarRolModalOpen, setCambiarRolModalOpen] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [errorModal, setErrorModal] = useState('');
-  const [nuevoRol, setNuevoRol] = useState('');
 
   useEffect(() => {
     cargarUsuarios();
@@ -128,7 +128,6 @@ function UsuariosPage() {
   }
 
   function abrirEditar() {
-    setErrorModal('');
     setEditarModalOpen(true);
   }
 
@@ -138,8 +137,6 @@ function UsuariosPage() {
   }
 
   function abrirCambiarRol() {
-    setErrorModal('');
-    setNuevoRol(resultado?.rol?.nombre ?? '');
     setCambiarRolModalOpen(true);
   }
 
@@ -156,28 +153,6 @@ function UsuariosPage() {
         setErrorModal('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
       } else {
         setErrorModal('Error al eliminar el usuario. Intentá de nuevo.');
-      }
-    } finally {
-      setGuardando(false);
-    }
-  }
-
-  async function handleCambiarRol() {
-    if (!nuevoRol || nuevoRol === resultado?.rol?.nombre) {
-      setCambiarRolModalOpen(false);
-      return;
-    }
-    setGuardando(true);
-    setErrorModal('');
-    try {
-      const actualizado = await cambiarRolUsuario(resultado.id, nuevoRol);
-      setResultado(actualizado);
-      setCambiarRolModalOpen(false);
-    } catch (err) {
-      if (err.message === 'servicio-no-disponible') {
-        setErrorModal('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
-      } else {
-        setErrorModal('Error al cambiar el rol. Intentá de nuevo.');
       }
     } finally {
       setGuardando(false);
@@ -411,34 +386,12 @@ function UsuariosPage() {
       )}
 
       {cambiarRolModalOpen && resultado && !Array.isArray(resultado) && (
-        <div className="modal-overlay" onClick={() => setCambiarRolModalOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Cambiar rol</h2>
-            <div className="modal-field">
-              <label className="modal-label" htmlFor="nuevo-rol">Nuevo rol</label>
-              <select
-                id="nuevo-rol"
-                className="modal-select"
-                value={nuevoRol}
-                onChange={(e) => setNuevoRol(e.target.value)}
-              >
-                <option value="">Seleccionar...</option>
-                {roles.map((r) => (
-                  <option key={r.id} value={r.nombre}>{r.nombre}</option>
-                ))}
-              </select>
-            </div>
-            {errorModal && <p className="modal-error" role="alert">{errorModal}</p>}
-            <div className="modal-actions">
-              <button type="button" className="modal-button-cancel" onClick={() => setCambiarRolModalOpen(false)}>
-                Cancelar
-              </button>
-              <button type="button" className="modal-button-submit" onClick={handleCambiarRol} disabled={guardando || !nuevoRol}>
-                {guardando ? 'Guardando...' : 'Confirmar'}
-              </button>
-            </div>
-          </div>
-        </div>
+        <CambiarRolForm
+          usuario={resultado}
+          roles={roles}
+          onSuccess={(actualizado) => { setResultado(actualizado); setCambiarRolModalOpen(false); }}
+          onCancel={() => setCambiarRolModalOpen(false)}
+        />
       )}
     </div>
   );
