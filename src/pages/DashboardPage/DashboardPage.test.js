@@ -26,8 +26,8 @@ describe('DashboardPage', () => {
     expect(screen.queryByText('Usuarios Administrativos')).not.toBeInTheDocument();
   });
 
-  test('renderiza la tarjeta de Usuarios Administrativos para superAdmin', () => {
-    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, role: 'superAdmin' });
+  test('renderiza la tarjeta de Usuarios Administrativos para SuperAdmin', () => {
+    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, role: 'SuperAdmin' });
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
     expect(screen.getByText('Socios')).toBeInTheDocument();
@@ -43,7 +43,7 @@ describe('DashboardPage', () => {
   });
 
   test('navega a /usuarios al hacer click en la tarjeta de Usuarios Administrativos', () => {
-    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, role: 'superAdmin' });
+    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, role: 'SuperAdmin' });
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
     fireEvent.click(screen.getByText('Usuarios Administrativos').closest('button'));

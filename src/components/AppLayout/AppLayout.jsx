@@ -10,7 +10,7 @@ import './AppLayout.css';
 const NAV_ITEMS_BASE = [
   { to: '/dashboard', label: 'Dashboard', desc: 'Inicio y resumen general', Icon: LayoutDashboard, rol: null },
   { to: '/socios', label: 'Socios', desc: 'Consultar y gestionar el padrón', Icon: Users, rol: null },
-  { to: '/usuarios', label: 'Usuarios', desc: 'Usuarios administrativos y roles', Icon: ShieldCheck, rol: 'superAdmin' },
+  { to: '/usuarios', label: 'Usuarios', desc: 'Usuarios administrativos y roles', Icon: ShieldCheck, rol: 'SuperAdmin' },
 ];
 
 function AppLayout() {

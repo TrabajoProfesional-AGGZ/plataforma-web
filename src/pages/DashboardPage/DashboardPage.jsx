@@ -16,7 +16,7 @@ const SECCIONES = [
     titulo: 'Usuarios Administrativos',
     descripcion: 'Crear nuevos usuarios administrativos y gestionar roles/permisos.',
     Icon: ShieldCheck,
-    rol: 'superAdmin',
+    rol: 'SuperAdmin',
   },
   {
     path: '/dashboard',

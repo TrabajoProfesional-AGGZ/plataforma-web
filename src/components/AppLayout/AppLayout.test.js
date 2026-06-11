@@ -57,8 +57,8 @@ describe('AppLayout', () => {
     expect(screen.queryByRole('link', { name: /usuarios/i })).not.toBeInTheDocument();
   });
 
-  test('muestra el link de usuarios para rol superAdmin', () => {
-    renderLayout('superAdmin');
+  test('muestra el link de usuarios para rol SuperAdmin', () => {
+    renderLayout('SuperAdmin');
     expect(screen.getByRole('link', { name: /usuarios/i })).toBeInTheDocument();
   });
 

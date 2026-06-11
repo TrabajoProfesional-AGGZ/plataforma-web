@@ -12,14 +12,17 @@ jest.mock('firebase/auth', () => ({
     callback(null);
     return jest.fn();
   }),
+  signOut: jest.fn(),
 }));
 
 describe('useAuth', () => {
-  test('retorna user, loading y role del contexto', () => {
+  test('retorna user, loading, role, permisos y userData del contexto', () => {
     const wrapper = ({ children }) => <AuthProvider>{children}</AuthProvider>;
     const { result } = renderHook(() => useAuth(), { wrapper });
     expect(result.current).toHaveProperty('user');
     expect(result.current).toHaveProperty('loading');
     expect(result.current).toHaveProperty('role');
+    expect(result.current).toHaveProperty('permisos');
+    expect(result.current).toHaveProperty('userData');
   });
 });
