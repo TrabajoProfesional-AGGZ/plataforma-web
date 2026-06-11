@@ -37,13 +37,13 @@ describe('PrivateRoute', () => {
 
   test('redirige a dashboard cuando el rol no coincide con el requerido', () => {
     useAuth.mockReturnValue({ user: { uid: '1' }, loading: false, role: 'admin' });
-    renderWithRoute('/protegida', 'superAdmin');
+    renderWithRoute('/protegida', 'SuperAdmin');
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
 
   test('muestra el contenido cuando el usuario tiene el rol requerido', () => {
-    useAuth.mockReturnValue({ user: { uid: '1' }, loading: false, role: 'superAdmin' });
-    renderWithRoute('/protegida', 'superAdmin');
+    useAuth.mockReturnValue({ user: { uid: '1' }, loading: false, role: 'SuperAdmin' });
+    renderWithRoute('/protegida', 'SuperAdmin');
     expect(screen.getByText('Contenido protegido')).toBeInTheDocument();
   });
 

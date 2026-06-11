@@ -23,7 +23,7 @@ function App() {
           </Route>
         </Route>
 
-        <Route element={<PrivateRoute requiredRole="superAdmin" />}>
+        <Route element={<PrivateRoute requiredRole="SuperAdmin" />}>
           <Route element={<AppLayout />}>
             <Route path="/usuarios" element={<UsuariosPage />} />
           </Route>

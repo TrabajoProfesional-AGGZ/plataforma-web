@@ -1,144 +1,411 @@
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import UsuariosPage from './UsuariosPage';
-import * as usuariosService from '../../services/usuariosService';
 
-jest.mock('../../firebase', () => ({ auth: {} }));
-jest.mock('../../services/usuariosService');
+jest.mock('../../services/usuariosService', () => ({
+  fetchUsuarios: jest.fn(),
+  eliminarUsuario: jest.fn(),
+  cambiarRolUsuario: jest.fn(),
+}));
+import { fetchUsuarios, eliminarUsuario, cambiarRolUsuario } from '../../services/usuariosService';
 
-const mockUsuarios = [
-  { uid: 'uid1', email: 'admin@club.com', role: 'admin' },
-  { uid: 'uid2', email: 'super@club.com', role: 'superAdmin' },
+jest.mock('../../services/rolesService', () => ({
+  fetchRoles: jest.fn(),
+}));
+import { fetchRoles } from '../../services/rolesService';
+
+jest.mock('../../components/createUserForm/CreateUserForm', () => ({
+  CreateUserForm: ({ onSuccess, onCancel }) => (
+    <div>
+      <h1>Nuevo usuario</h1>
+      <button onClick={onSuccess}>Confirmar creación</button>
+      <button onClick={onCancel}>Cancelar</button>
+    </div>
+  ),
+}));
+
+jest.mock('../../components/editUserForm/EditUserForm', () => ({
+  EditUserForm: ({ usuario, onSuccess, onCancel }) => (
+    <div>
+      <h2>Editar usuario</h2>
+      <span data-testid="edit-nombre">{usuario.nombre}</span>
+      <button onClick={() => onSuccess(usuario)}>Confirmar edición</button>
+      <button onClick={onCancel}>Cancelar</button>
+    </div>
+  ),
+}));
+
+jest.mock('../../components/cambiarRolForm/CambiarRolForm', () => ({
+  CambiarRolForm: ({ usuario, onSuccess, onCancel }) => (
+    <div>
+      <h2>Cambiar rol</h2>
+      <span data-testid="cambiar-rol-usuario">{usuario.nombre}</span>
+      <button onClick={() => onSuccess({ ...usuario, rol: { nombre: 'PRESIDENTE', permisos: [] } })}>
+        Confirmar cambio de rol
+      </button>
+      <button onClick={onCancel}>Cancelar</button>
+    </div>
+  ),
+}));
+
+const usuarioMock = {
+  id: 'uuid-0001',
+  firebase_uid: 'firebase-uid-1',
+  nombre: 'Carlos',
+  apellido: 'Rodríguez',
+  email: 'carlos@club.com',
+  fecha_nacimiento: '1985-03-20',
+  rol: { nombre: 'ADMIN', permisos: [{ id: 1, nombre: 'ver_socios' }, { id: 2, nombre: 'editar_socios' }] },
+  estado: { nombre: 'Activo' },
+};
+
+const usuarioMock2 = {
+  id: 'uuid-0002',
+  firebase_uid: 'firebase-uid-2',
+  nombre: 'Laura',
+  apellido: 'Sánchez',
+  email: 'laura@club.com',
+  fecha_nacimiento: '1990-07-15',
+  rol: { nombre: 'PRESIDENTE', permisos: [{ id: 1, nombre: 'ver_socios' }] },
+  estado: { nombre: 'Activo' },
+};
+
+const rolesMock = [
+  { id: 1, nombre: 'ADMIN', permisos: [] },
+  { id: 2, nombre: 'PRESIDENTE', permisos: [] },
 ];
 
 describe('UsuariosPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    fetchUsuarios.mockResolvedValue([]);
+    fetchRoles.mockResolvedValue(rolesMock);
   });
 
-  test('muestra animación de carga al inicio', () => {
-    usuariosService.getUsers.mockReturnValue(new Promise(() => {}));
+  test('renderiza el título, el campo de búsqueda y los botones', async () => {
     render(<UsuariosPage />);
-    expect(document.querySelector('.loading-logo')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /consultar usuarios/i })).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/buscar por nombre/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /buscar/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /ver todos/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /crear usuario/i })).toBeInTheDocument();
+    await waitFor(() => expect(fetchUsuarios).toHaveBeenCalled());
   });
 
-  test('muestra la tabla de usuarios cuando la carga es exitosa', async () => {
-    usuariosService.getUsers.mockResolvedValueOnce(mockUsuarios);
+  test('el botón buscar está deshabilitado si el campo está vacío', async () => {
     render(<UsuariosPage />);
+    await waitFor(() => expect(fetchUsuarios).toHaveBeenCalled());
+    expect(screen.getByRole('button', { name: /buscar/i })).toBeDisabled();
+  });
+
+  test('carga y muestra el listado de usuarios al montar la página', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(screen.getAllByText('Rodríguez').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Carlos').length).toBeGreaterThan(0);
+  });
+
+  test('muestra mensaje cuando no hay usuarios registrados', async () => {
+    render(<UsuariosPage />);
+    await waitFor(() => {
+      expect(screen.getByText(/no hay usuarios registrados/i)).toBeInTheDocument();
+    });
+  });
+
+  test('muestra error cuando el servicio no está disponible', async () => {
+    fetchUsuarios.mockRejectedValue(new Error('servicio-no-disponible'));
+    render(<UsuariosPage />);
+    await waitFor(() => {
+      expect(screen.getByText(/el servicio no está disponible/i)).toBeInTheDocument();
+    });
+  });
+
+  test('al hacer click en una fila muestra la card con permisos del usuario', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
 
     await waitFor(() => {
-      expect(screen.getByText('admin@club.com')).toBeInTheDocument();
-      expect(screen.getByText('super@club.com')).toBeInTheDocument();
+      expect(screen.getByText('carlos@club.com')).toBeInTheDocument();
+      expect(screen.getAllByText('ADMIN').length).toBeGreaterThan(0);
+      expect(screen.getByText('ver_socios')).toBeInTheDocument();
+      expect(screen.getByText('editar_socios')).toBeInTheDocument();
     });
   });
 
-  test('muestra banner de error cuando getUsers falla sin crashear', async () => {
-    usuariosService.getUsers.mockRejectedValueOnce(new Error('Network error'));
+  test('muestra los botones Editar, Cambiar rol y Eliminar en la card', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
     render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
 
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent(/no se pudieron cargar/i);
+      expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /cambiar rol/i })).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument();
     });
   });
 
-  test('botón de usuario admin dice "Promover a superAdmin"', async () => {
-    usuariosService.getUsers.mockResolvedValueOnce(mockUsuarios);
+  // --- Búsqueda client-side ---
+
+  test('filtra usuarios por texto de búsqueda', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock, usuarioMock2]);
     render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por nombre/i), {
+      target: { value: 'laura' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+
+    expect(screen.getAllByText('Sánchez').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Rodríguez')).not.toBeInTheDocument();
+  });
+
+  test('Ver todos limpia el filtro y muestra la lista completa', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock, usuarioMock2]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por nombre/i), {
+      target: { value: 'laura' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    expect(screen.queryByText('Rodríguez')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /promover a superAdmin/i })).toBeInTheDocument();
+      expect(screen.getAllByText('Rodríguez').length).toBeGreaterThan(0);
+      expect(screen.getAllByText('Sánchez').length).toBeGreaterThan(0);
     });
   });
 
-  test('botón de usuario superAdmin dice "Degradar a admin"', async () => {
-    usuariosService.getUsers.mockResolvedValueOnce(mockUsuarios);
+  // --- Filtro por rol ---
+
+  test('aparece el botón Filtrar por en la lista', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
     render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(screen.getByRole('button', { name: /filtrar por/i })).toBeInTheDocument();
+  });
+
+  test('al clickear Filtrar por aparece el dropdown de rol', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
+  });
+
+  test('filtrar por rol muestra solo los usuarios de ese rol', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock, usuarioMock2]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'PRESIDENTE' } });
+
+    expect(screen.getAllByText('Sánchez').length).toBeGreaterThan(0);
+    expect(screen.queryByText('Rodríguez')).not.toBeInTheDocument();
+  });
+
+  test('muestra mensaje cuando no hay usuarios con los filtros seleccionados', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por nombre/i), {
+      target: { value: 'zzznombreinexistente' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+
+    expect(screen.getByText(/no hay usuarios con los filtros seleccionados/i)).toBeInTheDocument();
+  });
+
+  // --- Modal crear ---
+
+  test('abre y cierra el formulario de creación', async () => {
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('button', { name: /crear usuario/i })).not.toBeDisabled());
+
+    fireEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
+    expect(screen.getByRole('heading', { name: /nuevo usuario/i })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /cancelar/i }));
+    expect(screen.queryByRole('heading', { name: /nuevo usuario/i })).not.toBeInTheDocument();
+  });
+
+  test('cierra el formulario de creación con ESC', async () => {
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('button', { name: /crear usuario/i })).not.toBeDisabled());
+
+    fireEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
+    expect(screen.getByRole('heading', { name: /nuevo usuario/i })).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByRole('heading', { name: /nuevo usuario/i })).not.toBeInTheDocument();
+  });
+
+  test('crear usuario exitoso cierra el formulario y recarga la lista', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('button', { name: /crear usuario/i })).not.toBeDisabled());
+
+    fireEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
+    fireEvent.click(screen.getByRole('button', { name: /confirmar creación/i }));
 
     await waitFor(() => {
-      expect(screen.getByRole('button', { name: /degradar a admin/i })).toBeInTheDocument();
+      expect(screen.queryByRole('heading', { name: /nuevo usuario/i })).not.toBeInTheDocument();
+      expect(fetchUsuarios).toHaveBeenCalledTimes(2);
     });
   });
 
-  test('al cambiar rol llama a updateUserRole con el rol opuesto', async () => {
-    usuariosService.getUsers.mockResolvedValueOnce(mockUsuarios);
-    usuariosService.updateUserRole.mockResolvedValueOnce();
-    render(<UsuariosPage />);
+  // --- Modal editar ---
 
-    await waitFor(() => screen.getByRole('button', { name: /promover a superAdmin/i }));
-    fireEvent.click(screen.getByRole('button', { name: /promover a superAdmin/i }));
+  test('abre el formulario de edición con los datos del usuario', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /editar/i }));
 
     await waitFor(() => {
-      expect(usuariosService.updateUserRole).toHaveBeenCalledWith('uid1', 'superAdmin');
+      expect(screen.getByRole('heading', { name: /editar usuario/i })).toBeInTheDocument();
+      expect(screen.getByTestId('edit-nombre')).toHaveTextContent('Carlos');
     });
   });
 
-  describe('modal de creación de usuario', () => {
-    beforeEach(() => {
-      usuariosService.getUsers.mockResolvedValue(mockUsuarios);
+  test('editar usuario exitoso cierra el modal', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /editar/i }));
+    await waitFor(() => expect(screen.getByRole('heading', { name: /editar usuario/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /confirmar edición/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole('heading', { name: /editar usuario/i })).not.toBeInTheDocument();
     });
+  });
 
-    async function abrirModal() {
-      render(<UsuariosPage />);
-      await waitFor(() => screen.getByRole('button', { name: /crear usuario/i }));
-      fireEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
-    }
+  // --- Modal eliminar ---
 
-    test('el modal no se muestra al cargar la página', async () => {
-      render(<UsuariosPage />);
-      await waitFor(() => screen.getByText('admin@club.com'));
-      expect(screen.queryByRole('heading', { name: /crear usuario/i })).not.toBeInTheDocument();
+  test('abre el modal de confirmación de eliminación', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
+
+    expect(screen.getByText(/eliminar usuario/i)).toBeInTheDocument();
+    expect(screen.getByText(/Carlos Rodríguez/)).toBeInTheDocument();
+  });
+
+  test('eliminar usuario exitoso recarga la lista', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    eliminarUsuario.mockResolvedValue();
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
+    await waitFor(() => expect(screen.getByText(/eliminar usuario/i)).toBeInTheDocument());
+
+    const botonesEliminar = screen.getAllByRole('button', { name: /^eliminar$/i });
+    fireEvent.click(botonesEliminar[botonesEliminar.length - 1]);
+
+    await waitFor(() => {
+      expect(eliminarUsuario).toHaveBeenCalledWith(usuarioMock.id);
+      expect(fetchUsuarios).toHaveBeenCalledTimes(2);
     });
+  });
 
-    test('el modal se abre al hacer click en "Crear usuario"', async () => {
-      await abrirModal();
-      expect(screen.getByRole('heading', { name: /crear usuario/i })).toBeInTheDocument();
+  test('muestra error en el modal si falla la eliminación', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    eliminarUsuario.mockRejectedValue(new Error('servicio-no-disponible'));
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
+    await waitFor(() => expect(screen.getByText(/eliminar usuario/i)).toBeInTheDocument());
+
+    const botonesEliminar = screen.getAllByRole('button', { name: /^eliminar$/i });
+    fireEvent.click(botonesEliminar[botonesEliminar.length - 1]);
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
     });
+  });
 
-    test('el modal se cierra al hacer click en "Cancelar"', async () => {
-      await abrirModal();
-      fireEvent.click(screen.getByRole('button', { name: /cancelar/i }));
-      expect(screen.queryByRole('heading', { name: /crear usuario/i })).not.toBeInTheDocument();
+  // --- CambiarRolForm ---
+
+  test('abre el formulario de cambio de rol', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /cambiar rol/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /cambiar rol/i }));
+
+    expect(screen.getByRole('heading', { name: /cambiar rol/i })).toBeInTheDocument();
+    expect(screen.getByTestId('cambiar-rol-usuario')).toHaveTextContent('Carlos');
+  });
+
+  test('cambiar rol exitoso cierra el formulario y actualiza la card', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /cambiar rol/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /cambiar rol/i }));
+    await waitFor(() => expect(screen.getByRole('heading', { name: /cambiar rol/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /confirmar cambio de rol/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole('heading', { name: /cambiar rol/i })).not.toBeInTheDocument();
     });
+  });
 
-    test('el modal se cierra al presionar ESC', async () => {
-      await abrirModal();
-      fireEvent.keyDown(document, { key: 'Escape' });
-      expect(screen.queryByRole('heading', { name: /crear usuario/i })).not.toBeInTheDocument();
-    });
+  test('cancelar cambio de rol cierra el formulario', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
-    test('el modal se cierra al hacer click fuera de él', async () => {
-      await abrirModal();
-      fireEvent.click(screen.getByRole('heading', { name: /crear usuario/i }).closest('.modal-overlay'));
-      expect(screen.queryByRole('heading', { name: /crear usuario/i })).not.toBeInTheDocument();
-    });
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /cambiar rol/i })).toBeInTheDocument());
 
-    test('al crear exitosamente se cierra el modal y se recargan los usuarios', async () => {
-      usuariosService.createUser.mockResolvedValueOnce({ uid: 'uid3' });
-      usuariosService.getUsers.mockResolvedValue(mockUsuarios);
-      await abrirModal();
+    fireEvent.click(screen.getByRole('button', { name: /cambiar rol/i }));
+    await waitFor(() => expect(screen.getByRole('heading', { name: /cambiar rol/i })).toBeInTheDocument());
 
-      fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'nuevo@club.com' } });
-      fireEvent.change(screen.getByLabelText(/contraseña/i), { target: { value: 'pass123' } });
-      fireEvent.submit(screen.getByRole('button', { name: /^crear$/i }).closest('form'));
+    fireEvent.click(screen.getByRole('button', { name: /^cancelar$/i }));
 
-      await waitFor(() => {
-        expect(screen.queryByRole('heading', { name: /crear usuario/i })).not.toBeInTheDocument();
-      });
-      expect(usuariosService.createUser).toHaveBeenCalledWith('nuevo@club.com', 'pass123', 'admin');
-      expect(usuariosService.getUsers).toHaveBeenCalledTimes(2);
-    });
-
-    test('al fallar la creación muestra el mensaje de error sin cerrar el modal', async () => {
-      usuariosService.createUser.mockRejectedValueOnce(new Error('Error al crear usuario'));
-      await abrirModal();
-
-      fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'x@x.com' } });
-      fireEvent.change(screen.getByLabelText(/contraseña/i), { target: { value: 'pass' } });
-      fireEvent.submit(screen.getByRole('button', { name: /^crear$/i }).closest('form'));
-
-      await waitFor(() => {
-        expect(screen.getByRole('alert')).toHaveTextContent(/no se pudo crear el usuario/i);
-      });
-      expect(screen.getByRole('heading', { name: /crear usuario/i })).toBeInTheDocument();
-    });
+    expect(screen.queryByRole('heading', { name: /cambiar rol/i })).not.toBeInTheDocument();
   });
 });
