@@ -7,16 +7,27 @@ import {
 } from 'firebase/auth';
 import { auth } from '../firebase';
 
-const VALID_ROLES = ['admin', 'superAdmin'];
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
 
 export async function login(email, password) {
   const { user } = await signInWithEmailAndPassword(auth, email, password);
-  const tokenResult = await user.getIdTokenResult();
-  if (!VALID_ROLES.includes(tokenResult.claims.role)) {
+  const idToken = await user.getIdToken();
+
+  const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${idToken}`,
+    },
+    body: JSON.stringify({ id_token: idToken }),
+  });
+
+  if (!response.ok) {
     await signOut(auth);
     throw new Error('unauthorized');
   }
-  return user;
+
+  return response.json();
 }
 
 export async function logout() {
