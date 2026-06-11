@@ -1,0 +1,97 @@
+import React from 'react';
+import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { EditUserForm } from './EditUserForm';
+
+jest.mock('../../firebase', () => ({ auth: { currentUser: { getIdToken: jest.fn().mockResolvedValue('token') } } }));
+
+jest.mock('../../services/usuariosService', () => ({
+  editarUsuario: jest.fn(),
+}));
+const { editarUsuario } = require('../../services/usuariosService');
+
+const USUARIO_MOCK = {
+  id: 'uuid-abc-123',
+  nombre: 'Carlos',
+  apellido: 'Rodríguez',
+  email: 'carlos@club.com',
+  fecha_nacimiento: '1985-03-20',
+  rol: { nombre: 'ADMIN', permisos: [] },
+  estado: { nombre: 'Activo' },
+};
+
+function renderForm(usuario = USUARIO_MOCK) {
+  const onSuccess = jest.fn();
+  const onCancel = jest.fn();
+  render(<EditUserForm usuario={usuario} onSuccess={onSuccess} onCancel={onCancel} />);
+  return { onSuccess, onCancel };
+}
+
+describe('EditUserForm', () => {
+  beforeEach(() => {
+    editarUsuario.mockResolvedValue({ ...USUARIO_MOCK });
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  test('renderiza el formulario con los datos pre-llenados', () => {
+    renderForm();
+    expect(screen.getByRole('heading', { name: /editar usuario/i })).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Carlos')).toBeInTheDocument();
+    expect(screen.getByDisplayValue('Rodríguez')).toBeInTheDocument();
+  });
+
+  test('llama a onCancel al hacer click en Cancelar', () => {
+    const { onCancel } = renderForm();
+    fireEvent.click(screen.getByRole('button', { name: /cancelar/i }));
+    expect(onCancel).toHaveBeenCalledTimes(1);
+  });
+
+  test('llama a editarUsuario con los datos correctos al guardar', async () => {
+    const { onSuccess } = renderForm();
+
+    fireEvent.change(screen.getByDisplayValue('Carlos'), { target: { value: 'Carlos Eduardo' } });
+    fireEvent.click(screen.getByRole('button', { name: /guardar cambios/i }));
+
+    await waitFor(() => {
+      expect(editarUsuario).toHaveBeenCalledWith(USUARIO_MOCK.id, {
+        nombre: 'Carlos Eduardo',
+        apellido: 'Rodríguez',
+      });
+      expect(onSuccess).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  test('muestra mensaje de error si falla el servicio', async () => {
+    editarUsuario.mockRejectedValue(new Error('servicio-no-disponible'));
+    renderForm();
+
+    fireEvent.click(screen.getByRole('button', { name: /guardar cambios/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent(/no está disponible/i);
+    });
+  });
+
+  test('muestra error genérico si falla por otro motivo', async () => {
+    editarUsuario.mockRejectedValue(new Error('Error al modificar usuario'));
+    renderForm();
+
+    fireEvent.click(screen.getByRole('button', { name: /guardar cambios/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+  });
+
+  test('el botón Guardar muestra texto de carga mientras se guarda', async () => {
+    editarUsuario.mockImplementation(() => new Promise(() => {}));
+    renderForm();
+
+    fireEvent.click(screen.getByRole('button', { name: /guardar cambios/i }));
+
+    expect(screen.getByRole('button', { name: /guardando/i })).toBeDisabled();
+  });
+});
