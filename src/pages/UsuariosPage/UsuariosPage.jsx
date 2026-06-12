@@ -5,6 +5,7 @@ import { fetchRoles } from '../../services/rolesService';
 import { CreateUserForm } from '../../components/createUserForm/CreateUserForm';
 import { EditUserForm } from '../../components/editUserForm/EditUserForm';
 import { CambiarRolForm } from '../../components/cambiarRolForm/CambiarRolForm';
+import { usePermiso } from '../../hooks/usePermiso';
 import logo from '../../assets/logo_socio.png';
 import logoVerde from '../../assets/logo-verde.png';
 import logoAmarillo from '../../assets/logo-amarillo.png';
@@ -29,6 +30,10 @@ function getValorOrden(usuario, campo) {
 }
 
 function UsuariosPage() {
+  const puedeCrear = usePermiso('crear_usuario');
+  const puedeEditar = usePermiso('editar_usuario');
+  const puedeBorrar = usePermiso('borrar_usuario');
+
   const [busqueda, setBusqueda] = useState('');
   const [modo, setModo] = useState('lista');
   const [resultado, setResultado] = useState(null);
@@ -202,10 +207,12 @@ function UsuariosPage() {
           <button className="usuarios-ver-todos-button" onClick={handleVerTodos} disabled={loading}>
             Ver todos
           </button>
-          <button className="usuarios-crear-button" onClick={() => setCrearModalOpen(true)} disabled={loading}>
-            <Plus size={15} aria-hidden="true" />
-            Crear usuario
-          </button>
+          {puedeCrear && (
+            <button className="usuarios-crear-button" onClick={() => setCrearModalOpen(true)} disabled={loading}>
+              <Plus size={15} aria-hidden="true" />
+              Crear usuario
+            </button>
+          )}
         </div>
       </div>
 
@@ -345,16 +352,22 @@ function UsuariosPage() {
               </div>
             </div>
             <div className="usuarios-card-actions">
-              <button className="usuarios-btn-eliminar" onClick={abrirEliminar}>
-                Eliminar
-              </button>
+              {puedeBorrar && (
+                <button className="usuarios-btn-eliminar" onClick={abrirEliminar}>
+                  Eliminar
+                </button>
+              )}
               <div className="usuarios-card-actions-right">
-                <button className="usuarios-btn-cambiar-rol" onClick={abrirCambiarRol}>
-                  Cambiar rol
-                </button>
-                <button className="usuarios-btn-editar" onClick={abrirEditar}>
-                  Editar
-                </button>
+                {puedeEditar && (
+                  <button className="usuarios-btn-cambiar-rol" onClick={abrirCambiarRol}>
+                    Cambiar rol
+                  </button>
+                )}
+                {puedeEditar && (
+                  <button className="usuarios-btn-editar" onClick={abrirEditar}>
+                    Editar
+                  </button>
+                )}
               </div>
             </div>
           </div>

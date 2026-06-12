@@ -10,13 +10,13 @@ jest.mock('firebase/auth', () => ({
 jest.mock('../../hooks/useAuth');
 import { useAuth } from '../../hooks/useAuth';
 
-function renderWithRoute(initialEntry, requiredRole) {
+function renderWithRoute(initialEntry, requiredPermiso) {
   return render(
     <MemoryRouter initialEntries={[initialEntry]}>
       <Routes>
         <Route path="/" element={<div>Login</div>} />
         <Route path="/dashboard" element={<div>Dashboard</div>} />
-        <Route element={<PrivateRoute requiredRole={requiredRole} />}>
+        <Route element={<PrivateRoute requiredPermiso={requiredPermiso} />}>
           <Route path="/protegida" element={<div>Contenido protegido</div>} />
         </Route>
       </Routes>
@@ -30,25 +30,25 @@ describe('PrivateRoute', () => {
   });
 
   test('redirige a login cuando no hay usuario autenticado', () => {
-    useAuth.mockReturnValue({ user: null, loading: false, role: null });
+    useAuth.mockReturnValue({ user: null, loading: false, permisos: [] });
     renderWithRoute('/protegida');
     expect(screen.getByText('Login')).toBeInTheDocument();
   });
 
-  test('redirige a dashboard cuando el rol no coincide con el requerido', () => {
-    useAuth.mockReturnValue({ user: { uid: '1' }, loading: false, role: 'admin' });
-    renderWithRoute('/protegida', 'SuperAdmin');
+  test('redirige a dashboard cuando el usuario no tiene el permiso requerido', () => {
+    useAuth.mockReturnValue({ user: { uid: '1' }, loading: false, permisos: [] });
+    renderWithRoute('/protegida', 'ver_usuarios');
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
 
-  test('muestra el contenido cuando el usuario tiene el rol requerido', () => {
-    useAuth.mockReturnValue({ user: { uid: '1' }, loading: false, role: 'SuperAdmin' });
-    renderWithRoute('/protegida', 'SuperAdmin');
+  test('muestra el contenido cuando el usuario tiene el permiso requerido', () => {
+    useAuth.mockReturnValue({ user: { uid: '1' }, loading: false, permisos: ['ver_usuarios'] });
+    renderWithRoute('/protegida', 'ver_usuarios');
     expect(screen.getByText('Contenido protegido')).toBeInTheDocument();
   });
 
-  test('muestra el contenido cuando no hay rol requerido y el usuario está autenticado', () => {
-    useAuth.mockReturnValue({ user: { uid: '1' }, loading: false, role: 'admin' });
+  test('muestra el contenido cuando no hay permiso requerido y el usuario está autenticado', () => {
+    useAuth.mockReturnValue({ user: { uid: '1' }, loading: false, permisos: [] });
     renderWithRoute('/protegida');
     expect(screen.getByText('Contenido protegido')).toBeInTheDocument();
   });

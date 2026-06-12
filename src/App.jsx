@@ -17,13 +17,18 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/socios" element={<SociosPage />} />
             <Route path="/perfil" element={<PerfilPage />} />
             <Route path="/cambiar-contrasena" element={<CambiarContrasenaPage />} />
           </Route>
         </Route>
 
-        <Route element={<PrivateRoute requiredRole="SuperAdmin" />}>
+        <Route element={<PrivateRoute requiredPermiso="ver_socios" />}>
+          <Route element={<AppLayout />}>
+            <Route path="/socios" element={<SociosPage />} />
+          </Route>
+        </Route>
+
+        <Route element={<PrivateRoute requiredPermiso="ver_usuarios" />}>
           <Route element={<AppLayout />}>
             <Route path="/usuarios" element={<UsuariosPage />} />
           </Route>

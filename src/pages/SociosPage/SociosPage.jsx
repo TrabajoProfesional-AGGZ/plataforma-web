@@ -3,6 +3,7 @@ import { Search, Plus } from 'lucide-react';
 import { getSocios, deleteSocio } from '../../services/sociosService';
 import { CreateSocioForm } from '../../components/createForm/CreateSocioForm';
 import { EditSocioForm } from '../../components/editForm/EditSocioForm';
+import { usePermiso } from '../../hooks/usePermiso';
 import logo from '../../assets/logo_socio.png';
 import logoVerde from '../../assets/logo-verde.png';
 import logoRojo from '../../assets/logo-rojo.png';
@@ -32,6 +33,10 @@ const ICONOS_ORDEN = { asc: ' ↑', desc: ' ↓', none: ' ↕' };
 
 
 function SociosPage() {
+  const puedeCrear = usePermiso('crear_socio');
+  const puedeEditar = usePermiso('editar_socio');
+  const puedeBorrar = usePermiso('borrar_socio');
+
   const [nroSocio, setNroSocio] = useState('');
   const [modo, setModo] = useState('idle'); // idle | socio | lista | no-encontrado
   const [resultado, setResultado] = useState(null);
@@ -198,10 +203,12 @@ function SociosPage() {
           <button className="socios-ver-todos-button" onClick={handleVerTodos} disabled={loading}>
             Ver todos
           </button>
-          <button className="socios-crear-button" onClick={() => setCrearModalOpen(true)} disabled={loading}>
-            <Plus size={15} aria-hidden="true" />
-            Crear socio
-          </button>
+          {puedeCrear && (
+            <button className="socios-crear-button" onClick={() => setCrearModalOpen(true)} disabled={loading}>
+              <Plus size={15} aria-hidden="true" />
+              Crear socio
+            </button>
+          )}
         </div>
       </div>
 
@@ -260,12 +267,16 @@ function SociosPage() {
               </div>
             </div>
             <div className="socios-card-actions">
-              <button className="socios-btn-eliminar" onClick={abrirEliminar}>
-                Eliminar
-              </button>
-              <button className="socios-btn-editar" onClick={abrirEditar}>
-                Editar
-              </button>
+              {puedeBorrar && (
+                <button className="socios-btn-eliminar" onClick={abrirEliminar}>
+                  Eliminar
+                </button>
+              )}
+              {puedeEditar && (
+                <button className="socios-btn-editar" onClick={abrirEditar}>
+                  Editar
+                </button>
+              )}
             </div>
           </div>
         );
