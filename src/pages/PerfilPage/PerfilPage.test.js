@@ -63,7 +63,7 @@ describe('PerfilPage', () => {
     test('el modal se cierra al hacer click fuera de él', () => {
       renderPage();
       fireEvent.click(screen.getByRole('button', { name: /cambiar contraseña/i }));
-      fireEvent.click(screen.getByRole('heading', { name: /cambiar contraseña/i }).closest('.modal-overlay'));
+      fireEvent.click(screen.getByRole('heading', { name: /cambiar contraseña/i }).closest('.csf-overlay'));
       expect(screen.queryByRole('heading', { name: /cambiar contraseña/i })).not.toBeInTheDocument();
     });
 

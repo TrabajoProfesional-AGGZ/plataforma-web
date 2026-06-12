@@ -1,8 +1,22 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import { EditUserForm } from './EditUserForm';
 
 jest.mock('../../firebase', () => ({ auth: { currentUser: { getIdToken: jest.fn().mockResolvedValue('token') } } }));
+
+jest.mock('framer-motion', () => {
+  const mockReact = require('react');
+  const motion = new Proxy({}, {
+    get: (_, tag) => {
+      return ({ children, whileHover, whileTap, initial, animate, exit, transition, variants, custom, ...props }) =>
+        mockReact.createElement(tag, props, children);
+    },
+  });
+  return {
+    motion,
+    AnimatePresence: ({ children }) => children,
+  };
+});
 
 jest.mock('../../services/usuariosService', () => ({
   editarUsuario: jest.fn(),
@@ -33,6 +47,7 @@ describe('EditUserForm', () => {
 
   afterEach(() => {
     jest.clearAllMocks();
+    jest.useRealTimers();
   });
 
   test('renderiza el formulario con los datos pre-llenados', () => {
@@ -49,6 +64,7 @@ describe('EditUserForm', () => {
   });
 
   test('llama a editarUsuario con los datos correctos al guardar', async () => {
+    jest.useFakeTimers();
     const { onSuccess } = renderForm();
 
     fireEvent.change(screen.getByDisplayValue('Carlos'), { target: { value: 'Carlos Eduardo' } });
@@ -59,8 +75,10 @@ describe('EditUserForm', () => {
         nombre: 'Carlos Eduardo',
         apellido: 'Rodríguez',
       });
-      expect(onSuccess).toHaveBeenCalledTimes(1);
     });
+
+    act(() => { jest.runAllTimers(); });
+    expect(onSuccess).toHaveBeenCalledTimes(1);
   });
 
   test('muestra mensaje de error si falla el servicio', async () => {
@@ -92,6 +110,8 @@ describe('EditUserForm', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /guardar cambios/i }));
 
-    expect(screen.getByRole('button', { name: /guardando/i })).toBeDisabled();
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /guardando/i })).toBeDisabled();
+    });
   });
 });
