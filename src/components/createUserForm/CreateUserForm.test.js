@@ -48,11 +48,31 @@ async function fillStep1() {
   fireEvent.change(screen.getByDisplayValue(''), { target: { value: '1990-05-15' } });
 }
 
-async function goToStep(targetStep) {
-  for (let i = 1; i < targetStep; i++) {
-    userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
-    await waitFor(() => expect(screen.getByText(new RegExp(`paso ${i + 1} de`, 'i'))).toBeInTheDocument());
-  }
+async function fillStep2() {
+  fireEvent.change(screen.getByText('Seleccionar...').closest('select'), { target: { value: 'DNI' } });
+  fireEvent.change(screen.getByPlaceholderText('Ej. 12345678'), { target: { value: '12345678' } });
+}
+
+async function fillStep3() {
+  fireEvent.change(screen.getByPlaceholderText('maria@ejemplo.com'), { target: { value: 'ana@ejemplo.com' } });
+  fireEvent.change(screen.getByPlaceholderText(/mínimo 6/i), { target: { value: 'secreta123' } });
+}
+
+async function navigateToStep4(onSuccess, onCancel) {
+  render(<CreateUserForm onSuccess={onSuccess} onCancel={onCancel} />);
+
+  await fillStep1();
+  userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+  await waitFor(() => expect(screen.getByText(/paso 2 de/i)).toBeInTheDocument());
+
+  fillStep2();
+  userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+  await waitFor(() => expect(screen.getByText(/paso 3 de/i)).toBeInTheDocument());
+
+  fillStep3();
+  userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+  await waitFor(() => expect(screen.getByText(/paso 4 de/i)).toBeInTheDocument());
+  await waitFor(() => expect(screen.getByRole('button', { name: /crear usuario/i })).not.toBeDisabled());
 }
 
 describe('CreateUserForm', () => {
@@ -155,5 +175,81 @@ describe('CreateUserForm', () => {
     renderForm();
     expect(screen.getByText('Nuevo usuario')).toBeInTheDocument();
     await waitFor(() => expect(fetchRoles).toHaveBeenCalled());
+  });
+
+  test('retrocede al paso 1 al hacer click en Atrás desde el paso 2', async () => {
+    const { onSuccess, onCancel } = renderForm();
+    await fillStep1();
+    userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+    await waitFor(() => expect(screen.getByText(/paso 2 de/i)).toBeInTheDocument());
+
+    userEvent.click(screen.getByRole('button', { name: /atrás/i }));
+    await waitFor(() => expect(screen.getByText(/paso 1 de/i)).toBeInTheDocument());
+  });
+
+  test('llama a onCancel al hacer click en el overlay', () => {
+    const { onCancel } = renderForm();
+    fireEvent.click(document.querySelector('.csf-overlay'));
+    expect(onCancel).toHaveBeenCalledTimes(1);
+  });
+
+  test('completa el flujo de 4 pasos y muestra pantalla de éxito', async () => {
+    const onSuccess = jest.fn();
+    const onCancel = jest.fn();
+    await navigateToStep4(onSuccess, onCancel);
+
+    fireEvent.change(screen.getByText('Seleccionar...').closest('select'), { target: { value: 'ADMIN' } });
+    userEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
+
+    await waitFor(() => expect(screen.getByText('¡Usuario creado!')).toBeInTheDocument());
+  });
+
+  test('llama a onSuccess tras 1800ms de la pantalla de éxito', async () => {
+    const onSuccess = jest.fn();
+    const onCancel = jest.fn();
+    await navigateToStep4(onSuccess, onCancel);
+
+    fireEvent.change(screen.getByText('Seleccionar...').closest('select'), { target: { value: 'ADMIN' } });
+    userEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
+
+    await waitFor(() => expect(screen.getByText('¡Usuario creado!')).toBeInTheDocument());
+    expect(onSuccess).not.toHaveBeenCalled();
+    await waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1), { timeout: 3000 });
+  });
+
+  test('muestra error de usuario duplicado al crear', async () => {
+    crearUsuario.mockRejectedValue(new Error('usuario-duplicado'));
+    const onSuccess = jest.fn();
+    const onCancel = jest.fn();
+    await navigateToStep4(onSuccess, onCancel);
+
+    fireEvent.change(screen.getByText('Seleccionar...').closest('select'), { target: { value: 'ADMIN' } });
+    userEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
+
+    await waitFor(() => expect(screen.getByText(/ya existe un usuario/i)).toBeInTheDocument());
+  });
+
+  test('muestra error de servicio no disponible al crear', async () => {
+    crearUsuario.mockRejectedValue(new Error('servicio-no-disponible'));
+    const onSuccess = jest.fn();
+    const onCancel = jest.fn();
+    await navigateToStep4(onSuccess, onCancel);
+
+    fireEvent.change(screen.getByText('Seleccionar...').closest('select'), { target: { value: 'ADMIN' } });
+    userEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
+
+    await waitFor(() => expect(screen.getByText(/servicio no está disponible/i)).toBeInTheDocument());
+  });
+
+  test('muestra error genérico ante fallos desconocidos', async () => {
+    crearUsuario.mockRejectedValue(new Error('unknown-error'));
+    const onSuccess = jest.fn();
+    const onCancel = jest.fn();
+    await navigateToStep4(onSuccess, onCancel);
+
+    fireEvent.change(screen.getByText('Seleccionar...').closest('select'), { target: { value: 'ADMIN' } });
+    userEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
+
+    await waitFor(() => expect(screen.getByText(/error al crear el usuario/i)).toBeInTheDocument());
   });
 });

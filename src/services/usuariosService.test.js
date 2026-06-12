@@ -15,7 +15,7 @@ describe('usuariosService', () => {
   });
 
   describe('fetchUsuarios', () => {
-    test('llama al endpoint correcto', async () => {
+    test('llama al endpoint correcto y retorna data.usuarios', async () => {
       fetchTo.mockResolvedValueOnce({
         ok: true,
         status: 200,
@@ -26,6 +26,18 @@ describe('usuariosService', () => {
 
       expect(fetchTo).toHaveBeenCalledWith('/api/v1/usuarios?pagina=1&limite=100', 'GET');
       expect(result).toHaveLength(1);
+    });
+
+    test('retorna data directamente cuando no hay clave usuarios', async () => {
+      const lista = [{ id: '1', nombre: 'Ana' }];
+      fetchTo.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => lista,
+      });
+
+      const result = await fetchUsuarios();
+      expect(result).toBe(lista);
     });
 
     test('lanza error de servicio no disponible en 500', async () => {
@@ -68,6 +80,11 @@ describe('usuariosService', () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
       await expect(crearUsuario({})).rejects.toThrow('servicio-no-disponible');
     });
+
+    test('lanza error genérico cuando la respuesta no es ok (ni 409 ni 5xx)', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 400 });
+      await expect(crearUsuario({})).rejects.toThrow('Error al crear usuario');
+    });
   });
 
   describe('editarUsuario', () => {
@@ -90,6 +107,11 @@ describe('usuariosService', () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 400 });
       await expect(editarUsuario('uuid-1', {})).rejects.toThrow('Error al modificar usuario');
     });
+
+    test('lanza servicio-no-disponible en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 503 });
+      await expect(editarUsuario('uuid-1', {})).rejects.toThrow('servicio-no-disponible');
+    });
   });
 
   describe('cambiarRolUsuario', () => {
@@ -111,6 +133,11 @@ describe('usuariosService', () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
       await expect(cambiarRolUsuario('uuid-1', 'ADMIN')).rejects.toThrow('servicio-no-disponible');
     });
+
+    test('lanza error genérico cuando la respuesta no es ok', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 400 });
+      await expect(cambiarRolUsuario('uuid-1', 'ADMIN')).rejects.toThrow('Error al cambiar rol');
+    });
   });
 
   describe('eliminarUsuario', () => {
@@ -125,6 +152,11 @@ describe('usuariosService', () => {
     test('lanza error cuando la respuesta no es ok', async () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
       await expect(eliminarUsuario('uuid-1')).rejects.toThrow('Error al eliminar usuario');
+    });
+
+    test('lanza servicio-no-disponible en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(eliminarUsuario('uuid-1')).rejects.toThrow('servicio-no-disponible');
     });
   });
 });

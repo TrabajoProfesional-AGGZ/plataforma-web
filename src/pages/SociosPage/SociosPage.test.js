@@ -453,4 +453,187 @@ describe('SociosPage', () => {
       expect(screen.getByRole('alert')).toBeInTheDocument();
     });
   });
+
+  test('muestra error servicio no disponible al fallar la eliminación', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    deleteSocio.mockRejectedValueOnce(new Error('servicio-no-disponible'));
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+      target: { value: '1001' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
+    const modal = screen.getByRole('heading', { name: /eliminar socio/i }).closest('.modal');
+    fireEvent.click(within(modal).getByRole('button', { name: /eliminar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+  });
+
+  // --- Cancelar modal eliminar ---
+
+  test('cierra el modal de eliminación al hacer click en Cancelar', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+      target: { value: '1001' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
+    await waitFor(() => expect(screen.getByRole('heading', { name: /eliminar socio/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /^cancelar$/i }));
+    expect(screen.queryByRole('heading', { name: /eliminar socio/i })).not.toBeInTheDocument();
+  });
+
+  test('cierra el modal de eliminación al hacer click en el overlay', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+      target: { value: '1001' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
+    await waitFor(() => expect(screen.getByRole('heading', { name: /eliminar socio/i })).toBeInTheDocument());
+
+    fireEvent.click(document.querySelector('.modal-overlay'));
+    expect(screen.queryByRole('heading', { name: /eliminar socio/i })).not.toBeInTheDocument();
+  });
+
+  // --- Cancelar edición ---
+
+  test('cancelar edición cierra el formulario', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+      target: { value: '1001' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /editar/i }));
+    await waitFor(() => expect(screen.getByRole('heading', { name: /editar socio/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /^cancelar$/i }));
+    expect(screen.queryByRole('heading', { name: /editar socio/i })).not.toBeInTheDocument();
+  });
+
+  // --- ESC cierra otros modales ---
+
+  test('ESC cierra el formulario de edición', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+      target: { value: '1001' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /editar/i }));
+    await waitFor(() => expect(screen.getByRole('heading', { name: /editar socio/i })).toBeInTheDocument());
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByRole('heading', { name: /editar socio/i })).not.toBeInTheDocument();
+  });
+
+  test('ESC cierra el modal de eliminación', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+      target: { value: '1001' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
+    await waitFor(() => expect(screen.getByRole('heading', { name: /eliminar socio/i })).toBeInTheDocument());
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByRole('heading', { name: /eliminar socio/i })).not.toBeInTheDocument();
+  });
+
+  // --- Ordenamiento ---
+
+  test('ordena la tabla al hacer click en el encabezado de columna', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    const th = screen.getAllByRole('columnheader')[0];
+    fireEvent.click(th);
+    expect(screen.getAllByRole('row').length).toBeGreaterThan(1);
+  });
+
+  test('cicla entre asc, desc y sin orden al hacer click en el mismo encabezado', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    const thNroSocio = screen.getAllByRole('columnheader')[0];
+    fireEvent.click(thNroSocio);
+    expect(thNroSocio.textContent).toContain('↑');
+
+    fireEvent.click(thNroSocio);
+    expect(thNroSocio.textContent).toContain('↓');
+
+    fireEvent.click(thNroSocio);
+    expect(thNroSocio.textContent).toContain('↕');
+  });
+
+  test('ordena por columna con objetos anidados (estado)', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    const thEstado = screen.getAllByRole('columnheader')[4];
+    fireEvent.click(thEstado);
+    expect(screen.getAllByRole('row').length).toBeGreaterThan(1);
+  });
+
+  test('ordena la tabla al hacer click en los encabezados Apellido, Nombre y Categoría', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    const headers = screen.getAllByRole('columnheader');
+
+    fireEvent.click(headers[1]);
+    expect(headers[1].textContent).toContain('↑');
+
+    fireEvent.click(headers[2]);
+    expect(headers[2].textContent).toContain('↑');
+
+    fireEvent.click(headers[3]);
+    expect(headers[3].textContent).toContain('↑');
+  });
+
+  test('aplica orden cuando dos socios tienen el mismo valor en la columna de ordenamiento', async () => {
+    const socioMockIgual = { ...socioMock2, id: 'id-igual', nro_socio: '1003', nombre: 'Pedro', apellido: 'Lopez', categoria: { nombre: 'Activo' } };
+    getSocios.mockResolvedValue([socioMock, socioMockIgual]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    const thCategoria = screen.getAllByRole('columnheader')[3];
+    fireEvent.click(thCategoria);
+    expect(screen.getAllByRole('row').length).toBeGreaterThan(1);
+  });
 });

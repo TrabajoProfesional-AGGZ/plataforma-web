@@ -120,4 +120,23 @@ describe('CambiarRolForm', () => {
       expect(screen.getByRole('combobox')).toBeInTheDocument();
     });
   });
+
+  test('muestra error genérico ante fallos desconocidos', async () => {
+    cambiarRolUsuario.mockRejectedValue(new Error('unknown-error'));
+    renderForm();
+
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'PRESIDENTE' } });
+    fireEvent.click(screen.getByRole('button', { name: /confirmar/i }));
+    fireEvent.click(screen.getByRole('button', { name: /^sí$/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/error al cambiar el rol/i)).toBeInTheDocument();
+    });
+  });
+
+  test('llama a onCancel al hacer click en el overlay', () => {
+    const { onCancel } = renderForm();
+    fireEvent.click(document.querySelector('.csf-overlay'));
+    expect(onCancel).toHaveBeenCalledTimes(1);
+  });
 });
