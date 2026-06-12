@@ -1,6 +1,10 @@
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import SociosPage from './SociosPage';
 
+jest.mock('../../hooks/usePermiso', () => ({
+  usePermiso: () => true,
+}));
+
 jest.mock('../../services/sociosService', () => ({
   getSocios: jest.fn(),
   updateSocio: jest.fn(),

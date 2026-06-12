@@ -1,6 +1,10 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import UsuariosPage from './UsuariosPage';
 
+jest.mock('../../hooks/usePermiso', () => ({
+  usePermiso: () => true,
+}));
+
 jest.mock('../../services/usuariosService', () => ({
   fetchUsuarios: jest.fn(),
   eliminarUsuario: jest.fn(),

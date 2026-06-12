@@ -14,8 +14,8 @@ jest.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }));
 
-function renderLayout(role = 'admin') {
-  useAuth.mockReturnValue({ user: { uid: '1', email: 'admin@club.com' }, loading: false, role });
+function renderLayout(permisos = []) {
+  useAuth.mockReturnValue({ user: { uid: '1', email: 'admin@club.com' }, loading: false, permisos });
   return render(
     <MemoryRouter>
       <AppLayout />
@@ -29,62 +29,71 @@ describe('AppLayout', () => {
   });
 
   test('muestra el email del usuario como botón en el header', () => {
-    renderLayout('admin');
+    renderLayout();
     expect(screen.getByRole('button', { name: 'admin@club.com' })).toBeInTheDocument();
   });
 
   test('muestra "Ver perfil" en el dropdown al hacer clic en el email', () => {
-    renderLayout('admin');
+    renderLayout();
     fireEvent.click(screen.getByRole('button', { name: 'admin@club.com' }));
     expect(screen.getByRole('button', { name: /ver perfil/i })).toBeInTheDocument();
   });
 
   test('navega a /perfil al hacer clic en "Ver perfil"', () => {
-    renderLayout('admin');
+    renderLayout();
     fireEvent.click(screen.getByRole('button', { name: 'admin@club.com' }));
     fireEvent.click(screen.getByRole('button', { name: /ver perfil/i }));
     expect(mockNavigate).toHaveBeenCalledWith('/perfil');
   });
 
-  test('muestra los links de navegación para todos los roles', () => {
-    renderLayout('admin');
+  test('muestra el link de dashboard sin permisos', () => {
+    renderLayout([]);
     expect(screen.getByRole('link', { name: /dashboard/i })).toBeInTheDocument();
+  });
+
+  test('no muestra el link de socios sin el permiso ver_socios', () => {
+    renderLayout([]);
+    expect(screen.queryByRole('link', { name: /socios/i })).not.toBeInTheDocument();
+  });
+
+  test('muestra el link de socios con el permiso ver_socios', () => {
+    renderLayout(['ver_socios']);
     expect(screen.getByRole('link', { name: /socios/i })).toBeInTheDocument();
   });
 
-  test('no muestra el link de usuarios para rol admin', () => {
-    renderLayout('admin');
+  test('no muestra el link de usuarios sin el permiso ver_usuarios', () => {
+    renderLayout([]);
     expect(screen.queryByRole('link', { name: /usuarios/i })).not.toBeInTheDocument();
   });
 
-  test('muestra el link de usuarios para rol SuperAdmin', () => {
-    renderLayout('SuperAdmin');
+  test('muestra el link de usuarios con el permiso ver_usuarios', () => {
+    renderLayout(['ver_usuarios']);
     expect(screen.getByRole('link', { name: /usuarios/i })).toBeInTheDocument();
   });
 
   test('no muestra el link de cambiar contraseña en la sidebar', () => {
-    renderLayout('admin');
+    renderLayout();
     expect(screen.queryByRole('link', { name: /cambiar contraseña/i })).not.toBeInTheDocument();
   });
 
   test('el logo de texto es un botón visible en el header', () => {
-    renderLayout('admin');
+    renderLayout();
     expect(screen.getByRole('button', { name: /ir al dashboard/i })).toBeInTheDocument();
   });
 
   test('hacer click en el logo de texto navega a /dashboard', () => {
-    renderLayout('admin');
+    renderLayout();
     fireEvent.click(screen.getByRole('button', { name: /ir al dashboard/i }));
     expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
   });
 
   test('el sidebar arranca cerrado al iniciar sesión', () => {
-    renderLayout('admin');
+    renderLayout();
     expect(document.querySelector('.app-sidebar')).toHaveClass('hidden');
   });
 
   test('hacer click en el contenido principal cierra el sidebar si está abierto', () => {
-    renderLayout('admin');
+    renderLayout();
     const sidebar = document.querySelector('.app-sidebar');
 
     fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
@@ -95,7 +104,7 @@ describe('AppLayout', () => {
   });
 
   test('hacer click en el contenido principal no abre el sidebar si está cerrado', () => {
-    renderLayout('admin');
+    renderLayout();
     const sidebar = document.querySelector('.app-sidebar');
     expect(sidebar).toHaveClass('hidden');
 
@@ -105,7 +114,7 @@ describe('AppLayout', () => {
 
   test('llama a logout y redirige al login al hacer clic en cerrar sesión', async () => {
     authService.logout.mockResolvedValueOnce();
-    renderLayout('admin');
+    renderLayout();
 
     fireEvent.click(screen.getByRole('button', { name: /cerrar sesión/i }));
 

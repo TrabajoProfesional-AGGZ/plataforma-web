@@ -8,13 +8,13 @@ import logoSocio from '../../assets/logo_socio.png';
 import './AppLayout.css';
 
 const NAV_ITEMS_BASE = [
-  { to: '/dashboard', label: 'Dashboard', desc: 'Inicio y resumen general', Icon: LayoutDashboard, rol: null },
-  { to: '/socios', label: 'Socios', desc: 'Consultar y gestionar el padrón', Icon: Users, rol: null },
-  { to: '/usuarios', label: 'Usuarios', desc: 'Usuarios administrativos y roles', Icon: ShieldCheck, rol: 'SuperAdmin' },
+  { to: '/dashboard', label: 'Dashboard', desc: 'Inicio y resumen general', Icon: LayoutDashboard, permiso: null },
+  { to: '/socios', label: 'Socios', desc: 'Consultar y gestionar el padrón', Icon: Users, permiso: 'ver_socios' },
+  { to: '/usuarios', label: 'Usuarios', desc: 'Usuarios administrativos y roles', Icon: ShieldCheck, permiso: 'ver_usuarios' },
 ];
 
 function AppLayout() {
-  const { user, role } = useAuth();
+  const { user, permisos } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -48,7 +48,7 @@ function AppLayout() {
     navigate('/');
   }
 
-  const navItems = NAV_ITEMS_BASE.filter(n => !n.rol || n.rol === role);
+  const navItems = NAV_ITEMS_BASE.filter(n => !n.permiso || permisos.includes(n.permiso));
 
   return (
     <div className="app-layout">
