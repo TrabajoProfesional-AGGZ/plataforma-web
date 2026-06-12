@@ -412,4 +412,187 @@ describe('UsuariosPage', () => {
 
     expect(screen.queryByRole('heading', { name: /cambiar rol/i })).not.toBeInTheDocument();
   });
+
+  // --- Errores genéricos ---
+
+  test('muestra error genérico cuando la carga de usuarios falla', async () => {
+    fetchUsuarios.mockRejectedValue(new Error('error-desconocido'));
+    render(<UsuariosPage />);
+    await waitFor(() => {
+      expect(screen.getByText(/error al obtener los usuarios/i)).toBeInTheDocument();
+    });
+  });
+
+  test('muestra error genérico si falla la eliminación', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    eliminarUsuario.mockRejectedValue(new Error('error-desconocido'));
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
+    await waitFor(() => expect(screen.getByText(/eliminar usuario/i)).toBeInTheDocument());
+
+    const botonesEliminar = screen.getAllByRole('button', { name: /^eliminar$/i });
+    fireEvent.click(botonesEliminar[botonesEliminar.length - 1]);
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toBeInTheDocument();
+    });
+  });
+
+  // --- Cancelar modal eliminar ---
+
+  test('cierra el modal de eliminación al hacer click en Cancelar', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
+    await waitFor(() => expect(screen.getByText(/eliminar usuario/i)).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /^cancelar$/i }));
+    expect(screen.queryByText(/eliminar usuario/i)).not.toBeInTheDocument();
+  });
+
+  test('cierra el modal de eliminación al hacer click en el overlay', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
+    await waitFor(() => expect(screen.getByText(/eliminar usuario/i)).toBeInTheDocument());
+
+    fireEvent.click(document.querySelector('.modal-overlay'));
+    expect(screen.queryByText(/eliminar usuario/i)).not.toBeInTheDocument();
+  });
+
+  // --- Cancelar edición ---
+
+  test('cancelar edición cierra el formulario', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /editar/i }));
+    await waitFor(() => expect(screen.getByRole('heading', { name: /editar usuario/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /^cancelar$/i }));
+    expect(screen.queryByRole('heading', { name: /editar usuario/i })).not.toBeInTheDocument();
+  });
+
+  // --- Ordenamiento ---
+
+  test('ordena la tabla al hacer click en el encabezado de columna', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock, usuarioMock2]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    const th = screen.getAllByRole('columnheader')[0];
+    fireEvent.click(th);
+    const rows = screen.getAllByRole('row');
+    expect(rows.length).toBeGreaterThan(1);
+  });
+
+  test('cicla entre asc, desc y sin orden al hacer click en el mismo encabezado', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock, usuarioMock2]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    const thApellido = screen.getAllByRole('columnheader')[0];
+    fireEvent.click(thApellido);
+    expect(thApellido.textContent).toContain('↑');
+
+    fireEvent.click(thApellido);
+    expect(thApellido.textContent).toContain('↓');
+
+    fireEvent.click(thApellido);
+    expect(thApellido.textContent).toContain('↕');
+  });
+
+  test('ordena la tabla al hacer click en los encabezados Nombre, Email, Rol y Estado', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock, usuarioMock2]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    const headers = screen.getAllByRole('columnheader');
+
+    fireEvent.click(headers[1]);
+    expect(headers[1].textContent).toContain('↑');
+
+    fireEvent.click(headers[2]);
+    expect(headers[2].textContent).toContain('↑');
+
+    fireEvent.click(headers[3]);
+    expect(headers[3].textContent).toContain('↑');
+
+    fireEvent.click(headers[4]);
+    expect(headers[4].textContent).toContain('↑');
+  });
+
+  test('aplica orden cuando dos usuarios tienen el mismo estado', async () => {
+    // Ambos usuarios tienen estado.nombre = 'Activo', lo que dispara el return 0 en aplicarOrden
+    fetchUsuarios.mockResolvedValue([usuarioMock, usuarioMock2]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    const thEstado = screen.getAllByRole('columnheader')[4];
+    fireEvent.click(thEstado);
+    expect(screen.getAllByRole('row').length).toBeGreaterThan(1);
+  });
+
+  // --- ESC cierra otros modales ---
+
+  test('ESC cierra el modal de edición', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /editar/i }));
+    await waitFor(() => expect(screen.getByRole('heading', { name: /editar usuario/i })).toBeInTheDocument());
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByRole('heading', { name: /editar usuario/i })).not.toBeInTheDocument();
+  });
+
+  test('ESC cierra el modal de eliminación', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
+    await waitFor(() => expect(screen.getByText(/eliminar usuario/i)).toBeInTheDocument());
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByText(/eliminar usuario/i)).not.toBeInTheDocument();
+  });
+
+  test('ESC cierra el modal de cambiar rol', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /cambiar rol/i })).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /cambiar rol/i }));
+    await waitFor(() => expect(screen.getByRole('heading', { name: /cambiar rol/i })).toBeInTheDocument());
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByRole('heading', { name: /cambiar rol/i })).not.toBeInTheDocument();
+  });
 });

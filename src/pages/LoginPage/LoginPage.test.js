@@ -69,4 +69,29 @@ describe('LoginPage', () => {
 
     expect(screen.getByRole('button', { name: /ingresando/i })).toBeDisabled();
   });
+
+  test('muestra pantalla de carga tras login exitoso', async () => {
+    authService.login.mockResolvedValueOnce();
+    renderLoginPage();
+
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'admin@club.com' } });
+    fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: 'secreto' } });
+    fireEvent.click(screen.getByRole('button', { name: /ingresar/i }));
+
+    await waitFor(() => {
+      expect(document.querySelector('.loading-logo')).toBeInTheDocument();
+    });
+  });
+
+  test('alterna la visibilidad de la contraseña al hacer click en Mostrar/Ocultar', () => {
+    renderLoginPage();
+    const passwordInput = screen.getByLabelText('Contraseña');
+    const toggleBtn = screen.getByRole('button', { name: /mostrar contraseña/i });
+
+    expect(passwordInput).toHaveAttribute('type', 'password');
+    fireEvent.click(toggleBtn);
+    expect(passwordInput).toHaveAttribute('type', 'text');
+    fireEvent.click(screen.getByRole('button', { name: /ocultar contraseña/i }));
+    expect(passwordInput).toHaveAttribute('type', 'password');
+  });
 });
