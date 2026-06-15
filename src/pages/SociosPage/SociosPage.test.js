@@ -99,15 +99,32 @@ describe('SociosPage', () => {
       target: { value: '1001' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByText('1001')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1001'));
 
     await waitFor(() => {
-      expect(screen.getByText(/Pérez/)).toBeInTheDocument();
       expect(screen.getByText('12345678')).toBeInTheDocument();
       expect(screen.getByText('1990-01-01')).toBeInTheDocument();
       expect(screen.getByText('juan@example.com')).toBeInTheDocument();
       expect(screen.getByText('11-2222-3333')).toBeInTheDocument();
       expect(screen.getAllByText('Al día').length).toBeGreaterThan(0);
     });
+  });
+
+  test('la búsqueda muestra el socio encontrado en la tabla sin abrir la card', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalled());
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+      target: { value: '1001' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(screen.getAllByText('Pérez').length).toBeGreaterThan(0);
+    expect(screen.queryByText('García')).not.toBeInTheDocument();
+    expect(screen.queryByText('12345678')).not.toBeInTheDocument();
   });
 
   test('muestra botones de editar y eliminar en la card del socio', async () => {
@@ -119,6 +136,8 @@ describe('SociosPage', () => {
       target: { value: '1001' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByText('1001')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1001'));
 
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument();
@@ -141,9 +160,9 @@ describe('SociosPage', () => {
     });
   });
 
-  test('muestra mensaje de error ante un fallo inesperado en la búsqueda', async () => {
+  test('muestra mensaje de error ante un fallo inesperado en la búsqueda cuando no hay caché', async () => {
     getSocios
-      .mockResolvedValueOnce([])
+      .mockRejectedValueOnce(new Error('fallo inicial'))
       .mockRejectedValueOnce(new Error('Error al obtener socios'));
     render(<SociosPage />);
     await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
@@ -158,9 +177,9 @@ describe('SociosPage', () => {
     });
   });
 
-  test('muestra mensaje de servicio no disponible cuando el backend devuelve 500 en búsqueda', async () => {
+  test('muestra mensaje de servicio no disponible en la búsqueda cuando no hay caché', async () => {
     getSocios
-      .mockResolvedValueOnce([])
+      .mockRejectedValueOnce(new Error('fallo inicial'))
       .mockRejectedValueOnce(new Error('servicio-no-disponible'));
     render(<SociosPage />);
     await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
@@ -175,15 +194,9 @@ describe('SociosPage', () => {
     });
   });
 
-  test('muestra mensaje de servicio no disponible cuando el backend devuelve 500 en ver todos', async () => {
-    getSocios
-      .mockResolvedValueOnce([])
-      .mockRejectedValueOnce(new Error('servicio-no-disponible'));
+  test('muestra mensaje de servicio no disponible en la carga inicial de socios', async () => {
+    getSocios.mockRejectedValue(new Error('servicio-no-disponible'));
     render(<SociosPage />);
-    await waitFor(() => expect(screen.getByRole('button', { name: /ver todos/i })).not.toBeDisabled());
-
-    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
-
     await waitFor(() => {
       expect(screen.getByText(/el servicio no está disponible/i)).toBeInTheDocument();
     });
@@ -223,18 +236,23 @@ describe('SociosPage', () => {
     });
   });
 
-  test('muestra mensaje de error si falla la carga de todos los socios', async () => {
-    getSocios
-      .mockResolvedValueOnce([])
-      .mockRejectedValueOnce(new Error('Error al obtener socios'));
+  test('muestra mensaje de error genérico en la carga inicial de socios', async () => {
+    getSocios.mockRejectedValue(new Error('Error genérico'));
     render(<SociosPage />);
-    await waitFor(() => expect(screen.getByRole('button', { name: /ver todos/i })).not.toBeDisabled());
-
-    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
-
     await waitFor(() => {
       expect(screen.getByText(/error al obtener los socios/i)).toBeInTheDocument();
     });
+  });
+
+  test('hacer click en Ver todos usa la caché y no vuelve a llamar al servidor', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
+
+    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
+
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(getSocios).toHaveBeenCalledTimes(1);
   });
 
   // --- Modal crear ---
@@ -288,6 +306,8 @@ describe('SociosPage', () => {
       target: { value: '1001' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByText('1001')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1001'));
     await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /editar/i }));
@@ -307,6 +327,8 @@ describe('SociosPage', () => {
       target: { value: '1001' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByText('1001')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1001'));
     await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /editar/i }));
@@ -328,6 +350,8 @@ describe('SociosPage', () => {
       target: { value: '1001' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByText('1001')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1001'));
     await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
@@ -346,6 +370,8 @@ describe('SociosPage', () => {
       target: { value: '1001' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByText('1001')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1001'));
     await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
@@ -443,6 +469,8 @@ describe('SociosPage', () => {
       target: { value: '1001' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByText('1001')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1001'));
     await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
@@ -464,6 +492,8 @@ describe('SociosPage', () => {
       target: { value: '1001' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByText('1001')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1001'));
     await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
@@ -486,6 +516,8 @@ describe('SociosPage', () => {
       target: { value: '1001' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByText('1001')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1001'));
     await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
@@ -504,6 +536,8 @@ describe('SociosPage', () => {
       target: { value: '1001' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByText('1001')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1001'));
     await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
@@ -524,6 +558,8 @@ describe('SociosPage', () => {
       target: { value: '1001' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByText('1001')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1001'));
     await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /editar/i }));
@@ -544,6 +580,8 @@ describe('SociosPage', () => {
       target: { value: '1001' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByText('1001')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1001'));
     await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /editar/i }));
@@ -562,6 +600,8 @@ describe('SociosPage', () => {
       target: { value: '1001' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    await waitFor(() => expect(screen.getByText('1001')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1001'));
     await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));

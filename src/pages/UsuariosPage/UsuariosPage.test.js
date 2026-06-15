@@ -165,8 +165,19 @@ describe('UsuariosPage', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
 
-    expect(screen.getAllByText('Sánchez').length).toBeGreaterThan(0);
+    await waitFor(() => expect(screen.getAllByText('Sánchez').length).toBeGreaterThan(0));
     expect(screen.queryByText('Rodríguez')).not.toBeInTheDocument();
+  });
+
+  test('hacer click en Ver todos usa la caché y no vuelve a llamar al servidor', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(fetchUsuarios).toHaveBeenCalledTimes(1));
+
+    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
+
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(fetchUsuarios).toHaveBeenCalledTimes(1);
   });
 
   test('Ver todos limpia el filtro y muestra la lista completa', async () => {
@@ -178,8 +189,6 @@ describe('UsuariosPage', () => {
       target: { value: 'laura' },
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
-    expect(screen.queryByText('Rodríguez')).not.toBeInTheDocument();
-
     fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
 
     await waitFor(() => {
@@ -229,7 +238,9 @@ describe('UsuariosPage', () => {
     });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
 
-    expect(screen.getByText(/no hay usuarios con los filtros seleccionados/i)).toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.getByText(/no hay usuarios con los filtros seleccionados/i)).toBeInTheDocument();
+    });
   });
 
   // --- Modal crear ---
