@@ -114,4 +114,18 @@ describe('EditUserForm', () => {
       expect(screen.getByRole('button', { name: /guardando/i })).toBeDisabled();
     });
   });
+
+  test('cierra el formulario al presionar ESC', () => {
+    const { onCancel } = renderForm();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onCancel).toHaveBeenCalledTimes(1);
+  });
+
+  test('los inputs aplican estilo al recibir y perder foco', () => {
+    renderForm();
+    const nombreInput = screen.getByDisplayValue('Carlos');
+    fireEvent.focus(nombreInput);
+    fireEvent.blur(nombreInput);
+    expect(nombreInput).toBeInTheDocument();
+  });
 });

@@ -563,6 +563,21 @@ describe('UsuariosPage', () => {
     expect(screen.getAllByRole('row').length).toBeGreaterThan(1);
   });
 
+  test('Ver todos recarga del servidor cuando no hay caché', async () => {
+    fetchUsuarios
+      .mockRejectedValueOnce(new Error('fallo inicial'))
+      .mockResolvedValueOnce([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(fetchUsuarios).toHaveBeenCalledTimes(1));
+
+    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
+
+    await waitFor(() => {
+      expect(fetchUsuarios).toHaveBeenCalledTimes(2);
+      expect(screen.getByRole('table')).toBeInTheDocument();
+    });
+  });
+
   // --- ESC cierra otros modales ---
 
   test('ESC cierra el modal de edición', async () => {

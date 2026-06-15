@@ -676,4 +676,71 @@ describe('SociosPage', () => {
     fireEvent.click(thCategoria);
     expect(screen.getAllByRole('row').length).toBeGreaterThan(1);
   });
+
+  // --- Búsqueda sin caché (ruta no-cache en handleBuscar) ---
+
+  test('muestra el socio en la tabla al buscarlo cuando la caché está vacía', async () => {
+    getSocios
+      .mockRejectedValueOnce(new Error('fallo inicial'))
+      .mockResolvedValueOnce([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+      target: { value: '1001' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(screen.getAllByText('Pérez').length).toBeGreaterThan(0);
+  });
+
+  test('muestra no encontrado al buscar sin caché cuando el socio no existe', async () => {
+    getSocios
+      .mockRejectedValueOnce(new Error('fallo inicial'))
+      .mockResolvedValueOnce([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+      target: { value: '9999' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/no se encontró ningún socio/i)).toBeInTheDocument();
+    });
+  });
+
+  test('Ver todos cancela el timeout de búsqueda pendiente y muestra la lista', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+      target: { value: '1001' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+    // buscarTimeoutRef.current queda pendiente (400ms), no ha disparado aún
+
+    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
+
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(getSocios).toHaveBeenCalledTimes(1);
+  });
+
+  test('Ver todos recarga del servidor cuando no hay caché', async () => {
+    getSocios
+      .mockRejectedValueOnce(new Error('fallo inicial'))
+      .mockResolvedValueOnce([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
+
+    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
+
+    await waitFor(() => {
+      expect(getSocios).toHaveBeenCalledTimes(2);
+      expect(screen.getByRole('table')).toBeInTheDocument();
+    });
+  });
 });
