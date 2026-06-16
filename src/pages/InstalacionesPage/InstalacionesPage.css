@@ -1,0 +1,341 @@
+.instalaciones-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.instalaciones-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: #111111;
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.instalaciones-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+.instalaciones-empty {
+  text-align: center;
+  padding: 48px 0;
+  color: #4a4a4a;
+  font-size: 15px;
+  margin: 0;
+}
+
+/* ── Table ── */
+.instalaciones-table-wrapper {
+  background-color: #ffffff;
+  border: 1px solid #111111;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.instalaciones-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.instalaciones-tabla th {
+  text-align: left;
+  padding: 12px 20px;
+  border-bottom: 1px solid #111111;
+  color: #4a4a4a;
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.instalaciones-tabla td {
+  padding: 14px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #111111;
+  vertical-align: middle;
+}
+
+.instalaciones-tabla tr:last-child td {
+  border-bottom: none;
+}
+
+.instalaciones-tr-clickable {
+  cursor: pointer;
+}
+
+.instalaciones-tr-clickable:hover td {
+  background-color: #f5f5f5;
+}
+
+/* ── Badges ── */
+.instalaciones-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid;
+}
+
+.badge-si {
+  background-color: #fff3cd;
+  color: #856404;
+  border-color: #ffc107;
+}
+
+.badge-no {
+  background-color: #f5f5f5;
+  color: #4a4a4a;
+  border-color: #4a4a4a;
+}
+
+/* ── Buttons ── */
+.instalaciones-btn-crear {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  background-color: #111111;
+  color: #ffffff;
+  transition: background-color 0.15s;
+}
+
+.instalaciones-btn-crear:hover {
+  background-color: #4a4a4a;
+}
+
+/* ── Detail view ── */
+.instalaciones-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.instalaciones-nav-acciones {
+  display: flex;
+  gap: 8px;
+}
+
+.instalaciones-btn-volver {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  border: 1px solid #111111;
+  border-radius: 6px;
+  background: #ffffff;
+  font-size: 14px;
+  font-weight: 500;
+  color: #111111;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.instalaciones-btn-volver:hover {
+  background-color: #f5f5f5;
+}
+
+.instalaciones-btn-editar-inst {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: #111111;
+  color: #ffffff;
+  border: none;
+  transition: background-color 0.15s;
+}
+
+.instalaciones-btn-editar-inst:hover {
+  background-color: #4a4a4a;
+}
+
+.instalaciones-btn-eliminar-inst {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: #c0392b;
+  color: #ffffff;
+  border: none;
+  transition: background-color 0.15s;
+}
+
+.instalaciones-btn-eliminar-inst:hover {
+  background-color: #96281b;
+}
+
+/* ── Installation card ── */
+.instalaciones-card {
+  background-color: #ffffff;
+  border: 1px solid #111111;
+  border-radius: 12px;
+  padding: 24px 28px;
+  margin-bottom: 28px;
+}
+
+.instalaciones-card-nombre {
+  font-size: 22px;
+  font-weight: 600;
+  color: #111111;
+  margin: 0 0 16px 0;
+}
+
+.instalaciones-card-datos {
+  display: flex;
+  gap: 40px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.instalaciones-card-dato {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.instalaciones-card-label {
+  font-weight: 500;
+  color: #4a4a4a;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+/* ── Reservas section ── */
+.instalaciones-reservas-section {
+  margin-top: 8px;
+}
+
+.instalaciones-reservas-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.instalaciones-reservas-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111111;
+  margin: 0;
+}
+
+.instalaciones-reserva-acciones {
+  display: flex;
+  gap: 6px;
+}
+
+.instalaciones-btn-reserva-editar,
+.instalaciones-btn-reserva-eliminar {
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.instalaciones-btn-reserva-editar {
+  background-color: #ffffff;
+  color: #111111;
+  border: 1px solid #111111;
+}
+
+.instalaciones-btn-reserva-editar:hover {
+  background-color: #f5f5f5;
+}
+
+.instalaciones-btn-reserva-eliminar {
+  background-color: #c0392b;
+  color: #ffffff;
+  border: none;
+}
+
+.instalaciones-btn-reserva-eliminar:hover {
+  background-color: #96281b;
+}
+
+/* ── Secciones en vista lista ── */
+.instalaciones-seccion-separator {
+  margin-top: 32px;
+}
+
+.instalaciones-seccion-separator:first-of-type {
+  margin-top: 0;
+}
+
+.instalaciones-seccion-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.instalaciones-seccion-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111111;
+  margin: 0;
+}
+
+.instalaciones-placeholder {
+  padding: 24px 0;
+  font-style: italic;
+}
+
+/* ── Formulario inline de reserva (en detalle) ── */
+.instalaciones-reserva-form {
+  background-color: #ffffff;
+  border: 1px solid #111111;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.instalaciones-reserva-form-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.instalaciones-reserva-horas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.instalaciones-reserva-form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ── Checkbox field modifier (en modales simples) ── */
+.modal-field.modal-field-checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.modal-field.modal-field-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #111111;
+  flex-shrink: 0;
+}
