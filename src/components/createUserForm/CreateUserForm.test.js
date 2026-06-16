@@ -1,5 +1,5 @@
 import React from 'react';
-import { render, screen, waitFor, fireEvent } from '@testing-library/react';
+import { render, screen, waitFor, fireEvent, act } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CreateUserForm } from './CreateUserForm';
 
@@ -35,10 +35,11 @@ const ROLES_MOCK = [
   { id: 2, nombre: 'PRESIDENTE' },
 ];
 
-function renderForm() {
+async function renderForm() {
   const onSuccess = jest.fn();
   const onCancel = jest.fn();
   render(<CreateUserForm onSuccess={onSuccess} onCancel={onCancel} />);
+  await act(async () => {});
   return { onSuccess, onCancel };
 }
 
@@ -60,6 +61,7 @@ async function fillStep3() {
 
 async function navigateToStep4(onSuccess, onCancel) {
   render(<CreateUserForm onSuccess={onSuccess} onCancel={onCancel} />);
+  await act(async () => {});
 
   await fillStep1();
   userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
@@ -86,7 +88,7 @@ describe('CreateUserForm', () => {
   });
 
   test('renderiza el paso 1 con los campos personales', async () => {
-    renderForm();
+    await renderForm();
     expect(screen.getByText('Nuevo usuario')).toBeInTheDocument();
     expect(screen.getByText(/paso 1 de/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText('María')).toBeInTheDocument();
@@ -95,14 +97,14 @@ describe('CreateUserForm', () => {
   });
 
   test('llama a onCancel al hacer click en Cancelar en paso 1', async () => {
-    const { onCancel } = renderForm();
+    const { onCancel } = await renderForm();
     fireEvent.click(screen.getByRole('button', { name: /cancelar/i }));
     expect(onCancel).toHaveBeenCalledTimes(1);
     await waitFor(() => expect(fetchRoles).toHaveBeenCalled());
   });
 
   test('no avanza al paso 2 si los campos del paso 1 están vacíos', async () => {
-    renderForm();
+    await renderForm();
     userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
     await waitFor(() => {
       expect(screen.getByText(/paso 1 de/i)).toBeInTheDocument();
@@ -110,7 +112,7 @@ describe('CreateUserForm', () => {
   });
 
   test('avanza al paso 2 con campos válidos en paso 1', async () => {
-    renderForm();
+    await renderForm();
     await fillStep1();
     userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
     await waitFor(() => {
@@ -120,7 +122,7 @@ describe('CreateUserForm', () => {
   });
 
   test('renderiza el paso 4 con el select de roles cargado', async () => {
-    renderForm();
+    await renderForm();
     await fillStep1();
     userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
     await waitFor(() => expect(screen.getByText(/paso 2 de/i)).toBeInTheDocument());
@@ -142,7 +144,7 @@ describe('CreateUserForm', () => {
   });
 
   test('muestra error si el rol no fue seleccionado al intentar crear', async () => {
-    renderForm();
+    await renderForm();
     await fillStep1();
     userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
     await waitFor(() => expect(screen.getByText(/paso 2 de/i)).toBeInTheDocument());
@@ -172,13 +174,13 @@ describe('CreateUserForm', () => {
 
   test('muestra los selects aunque falle la carga de roles', async () => {
     fetchRoles.mockRejectedValue(new Error('network error'));
-    renderForm();
+    await renderForm();
     expect(screen.getByText('Nuevo usuario')).toBeInTheDocument();
     await waitFor(() => expect(fetchRoles).toHaveBeenCalled());
   });
 
   test('retrocede al paso 1 al hacer click en Atrás desde el paso 2', async () => {
-    const { onSuccess, onCancel } = renderForm();
+    const { onSuccess, onCancel } = await renderForm();
     await fillStep1();
     userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
     await waitFor(() => expect(screen.getByText(/paso 2 de/i)).toBeInTheDocument());
@@ -187,8 +189,8 @@ describe('CreateUserForm', () => {
     await waitFor(() => expect(screen.getByText(/paso 1 de/i)).toBeInTheDocument());
   });
 
-  test('llama a onCancel al hacer click en el overlay', () => {
-    const { onCancel } = renderForm();
+  test('llama a onCancel al hacer click en el overlay', async () => {
+    const { onCancel } = await renderForm();
     fireEvent.click(document.querySelector('.csf-overlay'));
     expect(onCancel).toHaveBeenCalledTimes(1);
   });
