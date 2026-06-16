@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { Users, ShieldCheck, Calendar, Trophy, ArrowUpRight, Building2 } from 'lucide-react';
+import { Users, ShieldCheck, Trophy, ArrowUpRight, Building2 } from 'lucide-react';
 import './DashboardPage.css';
 
 const SECCIONES = [
