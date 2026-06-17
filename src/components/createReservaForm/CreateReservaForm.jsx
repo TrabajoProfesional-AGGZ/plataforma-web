@@ -5,19 +5,22 @@ import {
   User, Clock,
   ChevronRight, ChevronLeft,
   CheckCircle2, AlertCircle,
-  Calendar, Tag,
+  Calendar, Building2, Hash,
 } from 'lucide-react';
+import { createReserva } from '../../services/reservasService';
+import { getSocioByNroSocio } from '../../services/sociosService';
 import logoVerde from '../../assets/logo-verde.png';
+import logo from '../../assets/logo_socio.png';
 import '../createForm/CreateSocioForm.css';
 
 const STEPS = [
-  { id: 1, label: 'Solicitante', icon: User },
+  { id: 1, label: 'Datos', icon: User },
   { id: 2, label: 'Horario', icon: Clock },
 ];
 
 const stepFields = {
-  1: ['titulo', 'nombre_solicitante'],
-  2: ['fecha', 'hora_inicio', 'hora_fin'],
+  1: ['nro_socio', 'id_instalacion'],
+  2: ['fecha_reserva', 'hora_inicio', 'hora_fin'],
 };
 
 const slideVariants = {
@@ -74,11 +77,32 @@ function StyledInput({ error, ...props }) {
   );
 }
 
-export function CreateReservaForm({ onSuccess, onCancel }) {
+function StyledSelect({ error, children, ...props }) {
+  const [focused, setFocused] = useState(false);
+  return (
+    <select
+      {...props}
+      onFocus={(e) => { setFocused(true); props.onFocus?.(e); }}
+      onBlur={(e) => { setFocused(false); props.onBlur?.(e); }}
+      className={`csf-input${error ? ' csf-input--error' : ''}`}
+      style={{
+        background: focused ? '#ffffff' : error ? '#ffffff' : '#f5f5f5',
+        borderColor: error ? '#c0392b' : focused ? '#111111' : 'transparent',
+      }}
+    >
+      {children}
+    </select>
+  );
+}
+
+export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [] }) {
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [navGuard, setNavGuard] = useState(false);
+  const [busquedaSocio, setBusquedaSocio] = useState(false);
+  const [errorSocio, setErrorSocio] = useState('');
+  const [socioResuelto, setSocioResuelto] = useState(null);
 
   const {
     register,
@@ -99,6 +123,26 @@ export function CreateReservaForm({ onSuccess, onCancel }) {
   const goNext = async () => {
     const valid = await trigger(stepFields[step]);
     if (!valid) return;
+
+    if (step === 1) {
+      const nroSocio = getValues('nro_socio');
+      setBusquedaSocio(true);
+      setErrorSocio('');
+      try {
+        const socio = await getSocioByNroSocio(nroSocio);
+        setSocioResuelto(socio);
+        setNavGuard(true);
+        setDirection(1);
+        setStep((s) => s + 1);
+        setTimeout(() => setNavGuard(false), 300);
+      } catch {
+        setErrorSocio('No se encontró ningún socio con ese número.');
+      } finally {
+        setBusquedaSocio(false);
+      }
+      return;
+    }
+
     setNavGuard(true);
     setDirection(1);
     setStep((s) => s + 1);
@@ -110,8 +154,19 @@ export function CreateReservaForm({ onSuccess, onCancel }) {
     setStep((s) => s - 1);
   };
 
-  const onSubmit = () => {
+  const onSubmit = async (data) => {
     setSubmitted(true);
+    try {
+      await createReserva({
+        id_socio: socioResuelto.id,
+        id_instalacion: data.id_instalacion,
+        fecha_reserva: data.fecha_reserva,
+        hora_inicio: data.hora_inicio,
+        hora_fin: data.hora_fin,
+      });
+    } catch {
+      // silently ignore
+    }
     setTimeout(() => onSuccess(), 1800);
   };
 
@@ -235,19 +290,42 @@ export function CreateReservaForm({ onSuccess, onCancel }) {
                         transition={{ duration: 0.26, ease: 'easeInOut' }}
                         className="csf-fields"
                       >
-                        <Field label="Título de la reserva" icon={Tag} error={errors.titulo?.message}>
+                        <Field label="Número de socio" icon={Hash} error={errors.nro_socio?.message}>
                           <StyledInput
-                            {...register('titulo', { required: 'El título es requerido' })}
-                            placeholder="Ej. Partido de fútbol"
-                            error={!!errors.titulo}
+                            {...register('nro_socio', { required: 'El número de socio es requerido' })}
+                            type="text"
+                            placeholder="Ej. 1234"
+                            error={!!errors.nro_socio}
                           />
+                          {socioResuelto && (
+                            <p className="csf-socio-encontrado">
+                              <CheckCircle2 size={13} color="#0D6E0D" />
+                              {socioResuelto.apellido} {socioResuelto.nombre}
+                            </p>
+                          )}
+                          {errorSocio && (
+                            <p className="csf-error">
+                              <AlertCircle size={12} />
+                              {errorSocio}
+                            </p>
+                          )}
+                          {busquedaSocio && (
+                            <div className="csf-socio-buscando">
+                              <img src={logo} alt="" className="csf-socio-logo-spin" />
+                              <span>Buscando socio...</span>
+                            </div>
+                          )}
                         </Field>
-                        <Field label="Nombre del solicitante" icon={User} error={errors.nombre_solicitante?.message}>
-                          <StyledInput
-                            {...register('nombre_solicitante', { required: 'El nombre del solicitante es requerido' })}
-                            placeholder="Ej. Juan García"
-                            error={!!errors.nombre_solicitante}
-                          />
+                        <Field label="Instalación" icon={Building2} error={errors.id_instalacion?.message}>
+                          <StyledSelect
+                            {...register('id_instalacion', { required: 'Debe seleccionar una instalación' })}
+                            error={!!errors.id_instalacion}
+                          >
+                            <option value="">Seleccionar instalación...</option>
+                            {instalaciones.map((inst) => (
+                              <option key={inst.id} value={inst.id}>{inst.nombre}</option>
+                            ))}
+                          </StyledSelect>
                         </Field>
                       </motion.div>
                     )}
@@ -263,11 +341,11 @@ export function CreateReservaForm({ onSuccess, onCancel }) {
                         transition={{ duration: 0.26, ease: 'easeInOut' }}
                         className="csf-fields"
                       >
-                        <Field label="Fecha" icon={Calendar} error={errors.fecha?.message}>
+                        <Field label="Fecha" icon={Calendar} error={errors.fecha_reserva?.message}>
                           <StyledInput
-                            {...register('fecha', { required: 'La fecha es requerida' })}
+                            {...register('fecha_reserva', { required: 'La fecha es requerida' })}
                             type="date"
-                            error={!!errors.fecha}
+                            error={!!errors.fecha_reserva}
                           />
                         </Field>
                         <div className="csf-grid-2">
@@ -325,6 +403,7 @@ export function CreateReservaForm({ onSuccess, onCancel }) {
                       <motion.button
                         type="button"
                         onClick={goNext}
+                        disabled={busquedaSocio}
                         whileHover={{ scale: 1.015 }}
                         whileTap={{ scale: 0.985 }}
                         className="csf-btn-next"

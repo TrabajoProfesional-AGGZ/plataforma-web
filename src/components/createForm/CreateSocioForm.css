@@ -353,3 +353,34 @@
   accent-color: #111111;
   flex-shrink: 0;
 }
+
+/* ── Búsqueda de socio por número ── */
+.csf-socio-encontrado {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #0D6E0D;
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+.csf-socio-buscando {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #4a4a4a;
+  margin-top: 6px;
+}
+
+.csf-socio-logo-spin {
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

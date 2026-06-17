@@ -5,7 +5,7 @@ import {
   Building2, Settings,
   ChevronRight, ChevronLeft,
   CheckCircle2, AlertCircle,
-  Users, DollarSign,
+  Users, DollarSign, Tag,
 } from 'lucide-react';
 import logoVerde from '../../assets/logo-verde.png';
 import '../createForm/CreateSocioForm.css';
@@ -16,8 +16,8 @@ const STEPS = [
 ];
 
 const stepFields = {
-  1: ['nombre'],
-  2: ['capacidad_maxima'],
+  1: ['nombre', 'tipo'],
+  2: ['capacidad_maxima', 'valor_hora'],
 };
 
 const slideVariants = {
@@ -113,8 +113,10 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
     setSubmitted(true);
     setTimeout(() => onSuccess({
       nombre: data.nombre.trim(),
+      tipo: data.tipo.trim(),
       capacidad_maxima: Number(data.capacidad_maxima),
-      requiere_pago_extra: Boolean(data.requiere_pago_extra),
+      valor_hora: Number(data.valor_hora),
+      activa: Boolean(data.activa),
     }), 1800);
   };
 
@@ -245,6 +247,13 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
                             error={!!errors.nombre}
                           />
                         </Field>
+                        <Field label="Tipo de instalación" icon={Tag} error={errors.tipo?.message}>
+                          <StyledInput
+                            {...register('tipo', { required: 'El tipo es requerido' })}
+                            placeholder="Ej. Deportiva, Social, Recreativa"
+                            error={!!errors.tipo}
+                          />
+                        </Field>
                       </motion.div>
                     )}
 
@@ -272,18 +281,33 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
                             error={!!errors.capacidad_maxima}
                           />
                         </Field>
+                        <Field label="Valor por hora ($)" icon={DollarSign} error={errors.valor_hora?.message}>
+                          <StyledInput
+                            {...register('valor_hora', {
+                              required: 'El valor por hora es requerido',
+                              min: { value: 0, message: 'No puede ser negativo' },
+                              validate: (v) => Number(v) >= 0 || 'No puede ser negativo',
+                            })}
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            placeholder="Ej. 1500"
+                            error={!!errors.valor_hora}
+                          />
+                        </Field>
                         <div className="csf-field">
                           <span className="csf-label">
-                            <DollarSign size={13} strokeWidth={2} />
-                            Pago extra
+                            <CheckCircle2 size={13} strokeWidth={2} />
+                            Estado
                           </span>
                           <label className="csf-checkbox-label">
                             <input
                               type="checkbox"
                               className="csf-checkbox-input"
-                              {...register('requiere_pago_extra')}
+                              defaultChecked
+                              {...register('activa')}
                             />
-                            Esta instalación requiere pago extra para reservar
+                            La instalación está activa y disponible para reservas
                           </label>
                         </div>
                       </motion.div>
