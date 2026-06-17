@@ -49,17 +49,18 @@ function InstalacionesPage() {
       .finally(() => setLoadingInstalaciones(false));
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  async function cargarReservas(instalacionId) {
+    const [reservasData, sociosData] = await Promise.all([getReservas(instalacionId), getSocios()]);
+    const socioMap = Object.fromEntries(sociosData.map((s) => [s.id, s.nro_socio]));
+    setReservas(reservasData.map((r) => ({
+      ...r,
+      nro_socio: r.nro_socio ?? socioMap[r.id_socio] ?? r.id_socio,
+    })));
+  }
+
   useEffect(() => {
     if (!instalacionActual || !puedeVerReservas) return;
-    Promise.all([getReservas(instalacionActual.id), getSocios()])
-      .then(([reservasData, sociosData]) => {
-        const socioMap = Object.fromEntries(sociosData.map((s) => [s.id, s.nro_socio]));
-        setReservas(reservasData.map((r) => ({
-          ...r,
-          nro_socio: r.nro_socio ?? socioMap[r.id_socio] ?? r.id_socio,
-        })));
-      })
-      .catch(() => {});
+    cargarReservas(instalacionActual.id).catch(() => {});
   }, [instalacionActual]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const anyModalOpen = eliminarInstalacionOpen || eliminarReservaOpen;
@@ -141,31 +142,21 @@ function InstalacionesPage() {
       setLoadingReservaInline(false);
       return;
     }
-    setLoadingReservaInline(false);
 
-    const tempId = genId();
-    const nueva = {
-      id: tempId,
-      instalacion_id: instalacionActual.id,
-      nro_socio: nro_socio.trim(),
-      fecha_reserva,
-      hora_inicio,
-      hora_fin,
-    };
-    setReservas((prev) => [...prev, nueva]);
     setFormReserva(FORM_RESERVA_INICIAL);
     try {
-      const created = await createReserva({
+      await createReserva({
         id_socio: socio.id,
         id_instalacion: instalacionActual.id,
-        fecha_reserva: nueva.fecha_reserva,
-        hora_inicio: nueva.hora_inicio,
-        hora_fin: nueva.hora_fin,
+        fecha_reserva,
+        hora_inicio,
+        hora_fin,
       });
-      setReservas((prev) => prev.map((r) => r.id === tempId ? { ...r, id: created.id } : r));
+      await cargarReservas(instalacionActual.id);
     } catch {
-      setReservas((prev) => prev.filter((r) => r.id !== tempId));
       setErrReservaInline('Error al crear la reserva. Intente nuevamente.');
+    } finally {
+      setLoadingReservaInline(false);
     }
   }
 

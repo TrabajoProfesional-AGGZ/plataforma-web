@@ -9,24 +9,24 @@ describe('reservasService', () => {
   });
 
   describe('getReservas', () => {
-    test('llama al endpoint correcto con el id de la instalación', async () => {
+    test('llama al endpoint correcto y filtra por instalacion', async () => {
       fetchTo.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: async () => ({ reservas: [{ id: '1', titulo: 'Partido' }] }),
+        json: async () => ({ reservas: [{ id: '1', titulo: 'Partido', id_instalacion: 'inst-1' }] }),
       });
 
       const result = await getReservas('inst-1');
 
-      expect(fetchTo).toHaveBeenCalledWith('/api/v1/instalaciones/inst-1/reservas', 'GET');
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/reservas', 'GET');
       expect(result).toHaveLength(1);
     });
 
-    test('devuelve la respuesta directa si no tiene clave reservas', async () => {
+    test('devuelve la respuesta directa si no tiene clave reservas, filtrando por instalacion', async () => {
       fetchTo.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: async () => [{ id: '1' }],
+        json: async () => [{ id: '1', id_instalacion: 'inst-1' }],
       });
 
       const result = await getReservas('inst-1');
@@ -82,7 +82,7 @@ describe('reservasService', () => {
 
       await deleteReserva('inst-1', 'reserva-1');
 
-      expect(fetchTo).toHaveBeenCalledWith('/api/v1/instalaciones/inst-1/reservas/reserva-1', 'DELETE');
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/reservas/reserva-1', 'DELETE');
     });
 
     test('lanza servicio-no-disponible en 500', async () => {

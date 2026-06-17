@@ -20,9 +20,10 @@ jest.mock('../../services/reservasService', () => ({
 import { getReservas, createReserva, deleteReserva } from '../../services/reservasService';
 
 jest.mock('../../services/sociosService', () => ({
+  getSocios: jest.fn(),
   getSocioByNroSocio: jest.fn(),
 }));
-import { getSocioByNroSocio } from '../../services/sociosService';
+import { getSocios, getSocioByNroSocio } from '../../services/sociosService';
 
 jest.mock('../../assets/logo_socio.png', () => 'logo_socio.png');
 
@@ -80,14 +81,29 @@ function ultimoBoton(nombre) {
 
 const SOCIO_MOCK = { id: 'socio-uuid-1', nro_socio: '1234', nombre: 'Juan', apellido: 'García' };
 
+let reservasStore = [];
+
 describe('InstalacionesPage', () => {
   beforeEach(() => {
+    reservasStore = [];
     getInstalaciones.mockResolvedValue([]);
     createInstalacion.mockResolvedValue({ id: 'test-id' });
     deleteInstalacion.mockResolvedValue(undefined);
-    getReservas.mockResolvedValue([]);
-    createReserva.mockResolvedValue({ id: 'test-reserva-id' });
+    getReservas.mockImplementation(() => Promise.resolve([...reservasStore]));
+    createReserva.mockImplementation(async (data) => {
+      const id = 'test-reserva-id';
+      reservasStore = [...reservasStore, {
+        id,
+        id_instalacion: data.id_instalacion,
+        id_socio: data.id_socio,
+        fecha_reserva: data.fecha_reserva,
+        hora_inicio: data.hora_inicio,
+        hora_fin: data.hora_fin,
+      }];
+      return { id };
+    });
     deleteReserva.mockResolvedValue(undefined);
+    getSocios.mockResolvedValue([SOCIO_MOCK]);
     getSocioByNroSocio.mockResolvedValue(SOCIO_MOCK);
   });
 
@@ -279,11 +295,11 @@ describe('InstalacionesPage', () => {
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
-    await crearReservaInline({ nroSocio: '2001', fecha: '2026-10-05', horaIni: '16:00', horaFin: '18:00' });
-    expect(screen.getByText('2001')).toBeInTheDocument();
+    await crearReservaInline({ nroSocio: '1234', fecha: '2026-10-05', horaIni: '16:00', horaFin: '18:00' });
+    expect(screen.getByText('1234')).toBeInTheDocument();
     fireEvent.click(ultimoBoton('Eliminar'));
     fireEvent.click(ultimoBoton('Eliminar'));
-    expect(screen.queryByText('2001')).not.toBeInTheDocument();
+    expect(screen.queryByText('1234')).not.toBeInTheDocument();
     expect(screen.getByText('No hay reservas para esta instalación.')).toBeInTheDocument();
   });
 
@@ -291,10 +307,10 @@ describe('InstalacionesPage', () => {
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
-    await crearReservaInline({ nroSocio: '2002', fecha: '2026-10-10', horaIni: '10:00', horaFin: '11:00' });
+    await crearReservaInline({ nroSocio: '1234', fecha: '2026-10-10', horaIni: '10:00', horaFin: '11:00' });
     fireEvent.click(ultimoBoton('Eliminar'));
     fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
-    expect(screen.getByText('2002')).toBeInTheDocument();
+    expect(screen.getByText('1234')).toBeInTheDocument();
   });
 
   test('al eliminar instalación también se eliminan sus reservas', async () => {
@@ -336,12 +352,12 @@ describe('InstalacionesPage', () => {
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
-    await crearReservaInline({ nroSocio: '2006', fecha: '2026-07-01', horaIni: '09:00', horaFin: '10:00' });
+    await crearReservaInline({ nroSocio: '1234', fecha: '2026-07-01', horaIni: '09:00', horaFin: '10:00' });
     fireEvent.click(ultimoBoton('Eliminar'));
     expect(screen.getByText(/estás seguro/i)).toBeInTheDocument();
     fireEvent.click(document.querySelector('.modal-overlay'));
     expect(screen.queryByText(/estás seguro/i)).not.toBeInTheDocument();
-    expect(screen.getByText('2006')).toBeInTheDocument();
+    expect(screen.getByText('1234')).toBeInTheDocument();
   });
 
   // ── Tests de permisos ──
