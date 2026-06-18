@@ -9,37 +9,37 @@ const SECCIONES = [
     titulo: 'Socios',
     descripcion: 'Crear nuevos socios y consultar el padrón.',
     Icon: Users,
-    rol: null,
+    permiso: 'ver_socios',
   },
   {
     path: '/usuarios',
     titulo: 'Usuarios Administrativos',
     descripcion: 'Crear nuevos usuarios administrativos y gestionar roles/permisos.',
     Icon: ShieldCheck,
-    rol: 'SuperAdmin',
+    permiso: 'ver_usuarios',
   },
   {
     path: '/dashboard',
     titulo: 'Reservas',
     descripcion: 'Crear, modificar, eliminar o consultar reservas.',
     Icon: Calendar,
-    rol: null,
+    permiso: null,
   },
   {
     path: '/dashboard',
     titulo: 'Disciplinas',
     descripcion: 'Crear, modificar, eliminar o consultar disciplinas.',
     Icon: Trophy,
-    rol: null,
+    permiso: null,
   },
 ];
 
 
 function DashboardPage() {
   const navigate = useNavigate();
-  const { user, role } = useAuth();
+  const { user, permisos } = useAuth();
 
-  const secciones = SECCIONES.filter(s => !s.rol || s.rol === role);
+  const secciones = SECCIONES.filter(s => !s.permiso || permisos.includes(s.permiso));
 
   return (
     <div className="dashboard-main">

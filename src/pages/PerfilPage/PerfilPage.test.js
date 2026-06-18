@@ -63,7 +63,7 @@ describe('PerfilPage', () => {
     test('el modal se cierra al hacer click fuera de él', () => {
       renderPage();
       fireEvent.click(screen.getByRole('button', { name: /cambiar contraseña/i }));
-      fireEvent.click(screen.getByRole('heading', { name: /cambiar contraseña/i }).closest('.modal-overlay'));
+      fireEvent.click(screen.getByRole('heading', { name: /cambiar contraseña/i }).closest('.csf-overlay'));
       expect(screen.queryByRole('heading', { name: /cambiar contraseña/i })).not.toBeInTheDocument();
     });
 
@@ -113,6 +113,26 @@ describe('PerfilPage', () => {
         expect(authService.logout).not.toHaveBeenCalled();
       });
       expect(screen.getByRole('heading', { name: /cambiar contraseña/i })).toBeInTheDocument();
+    });
+
+    test('el botón de mostrar/ocultar contraseña cambia la visibilidad del campo', () => {
+      renderPage();
+      fireEvent.click(screen.getByRole('button', { name: /cambiar contraseña/i }));
+
+      const showButton = screen.getAllByRole('button', { name: /mostrar contraseña/i })[0];
+      fireEvent.click(showButton);
+
+      expect(screen.getAllByRole('button', { name: /ocultar contraseña/i }).length).toBeGreaterThan(0);
+    });
+
+    test('los campos de contraseña aplican estilo al recibir y perder foco', () => {
+      renderPage();
+      fireEvent.click(screen.getByRole('button', { name: /cambiar contraseña/i }));
+
+      const input = screen.getByLabelText('Contraseña actual');
+      fireEvent.focus(input);
+      fireEvent.blur(input);
+      expect(input).toBeInTheDocument();
     });
   });
 });

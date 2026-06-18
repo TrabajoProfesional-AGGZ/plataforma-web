@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search, Plus } from 'lucide-react';
 import { fetchUsuarios, eliminarUsuario } from '../../services/usuariosService';
 import { fetchRoles } from '../../services/rolesService';
 import { CreateUserForm } from '../../components/createUserForm/CreateUserForm';
 import { EditUserForm } from '../../components/editUserForm/EditUserForm';
 import { CambiarRolForm } from '../../components/cambiarRolForm/CambiarRolForm';
+import { usePermiso } from '../../hooks/usePermiso';
 import logo from '../../assets/logo_socio.png';
 import logoVerde from '../../assets/logo-verde.png';
 import logoAmarillo from '../../assets/logo-amarillo.png';
@@ -29,6 +30,13 @@ function getValorOrden(usuario, campo) {
 }
 
 function UsuariosPage() {
+  const puedeCrear = usePermiso('crear_usuario');
+  const puedeEditar = usePermiso('editar_usuario');
+  const puedeBorrar = usePermiso('borrar_usuario');
+
+  const cacheUsuariosRef = useRef(null);
+  const buscarTimeoutRef = useRef(null);
+
   const [busqueda, setBusqueda] = useState('');
   const [modo, setModo] = useState('lista');
   const [resultado, setResultado] = useState(null);
@@ -50,10 +58,13 @@ function UsuariosPage() {
   const [errorModal, setErrorModal] = useState('');
 
   useEffect(() => {
-    cargarUsuarios();
+    fetchYActualizarUsuarios();
     fetchRoles()
       .then((data) => setRoles(Array.isArray(data) ? data : []))
       .catch(() => {});
+    return () => {
+      if (buscarTimeoutRef.current) clearTimeout(buscarTimeoutRef.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -71,16 +82,12 @@ function UsuariosPage() {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [anyModalOpen, crearModalOpen, editarModalOpen, eliminarModalOpen, cambiarRolModalOpen]);
 
-  async function cargarUsuarios() {
+  async function fetchYActualizarUsuarios() {
     setLoading(true);
     setError(null);
-    setBusqueda('');
-    setFiltroBusqueda('');
-    setFiltroRol('');
-    setFiltroAbierto(false);
-    setOrden({ campo: null, dir: 'asc' });
     try {
       const usuarios = await fetchUsuarios();
+      cacheUsuariosRef.current = usuarios;
       setResultado(usuarios);
       setModo('lista');
     } catch (err) {
@@ -94,14 +101,47 @@ function UsuariosPage() {
     }
   }
 
+  async function recargarUsuarios() {
+    setBusqueda('');
+    setFiltroBusqueda('');
+    setFiltroRol('');
+    setFiltroAbierto(false);
+    setOrden({ campo: null, dir: 'asc' });
+    cacheUsuariosRef.current = null;
+    await fetchYActualizarUsuarios();
+  }
+
   function handleBuscar(e) {
     e.preventDefault();
-    setFiltroBusqueda(busqueda.trim().toLowerCase());
-    setModo('lista');
+    if (buscarTimeoutRef.current) clearTimeout(buscarTimeoutRef.current);
+    setLoading(true);
+    const termino = busqueda.trim().toLowerCase();
+    buscarTimeoutRef.current = setTimeout(() => {
+      buscarTimeoutRef.current = null;
+      setFiltroBusqueda(termino);
+      setModo('lista');
+      setLoading(false);
+    }, 400);
   }
 
   function handleVerTodos() {
-    cargarUsuarios();
+    if (buscarTimeoutRef.current) {
+      clearTimeout(buscarTimeoutRef.current);
+      buscarTimeoutRef.current = null;
+      setLoading(false);
+    }
+    setBusqueda('');
+    setFiltroBusqueda('');
+    setFiltroRol('');
+    setFiltroAbierto(false);
+    setOrden({ campo: null, dir: 'asc' });
+    setError(null);
+    if (cacheUsuariosRef.current !== null) {
+      setResultado(cacheUsuariosRef.current);
+      setModo('lista');
+      return;
+    }
+    fetchYActualizarUsuarios();
   }
 
   function toggleOrden(campo) {
@@ -147,8 +187,7 @@ function UsuariosPage() {
     try {
       await eliminarUsuario(resultado.id);
       setEliminarModalOpen(false);
-      setModo('lista');
-      cargarUsuarios();
+      await recargarUsuarios();
     } catch (err) {
       if (err.message === 'servicio-no-disponible') {
         setErrorModal('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
@@ -199,13 +238,15 @@ function UsuariosPage() {
           </form>
         </div>
         <div className="usuarios-toolbar-right">
-          <button className="usuarios-ver-todos-button" onClick={handleVerTodos} disabled={loading}>
+          <button className="usuarios-ver-todos-button" onClick={handleVerTodos}>
             Ver todos
           </button>
-          <button className="usuarios-crear-button" onClick={() => setCrearModalOpen(true)} disabled={loading}>
-            <Plus size={15} aria-hidden="true" />
-            Crear usuario
-          </button>
+          {puedeCrear && (
+            <button className="usuarios-crear-button" onClick={() => setCrearModalOpen(true)} disabled={loading}>
+              <Plus size={15} aria-hidden="true" />
+              Crear usuario
+            </button>
+          )}
         </div>
       </div>
 
@@ -345,16 +386,22 @@ function UsuariosPage() {
               </div>
             </div>
             <div className="usuarios-card-actions">
-              <button className="usuarios-btn-eliminar" onClick={abrirEliminar}>
-                Eliminar
-              </button>
+              {puedeBorrar && (
+                <button className="usuarios-btn-eliminar" onClick={abrirEliminar}>
+                  Eliminar
+                </button>
+              )}
               <div className="usuarios-card-actions-right">
-                <button className="usuarios-btn-cambiar-rol" onClick={abrirCambiarRol}>
-                  Cambiar rol
-                </button>
-                <button className="usuarios-btn-editar" onClick={abrirEditar}>
-                  Editar
-                </button>
+                {puedeEditar && (
+                  <button className="usuarios-btn-cambiar-rol" onClick={abrirCambiarRol}>
+                    Cambiar rol
+                  </button>
+                )}
+                {puedeEditar && (
+                  <button className="usuarios-btn-editar" onClick={abrirEditar}>
+                    Editar
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -363,7 +410,7 @@ function UsuariosPage() {
 
       {crearModalOpen && (
         <CreateUserForm
-          onSuccess={() => { setCrearModalOpen(false); cargarUsuarios(); }}
+          onSuccess={() => { setCrearModalOpen(false); recargarUsuarios(); }}
           onCancel={() => setCrearModalOpen(false)}
         />
       )}

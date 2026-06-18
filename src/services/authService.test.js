@@ -86,6 +86,14 @@ describe('authService', () => {
     });
   });
 
+  describe('logout', () => {
+    test('llama a signOut al hacer logout', async () => {
+      signOut.mockResolvedValueOnce();
+      await logout();
+      expect(signOut).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('changePassword', () => {
     test('cambia la contraseña correctamente cuando la contraseña actual es válida', async () => {
       const mockCredential = {};

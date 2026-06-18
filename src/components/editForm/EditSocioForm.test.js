@@ -160,4 +160,67 @@ describe('EditSocioForm', () => {
     expect(onCancel).toHaveBeenCalledTimes(1);
     await screen.findByRole('option', { name: 'Activo' });
   });
+
+  test('retrocede al paso 1 al hacer click en Atrás desde el paso 2', async () => {
+    renderForm();
+    await screen.findByDisplayValue('Activo');
+
+    userEvent.click(screen.getByRole('button', { name: /Siguiente/i }));
+    await waitFor(() => expect(screen.getByPlaceholderText('ej: 12345678')).toBeInTheDocument());
+
+    userEvent.click(screen.getByRole('button', { name: /Atrás/i }));
+    await waitFor(() => expect(screen.getByText(/Paso 1 de/)).toBeInTheDocument());
+  });
+
+  test('llama a onCancel al hacer click en el overlay', async () => {
+    const { onCancel } = renderForm();
+    fireEvent.click(document.querySelector('.csf-overlay'));
+    expect(onCancel).toHaveBeenCalledTimes(1);
+    await screen.findByRole('option', { name: 'Activo' });
+  });
+
+  test('muestra la pantalla de éxito tras guardar cambios', async () => {
+    renderForm();
+    await screen.findByDisplayValue('Activo');
+
+    await navigateToStep3();
+    userEvent.click(screen.getByRole('button', { name: /Guardar cambios/i }));
+
+    await waitFor(() => expect(screen.getByText('¡Datos actualizados!')).toBeInTheDocument());
+  });
+
+  test('llama a onSuccess tras 1800ms de la pantalla de éxito', async () => {
+    const { onSuccess } = renderForm();
+    await screen.findByDisplayValue('Activo');
+
+    await navigateToStep3();
+    userEvent.click(screen.getByRole('button', { name: /Guardar cambios/i }));
+
+    await waitFor(() => expect(screen.getByText('¡Datos actualizados!')).toBeInTheDocument());
+    expect(onSuccess).not.toHaveBeenCalled();
+
+    await waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1), { timeout: 3000 });
+  });
+
+  test('muestra error de servicio no disponible al guardar', async () => {
+    updateSocio.mockRejectedValue(new Error('servicio-no-disponible'));
+    renderForm();
+    await screen.findByDisplayValue('Activo');
+
+    await navigateToStep3();
+    userEvent.click(screen.getByRole('button', { name: /Guardar cambios/i }));
+
+    await waitFor(() => expect(screen.getByText(/servicio no está disponible/i)).toBeInTheDocument());
+  });
+
+  test('muestra error genérico ante fallos desconocidos', async () => {
+    updateSocio.mockRejectedValue(new Error('unknown'));
+    renderForm();
+    await screen.findByDisplayValue('Activo');
+
+    await navigateToStep3();
+    userEvent.click(screen.getByRole('button', { name: /Guardar cambios/i }));
+
+    await waitFor(() => expect(screen.getByText(/error al modificar el socio/i)).toBeInTheDocument());
+  });
 });

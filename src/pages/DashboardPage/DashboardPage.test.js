@@ -17,17 +17,25 @@ describe('DashboardPage', () => {
     jest.clearAllMocks();
   });
 
-  test('renderiza el título y las tarjetas visibles para admin', () => {
-    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, role: 'admin' });
+  test('renderiza el título sin tarjetas protegidas para usuario sin permisos', () => {
+    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, permisos: [] });
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
     expect(screen.getByRole('heading', { name: /panel principal/i })).toBeInTheDocument();
+    expect(screen.queryByText('Socios')).not.toBeInTheDocument();
+    expect(screen.queryByText('Usuarios Administrativos')).not.toBeInTheDocument();
+  });
+
+  test('muestra la tarjeta de Socios con el permiso ver_socios', () => {
+    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, permisos: ['ver_socios'] });
+    render(<MemoryRouter><DashboardPage /></MemoryRouter>);
+
     expect(screen.getByText('Socios')).toBeInTheDocument();
     expect(screen.queryByText('Usuarios Administrativos')).not.toBeInTheDocument();
   });
 
-  test('renderiza la tarjeta de Usuarios Administrativos para SuperAdmin', () => {
-    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, role: 'SuperAdmin' });
+  test('muestra ambas tarjetas con ver_socios y ver_usuarios', () => {
+    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, permisos: ['ver_socios', 'ver_usuarios'] });
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
     expect(screen.getByText('Socios')).toBeInTheDocument();
@@ -35,7 +43,7 @@ describe('DashboardPage', () => {
   });
 
   test('navega a /socios al hacer click en la tarjeta de Socios', () => {
-    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, role: 'admin' });
+    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, permisos: ['ver_socios'] });
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
     fireEvent.click(screen.getByText('Socios').closest('button'));
@@ -43,7 +51,7 @@ describe('DashboardPage', () => {
   });
 
   test('navega a /usuarios al hacer click en la tarjeta de Usuarios Administrativos', () => {
-    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, role: 'SuperAdmin' });
+    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, permisos: ['ver_socios', 'ver_usuarios'] });
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
     fireEvent.click(screen.getByText('Usuarios Administrativos').closest('button'));

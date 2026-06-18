@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Search, Plus } from 'lucide-react';
 import { getSocios, deleteSocio } from '../../services/sociosService';
 import { CreateSocioForm } from '../../components/createForm/CreateSocioForm';
 import { EditSocioForm } from '../../components/editForm/EditSocioForm';
+import { usePermiso } from '../../hooks/usePermiso';
 import logo from '../../assets/logo_socio.png';
 import logoVerde from '../../assets/logo-verde.png';
 import logoRojo from '../../assets/logo-rojo.png';
@@ -32,6 +33,13 @@ const ICONOS_ORDEN = { asc: ' ↑', desc: ' ↓', none: ' ↕' };
 
 
 function SociosPage() {
+  const puedeCrear = usePermiso('crear_socio');
+  const puedeEditar = usePermiso('editar_socio');
+  const puedeBorrar = usePermiso('borrar_socio');
+
+  const cacheSociosRef = useRef(null);
+  const buscarTimeoutRef = useRef(null);
+
   const [nroSocio, setNroSocio] = useState('');
   const [modo, setModo] = useState('idle'); // idle | socio | lista | no-encontrado
   const [resultado, setResultado] = useState(null);
@@ -50,7 +58,10 @@ function SociosPage() {
   const [errorModal, setErrorModal] = useState('');
 
   useEffect(() => {
-    handleVerTodos();
+    cargarSocios();
+    return () => {
+      if (buscarTimeoutRef.current) clearTimeout(buscarTimeoutRef.current);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -91,17 +102,66 @@ function SociosPage() {
     });
   }
 
-  async function handleBuscar(e) {
-    e.preventDefault();
-    if (!nroSocio.trim()) return;
+  async function cargarSocios() {
     setLoading(true);
     setError(null);
     try {
       const socios = await getSocios();
-      const encontrado = socios.find(s => s.nro_socio === nroSocio.trim());
+      cacheSociosRef.current = socios;
+      setResultado(socios);
+      setModo('lista');
+    } catch (err) {
+      if (err.message === 'servicio-no-disponible') {
+        setError('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
+      } else {
+        setError('Error al obtener los socios. Intentá de nuevo.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function recargarSocios() {
+    setNroSocio('');
+    setOrden({ campo: null, dir: 'asc' });
+    setFiltroEstado('');
+    setFiltroAbierto(false);
+    setFiltroCategoria('');
+    cacheSociosRef.current = null;
+    await cargarSocios();
+  }
+
+  async function handleBuscar(e) {
+    e.preventDefault();
+    if (!nroSocio.trim()) return;
+    const socios = cacheSociosRef.current;
+    if (socios !== null) {
+      if (buscarTimeoutRef.current) clearTimeout(buscarTimeoutRef.current);
+      setLoading(true);
+      const nro = nroSocio.trim();
+      buscarTimeoutRef.current = setTimeout(() => {
+        buscarTimeoutRef.current = null;
+        const encontrado = socios.find(s => s.nro_socio === nro);
+        if (encontrado) {
+          setResultado([encontrado]);
+          setModo('lista');
+        } else {
+          setModo('no-encontrado');
+          setResultado(null);
+        }
+        setLoading(false);
+      }, 400);
+      return;
+    }
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await getSocios();
+      cacheSociosRef.current = data;
+      const encontrado = data.find(s => s.nro_socio === nroSocio.trim());
       if (encontrado) {
-        setResultado(encontrado);
-        setModo('socio');
+        setResultado([encontrado]);
+        setModo('lista');
       } else {
         setModo('no-encontrado');
         setResultado(null);
@@ -117,27 +177,24 @@ function SociosPage() {
     }
   }
 
-  async function handleVerTodos() {
-    setLoading(true);
-    setError(null);
+  function handleVerTodos() {
+    if (buscarTimeoutRef.current) {
+      clearTimeout(buscarTimeoutRef.current);
+      buscarTimeoutRef.current = null;
+      setLoading(false);
+    }
     setNroSocio('');
     setOrden({ campo: null, dir: 'asc' });
     setFiltroEstado('');
     setFiltroAbierto(false);
     setFiltroCategoria('');
-    try {
-      const socios = await getSocios();
-      setResultado(socios);
+    setError(null);
+    if (cacheSociosRef.current !== null) {
+      setResultado(cacheSociosRef.current);
       setModo('lista');
-    } catch (err) {
-      if (err.message === 'servicio-no-disponible') {
-        setError('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
-      } else {
-        setError('Error al obtener los socios. Intentá de nuevo.');
-      }
-    } finally {
-      setLoading(false);
+      return;
     }
+    cargarSocios();
   }
 
   function abrirEditar() {
@@ -155,6 +212,7 @@ function SociosPage() {
     setErrorModal('');
     try {
       await deleteSocio(resultado.id);
+      cacheSociosRef.current = null;
       setEliminarModalOpen(false);
       setModo('idle');
       setResultado(null);
@@ -195,13 +253,15 @@ function SociosPage() {
           </form>
         </div>
         <div className="socios-toolbar-right">
-          <button className="socios-ver-todos-button" onClick={handleVerTodos} disabled={loading}>
+          <button className="socios-ver-todos-button" onClick={handleVerTodos}>
             Ver todos
           </button>
-          <button className="socios-crear-button" onClick={() => setCrearModalOpen(true)} disabled={loading}>
-            <Plus size={15} aria-hidden="true" />
-            Crear socio
-          </button>
+          {puedeCrear && (
+            <button className="socios-crear-button" onClick={() => setCrearModalOpen(true)} disabled={loading}>
+              <Plus size={15} aria-hidden="true" />
+              Crear socio
+            </button>
+          )}
         </div>
       </div>
 
@@ -260,12 +320,16 @@ function SociosPage() {
               </div>
             </div>
             <div className="socios-card-actions">
-              <button className="socios-btn-eliminar" onClick={abrirEliminar}>
-                Eliminar
-              </button>
-              <button className="socios-btn-editar" onClick={abrirEditar}>
-                Editar
-              </button>
+              {puedeBorrar && (
+                <button className="socios-btn-eliminar" onClick={abrirEliminar}>
+                  Eliminar
+                </button>
+              )}
+              {puedeEditar && (
+                <button className="socios-btn-editar" onClick={abrirEditar}>
+                  Editar
+                </button>
+              )}
             </div>
           </div>
         );
@@ -386,7 +450,7 @@ function SociosPage() {
       {/* Modal crear socio */}
       {crearModalOpen && (
         <CreateSocioForm
-          onSuccess={() => { setCrearModalOpen(false); handleVerTodos(); }}
+          onSuccess={() => { setCrearModalOpen(false); recargarSocios(); }}
           onCancel={() => setCrearModalOpen(false)}
         />
       )}
