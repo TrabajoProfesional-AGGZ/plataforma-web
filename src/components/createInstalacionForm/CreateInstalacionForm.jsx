@@ -6,6 +6,7 @@ import { Field, StyledInput, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
+import PropTypes from 'prop-types';
 
 const STEPS = [
   { id: 1, label: 'Datos', icon: Building2 },
@@ -131,3 +132,8 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
     </MultiStepFormShell>
   );
 }
+
+CreateInstalacionForm.propTypes = {
+  onSuccess: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+};

@@ -112,7 +112,7 @@ function InstalacionesPage() {
 
   // === Instalaciones filtradas ===
 
-  const tiposDisponibles = [...new Set(instalaciones.map((i) => i.tipo))].sort();
+  const tiposDisponibles = [...new Set(instalaciones.map((i) => i.tipo))].sort((a, b) => a.localeCompare(b));
   const instalacionesFiltradas = filtroTipo
     ? instalaciones.filter((i) => i.tipo === filtroTipo)
     : instalaciones;
