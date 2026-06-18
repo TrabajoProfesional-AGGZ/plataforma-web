@@ -5,6 +5,11 @@ jest.mock('../../hooks/usePermiso', () => ({
   usePermiso: () => true,
 }));
 
+jest.mock('../../context/AuthContext', () => ({
+  useAuthContext: jest.fn(() => ({ userData: { usuario_id: 'uuid-9999' } })),
+}));
+import { useAuthContext } from '../../context/AuthContext';
+
 jest.mock('../../services/usuariosService', () => ({
   fetchUsuarios: jest.fn(),
   eliminarUsuario: jest.fn(),
@@ -83,6 +88,7 @@ describe('UsuariosPage', () => {
     jest.clearAllMocks();
     fetchUsuarios.mockResolvedValue([]);
     fetchRoles.mockResolvedValue(rolesMock);
+    useAuthContext.mockReturnValue({ userData: { usuario_id: 'uuid-9999' } });
   });
 
   test('renderiza el título, el campo de búsqueda y los botones', async () => {
@@ -620,5 +626,31 @@ describe('UsuariosPage', () => {
 
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByRole('heading', { name: /cambiar rol/i })).not.toBeInTheDocument();
+  });
+
+  // --- Auto-edición de permisos ---
+
+  test('no muestra el botón Cambiar rol cuando el usuario seleccionado es el usuario logueado', async () => {
+    useAuthContext.mockReturnValue({ userData: { usuario_id: 'uuid-0001' } });
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+
+    await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: /cambiar rol/i })).not.toBeInTheDocument();
+  });
+
+  test('muestra el botón Cambiar rol cuando el usuario seleccionado no es el usuario logueado', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /cambiar rol/i })).toBeInTheDocument();
+    });
   });
 });

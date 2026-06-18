@@ -7,6 +7,7 @@ import { CreateUserForm } from '../../components/createUserForm/CreateUserForm';
 import { EditUserForm } from '../../components/editUserForm/EditUserForm';
 import { CambiarRolForm } from '../../components/cambiarRolForm/CambiarRolForm';
 import { usePermiso } from '../../hooks/usePermiso';
+import { useAuthContext } from '../../context/AuthContext';
 import logo from '../../assets/logo_socio.png';
 import logoVerde from '../../assets/logo-verde.png';
 import logoAmarillo from '../../assets/logo-amarillo.png';
@@ -35,6 +36,7 @@ function UsuariosPage() {
   const puedeCrear = usePermiso('crear_usuario');
   const puedeEditar = usePermiso('editar_usuario');
   const puedeBorrar = usePermiso('borrar_usuario');
+  const { userData } = useAuthContext();
 
   const cacheUsuariosRef = useRef(null);
   const buscarTimeoutRef = useRef(null);
@@ -350,6 +352,7 @@ function UsuariosPage() {
       {!loading && modo === 'usuario' && resultado && !Array.isArray(resultado) && (() => {
         const cfg = estadoConfig(resultado.estado?.nombre);
         const permisos = resultado.rol?.permisos ?? [];
+        const esMismoUsuario = resultado.id === userData?.usuario_id;
         return (
           <div className="usuarios-card" style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}>
             <div className="usuarios-card-inner">
@@ -394,7 +397,7 @@ function UsuariosPage() {
                 </button>
               )}
               <div className="usuarios-card-actions-right">
-                {puedeEditar && (
+                {puedeEditar && !esMismoUsuario && (
                   <button className="usuarios-btn-cambiar-rol" onClick={abrirCambiarRol}>
                     Cambiar rol
                   </button>
