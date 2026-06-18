@@ -1,17 +1,6 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { CreateDisciplinaForm } from './CreateDisciplinaForm';
 
-jest.mock('framer-motion', () => {
-  const React = require('react');
-  return {
-    motion: new Proxy({}, {
-      get: (_, tag) => ({ children, animate, initial, exit, transition, variants, custom, whileHover, whileTap, ...props }) =>
-        React.createElement(tag, props, children),
-    }),
-    AnimatePresence: ({ children }) => children,
-  };
-});
-
 jest.mock('../../assets/logo-verde.png', () => 'logo-verde.png');
 
 const onSuccess = jest.fn();

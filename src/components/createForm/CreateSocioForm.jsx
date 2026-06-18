@@ -6,6 +6,7 @@ import {
   Calendar, Mail, MapPin,
 } from 'lucide-react';
 import { createSocio } from '../../services/sociosService';
+import { validarFechaNacimiento } from '../../utils/formValidators';
 import { Field, StyledInput, StyledSelect, FormStep } from './FormFields';
 import { MultiStepFormShell } from './MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
@@ -115,17 +116,7 @@ export function CreateSocioForm({ onSuccess, onCancel }) {
             </div>
             <Field label="Fecha de nacimiento" icon={Calendar} error={errors.birthDate?.message}>
               <StyledInput
-                {...register('birthDate', {
-                  required: 'La fecha es requerida',
-                  validate: (v) => {
-                    const d = new Date(v);
-                    const now = new Date();
-                    if (isNaN(d.getTime())) return 'Fecha inválida';
-                    if (d > now) return 'La fecha no puede ser futura';
-                    if (now.getFullYear() - d.getFullYear() > 120) return 'Fecha inválida';
-                    return true;
-                  },
-                })}
+                {...register('birthDate', { required: 'La fecha es requerida', validate: validarFechaNacimiento })}
                 type="date"
                 max={new Date().toISOString().split('T')[0]}
                 error={!!errors.birthDate}

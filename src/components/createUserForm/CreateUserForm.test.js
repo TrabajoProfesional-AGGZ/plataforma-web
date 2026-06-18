@@ -5,20 +5,6 @@ import { CreateUserForm } from './CreateUserForm';
 
 jest.mock('../../firebase', () => ({ auth: { currentUser: { getIdToken: jest.fn().mockResolvedValue('token') } } }));
 
-jest.mock('framer-motion', () => {
-  const mockReact = require('react');
-  const motion = new Proxy({}, {
-    get: (_, tag) => {
-      return ({ children, whileHover, whileTap, initial, animate, exit, transition, variants, custom, ...props }) =>
-        mockReact.createElement(tag, props, children);
-    },
-  });
-  return {
-    motion,
-    AnimatePresence: ({ children }) => children,
-  };
-});
-
 jest.mock('../../services/usuariosService', () => ({
   crearUsuario: jest.fn(),
 }));
@@ -122,21 +108,7 @@ describe('CreateUserForm', () => {
   });
 
   test('renderiza el paso 4 con el select de roles cargado', async () => {
-    await renderForm();
-    await fillStep1();
-    userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
-    await waitFor(() => expect(screen.getByText(/paso 2 de/i)).toBeInTheDocument());
-
-    fireEvent.change(screen.getByText('Seleccionar...').closest('select'), { target: { value: 'DNI' } });
-    fireEvent.change(screen.getByPlaceholderText('Ej. 12345678'), { target: { value: '12345678' } });
-    userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
-    await waitFor(() => expect(screen.getByText(/paso 3 de/i)).toBeInTheDocument());
-
-    fireEvent.change(screen.getByPlaceholderText('maria@ejemplo.com'), { target: { value: 'ana@ejemplo.com' } });
-    fireEvent.change(screen.getByPlaceholderText(/mínimo 6/i), { target: { value: 'secreta123' } });
-    userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
-    await waitFor(() => expect(screen.getByText(/paso 4 de/i)).toBeInTheDocument());
-
+    await navigateToStep4(jest.fn(), jest.fn());
     await waitFor(() => {
       expect(screen.getByRole('option', { name: 'ADMIN' })).toBeInTheDocument();
       expect(screen.getByRole('option', { name: 'PRESIDENTE' })).toBeInTheDocument();
@@ -144,25 +116,8 @@ describe('CreateUserForm', () => {
   });
 
   test('muestra error si el rol no fue seleccionado al intentar crear', async () => {
-    await renderForm();
-    await fillStep1();
-    userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
-    await waitFor(() => expect(screen.getByText(/paso 2 de/i)).toBeInTheDocument());
-
-    fireEvent.change(screen.getByText('Seleccionar...').closest('select'), { target: { value: 'DNI' } });
-    fireEvent.change(screen.getByPlaceholderText('Ej. 12345678'), { target: { value: '12345678' } });
-    userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
-    await waitFor(() => expect(screen.getByText(/paso 3 de/i)).toBeInTheDocument());
-
-    fireEvent.change(screen.getByPlaceholderText('maria@ejemplo.com'), { target: { value: 'ana@ejemplo.com' } });
-    fireEvent.change(screen.getByPlaceholderText(/mínimo 6/i), { target: { value: 'secreta123' } });
-    userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
-    await waitFor(() => {
-      expect(screen.getByText(/paso 4 de/i)).toBeInTheDocument();
-    });
-    await waitFor(() => {
-      expect(screen.getByRole('button', { name: /crear usuario/i })).not.toBeDisabled();
-    });
+    await navigateToStep4(jest.fn(), jest.fn());
+    await waitFor(() => expect(screen.getByRole('button', { name: /crear usuario/i })).not.toBeDisabled());
 
     userEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
 

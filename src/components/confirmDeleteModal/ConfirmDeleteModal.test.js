@@ -2,17 +2,6 @@ import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import ConfirmDeleteModal from './ConfirmDeleteModal';
 
-jest.mock('framer-motion', () => {
-  const mockReact = require('react');
-  const motion = new Proxy({}, {
-    get: (_, tag) => {
-      return ({ children, whileHover, whileTap, initial, animate, exit, transition, ...props }) =>
-        mockReact.createElement(tag, props, children);
-    },
-  });
-  return { motion };
-});
-
 describe('ConfirmDeleteModal', () => {
   const defaultProps = {
     open: true,

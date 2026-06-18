@@ -6,6 +6,7 @@ import {
   Calendar, Mail, MapPin, Activity, Tag,
 } from 'lucide-react';
 import { updateSocio } from '../../services/sociosService';
+import { validarFechaNacimientoOpcional } from '../../utils/formValidators';
 import { fetchEstadosSocio, fetchCategoriasSocio } from '../../services/catalogosService';
 import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFields';
@@ -136,17 +137,7 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
             <div className="csf-grid-2">
               <Field label="Fecha de nacimiento" icon={Calendar} error={errors.fecha_nacimiento?.message}>
                 <StyledInput
-                  {...register('fecha_nacimiento', {
-                    validate: (v) => {
-                      if (!v) return true;
-                      const d = new Date(v);
-                      const now = new Date();
-                      if (isNaN(d.getTime())) return 'Fecha inválida';
-                      if (d > now) return 'La fecha no puede ser futura';
-                      if (now.getFullYear() - d.getFullYear() > 120) return 'Fecha inválida';
-                      return true;
-                    },
-                  })}
+                  {...register('fecha_nacimiento', { validate: validarFechaNacimientoOpcional })}
                   type="date"
                   max={new Date().toISOString().split('T')[0]}
                   error={!!errors.fecha_nacimiento}

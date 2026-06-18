@@ -6,6 +6,7 @@ import {
   Calendar, Lock,
 } from 'lucide-react';
 import { crearUsuario } from '../../services/usuariosService';
+import { validarFechaNacimiento } from '../../utils/formValidators';
 import { fetchRoles } from '../../services/rolesService';
 import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFields';
@@ -124,17 +125,7 @@ export function CreateUserForm({ onSuccess, onCancel }) {
             </div>
             <Field label="Fecha de nacimiento" icon={Calendar} error={errors.fechaNacimiento?.message}>
               <StyledInput
-                {...register('fechaNacimiento', {
-                  required: 'La fecha es requerida',
-                  validate: (v) => {
-                    const d = new Date(v);
-                    const now = new Date();
-                    if (isNaN(d.getTime())) return 'Fecha inválida';
-                    if (d > now) return 'La fecha no puede ser futura';
-                    if (now.getFullYear() - d.getFullYear() > 120) return 'Fecha inválida';
-                    return true;
-                  },
-                })}
+                {...register('fechaNacimiento', { required: 'La fecha es requerida', validate: validarFechaNacimiento })}
                 type="date"
                 max={new Date().toISOString().split('T')[0]}
                 error={!!errors.fechaNacimiento}

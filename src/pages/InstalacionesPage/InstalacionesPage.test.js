@@ -53,6 +53,12 @@ jest.mock('../../components/createReservaForm/CreateReservaForm', () => ({
   ),
 }));
 
+function mockUnaReserva() {
+  getReservas.mockImplementation((instalacionId) => Promise.resolve([
+    { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+  ]));
+}
+
 // Helpers
 async function renderPage() {
   render(<InstalacionesPage />);
@@ -258,14 +264,10 @@ describe('InstalacionesPage', () => {
   // ── Tests de Ver Socio ──
 
   test('hacer clic en el nro de socio abre un card con sus datos', async () => {
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
-    ]));
-
+    mockUnaReserva();
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
-
     await waitFor(() => expect(screen.getByText('1234')).toBeInTheDocument());
     fireEvent.click(screen.getByText('1234'));
 
@@ -274,14 +276,10 @@ describe('InstalacionesPage', () => {
   });
 
   test('el card del socio se cierra al hacer clic en Cerrar', async () => {
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
-    ]));
-
+    mockUnaReserva();
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
-
     await waitFor(() => expect(screen.getByText('1234')).toBeInTheDocument());
     fireEvent.click(screen.getByText('1234'));
     expect(screen.getByText('García Juan')).toBeInTheDocument();
@@ -291,14 +289,10 @@ describe('InstalacionesPage', () => {
   });
 
   test('ESC cierra el card del socio', async () => {
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
-    ]));
-
+    mockUnaReserva();
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
-
     await waitFor(() => expect(screen.getByText('1234')).toBeInTheDocument());
     fireEvent.click(screen.getByText('1234'));
     expect(screen.getByText('García Juan')).toBeInTheDocument();
@@ -309,14 +303,10 @@ describe('InstalacionesPage', () => {
   // ── Tests de toggle de reservas ──
 
   test('el toggle oculta las reservas al hacer clic en "Ocultar reservas"', async () => {
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
-    ]));
-
+    mockUnaReserva();
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
-
     await waitFor(() => expect(screen.getByText('2026-08-01')).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /ocultar reservas/i }));
@@ -324,14 +314,10 @@ describe('InstalacionesPage', () => {
   });
 
   test('el toggle muestra las reservas al hacer clic en "Mostrar reservas"', async () => {
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
-    ]));
-
+    mockUnaReserva();
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
-
     await waitFor(() => expect(screen.getByText('2026-08-01')).toBeInTheDocument());
     fireEvent.click(screen.getByRole('button', { name: /ocultar reservas/i }));
     expect(screen.queryByText('2026-08-01')).not.toBeInTheDocument();
@@ -501,14 +487,10 @@ describe('InstalacionesPage', () => {
   });
 
   test('hacer click en el overlay del card del socio lo cierra', async () => {
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
-    ]));
-
+    mockUnaReserva();
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
-
     await waitFor(() => expect(screen.getByText('1234')).toBeInTheDocument());
     fireEvent.click(screen.getByText('1234'));
     expect(screen.getByText('García Juan')).toBeInTheDocument();
