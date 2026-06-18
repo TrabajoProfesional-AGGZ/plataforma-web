@@ -25,20 +25,17 @@ export function MultiStepFormShell({
   const progress = (step / steps.length) * 100;
 
   return (
-    <button
-      type="button"
+    <div
       className="csf-overlay"
-      aria-label="Cerrar formulario"
-      onClick={onCancel}
-      onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') onCancel(); }}
+      role="presentation"
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onCancel();
+      }}
+      onKeyDown={(e) => {
+        if (e.target === e.currentTarget && (e.key === 'Escape' || e.key === 'Enter')) onCancel();
+      }}
     >
-      {/* ¡Acá está el cambio! Usamos <dialog> nativo con el atributo open */}
-      <dialog 
-        open 
-        className="csf-wrapper" 
-        onClick={(e) => e.stopPropagation()} 
-        onKeyDown={(e) => e.stopPropagation()}
-      >
+      <dialog open className="csf-wrapper">
         <AnimatePresence mode="wait">
           {submitted ? (
             <motion.div
@@ -212,7 +209,7 @@ export function MultiStepFormShell({
           )}
         </AnimatePresence>
       </dialog>
-    </button>
+    </div>
   );
 }
 
