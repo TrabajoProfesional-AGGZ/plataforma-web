@@ -51,6 +51,7 @@ function InstalacionesPage() {
   const [eliminarReservaOpen, setEliminarReservaOpen] = useState(false);
   const [reservaActual, setReservaActual] = useState(null);
 
+  const [filtroTipo, setFiltroTipo] = useState('');
   const [filtroFecha, setFiltroFecha] = useState('');
   const [reservasVisible, setReservasVisible] = useState(true);
   const [verSocioData, setVerSocioData] = useState(null);
@@ -120,6 +121,13 @@ function InstalacionesPage() {
     } catch { /* silently ignore */ }
   }
 
+  // === Instalaciones filtradas ===
+
+  const tiposDisponibles = [...new Set(instalaciones.map((i) => i.tipo))].sort();
+  const instalacionesFiltradas = filtroTipo
+    ? instalaciones.filter((i) => i.tipo === filtroTipo)
+    : instalaciones;
+
   // === Reservas (en detalle de instalación) ===
 
   const reservasDeInstalacion = reservas.filter((r) => (r.instalacion_id ?? r.id_instalacion) === instalacionActual?.id);
@@ -158,12 +166,29 @@ function InstalacionesPage() {
           <div className="instalaciones-seccion-separator">
             <div className="instalaciones-seccion-header">
               <h2 className="instalaciones-seccion-title">Instalaciones</h2>
-              {puedeCrearInstalacion && (
-                <button className="instalaciones-btn-crear" onClick={() => setCrearInstalacionFormOpen(true)}>
-                  <Plus size={15} aria-hidden="true" />
-                  Nueva instalación
-                </button>
-              )}
+              <div className="instalaciones-seccion-toolbar">
+                <div>
+                  {tiposDisponibles.length > 0 && (
+                    <select
+                      className="instalaciones-filtro-tipo"
+                      value={filtroTipo}
+                      onChange={(e) => setFiltroTipo(e.target.value)}
+                      aria-label="Filtrar por tipo"
+                    >
+                      <option value="">Todos los tipos</option>
+                      {tiposDisponibles.map((tipo) => (
+                        <option key={tipo} value={tipo}>{tipo}</option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+                {puedeCrearInstalacion && (
+                  <button className="instalaciones-btn-crear" onClick={() => setCrearInstalacionFormOpen(true)}>
+                    <Plus size={15} aria-hidden="true" />
+                    Nueva instalación
+                  </button>
+                )}
+              </div>
             </div>
 
             {loadingInstalaciones ? (
@@ -172,6 +197,8 @@ function InstalacionesPage() {
               </div>
             ) : instalaciones.length === 0 ? (
               <p className="instalaciones-empty">No hay instalaciones registradas.</p>
+            ) : instalacionesFiltradas.length === 0 ? (
+              <p className="instalaciones-empty">No hay instalaciones del tipo seleccionado.</p>
             ) : (
               <div className="instalaciones-table-wrapper">
                 <table className="instalaciones-tabla">
@@ -185,7 +212,7 @@ function InstalacionesPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {instalaciones.map((inst) => (
+                    {instalacionesFiltradas.map((inst) => (
                       <tr
                         key={inst.id}
                         className="instalaciones-tr-clickable"

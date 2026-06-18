@@ -123,7 +123,7 @@ describe('InstalacionesPage', () => {
     await renderPage();
     crearInstalacionHelper();
     expect(screen.getByText('Test')).toBeInTheDocument();
-    expect(screen.getByText('Deportiva')).toBeInTheDocument();
+    expect(screen.getAllByText('Deportiva').length).toBeGreaterThan(0);
     expect(screen.getByText('10 personas')).toBeInTheDocument();
     expect(screen.getByText('$1500/h')).toBeInTheDocument();
     expect(screen.getByText('Activa')).toBeInTheDocument();
@@ -469,5 +469,47 @@ describe('InstalacionesPage', () => {
     crearInstalacionHelper();
     irAlDetalle();
     expect(screen.queryByRole('button', { name: 'Editar' })).not.toBeInTheDocument();
+  });
+
+  test('filtra instalaciones por tipo al cambiar el selector', async () => {
+    await renderPage();
+    crearInstalacionHelper();
+    fireEvent.change(screen.getByLabelText('Filtrar por tipo'), { target: { value: 'Deportiva' } });
+    expect(screen.getByText('Test')).toBeInTheDocument();
+  });
+
+  test('muestra todas las instalaciones al limpiar el filtro de tipo', async () => {
+    await renderPage();
+    crearInstalacionHelper();
+    fireEvent.change(screen.getByLabelText('Filtrar por tipo'), { target: { value: 'Deportiva' } });
+    fireEvent.change(screen.getByLabelText('Filtrar por tipo'), { target: { value: '' } });
+    expect(screen.getByText('Test')).toBeInTheDocument();
+  });
+
+  test('revierte la instalación optimista si falla createInstalacion', async () => {
+    createInstalacion.mockRejectedValueOnce(new Error('error de red'));
+    await renderPage();
+    crearInstalacionHelper();
+    await waitFor(() => {
+      expect(screen.getByText('No hay instalaciones registradas.')).toBeInTheDocument();
+    });
+  });
+
+  test('hacer click en el overlay del modal "Ver Socio" lo cierra', async () => {
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+    ]));
+
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('Ver Socio')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Ver Socio'));
+    expect(screen.getByText('García Juan')).toBeInTheDocument();
+
+    const overlay = document.querySelector('.instalaciones-ver-socio-wrapper')?.closest('.modal-overlay');
+    fireEvent.click(overlay);
+    expect(screen.queryByText('García Juan')).not.toBeInTheDocument();
   });
 });

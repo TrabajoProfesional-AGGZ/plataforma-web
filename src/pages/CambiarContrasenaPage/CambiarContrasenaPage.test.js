@@ -76,4 +76,12 @@ describe('CambiarContrasenaPage', () => {
       expect(authService.logout).not.toHaveBeenCalled();
     });
   });
+
+  test('el botón "Mostrar" alterna la visibilidad de la contraseña', () => {
+    renderPage();
+    const toggleButtons = screen.getAllByRole('button', { name: /mostrar contraseña/i });
+    expect(toggleButtons.length).toBeGreaterThan(0);
+    fireEvent.click(toggleButtons[0]);
+    expect(screen.getAllByRole('button', { name: /ocultar contraseña/i }).length).toBeGreaterThan(0);
+  });
 });
