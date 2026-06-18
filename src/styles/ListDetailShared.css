@@ -1,5 +1,7 @@
 .disciplinas-btn-crear,
-.instalaciones-btn-crear {
+.instalaciones-btn-crear,
+.socios-crear-button,
+.usuarios-crear-button {
   display: flex;
   align-items: center;
   gap: 6px;

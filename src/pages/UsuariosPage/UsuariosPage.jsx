@@ -14,6 +14,8 @@ import logo from '../../assets/logo_socio.png';
 import logoVerde from '../../assets/logo-verde.png';
 import logoAmarillo from '../../assets/logo-amarillo.png';
 import './UsuariosPage.css';
+import '../../styles/ListPage.css';
+import '../../styles/ListDetailShared.css';
 import '../../styles/PageTableHeader.css';
 
 const ESTADO_CONFIG = {

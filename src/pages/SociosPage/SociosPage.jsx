@@ -12,6 +12,8 @@ import logoRojo from '../../assets/logo-rojo.png';
 import logoAmarillo from '../../assets/logo-amarillo.png';
 import logoNaranja from '../../assets/logo-naranja.png'
 import './SociosPage.css';
+import '../../styles/ListPage.css';
+import '../../styles/ListDetailShared.css';
 import '../../styles/SocioCard.css';
 import '../../styles/PageTableHeader.css';
 

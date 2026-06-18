@@ -1,3 +1,7 @@
+/* Toolbar, search, filters, table base, estado-cell, btn base → src/styles/ListPage.css
+   btn-crear → src/styles/ListDetailShared.css
+   th styles → src/styles/PageTableHeader.css */
+
 .usuarios-page {
   max-width: 900px;
   margin: 0 auto;
@@ -11,29 +15,7 @@
   text-align: center;
 }
 
-.usuarios-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-
-.usuarios-toolbar-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex: 1;
-  min-width: 200px;
-}
-
-.usuarios-toolbar-right {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
+/* ── Search form ──────────────────────────────────────────────── */
 .usuarios-search-form {
   display: flex;
   align-items: center;
@@ -42,42 +24,7 @@
   max-width: 460px;
 }
 
-.usuarios-search-container {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background-color: #ffffff;
-  border: 1px solid #111111;
-  border-radius: 6px;
-  padding: 8px 12px;
-  flex: 1;
-}
-
-.usuarios-search-container svg {
-  color: #4a4a4a;
-  flex-shrink: 0;
-}
-
-.usuarios-search-input {
-  border: none;
-  outline: none;
-  background: transparent;
-  color: #111111;
-  width: 100%;
-  font-size: 14px;
-}
-
-.usuarios-search-button,
-.usuarios-ver-todos-button {
-  padding: 8px 16px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.15s, color 0.15s;
-}
-
+/* ── Button color variants ────────────────────────────────────── */
 .usuarios-search-button {
   background-color: #111111;
   color: #ffffff;
@@ -105,49 +52,11 @@
   cursor: not-allowed;
 }
 
-.usuarios-crear-button {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.15s;
-  background-color: #111111;
-  color: #ffffff;
-}
-
 .usuarios-crear-button:hover:not(:disabled) {
   background-color: #4a4a4a;
 }
 
-.usuarios-search-loading {
-  display: flex;
-  justify-content: center;
-  padding: 48px 0;
-}
-
-.usuarios-error {
-  color: #c0392b;
-  font-size: 14px;
-  text-align: center;
-  background-color: #fdecea;
-  border: 1px solid #f5c6cb;
-  border-radius: 4px;
-  padding: 10px 14px;
-}
-
-.usuarios-no-encontrado {
-  color: #4a4a4a;
-  font-size: 14px;
-  text-align: center;
-}
-
-/* ── Filters ──────────────────────────────────────────────── */
+/* ── Filters layout ───────────────────────────────────────────── */
 .usuarios-filtros {
   display: flex;
   flex-direction: row;
@@ -167,63 +76,7 @@
   width: 180px;
 }
 
-.usuarios-filtro-toggle {
-  padding: 6px 12px;
-  border: 1px solid #111111;
-  border-radius: 6px;
-  background: #ffffff;
-  font-size: 13px;
-  font-weight: 500;
-  color: #111111;
-  cursor: pointer;
-  transition: background-color 0.15s;
-}
-
-.usuarios-filtro-toggle:hover {
-  background-color: #f5f5f5;
-}
-
-.usuarios-filtro-select {
-  border: 1px solid #111111;
-  border-radius: 6px;
-  padding: 6px 10px;
-  font-size: 13px;
-  color: #111111;
-  background-color: #ffffff;
-  outline: none;
-  cursor: pointer;
-  width: 100%;
-}
-
-.usuarios-filtro-select:focus {
-  border-color: #111111;
-}
-
-/* ── Table wrapper (card) ─────────────────────────────────── */
-.usuarios-table-wrapper {
-  background-color: #ffffff;
-  border: 1px solid #111111;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.usuarios-table-empty {
-  padding: 32px;
-  text-align: center;
-  color: #4a4a4a;
-  font-size: 14px;
-  margin: 0;
-}
-
-/* ── Table ────────────────────────────────────────────────── */
-.usuarios-tabla {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-
-/* th styles → src/styles/PageTableHeader.css */
-
+/* ── Table sort ───────────────────────────────────────────────── */
 .usuarios-th-sort {
   cursor: pointer;
   user-select: none;
@@ -233,27 +86,7 @@
   color: #111111;
 }
 
-.usuarios-tabla td {
-  padding: 14px 20px;
-  border-bottom: 1px solid #f0f0f0;
-  color: #111111;
-  text-align: left;
-  vertical-align: middle;
-}
-
-.usuarios-tabla tr:last-child td {
-  border-bottom: none;
-}
-
-.usuarios-tr-clickable {
-  cursor: pointer;
-}
-
-.usuarios-tr-clickable:hover td {
-  background-color: #f5f5f5;
-}
-
-/* Rol badge en tabla */
+/* ── Rol badge ────────────────────────────────────────────────── */
 .usuarios-rol-badge {
   display: inline-block;
   padding: 3px 10px;
@@ -265,25 +98,13 @@
   border: 1px solid #4a4a4a;
 }
 
-/* Estado en tabla */
-.usuarios-estado-cell {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #111111;
-  padding: 4px 10px 4px 6px;
-  border-radius: 8px;
-  border: 1px solid;
-}
-
+/* ── Estado logo ──────────────────────────────────────────────── */
 .usuarios-estado-logo {
   width: 22px;
   height: auto;
 }
 
-/* Card usuario individual */
+/* ── Card usuario individual ──────────────────────────────────── */
 .usuarios-card {
   border: 1px solid;
   border-radius: 12px;
@@ -363,18 +184,7 @@
   gap: 10px;
 }
 
-.usuarios-btn-eliminar,
-.usuarios-btn-editar,
-.usuarios-btn-cambiar-rol {
-  padding: 8px 20px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.15s, color 0.15s;
-  border: none;
-}
-
+/* ── Card action button colors ────────────────────────────────── */
 .usuarios-btn-editar {
   background-color: #111111;
   color: #ffffff;
@@ -526,46 +336,39 @@
   color: #111111;
 }
 
-.modal-button-submit {
-  background-color: #111111;
-  color: #ffffff;
+/* ── Modal action buttons base ────────────────────────────────── */
+.modal-button-submit,
+.modal-button-danger {
   border: none;
   border-radius: 4px;
+  color: #ffffff;
   font-size: 15px;
   font-weight: 500;
   padding: 7px 16px;
   cursor: pointer;
   transition: background-color 0.15s ease;
+}
+
+.modal-button-submit:disabled,
+.modal-button-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.modal-button-submit {
+  background-color: #111111;
 }
 
 .modal-button-submit:hover:not(:disabled) {
   background-color: #4a4a4a;
 }
 
-.modal-button-submit:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
 .modal-button-danger {
   background-color: #c0392b;
-  color: #ffffff;
-  border: none;
-  border-radius: 4px;
-  font-size: 15px;
-  font-weight: 500;
-  padding: 7px 16px;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
 }
 
 .modal-button-danger:hover:not(:disabled) {
   background-color: #96281b;
-}
-
-.modal-button-danger:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
 }
 
 .modal-confirmar-texto {

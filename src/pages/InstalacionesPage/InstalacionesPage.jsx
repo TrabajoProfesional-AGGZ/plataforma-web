@@ -13,6 +13,7 @@ import logoRojo from '../../assets/logo-rojo.png';
 import logoAmarillo from '../../assets/logo-amarillo.png';
 import logoNaranja from '../../assets/logo-naranja.png';
 import './InstalacionesPage.css';
+import '../../styles/ListPage.css';
 import '../../styles/SocioCard.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';

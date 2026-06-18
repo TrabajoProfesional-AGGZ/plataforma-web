@@ -6,6 +6,7 @@ import { getDisciplinas, createDisciplina, pausarDisciplina } from '../../servic
 import { usePermiso } from '../../hooks/usePermiso';
 import logo from '../../assets/logo_socio.png';
 import './DisciplinasPage.css';
+import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
 
