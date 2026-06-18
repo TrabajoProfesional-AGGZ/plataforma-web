@@ -133,11 +133,6 @@
   margin-bottom: 20px;
 }
 
-.instalaciones-nav-acciones {
-  display: flex;
-  gap: 8px;
-}
-
 .instalaciones-btn-volver {
   display: flex;
   align-items: center;
@@ -157,6 +152,48 @@
   background-color: #f5f5f5;
 }
 
+.instalaciones-detalle-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px 24px;
+}
+
+.instalaciones-detalle-nombre {
+  font-size: 22px;
+  font-weight: 700;
+  color: #111111;
+  text-align: center;
+  margin: 0 0 40px 0;
+}
+
+.instalaciones-detalle-card {
+  width: 100%;
+  max-width: 500px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  margin-bottom: 32px;
+}
+
+.instalaciones-detalle-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+}
+
+.instalaciones-detalle-row-label {
+  color: #4a4a4a;
+  font-size: 14px;
+}
+
+.instalaciones-detalle-row-value {
+  font-size: 14px;
+  font-weight: 600;
+}
+
 .instalaciones-btn-eliminar-inst {
   padding: 8px 20px;
   border-radius: 6px;
@@ -171,45 +208,6 @@
 
 .instalaciones-btn-eliminar-inst:hover {
   background-color: #96281b;
-}
-
-/* ── Installation card ── */
-.instalaciones-card {
-  background-color: #ffffff;
-  border: 1px solid #111111;
-  border-radius: 12px;
-  padding: 24px 28px;
-  margin-bottom: 28px;
-}
-
-.instalaciones-card-nombre {
-  font-size: 22px;
-  font-weight: 600;
-  color: #111111;
-  margin: 0 0 16px 0;
-  text-align: center;
-}
-
-.instalaciones-card-datos {
-  display: flex;
-  gap: 40px;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-}
-
-.instalaciones-card-dato {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.instalaciones-card-label {
-  font-weight: 500;
-  color: #4a4a4a;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 
 /* ── Botón agregar reserva (fuera del card) ── */
@@ -227,10 +225,17 @@
 .instalaciones-reservas-controles {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   gap: 10px;
   flex-wrap: wrap;
   margin-bottom: 16px;
+}
+
+.instalaciones-reservas-controles-izq {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
 }
 
 .instalaciones-reservas-title {

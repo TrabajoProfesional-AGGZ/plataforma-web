@@ -218,44 +218,43 @@ function InstalacionesPage() {
               <ChevronLeft size={16} aria-hidden="true" />
               Volver
             </button>
-            <div className="instalaciones-nav-acciones">
-              {puedeBorrarInstalacion && (
-                <button className="instalaciones-btn-eliminar-inst" onClick={() => setEliminarInstalacionOpen(true)}>
-                  Eliminar
-                </button>
-              )}
+          </div>
+
+          <div className="instalaciones-detalle-content">
+            <h1 className="instalaciones-detalle-nombre">{instalacionActual.nombre}</h1>
+
+            <div className="instalaciones-detalle-card">
+              {[
+                { label: 'Tipo', value: instalacionActual.tipo },
+                { label: 'Capacidad máxima', value: `${instalacionActual.capacidad_maxima} personas` },
+                { label: 'Valor por hora', value: `$${instalacionActual.valor_hora}/h` },
+                {
+                  label: 'Estado',
+                  value: instalacionActual.activa ? 'Activa' : 'Inactiva',
+                  color: instalacionActual.activa ? '#155724' : '#4a4a4a',
+                },
+              ].map((field, i, arr) => (
+                <div
+                  key={field.label}
+                  className="instalaciones-detalle-row"
+                  style={{ borderBottom: i < arr.length - 1 ? '1px solid #f5f5f5' : 'none' }}
+                >
+                  <span className="instalaciones-detalle-row-label">{field.label}</span>
+                  <span
+                    className="instalaciones-detalle-row-value"
+                    style={{ color: field.color ?? '#111111' }}
+                  >
+                    {field.value}
+                  </span>
+                </div>
+              ))}
             </div>
           </div>
 
-          <div className="instalaciones-card">
-            <h2 className="instalaciones-card-nombre">{instalacionActual.nombre}</h2>
-            <div className="instalaciones-card-datos">
-              <div className="instalaciones-card-dato">
-                <span className="instalaciones-card-label">Tipo</span>
-                <span>{instalacionActual.tipo}</span>
-              </div>
-              <div className="instalaciones-card-dato">
-                <span className="instalaciones-card-label">Capacidad máxima</span>
-                <span>{instalacionActual.capacidad_maxima} personas</span>
-              </div>
-              <div className="instalaciones-card-dato">
-                <span className="instalaciones-card-label">Valor por hora</span>
-                <span>${instalacionActual.valor_hora}/h</span>
-              </div>
-              <div className="instalaciones-card-dato">
-                <span className="instalaciones-card-label">Estado</span>
-                <span className={`instalaciones-badge ${instalacionActual.activa ? 'badge-activa' : 'badge-inactiva'}`}>
-                  {instalacionActual.activa ? 'Activa' : 'Inactiva'}
-                </span>
-              </div>
-            </div>
-          </div>
-
-          {puedeCrearReserva && (
+          {puedeBorrarInstalacion && (
             <div className="instalaciones-agregar-reserva">
-              <button className="instalaciones-btn-crear" onClick={() => setCrearReservaFormOpen(true)}>
-                <Plus size={15} aria-hidden="true" />
-                Agregar reserva
+              <button className="instalaciones-btn-eliminar-inst" onClick={() => setEliminarInstalacionOpen(true)}>
+                Eliminar
               </button>
             </div>
           )}
@@ -263,26 +262,34 @@ function InstalacionesPage() {
           <div className="instalaciones-reservas-section">
             <h3 className="instalaciones-reservas-title">Reservas</h3>
             <div className="instalaciones-reservas-controles">
-              {puedeVerReservas && reservasDeInstalacion.length > 0 && (
-                <input
-                  type="date"
-                  className="instalaciones-filtro-fecha"
-                  value={filtroFecha}
-                  onChange={(e) => setFiltroFecha(e.target.value)}
-                  aria-label="Filtrar por fecha"
-                />
-              )}
-              <button
-                className="instalaciones-btn-toggle"
-                onClick={() => setReservasVisible((v) => !v)}
-                aria-label={reservasVisible ? 'Ocultar reservas' : 'Mostrar reservas'}
-              >
-                {reservasVisible ? (
-                  <><ChevronUp size={15} aria-hidden="true" /> Ocultar reservas</>
-                ) : (
-                  <><ChevronDown size={15} aria-hidden="true" /> Mostrar reservas</>
+              <div className="instalaciones-reservas-controles-izq">
+                {puedeVerReservas && reservasDeInstalacion.length > 0 && (
+                  <input
+                    type="date"
+                    className="instalaciones-filtro-fecha"
+                    value={filtroFecha}
+                    onChange={(e) => setFiltroFecha(e.target.value)}
+                    aria-label="Filtrar por fecha"
+                  />
                 )}
-              </button>
+                <button
+                  className="instalaciones-btn-toggle"
+                  onClick={() => setReservasVisible((v) => !v)}
+                  aria-label={reservasVisible ? 'Ocultar reservas' : 'Mostrar reservas'}
+                >
+                  {reservasVisible ? (
+                    <><ChevronUp size={15} aria-hidden="true" /> Ocultar reservas</>
+                  ) : (
+                    <><ChevronDown size={15} aria-hidden="true" /> Mostrar reservas</>
+                  )}
+                </button>
+              </div>
+              {puedeCrearReserva && (
+                <button className="instalaciones-btn-crear" onClick={() => setCrearReservaFormOpen(true)}>
+                  <Plus size={15} aria-hidden="true" />
+                  Agregar reserva
+                </button>
+              )}
             </div>
 
             {reservasVisible && (
