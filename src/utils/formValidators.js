@@ -1,3 +1,14 @@
+export function getDocNumberRules({ required = true } = {}) {
+  return {
+    ...(required && { required: 'El número es requerido' }),
+    pattern: {
+      value: /^[A-Z0-9]{5,20}$/,
+      message: 'Solo letras mayúsculas y números (5–20 caracteres)',
+    },
+    setValueAs: (v) => v.toUpperCase(),
+  };
+}
+
 export function validarFechaNacimiento(v) {
   const d = new Date(v);
   const now = new Date();
