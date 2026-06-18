@@ -6,6 +6,7 @@ import { fetchRoles } from '../../services/rolesService';
 import { CreateUserForm } from '../../components/createUserForm/CreateUserForm';
 import { EditUserForm } from '../../components/editUserForm/EditUserForm';
 import { CambiarRolForm } from '../../components/cambiarRolForm/CambiarRolForm';
+import { PermisosModal } from '../../components/permisosModal/PermisosModal';
 import { usePermiso } from '../../hooks/usePermiso';
 import { useAuthContext } from '../../context/AuthContext';
 import logo from '../../assets/logo_socio.png';
@@ -58,6 +59,7 @@ function UsuariosPage() {
   const [editarModalOpen, setEditarModalOpen] = useState(false);
   const [eliminarModalOpen, setEliminarModalOpen] = useState(false);
   const [cambiarRolModalOpen, setCambiarRolModalOpen] = useState(false);
+  const [permisosModalOpen, setPermisosModalOpen] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [errorModal, setErrorModal] = useState('');
 
@@ -72,7 +74,7 @@ function UsuariosPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const anyModalOpen = crearModalOpen || editarModalOpen || eliminarModalOpen || cambiarRolModalOpen;
+  const anyModalOpen = crearModalOpen || editarModalOpen || eliminarModalOpen || cambiarRolModalOpen || permisosModalOpen;
   useEffect(() => {
     if (!anyModalOpen) return;
     function handleKeyDown(e) {
@@ -84,7 +86,7 @@ function UsuariosPage() {
     }
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [anyModalOpen, crearModalOpen, editarModalOpen, eliminarModalOpen, cambiarRolModalOpen]);
+  }, [anyModalOpen, crearModalOpen, editarModalOpen, eliminarModalOpen, cambiarRolModalOpen, permisosModalOpen]);
 
   async function fetchYActualizarUsuarios() {
     setLoading(true);
@@ -379,13 +381,14 @@ function UsuariosPage() {
                   <span>{resultado.estado?.nombre}</span>
                 </div>
                 {permisos.length > 0 && (
-                  <div className="usuarios-card-permisos">
-                    <span className="usuarios-card-label">Permisos</span>
-                    <div className="usuarios-permisos-lista">
-                      {permisos.map((p) => (
-                        <span key={p.id} className="usuarios-permiso-tag">{p.nombre}</span>
-                      ))}
-                    </div>
+                  <div className="usuarios-card-row">
+                    <button
+                      className="usuarios-btn-ver-permisos"
+                      style={{ '--card-bg': cfg.bg }}
+                      onClick={() => setPermisosModalOpen(true)}
+                    >
+                      Ver permisos
+                    </button>
                   </div>
                 )}
               </div>
@@ -444,6 +447,13 @@ function UsuariosPage() {
           roles={roles}
           onSuccess={(actualizado) => { setResultado(actualizado); setCambiarRolModalOpen(false); }}
           onCancel={() => setCambiarRolModalOpen(false)}
+        />
+      )}
+
+      {permisosModalOpen && resultado && !Array.isArray(resultado) && (
+        <PermisosModal
+          permisos={(resultado.rol?.permisos ?? []).map((p) => p.nombre)}
+          onClose={() => setPermisosModalOpen(false)}
         />
       )}
     </div>

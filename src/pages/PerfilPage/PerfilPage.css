@@ -86,8 +86,29 @@
 
 .perfil-actions {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
+  align-items: center;
   margin-top: 16px;
+}
+
+.perfil-actions > button:only-child {
+  margin-left: auto;
+}
+
+.perfil-ver-permisos-button {
+  background: none;
+  border: none;
+  color: #4a4a4a;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 6px 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.perfil-ver-permisos-button:hover {
+  color: #111111;
 }
 
 .perfil-cambiar-button {

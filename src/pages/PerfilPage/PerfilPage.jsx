@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { changePassword, logout } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
+import { PermisosModal } from '../../components/permisosModal/PermisosModal';
 import { Lock, Eye, EyeOff } from 'lucide-react';
 import '../../components/createForm/CreateSocioForm.css';
 import './PerfilPage.css';
@@ -155,8 +156,9 @@ function CambiarContrasenaModal({ onClose }) {
 }
 
 function PerfilPage() {
-  const { user, role } = useAuth();
+  const { user, role, permisos } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);
+  const [permisosModalOpen, setPermisosModalOpen] = useState(false);
 
   const cerrarModal = useCallback(() => setModalOpen(false), []);
 
@@ -181,11 +183,19 @@ function PerfilPage() {
         </div>
       </div>
       <div className="perfil-actions">
+        {permisos && permisos.length > 0 && (
+          <button className="perfil-ver-permisos-button" onClick={() => setPermisosModalOpen(true)}>
+            Ver permisos
+          </button>
+        )}
         <button className="perfil-cambiar-button" onClick={() => setModalOpen(true)}>
           Cambiar contraseña
         </button>
       </div>
       {modalOpen && <CambiarContrasenaModal onClose={cerrarModal} />}
+      {permisosModalOpen && (
+        <PermisosModal permisos={permisos} onClose={() => setPermisosModalOpen(false)} />
+      )}
     </div>
   );
 }

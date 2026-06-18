@@ -334,27 +334,21 @@
   font-size: 14px;
 }
 
-.usuarios-card-permisos {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.usuarios-permisos-lista {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.usuarios-permiso-tag {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  background-color: rgba(0, 0, 0, 0.08);
+.usuarios-btn-ver-permisos {
+  background-color: var(--card-bg, #f5f5f5);
   color: #111111;
-  border: 1px solid rgba(0, 0, 0, 0.15);
+  border: none;
+  padding: 6px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.usuarios-btn-ver-permisos:hover {
+  background-color: #ffffff;
+  color: #111111;
 }
 
 .usuarios-card-actions {
