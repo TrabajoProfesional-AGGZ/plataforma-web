@@ -5,6 +5,8 @@ import '../createForm/CreateSocioForm.css';
 import './PermisosModal.css';
 
 function PermisosModal({ permisos, onClose }) {
+  // Este useEffect está perfecto. Garantiza que el ESC funcione 
+  // incluso si el usuario no tiene el foco en el modal.
   useEffect(() => {
     function handleKeyDown(e) {
       if (e.key === 'Escape') onClose();
@@ -14,14 +16,19 @@ function PermisosModal({ permisos, onClose }) {
   }, [onClose]);
 
   return (
-    <button
-      type="button"
+    <div
       className="csf-overlay"
-      aria-label="Cerrar"
-      onClick={onClose}
-      onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') onClose(); }}
+      role="presentation"
+      onClick={(e) => {
+        // Solo cerramos si el clic fue EXACTAMENTE en el fondo oscuro
+        if (e.target === e.currentTarget) onClose();
+      }}
+      onKeyDown={(e) => {
+        if (e.target === e.currentTarget && (e.key === 'Escape' || e.key === 'Enter')) onClose();
+      }}
     >
-      <dialog open className="csf-wrapper permisos-modal-wrapper" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+      {/* El dialog queda 100% limpio de eventos y warnings */}
+      <dialog open className="csf-wrapper permisos-modal-wrapper">
         <div className="csf-outer-card">
           <div className="csf-header">
             <h1>Permisos</h1>
@@ -37,7 +44,7 @@ function PermisosModal({ permisos, onClose }) {
           </div>
         </div>
       </dialog>
-    </button>
+    </div>
   );
 }
 
