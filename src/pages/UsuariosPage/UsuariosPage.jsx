@@ -8,6 +8,7 @@ import { EditUserForm } from '../../components/editUserForm/EditUserForm';
 import { CambiarRolForm } from '../../components/cambiarRolForm/CambiarRolForm';
 import { PermisosModal } from '../../components/permisosModal/PermisosModal';
 import { usePermiso } from '../../hooks/usePermiso';
+import { useSortedList } from '../../hooks/useSortedList';
 import { useAuthContext } from '../../context/AuthContext';
 import logo from '../../assets/logo_socio.png';
 import logoVerde from '../../assets/logo-verde.png';
@@ -24,8 +25,6 @@ const ESTADO_DEFAULT = { logo: logoAmarillo, bg: '#f4ecb5ee', border: '#9A6200' 
 function estadoConfig(nombre) {
   return ESTADO_CONFIG[nombre] ?? ESTADO_DEFAULT;
 }
-
-const ICONOS_ORDEN = { asc: ' ↑', desc: ' ↓', none: ' ↕' };
 
 function getValorOrden(usuario, campo) {
   if (campo === 'rol') return String(usuario.rol?.nombre ?? '').toLowerCase();
@@ -47,7 +46,7 @@ function UsuariosPage() {
   const [resultado, setResultado] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [orden, setOrden] = useState({ campo: null, dir: 'asc' });
+  const { orden, setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
 
   const [filtroRol, setFiltroRol] = useState('');
   const [filtroAbierto, setFiltroAbierto] = useState(false);
@@ -148,30 +147,6 @@ function UsuariosPage() {
       return;
     }
     fetchYActualizarUsuarios();
-  }
-
-  function toggleOrden(campo) {
-    setOrden((prev) => {
-      if (prev.campo !== campo) return { campo, dir: 'asc' };
-      if (prev.dir === 'asc') return { campo, dir: 'desc' };
-      return { campo: null, dir: 'asc' };
-    });
-  }
-
-  function iconoOrden(campo) {
-    if (orden.campo !== campo) return ICONOS_ORDEN.none;
-    return ICONOS_ORDEN[orden.dir];
-  }
-
-  function aplicarOrden(lista) {
-    if (!orden.campo) return lista;
-    return [...lista].sort((a, b) => {
-      const va = getValorOrden(a, orden.campo);
-      const vb = getValorOrden(b, orden.campo);
-      if (va < vb) return orden.dir === 'asc' ? -1 : 1;
-      if (va > vb) return orden.dir === 'asc' ? 1 : -1;
-      return 0;
-    });
   }
 
   function abrirEditar() {

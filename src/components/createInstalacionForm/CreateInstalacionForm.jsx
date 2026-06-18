@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { AnimatePresence } from 'framer-motion';
 import { Building2, Settings, CheckCircle2, Users, DollarSign, Tag } from 'lucide-react';
@@ -6,6 +5,7 @@ import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 
 const STEPS = [
   { id: 1, label: 'Datos', icon: Building2 },
@@ -27,13 +27,7 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
     formState: { errors },
   } = useForm({ mode: 'onTouched' });
 
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === 'Escape') onCancel();
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onCancel]);
+  useEscapeKey(onCancel);
 
   const goNext = async () => {
     const valid = await trigger(stepFields[step]);

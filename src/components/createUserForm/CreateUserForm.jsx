@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
 import { AnimatePresence } from 'framer-motion';
 import {
   User, CreditCard, Mail, Shield,
   Calendar, Lock,
 } from 'lucide-react';
 import { crearUsuario } from '../../services/usuariosService';
-import { validarFechaNacimiento } from '../../utils/formValidators';
+import { validarFechaNacimiento, getDocNumberRules } from '../../utils/formValidators';
 import { fetchRoles } from '../../services/rolesService';
 import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
-import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
+import { useMultiStepForm } from '../../hooks/useMultiStepForm';
 
 const STEPS = [
   { id: 1, label: 'Personal', icon: User },
@@ -28,8 +27,11 @@ const stepFields = {
 };
 
 export function CreateUserForm({ onSuccess, onCancel }) {
-  const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
-  const [formError, setFormError] = useState('');
+  const {
+    step, direction, submitted, setSubmitted, navGuard,
+    goBack, goNext, formError, setFormError,
+    register, handleSubmit, errors, isSubmitting,
+  } = useMultiStepForm(stepFields);
   const [roles, setRoles] = useState([]);
 
   useEffect(() => {
@@ -37,19 +39,6 @@ export function CreateUserForm({ onSuccess, onCancel }) {
       .then((data) => setRoles(Array.isArray(data) ? data : []))
       .catch(() => {});
   }, []);
-
-  const {
-    register,
-    handleSubmit,
-    trigger,
-    formState: { errors, isSubmitting },
-  } = useForm({ mode: 'onTouched' });
-
-  const goNext = async () => {
-    const valid = await trigger(stepFields[step]);
-    if (!valid) return;
-    advance();
-  };
 
   const onSubmit = async (data) => {
     setFormError('');
@@ -78,14 +67,7 @@ export function CreateUserForm({ onSuccess, onCancel }) {
     }
   };
 
-  const nroDocumentoRegister = register('nroDocumento', {
-    required: 'El número es requerido',
-    pattern: {
-      value: /^[A-Z0-9]{5,20}$/,
-      message: 'Solo letras mayúsculas y números (5–20 caracteres)',
-    },
-    setValueAs: (v) => v.toUpperCase(),
-  });
+  const nroDocumentoRegister = register('nroDocumento', getDocNumberRules());
 
   return (
     <MultiStepFormShell

@@ -1,17 +1,16 @@
 import { useState, useEffect } from 'react';
-import { useForm } from 'react-hook-form';
 import { AnimatePresence } from 'framer-motion';
 import {
   User, CreditCard, Phone,
   Calendar, Mail, MapPin, Activity, Tag,
 } from 'lucide-react';
 import { updateSocio } from '../../services/sociosService';
-import { validarFechaNacimientoOpcional } from '../../utils/formValidators';
+import { validarFechaNacimientoOpcional, getDocNumberRules } from '../../utils/formValidators';
 import { fetchEstadosSocio, fetchCategoriasSocio } from '../../services/catalogosService';
 import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
-import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
+import { useMultiStepForm } from '../../hooks/useMultiStepForm';
 
 const STEPS = [
   { id: 1, label: 'Personal', icon: User },
@@ -26,23 +25,11 @@ const stepFields = {
 };
 
 export function EditSocioForm({ socio, onSuccess, onCancel }) {
-  const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
-  const [formError, setFormError] = useState('');
-  const [catalogo, setCatalogo] = useState({ estados: [], categorias: [] });
-
-  useEffect(() => {
-    Promise.all([fetchEstadosSocio(), fetchCategoriasSocio()])
-      .then(([estados, categorias]) => setCatalogo({ estados, categorias }))
-      .catch(() => {});
-  }, []);
-
   const {
-    register,
-    handleSubmit,
-    trigger,
-    setValue,
-    formState: { errors, isSubmitting },
-  } = useForm({
+    step, direction, submitted, setSubmitted, navGuard,
+    goBack, goNext, formError, setFormError,
+    register, handleSubmit, setValue, errors, isSubmitting,
+  } = useMultiStepForm(stepFields, {
     mode: 'onTouched',
     defaultValues: {
       nombre: socio.nombre ?? '',
@@ -57,6 +44,13 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
       direccion: '',
     },
   });
+  const [catalogo, setCatalogo] = useState({ estados: [], categorias: [] });
+
+  useEffect(() => {
+    Promise.all([fetchEstadosSocio(), fetchCategoriasSocio()])
+      .then(([estados, categorias]) => setCatalogo({ estados, categorias }))
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (catalogo.estados.length > 0) {
@@ -64,12 +58,6 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
       setValue('categoria', socio.categoria?.nombre ?? '');
     }
   }, [catalogo]); // eslint-disable-line react-hooks/exhaustive-deps
-
-  const goNext = async () => {
-    const valid = await trigger(stepFields[step]);
-    if (!valid) return;
-    advance();
-  };
 
   const onSubmit = async (data) => {
     setFormError('');
@@ -90,13 +78,7 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
     }
   };
 
-  const docNumberRegister = register('nro_documento', {
-    pattern: {
-      value: /^[A-Z0-9]{5,20}$/,
-      message: 'Solo letras mayúsculas y números (5–20 caracteres)',
-    },
-    setValueAs: (v) => v.toUpperCase(),
-  });
+  const docNumberRegister = register('nro_documento', getDocNumberRules({ required: false }));
 
   return (
     <MultiStepFormShell

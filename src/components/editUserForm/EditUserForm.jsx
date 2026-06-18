@@ -1,7 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { User } from 'lucide-react';
 import { editarUsuario } from '../../services/usuariosService';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
@@ -24,13 +25,7 @@ export function EditUserForm({ usuario, onSuccess, onCancel }) {
     },
   });
 
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === 'Escape') onCancel();
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onCancel]);
+  useEscapeKey(onCancel);
 
   const onSubmit = async (data) => {
     setFormError('');

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { AnimatePresence } from 'framer-motion';
 import {
@@ -12,6 +12,7 @@ import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 
 const STEPS = [
   { id: 1, label: 'Datos', icon: User },
@@ -37,13 +38,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
     formState: { errors },
   } = useForm({ mode: 'onTouched', defaultValues: { id_instalacion: instalacionPreseleccionada } });
 
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === 'Escape') onCancel();
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onCancel]);
+  useEscapeKey(onCancel);
 
   const goNext = async () => {
     const valid = await trigger(stepFields[step]);

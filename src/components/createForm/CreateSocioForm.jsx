@@ -1,15 +1,13 @@
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { AnimatePresence } from 'framer-motion';
 import {
   User, CreditCard, Phone,
   Calendar, Mail, MapPin,
 } from 'lucide-react';
 import { createSocio } from '../../services/sociosService';
-import { validarFechaNacimiento } from '../../utils/formValidators';
+import { validarFechaNacimiento, getDocNumberRules } from '../../utils/formValidators';
 import { Field, StyledInput, StyledSelect, FormStep } from './FormFields';
 import { MultiStepFormShell } from './MultiStepFormShell';
-import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
+import { useMultiStepForm } from '../../hooks/useMultiStepForm';
 import './CreateSocioForm.css';
 
 const STEPS = [
@@ -25,21 +23,11 @@ const stepFields = {
 };
 
 export function CreateSocioForm({ onSuccess, onCancel }) {
-  const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
-  const [formError, setFormError] = useState('');
-
   const {
-    register,
-    handleSubmit,
-    trigger,
-    formState: { errors, isSubmitting },
-  } = useForm({ mode: 'onTouched' });
-
-  const goNext = async () => {
-    const valid = await trigger(stepFields[step]);
-    if (!valid) return;
-    advance();
-  };
+    step, direction, submitted, setSubmitted, navGuard,
+    goBack, goNext, formError, setFormError,
+    register, handleSubmit, errors, isSubmitting,
+  } = useMultiStepForm(stepFields);
 
   const onSubmit = async (data) => {
     setFormError('');
@@ -69,14 +57,7 @@ export function CreateSocioForm({ onSuccess, onCancel }) {
     }
   };
 
-  const docNumberRegister = register('docNumber', {
-    required: 'El número es requerido',
-    pattern: {
-      value: /^[A-Z0-9]{5,20}$/,
-      message: 'Solo letras mayúsculas y números (5–20 caracteres)',
-    },
-    setValueAs: (v) => v.toUpperCase(),
-  });
+  const docNumberRegister = register('docNumber', getDocNumberRules());
 
   return (
     <MultiStepFormShell

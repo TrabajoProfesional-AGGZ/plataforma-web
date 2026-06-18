@@ -1,7 +1,7 @@
-import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { changePassword, logout } from '../../services/authService';
+import { useState, useCallback } from 'react';
 import { useAuth } from '../../hooks/useAuth';
+import { useChangePassword } from '../../hooks/useChangePassword';
+import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { PermisosModal } from '../../components/permisosModal/PermisosModal';
 import { Lock, Eye, EyeOff } from 'lucide-react';
 import '../../components/createForm/CreateSocioForm.css';
@@ -53,38 +53,8 @@ function PasswordInput({ id, value, onChange, autoComplete, required }) {
 }
 
 function CambiarContrasenaModal({ onClose }) {
-  const [actual, setActual] = useState('');
-  const [nueva, setNueva] = useState('');
-  const [confirmar, setConfirmar] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === 'Escape') onClose();
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setError('');
-    if (nueva !== confirmar) {
-      setError('Las contraseñas nuevas no coinciden');
-      return;
-    }
-    setLoading(true);
-    try {
-      await changePassword(actual, nueva);
-      await logout();
-      navigate('/', { state: { passwordChanged: true } });
-    } catch {
-      setError('Contraseña actual incorrecta o error al cambiar contraseña');
-      setLoading(false);
-    }
-  }
+  const { actual, setActual, nueva, setNueva, confirmar, setConfirmar, error, loading, handleSubmit } = useChangePassword();
+  useEscapeKey(onClose);
 
   return (
     <div className="csf-overlay" onClick={onClose}>

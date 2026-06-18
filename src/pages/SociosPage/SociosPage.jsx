@@ -5,6 +5,7 @@ import { CreateSocioForm } from '../../components/createForm/CreateSocioForm';
 import { EditSocioForm } from '../../components/editForm/EditSocioForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { usePermiso } from '../../hooks/usePermiso';
+import { useSortedList } from '../../hooks/useSortedList';
 import logo from '../../assets/logo_socio.png';
 import logoVerde from '../../assets/logo-verde.png';
 import logoRojo from '../../assets/logo-rojo.png';
@@ -32,7 +33,6 @@ function getValorOrden(socio, campo) {
   return String(val ?? '').toLowerCase();
 }
 
-const ICONOS_ORDEN = { asc: ' ↑', desc: ' ↓', none: ' ↕' };
 
 
 function SociosPage() {
@@ -48,7 +48,7 @@ function SociosPage() {
   const [resultado, setResultado] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [orden, setOrden] = useState({ campo: null, dir: 'asc' });
+  const { orden, setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
 
   const [filtroEstado, setFiltroEstado] = useState('');
   const [filtroAbierto, setFiltroAbierto] = useState(false);
@@ -80,30 +80,6 @@ function SociosPage() {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [anyModalOpen, crearModalOpen, editarModalOpen, eliminarModalOpen]);
-
-  function toggleOrden(campo) {
-    setOrden(prev => {
-      if (prev.campo !== campo) return { campo, dir: 'asc' };
-      if (prev.dir === 'asc') return { campo, dir: 'desc' };
-      return { campo: null, dir: 'asc' };
-    });
-  }
-
-  function iconoOrden(campo) {
-    if (orden.campo !== campo) return ICONOS_ORDEN.none;
-    return ICONOS_ORDEN[orden.dir];
-  }
-
-  function aplicarOrden(socios) {
-    if (!orden.campo) return socios;
-    return [...socios].sort((a, b) => {
-      const va = getValorOrden(a, orden.campo);
-      const vb = getValorOrden(b, orden.campo);
-      if (va < vb) return orden.dir === 'asc' ? -1 : 1;
-      if (va > vb) return orden.dir === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }
 
   async function cargarSocios() {
     setLoading(true);
