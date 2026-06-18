@@ -95,7 +95,7 @@ function StyledSelect({ error, children, ...props }) {
   );
 }
 
-export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [] }) {
+export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], instalacionPreseleccionada = '' }) {
   const [step, setStep] = useState(1);
   const [direction, setDirection] = useState(1);
   const [submitted, setSubmitted] = useState(false);
@@ -110,7 +110,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [] }) {
     trigger,
     getValues,
     formState: { errors },
-  } = useForm({ mode: 'onTouched' });
+  } = useForm({ mode: 'onTouched', defaultValues: { id_instalacion: instalacionPreseleccionada } });
 
   useEffect(() => {
     function handleKeyDown(e) {

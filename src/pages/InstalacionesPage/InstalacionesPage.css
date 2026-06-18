@@ -187,6 +187,7 @@
   font-weight: 600;
   color: #111111;
   margin: 0 0 16px 0;
+  text-align: center;
 }
 
 .instalaciones-card-datos {
@@ -194,6 +195,7 @@
   gap: 40px;
   flex-wrap: wrap;
   align-items: center;
+  justify-content: center;
 }
 
 .instalaciones-card-dato {
@@ -210,15 +212,24 @@
   letter-spacing: 0.04em;
 }
 
+/* ── Botón agregar reserva (fuera del card) ── */
+.instalaciones-agregar-reserva {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
 /* ── Reservas section ── */
 .instalaciones-reservas-section {
   margin-top: 8px;
 }
 
-.instalaciones-reservas-header {
+.instalaciones-reservas-controles {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
+  gap: 10px;
+  flex-wrap: wrap;
   margin-bottom: 16px;
 }
 
@@ -226,7 +237,130 @@
   font-size: 20px;
   font-weight: 600;
   color: #111111;
-  margin: 0;
+  margin: 0 0 12px 0;
+  text-align: center;
+}
+
+/* ── Filtro de fecha ── */
+.instalaciones-filtro-fecha {
+  padding: 6px 10px;
+  border: 1px solid #111111;
+  border-radius: 6px;
+  font-size: 13px;
+  color: #111111;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+
+/* ── Toggle mostrar/ocultar reservas ── */
+.instalaciones-btn-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  border: 1px solid #111111;
+  border-radius: 6px;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  color: #111111;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s;
+}
+
+.instalaciones-btn-toggle:hover {
+  background-color: #f5f5f5;
+}
+
+/* ── Celda de socio con botón Ver Socio ── */
+.instalaciones-socio-cell {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.instalaciones-btn-ver-socio {
+  padding: 3px 9px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid #111111;
+  background-color: #ffffff;
+  color: #111111;
+  white-space: nowrap;
+  transition: background-color 0.15s;
+}
+
+.instalaciones-btn-ver-socio:hover {
+  background-color: #f5f5f5;
+}
+
+/* ── Modal Ver Socio (wrapper + card de socios) ── */
+.instalaciones-ver-socio-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 520px;
+  width: 100%;
+}
+
+.instalaciones-ver-socio-cerrar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ── Socio card (idéntico al de SociosPage) ── */
+.socios-card {
+  border: 1px solid;
+  border-radius: 12px;
+  padding: 24px 28px;
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.socios-card-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 28px;
+}
+
+.socios-card-logo {
+  width: 80px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.socios-card-data {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.socios-card-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.socios-card-label {
+  font-weight: 500;
+  color: #4a4a4a;
+  min-width: 90px;
+  font-size: 15px;
+}
+
+.socios-card-row span:last-child {
+  color: #111111;
+  font-size: 14px;
 }
 
 .instalaciones-reserva-acciones {

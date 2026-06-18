@@ -14,18 +14,20 @@ import { getInstalaciones, createInstalacion, deleteInstalacion } from '../../se
 
 jest.mock('../../services/reservasService', () => ({
   getReservas: jest.fn(),
-  createReserva: jest.fn(),
   deleteReserva: jest.fn(),
 }));
-import { getReservas, createReserva, deleteReserva } from '../../services/reservasService';
+import { getReservas, deleteReserva } from '../../services/reservasService';
 
 jest.mock('../../services/sociosService', () => ({
   getSocios: jest.fn(),
-  getSocioByNroSocio: jest.fn(),
 }));
-import { getSocios, getSocioByNroSocio } from '../../services/sociosService';
+import { getSocios } from '../../services/sociosService';
 
 jest.mock('../../assets/logo_socio.png', () => 'logo_socio.png');
+jest.mock('../../assets/logo-verde.png', () => 'logo-verde.png');
+jest.mock('../../assets/logo-rojo.png', () => 'logo-rojo.png');
+jest.mock('../../assets/logo-amarillo.png', () => 'logo-amarillo.png');
+jest.mock('../../assets/logo-naranja.png', () => 'logo-naranja.png');
 
 jest.mock('../../components/createInstalacionForm/CreateInstalacionForm', () => ({
   CreateInstalacionForm: ({ onSuccess, onCancel }) => (
@@ -64,16 +66,6 @@ function irAlDetalle() {
   fireEvent.click(screen.getByText('Test'));
 }
 
-async function crearReservaInline({ nroSocio, fecha, horaIni, horaFin }) {
-  fireEvent.change(screen.getByLabelText('Nro. de socio'), { target: { value: nroSocio } });
-  fireEvent.change(screen.getByLabelText('Fecha'), { target: { value: fecha } });
-  fireEvent.change(screen.getByLabelText('Hora inicio'), { target: { value: horaIni } });
-  fireEvent.change(screen.getByLabelText('Hora fin'), { target: { value: horaFin } });
-  await act(async () => {
-    fireEvent.click(screen.getByRole('button', { name: /agregar reserva/i }));
-  });
-}
-
 function ultimoBoton(nombre) {
   const botones = screen.getAllByRole('button', { name: nombre });
   return botones[botones.length - 1];
@@ -90,21 +82,8 @@ describe('InstalacionesPage', () => {
     createInstalacion.mockResolvedValue({ id: 'test-id' });
     deleteInstalacion.mockResolvedValue(undefined);
     getReservas.mockImplementation(() => Promise.resolve([...reservasStore]));
-    createReserva.mockImplementation(async (data) => {
-      const id = 'test-reserva-id';
-      reservasStore = [...reservasStore, {
-        id,
-        id_instalacion: data.id_instalacion,
-        id_socio: data.id_socio,
-        fecha_reserva: data.fecha_reserva,
-        hora_inicio: data.hora_inicio,
-        hora_fin: data.hora_fin,
-      }];
-      return { id };
-    });
     deleteReserva.mockResolvedValue(undefined);
     getSocios.mockResolvedValue([SOCIO_MOCK]);
-    getSocioByNroSocio.mockResolvedValue(SOCIO_MOCK);
   });
 
   test('muestra el título "Reservas e Instalaciones"', async () => {
@@ -112,10 +91,14 @@ describe('InstalacionesPage', () => {
     expect(screen.getByText('Reservas e Instalaciones')).toBeInTheDocument();
   });
 
-  test('muestra la sección Instalaciones y la sección Reservas', async () => {
+  test('muestra la sección Instalaciones en la vista de lista', async () => {
     await renderPage();
     expect(screen.getByRole('heading', { name: 'Instalaciones' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Reservas' })).toBeInTheDocument();
+  });
+
+  test('no muestra el botón "Nueva reserva" en la vista de lista', async () => {
+    await renderPage();
+    expect(screen.queryByRole('button', { name: /nueva reserva/i })).not.toBeInTheDocument();
   });
 
   test('muestra mensaje cuando no hay instalaciones', async () => {
@@ -146,33 +129,12 @@ describe('InstalacionesPage', () => {
     expect(screen.getByText('Activa')).toBeInTheDocument();
   });
 
-  test('abre el formulario de crear reserva al hacer clic en "Nueva reserva"', async () => {
-    await renderPage();
-    fireEvent.click(screen.getByRole('button', { name: /nueva reserva/i }));
-    expect(screen.getByRole('button', { name: 'Confirmar reserva' })).toBeInTheDocument();
-  });
-
-  test('cierra el formulario de crear reserva al confirmar', async () => {
-    await renderPage();
-    fireEvent.click(screen.getByRole('button', { name: /nueva reserva/i }));
-    fireEvent.click(screen.getByRole('button', { name: 'Confirmar reserva' }));
-    expect(screen.queryByRole('button', { name: 'Confirmar reserva' })).not.toBeInTheDocument();
-  });
-
-  test('cancela el formulario de crear reserva', async () => {
-    await renderPage();
-    fireEvent.click(screen.getByRole('button', { name: /nueva reserva/i }));
-    fireEvent.click(screen.getByRole('button', { name: 'Cancelar reserva' }));
-    expect(screen.queryByRole('button', { name: 'Cancelar reserva' })).not.toBeInTheDocument();
-  });
-
   test('navega a la vista de detalle al hacer clic en una instalación', async () => {
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
     expect(screen.getByRole('button', { name: /volver/i })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Reservas' })).toBeInTheDocument();
-    expect(screen.getByLabelText('Nro. de socio')).toBeInTheDocument();
   });
 
   test('vuelve a la lista al hacer clic en Volver', async () => {
@@ -184,73 +146,196 @@ describe('InstalacionesPage', () => {
     expect(screen.queryByRole('button', { name: /volver/i })).not.toBeInTheDocument();
   });
 
-  test('muestra el formulario inline de reserva en la vista de detalle', async () => {
+  test('muestra botón "Agregar reserva" fuera del card en la vista de detalle', async () => {
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
-    expect(screen.getByLabelText('Nro. de socio')).toBeInTheDocument();
-    expect(screen.getByLabelText('Fecha')).toBeInTheDocument();
-    expect(screen.getByLabelText('Hora inicio')).toBeInTheDocument();
-    expect(screen.getByLabelText('Hora fin')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /agregar reserva/i })).toBeInTheDocument();
+  });
+
+  test('al hacer clic en "Agregar reserva" se abre CreateReservaForm', async () => {
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+    fireEvent.click(screen.getByRole('button', { name: /agregar reserva/i }));
+    expect(screen.getByRole('button', { name: 'Confirmar reserva' })).toBeInTheDocument();
+  });
+
+  test('cancela el formulario de crear reserva desde detalle', async () => {
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+    fireEvent.click(screen.getByRole('button', { name: /agregar reserva/i }));
+    fireEvent.click(screen.getByRole('button', { name: 'Cancelar reserva' }));
+    expect(screen.queryByRole('button', { name: 'Confirmar reserva' })).not.toBeInTheDocument();
+  });
+
+  test('al confirmar la reserva se recargan las reservas de la instalación', async () => {
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(getReservas).toHaveBeenCalledTimes(1));
+
+    fireEvent.click(screen.getByRole('button', { name: /agregar reserva/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Confirmar reserva' }));
+    });
+
+    await waitFor(() => {
+      expect(getReservas).toHaveBeenCalledTimes(2);
+    });
   });
 
   test('muestra mensaje cuando no hay reservas en la instalación', async () => {
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
-    expect(screen.getByText('No hay reservas para esta instalación.')).toBeInTheDocument();
-  });
-
-  test('agrega una reserva y la muestra en la tabla', async () => {
-    await renderPage();
-    crearInstalacionHelper();
-    irAlDetalle();
-    await crearReservaInline({ nroSocio: '1234', fecha: '2026-07-15', horaIni: '10:00', horaFin: '12:00' });
-    expect(screen.getByText('1234')).toBeInTheDocument();
-    expect(screen.getByText('2026-07-15')).toBeInTheDocument();
-  });
-
-  test('muestra error si el número de socio está vacío', async () => {
-    await renderPage();
-    crearInstalacionHelper();
-    irAlDetalle();
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /agregar reserva/i }));
-    });
-    expect(screen.getByRole('alert')).toHaveTextContent('El número de socio es obligatorio.');
-  });
-
-  test('muestra error si el socio no existe', async () => {
-    getSocioByNroSocio.mockRejectedValue(new Error('socio-no-encontrado'));
-    await renderPage();
-    crearInstalacionHelper();
-    irAlDetalle();
-    fireEvent.change(screen.getByLabelText('Nro. de socio'), { target: { value: '9999' } });
-    fireEvent.change(screen.getByLabelText('Fecha'), { target: { value: '2026-08-01' } });
-    fireEvent.change(screen.getByLabelText('Hora inicio'), { target: { value: '10:00' } });
-    fireEvent.change(screen.getByLabelText('Hora fin'), { target: { value: '11:00' } });
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /agregar reserva/i }));
-    });
     await waitFor(() => {
-      expect(screen.getByRole('alert')).toHaveTextContent('No se encontró ningún socio con ese número.');
+      expect(screen.getByText('No hay reservas para esta instalación.')).toBeInTheDocument();
     });
   });
 
-  test('muestra error si hora fin es anterior o igual a hora inicio', async () => {
+  test('muestra las reservas cargadas en la tabla', async () => {
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+    ]));
+
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
-    fireEvent.change(screen.getByLabelText('Nro. de socio'), { target: { value: '1234' } });
-    fireEvent.change(screen.getByLabelText('Fecha'), { target: { value: '2026-08-01' } });
-    fireEvent.change(screen.getByLabelText('Hora inicio'), { target: { value: '14:00' } });
-    fireEvent.change(screen.getByLabelText('Hora fin'), { target: { value: '13:00' } });
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /agregar reserva/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('1234')).toBeInTheDocument();
+      expect(screen.getByText('2026-08-01')).toBeInTheDocument();
     });
-    expect(screen.getByRole('alert')).toHaveTextContent('La hora de fin debe ser posterior');
   });
+
+  // ── Tests de filtro de fecha ──
+
+  test('el filtro de fecha muestra solo reservas de esa fecha', async () => {
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+      { id: 'r-2', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-05', hora_inicio: '14:00', hora_fin: '15:00' },
+    ]));
+
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getAllByText('1234').length).toBe(2));
+
+    fireEvent.change(screen.getByLabelText('Filtrar por fecha'), { target: { value: '2026-08-01' } });
+
+    expect(screen.getByText('2026-08-01')).toBeInTheDocument();
+    expect(screen.queryByText('2026-08-05')).not.toBeInTheDocument();
+  });
+
+  test('limpiar el filtro de fecha muestra todas las reservas', async () => {
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+      { id: 'r-2', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-05', hora_inicio: '14:00', hora_fin: '15:00' },
+    ]));
+
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getAllByText('1234').length).toBe(2));
+
+    fireEvent.change(screen.getByLabelText('Filtrar por fecha'), { target: { value: '2026-08-01' } });
+    fireEvent.change(screen.getByLabelText('Filtrar por fecha'), { target: { value: '' } });
+
+    expect(screen.getByText('2026-08-01')).toBeInTheDocument();
+    expect(screen.getByText('2026-08-05')).toBeInTheDocument();
+  });
+
+  // ── Tests de Ver Socio ──
+
+  test('el botón "Ver Socio" abre un card con los datos del socio', async () => {
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+    ]));
+
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('Ver Socio')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Ver Socio'));
+
+    expect(screen.getByText('García Juan')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Cerrar' })).toBeInTheDocument();
+  });
+
+  test('el card "Ver Socio" se cierra al hacer clic en Cerrar', async () => {
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+    ]));
+
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('Ver Socio')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Ver Socio'));
+    expect(screen.getByText('García Juan')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cerrar' }));
+    expect(screen.queryByText('García Juan')).not.toBeInTheDocument();
+  });
+
+  test('ESC cierra el card "Ver Socio"', async () => {
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+    ]));
+
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('Ver Socio')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Ver Socio'));
+    expect(screen.getByText('García Juan')).toBeInTheDocument();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(screen.queryByText('García Juan')).not.toBeInTheDocument();
+  });
+
+  // ── Tests de toggle de reservas ──
+
+  test('el toggle oculta las reservas al hacer clic en "Ocultar reservas"', async () => {
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+    ]));
+
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('2026-08-01')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /ocultar reservas/i }));
+    expect(screen.queryByText('2026-08-01')).not.toBeInTheDocument();
+  });
+
+  test('el toggle muestra las reservas al hacer clic en "Mostrar reservas"', async () => {
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+    ]));
+
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('2026-08-01')).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: /ocultar reservas/i }));
+    expect(screen.queryByText('2026-08-01')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /mostrar reservas/i }));
+    expect(screen.getByText('2026-08-01')).toBeInTheDocument();
+  });
+
+  // ── Tests de eliminar ──
 
   test('elimina una instalación y vuelve a la lista', async () => {
     await renderPage();
@@ -292,56 +377,46 @@ describe('InstalacionesPage', () => {
   });
 
   test('elimina una reserva correctamente', async () => {
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-10-05', hora_inicio: '16:00', hora_fin: '18:00' },
+    ]));
+
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
-    await crearReservaInline({ nroSocio: '1234', fecha: '2026-10-05', horaIni: '16:00', horaFin: '18:00' });
-    expect(screen.getByText('1234')).toBeInTheDocument();
+
+    await waitFor(() => expect(screen.getByText('2026-10-05')).toBeInTheDocument());
     fireEvent.click(ultimoBoton('Eliminar'));
     fireEvent.click(ultimoBoton('Eliminar'));
-    expect(screen.queryByText('1234')).not.toBeInTheDocument();
+    expect(screen.queryByText('2026-10-05')).not.toBeInTheDocument();
     expect(screen.getByText('No hay reservas para esta instalación.')).toBeInTheDocument();
   });
 
   test('cancela la eliminación de una reserva', async () => {
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-10-10', hora_inicio: '10:00', hora_fin: '11:00' },
+    ]));
+
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
-    await crearReservaInline({ nroSocio: '1234', fecha: '2026-10-10', horaIni: '10:00', horaFin: '11:00' });
+
+    await waitFor(() => expect(screen.getByText('2026-10-10')).toBeInTheDocument());
     fireEvent.click(ultimoBoton('Eliminar'));
     fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
-    expect(screen.getByText('1234')).toBeInTheDocument();
-  });
-
-  test('al eliminar instalación también se eliminan sus reservas', async () => {
-    await renderPage();
-    crearInstalacionHelper();
-    irAlDetalle();
-    await crearReservaInline({ nroSocio: '2003', fecha: '2026-11-01', horaIni: '08:00', horaFin: '09:00' });
-    const botonesEliminar = screen.getAllByRole('button', { name: 'Eliminar' });
-    fireEvent.click(botonesEliminar[0]);
-    await act(async () => {
-      fireEvent.click(ultimoBoton('Eliminar'));
-    });
-    await waitFor(() => expect(screen.queryByRole('button', { name: /volver/i })).not.toBeInTheDocument());
-    crearInstalacionHelper();
-    fireEvent.click(screen.getAllByText('Test')[0]);
-    expect(screen.getByText('No hay reservas para esta instalación.')).toBeInTheDocument();
-  });
-
-  test('el formulario inline se limpia después de agregar una reserva', async () => {
-    await renderPage();
-    crearInstalacionHelper();
-    irAlDetalle();
-    await crearReservaInline({ nroSocio: '2004', fecha: '2026-12-01', horaIni: '09:00', horaFin: '10:00' });
-    expect(screen.getByLabelText('Nro. de socio').value).toBe('');
+    expect(screen.getByText('2026-10-10')).toBeInTheDocument();
   });
 
   test('ESC cierra el modal de eliminar reserva', async () => {
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-07-02', hora_inicio: '10:00', hora_fin: '12:00' },
+    ]));
+
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
-    await crearReservaInline({ nroSocio: '2005', fecha: '2026-07-02', horaIni: '10:00', horaFin: '12:00' });
+
+    await waitFor(() => expect(screen.getByText('2026-07-02')).toBeInTheDocument());
     fireEvent.click(ultimoBoton('Eliminar'));
     expect(screen.getByText(/estás seguro/i)).toBeInTheDocument();
     fireEvent.keyDown(document, { key: 'Escape' });
@@ -349,23 +424,27 @@ describe('InstalacionesPage', () => {
   });
 
   test('cierra el modal de eliminar reserva al hacer clic en el overlay', async () => {
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-07-01', hora_inicio: '09:00', hora_fin: '10:00' },
+    ]));
+
     await renderPage();
     crearInstalacionHelper();
     irAlDetalle();
-    await crearReservaInline({ nroSocio: '1234', fecha: '2026-07-01', horaIni: '09:00', horaFin: '10:00' });
+
+    await waitFor(() => expect(screen.getByText('2026-07-01')).toBeInTheDocument());
     fireEvent.click(ultimoBoton('Eliminar'));
     expect(screen.getByText(/estás seguro/i)).toBeInTheDocument();
     fireEvent.click(document.querySelector('.modal-overlay'));
     expect(screen.queryByText(/estás seguro/i)).not.toBeInTheDocument();
-    expect(screen.getByText('1234')).toBeInTheDocument();
+    expect(screen.getByText('2026-07-01')).toBeInTheDocument();
   });
 
   // ── Tests de permisos ──
 
-  test('muestra los botones de acción cuando el usuario tiene todos los permisos', async () => {
+  test('muestra el botón de crear instalación cuando el usuario tiene el permiso', async () => {
     await renderPage();
     expect(screen.getByRole('button', { name: /nueva instalación/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /nueva reserva/i })).toBeInTheDocument();
   });
 
   test('el botón "Eliminar" de instalación aparece con permiso borrar_instalacion', async () => {

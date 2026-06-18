@@ -11,7 +11,7 @@ const NAV_ITEMS_BASE = [
   { to: '/dashboard', label: 'Dashboard', desc: 'Inicio y resumen general', Icon: LayoutDashboard, permiso: null },
   { to: '/socios', label: 'Socios', desc: 'Consultar y gestionar el padrón', Icon: Users, permiso: 'ver_socios' },
   { to: '/usuarios', label: 'Usuarios', desc: 'Usuarios administrativos y roles', Icon: ShieldCheck, permiso: 'ver_usuarios' },
-  { to: '/instalaciones', label: 'Reservas e Instalaciones', desc: 'Administrar espacios físicos y reservas', Icon: Building2, permiso: null },
+  { to: '/instalaciones', label: 'Reservas e Instalaciones', desc: 'Administrar espacios físicos y reservas', Icon: Building2, permiso: 'ver_instalaciones' },
 ];
 
 function AppLayout() {

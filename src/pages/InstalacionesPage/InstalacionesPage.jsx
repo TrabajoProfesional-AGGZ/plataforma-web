@@ -1,19 +1,34 @@
 import { useState, useEffect } from 'react';
-import { Plus, ChevronLeft } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { CreateInstalacionForm } from '../../components/createInstalacionForm/CreateInstalacionForm';
 import { CreateReservaForm } from '../../components/createReservaForm/CreateReservaForm';
 import { getInstalaciones, createInstalacion, deleteInstalacion } from '../../services/instalacionesService';
-import { getReservas, createReserva, deleteReserva } from '../../services/reservasService';
-import { getSocios, getSocioByNroSocio } from '../../services/sociosService';
+import { getReservas, deleteReserva } from '../../services/reservasService';
+import { getSocios } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
 import logo from '../../assets/logo_socio.png';
+import logoVerde from '../../assets/logo-verde.png';
+import logoRojo from '../../assets/logo-rojo.png';
+import logoAmarillo from '../../assets/logo-amarillo.png';
+import logoNaranja from '../../assets/logo-naranja.png';
 import './InstalacionesPage.css';
+
+const ESTADO_CONFIG = {
+  'Activo':     { logo: logoVerde,    bg: '#a7daa7', border: '#0D6E0D' },
+  'Moroso':     { logo: logoRojo,     bg: '#f4bebe', border: '#A01414' },
+  'Inactivo':   { logo: logoAmarillo, bg: '#f5e9b2', border: '#9A6200' },
+  'Suspendido': { logo: logoNaranja,  bg: '#ffbd98',   border: '#f14701' },
+};
+const ESTADO_DEFAULT = { logo: logoAmarillo, bg: '#f5e9b2', border: '#9A6200' };
+
+function estadoConfig(estado) {
+  const nombre = estado?.nombre ?? estado ?? '';
+  return ESTADO_CONFIG[nombre] ?? ESTADO_DEFAULT;
+}
 
 function genId() {
   return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 }
-
-const FORM_RESERVA_INICIAL = { nro_socio: '', fecha_reserva: '', hora_inicio: '', hora_fin: '' };
 
 function InstalacionesPage() {
   const puedeVerInstalaciones = usePermiso('ver_instalaciones');
@@ -36,9 +51,10 @@ function InstalacionesPage() {
   const [eliminarReservaOpen, setEliminarReservaOpen] = useState(false);
   const [reservaActual, setReservaActual] = useState(null);
 
-  const [formReserva, setFormReserva] = useState(FORM_RESERVA_INICIAL);
-  const [errReservaInline, setErrReservaInline] = useState('');
-  const [loadingReservaInline, setLoadingReservaInline] = useState(false);
+  const [filtroFecha, setFiltroFecha] = useState('');
+  const [reservasVisible, setReservasVisible] = useState(true);
+  const [verSocioData, setVerSocioData] = useState(null);
+  const [verSocioOpen, setVerSocioOpen] = useState(false);
 
   useEffect(() => {
     if (!puedeVerInstalaciones) return;
@@ -51,10 +67,11 @@ function InstalacionesPage() {
 
   async function cargarReservas(instalacionId) {
     const [reservasData, sociosData] = await Promise.all([getReservas(instalacionId), getSocios()]);
-    const socioMap = Object.fromEntries(sociosData.map((s) => [s.id, s.nro_socio]));
+    const socioMap = Object.fromEntries(sociosData.map((s) => [s.id, s]));
     setReservas(reservasData.map((r) => ({
       ...r,
-      nro_socio: r.nro_socio ?? socioMap[r.id_socio] ?? r.id_socio,
+      nro_socio: r.nro_socio ?? socioMap[r.id_socio]?.nro_socio ?? r.id_socio,
+      socio: socioMap[r.id_socio] ?? null,
     })));
   }
 
@@ -63,7 +80,7 @@ function InstalacionesPage() {
     cargarReservas(instalacionActual.id).catch(() => {});
   }, [instalacionActual]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const anyModalOpen = eliminarInstalacionOpen || eliminarReservaOpen;
+  const anyModalOpen = eliminarInstalacionOpen || eliminarReservaOpen || verSocioOpen;
 
   useEffect(() => {
     if (!anyModalOpen) return;
@@ -71,10 +88,11 @@ function InstalacionesPage() {
       if (e.key !== 'Escape') return;
       if (eliminarInstalacionOpen) setEliminarInstalacionOpen(false);
       else if (eliminarReservaOpen) setEliminarReservaOpen(false);
+      else if (verSocioOpen) setVerSocioOpen(false);
     }
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [anyModalOpen, eliminarInstalacionOpen, eliminarReservaOpen]);
+  }, [anyModalOpen, eliminarInstalacionOpen, eliminarReservaOpen, verSocioOpen]);
 
   // === Instalaciones ===
 
@@ -106,6 +124,10 @@ function InstalacionesPage() {
 
   const reservasDeInstalacion = reservas.filter((r) => (r.instalacion_id ?? r.id_instalacion) === instalacionActual?.id);
 
+  const reservasFiltradas = filtroFecha
+    ? reservasDeInstalacion.filter((r) => (r.fecha_reserva ?? r.fecha) === filtroFecha)
+    : reservasDeInstalacion;
+
   function abrirEliminarReserva(reserva) {
     setReservaActual(reserva);
     setEliminarReservaOpen(true);
@@ -121,43 +143,9 @@ function InstalacionesPage() {
     } catch { /* silently ignore */ }
   }
 
-  // === Reserva desde detalle de instalación (inline) ===
-
-  async function handleCrearReservaEnInstalacion(e) {
-    e.preventDefault();
-    const { nro_socio, fecha_reserva, hora_inicio, hora_fin } = formReserva;
-    if (!nro_socio.trim()) { setErrReservaInline('El número de socio es obligatorio.'); return; }
-    if (!fecha_reserva) { setErrReservaInline('La fecha es obligatoria.'); return; }
-    if (!hora_inicio) { setErrReservaInline('La hora de inicio es obligatoria.'); return; }
-    if (!hora_fin) { setErrReservaInline('La hora de fin es obligatoria.'); return; }
-    if (hora_fin <= hora_inicio) { setErrReservaInline('La hora de fin debe ser posterior a la de inicio.'); return; }
-
-    setLoadingReservaInline(true);
-    setErrReservaInline('');
-    let socio;
-    try {
-      socio = await getSocioByNroSocio(nro_socio);
-    } catch {
-      setErrReservaInline('No se encontró ningún socio con ese número.');
-      setLoadingReservaInline(false);
-      return;
-    }
-
-    setFormReserva(FORM_RESERVA_INICIAL);
-    try {
-      await createReserva({
-        id_socio: socio.id,
-        id_instalacion: instalacionActual.id,
-        fecha_reserva,
-        hora_inicio,
-        hora_fin,
-      });
-      await cargarReservas(instalacionActual.id);
-    } catch {
-      setErrReservaInline('Error al crear la reserva. Intente nuevamente.');
-    } finally {
-      setLoadingReservaInline(false);
-    }
+  function abrirVerSocio(socio) {
+    setVerSocioData(socio);
+    setVerSocioOpen(true);
   }
 
   return (
@@ -167,7 +155,6 @@ function InstalacionesPage() {
         <>
           <h1 className="instalaciones-title">Reservas e Instalaciones</h1>
 
-          {/* Sección Instalaciones */}
           <div className="instalaciones-seccion-separator">
             <div className="instalaciones-seccion-header">
               <h2 className="instalaciones-seccion-title">Instalaciones</h2>
@@ -220,19 +207,6 @@ function InstalacionesPage() {
               </div>
             )}
           </div>
-
-          {/* Sección Reservas */}
-          <div className="instalaciones-seccion-separator">
-            <div className="instalaciones-seccion-header">
-              <h2 className="instalaciones-seccion-title">Reservas</h2>
-              {puedeCrearReserva && (
-                <button className="instalaciones-btn-crear" onClick={() => setCrearReservaFormOpen(true)}>
-                  <Plus size={15} aria-hidden="true" />
-                  Nueva reserva
-                </button>
-              )}
-            </div>
-          </div>
         </>
       )}
 
@@ -277,109 +251,101 @@ function InstalacionesPage() {
             </div>
           </div>
 
+          {puedeCrearReserva && (
+            <div className="instalaciones-agregar-reserva">
+              <button className="instalaciones-btn-crear" onClick={() => setCrearReservaFormOpen(true)}>
+                <Plus size={15} aria-hidden="true" />
+                Agregar reserva
+              </button>
+            </div>
+          )}
+
           <div className="instalaciones-reservas-section">
             <h3 className="instalaciones-reservas-title">Reservas</h3>
+            <div className="instalaciones-reservas-controles">
+              {puedeVerReservas && reservasDeInstalacion.length > 0 && (
+                <input
+                  type="date"
+                  className="instalaciones-filtro-fecha"
+                  value={filtroFecha}
+                  onChange={(e) => setFiltroFecha(e.target.value)}
+                  aria-label="Filtrar por fecha"
+                />
+              )}
+              <button
+                className="instalaciones-btn-toggle"
+                onClick={() => setReservasVisible((v) => !v)}
+                aria-label={reservasVisible ? 'Ocultar reservas' : 'Mostrar reservas'}
+              >
+                {reservasVisible ? (
+                  <><ChevronUp size={15} aria-hidden="true" /> Ocultar reservas</>
+                ) : (
+                  <><ChevronDown size={15} aria-hidden="true" /> Mostrar reservas</>
+                )}
+              </button>
+            </div>
 
-            {puedeCrearReserva && (
-              <form className="instalaciones-reserva-form" onSubmit={handleCrearReservaEnInstalacion}>
-                <div className="instalaciones-reserva-form-fields">
-                  <div className="modal-field">
-                    <label className="modal-label" htmlFor="cr-socio">Nro. de socio</label>
-                    <input
-                      id="cr-socio"
-                      className="modal-input"
-                      type="text"
-                      value={formReserva.nro_socio}
-                      onChange={(e) => setFormReserva((p) => ({ ...p, nro_socio: e.target.value }))}
-                      placeholder="Ej. 1234"
-                    />
-                  </div>
-                  <div className="modal-field">
-                    <label className="modal-label" htmlFor="cr-fecha">Fecha</label>
-                    <input
-                      id="cr-fecha"
-                      className="modal-input"
-                      type="date"
-                      value={formReserva.fecha_reserva}
-                      onChange={(e) => setFormReserva((p) => ({ ...p, fecha_reserva: e.target.value }))}
-                    />
-                  </div>
-                  <div className="instalaciones-reserva-horas">
-                    <div className="modal-field">
-                      <label className="modal-label" htmlFor="cr-hora-ini">Hora inicio</label>
-                      <input
-                        id="cr-hora-ini"
-                        className="modal-input"
-                        type="time"
-                        value={formReserva.hora_inicio}
-                        onChange={(e) => setFormReserva((p) => ({ ...p, hora_inicio: e.target.value }))}
-                      />
-                    </div>
-                    <div className="modal-field">
-                      <label className="modal-label" htmlFor="cr-hora-fin">Hora fin</label>
-                      <input
-                        id="cr-hora-fin"
-                        className="modal-input"
-                        type="time"
-                        value={formReserva.hora_fin}
-                        onChange={(e) => setFormReserva((p) => ({ ...p, hora_fin: e.target.value }))}
-                      />
-                    </div>
-                  </div>
+            {reservasVisible && (
+              reservasFiltradas.length === 0 ? (
+                <p className="instalaciones-empty">
+                  {filtroFecha && reservasDeInstalacion.length > 0
+                    ? 'No hay reservas para la fecha seleccionada.'
+                    : 'No hay reservas para esta instalación.'}
+                </p>
+              ) : (
+                <div className="instalaciones-table-wrapper">
+                  <table className="instalaciones-tabla">
+                    <thead>
+                      <tr>
+                        <th>Nro. de socio</th>
+                        <th>Fecha</th>
+                        <th>Inicio</th>
+                        <th>Fin</th>
+                        <th>Acciones</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {[...reservasFiltradas]
+                        .sort((a, b) =>
+                          (a.fecha_reserva ?? a.fecha ?? '').localeCompare(b.fecha_reserva ?? b.fecha ?? '') ||
+                          (a.hora_inicio ?? '').localeCompare(b.hora_inicio ?? '')
+                        )
+                        .map((r) => (
+                          <tr key={r.id}>
+                            <td>
+                              <div className="instalaciones-socio-cell">
+                                <span>{r.nro_socio}</span>
+                                {r.socio && (
+                                  <button
+                                    className="instalaciones-btn-ver-socio"
+                                    onClick={() => abrirVerSocio(r.socio)}
+                                  >
+                                    Ver Socio
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                            <td>{r.fecha_reserva ?? r.fecha}</td>
+                            <td>{r.hora_inicio}</td>
+                            <td>{r.hora_fin}</td>
+                            <td>
+                              <div className="instalaciones-reserva-acciones">
+                                {puedeBorrarReserva && (
+                                  <button
+                                    className="instalaciones-btn-reserva-eliminar"
+                                    onClick={() => abrirEliminarReserva(r)}
+                                  >
+                                    Eliminar
+                                  </button>
+                                )}
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                    </tbody>
+                  </table>
                 </div>
-                {errReservaInline && <p className="modal-error" role="alert">{errReservaInline}</p>}
-                <div className="instalaciones-reserva-form-actions">
-                  <button type="submit" className="instalaciones-btn-crear" disabled={loadingReservaInline}>
-                    <Plus size={15} aria-hidden="true" />
-                    {loadingReservaInline ? 'Buscando socio...' : 'Agregar reserva'}
-                  </button>
-                </div>
-              </form>
-            )}
-
-            {reservasDeInstalacion.length === 0 ? (
-              <p className="instalaciones-empty">No hay reservas para esta instalación.</p>
-            ) : (
-              <div className="instalaciones-table-wrapper">
-                <table className="instalaciones-tabla">
-                  <thead>
-                    <tr>
-                      <th>Nro. de socio</th>
-                      <th>Fecha</th>
-                      <th>Inicio</th>
-                      <th>Fin</th>
-                      <th>Acciones</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {[...reservasDeInstalacion]
-                      .sort((a, b) =>
-                        (a.fecha_reserva ?? a.fecha ?? '').localeCompare(b.fecha_reserva ?? b.fecha ?? '') ||
-                        (a.hora_inicio ?? '').localeCompare(b.hora_inicio ?? '')
-                      )
-                      .map((r) => (
-                        <tr key={r.id}>
-                          <td>{r.nro_socio}</td>
-                          <td>{r.fecha_reserva ?? r.fecha}</td>
-                          <td>{r.hora_inicio}</td>
-                          <td>{r.hora_fin}</td>
-                          <td>
-                            <div className="instalaciones-reserva-acciones">
-                              {puedeBorrarReserva && (
-                                <button
-                                  className="instalaciones-btn-reserva-eliminar"
-                                  onClick={() => abrirEliminarReserva(r)}
-                                >
-                                  Eliminar
-                                </button>
-                              )}
-                            </div>
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
+              )
             )}
           </div>
         </>
@@ -393,10 +359,14 @@ function InstalacionesPage() {
         />
       )}
 
-      {crearReservaFormOpen && (
+      {crearReservaFormOpen && instalacionActual && (
         <CreateReservaForm
-          instalaciones={instalaciones}
-          onSuccess={() => setCrearReservaFormOpen(false)}
+          instalaciones={[instalacionActual]}
+          instalacionPreseleccionada={instalacionActual.id}
+          onSuccess={async () => {
+            setCrearReservaFormOpen(false);
+            await cargarReservas(instalacionActual.id);
+          }}
           onCancel={() => setCrearReservaFormOpen(false)}
         />
       )}
@@ -441,6 +411,73 @@ function InstalacionesPage() {
           </div>
         </div>
       )}
+
+      {/* ── Modal: Ver socio ── */}
+      {verSocioOpen && verSocioData && (() => {
+        const cfg = estadoConfig(verSocioData.estado);
+        return (
+          <div className="modal-overlay" onClick={() => setVerSocioOpen(false)}>
+            <div className="instalaciones-ver-socio-wrapper" onClick={(e) => e.stopPropagation()}>
+              <div className="socios-card" style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}>
+                <div className="socios-card-inner">
+                  <img src={cfg.logo} alt="" className="socios-card-logo" />
+                  <div className="socios-card-data">
+                    <div className="socios-card-row">
+                      <span className="socios-card-label">N° Socio</span>
+                      <span>{verSocioData.nro_socio}</span>
+                    </div>
+                    <div className="socios-card-row">
+                      <span className="socios-card-label">Apellido y nombre</span>
+                      <span>{verSocioData.apellido} {verSocioData.nombre}</span>
+                    </div>
+                    {verSocioData.nro_documento && (
+                      <div className="socios-card-row">
+                        <span className="socios-card-label">DNI</span>
+                        <span>{verSocioData.nro_documento}</span>
+                      </div>
+                    )}
+                    {verSocioData.fecha_nacimiento && (
+                      <div className="socios-card-row">
+                        <span className="socios-card-label">Fecha de nacimiento</span>
+                        <span>{verSocioData.fecha_nacimiento}</span>
+                      </div>
+                    )}
+                    {verSocioData.email && (
+                      <div className="socios-card-row">
+                        <span className="socios-card-label">Email</span>
+                        <span>{verSocioData.email}</span>
+                      </div>
+                    )}
+                    {verSocioData.telefono && (
+                      <div className="socios-card-row">
+                        <span className="socios-card-label">Teléfono</span>
+                        <span>{verSocioData.telefono}</span>
+                      </div>
+                    )}
+                    {verSocioData.categoria && (
+                      <div className="socios-card-row">
+                        <span className="socios-card-label">Categoría</span>
+                        <span>{verSocioData.categoria?.nombre ?? verSocioData.categoria}</span>
+                      </div>
+                    )}
+                    {verSocioData.estado && (
+                      <div className="socios-card-row">
+                        <span className="socios-card-label">Estado</span>
+                        <span>{verSocioData.estado?.nombre ?? verSocioData.estado}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="instalaciones-ver-socio-cerrar">
+                <button type="button" className="modal-button-cancel" onClick={() => setVerSocioOpen(false)}>
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
     </div>
   );
 }

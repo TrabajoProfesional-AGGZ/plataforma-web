@@ -12,9 +12,9 @@ import logoNaranja from '../../assets/logo-naranja.png'
 import './SociosPage.css';
 
 const ESTADO_CONFIG = {
-  'Activo': { logo: logoVerde,    bg: '#8ac98ab0', border: '#0D6E0D' },
-  'Moroso': { logo: logoRojo,     bg: '#f0b2b2d2', border: '#A01414' },
-  'Inactivo': {logo: logoAmarillo, bg: '#f4ecb5ee', border: '#9A6200' },
+  'Activo': { logo: logoVerde,    bg: '#a7daa7', border: '#0D6E0D' },
+  'Moroso': { logo: logoRojo,     bg: '#f4bebe', border: '#A01414' },
+  'Inactivo': {logo: logoAmarillo, bg: '#f5e9b2', border: '#9A6200' },
   'Suspendido': {logo: logoNaranja, bg: '#ffbd98', border: '#f14701'}
 };
 const ESTADO_DEFAULT = { logo: logoAmarillo, bg: '#f4ecb5ee', border: '#9A6200' };
