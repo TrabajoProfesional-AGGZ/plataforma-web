@@ -32,7 +32,13 @@ export function MultiStepFormShell({
       onClick={onCancel}
       onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') onCancel(); }}
     >
-      <div role="dialog" aria-modal="true" className="csf-wrapper" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+      {/* ¡Acá está el cambio! Usamos <dialog> nativo con el atributo open */}
+      <dialog 
+        open 
+        className="csf-wrapper" 
+        onClick={(e) => e.stopPropagation()} 
+        onKeyDown={(e) => e.stopPropagation()}
+      >
         <AnimatePresence mode="wait">
           {submitted ? (
             <motion.div
@@ -205,7 +211,7 @@ export function MultiStepFormShell({
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
+      </dialog>
     </button>
   );
 }

@@ -127,7 +127,10 @@ export function DocHint() {
   );
 }
 
-const EMAIL_PATTERN = { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Ingresá un correo válido' };
+const EMAIL_PATTERN = { 
+  value: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/, 
+  message: 'Ingresá un correo válido' 
+};
 
 export function EmailField({ register, errors, required = false, placeholder = 'maria@ejemplo.com' }) {
   const rules = { pattern: EMAIL_PATTERN, ...(required && { required: 'El correo es requerido' }) };

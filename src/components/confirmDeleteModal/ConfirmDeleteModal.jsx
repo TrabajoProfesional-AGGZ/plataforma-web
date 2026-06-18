@@ -26,7 +26,7 @@ function ConfirmDeleteModal({
       onClick={onCancel}
       onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') onCancel(); }}
     >
-      <div role="dialog" aria-modal="true" className="csf-wrapper" onClick={(e) => e.stopPropagation()}>
+      <dialog open className="csf-wrapper" onClick={(e) => e.stopPropagation()}>
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -82,7 +82,7 @@ function ConfirmDeleteModal({
             </div>
           </div>
         </motion.div>
-      </div>
+      </dialog>
     </button>
   );
 }

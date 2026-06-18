@@ -21,7 +21,7 @@ function PermisosModal({ permisos, onClose }) {
       onClick={onClose}
       onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') onClose(); }}
     >
-      <div role="dialog" aria-modal="true" className="csf-wrapper permisos-modal-wrapper" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+      <dialog open className="csf-wrapper permisos-modal-wrapper" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
         <div className="csf-outer-card">
           <div className="csf-header">
             <h1>Permisos</h1>
@@ -36,7 +36,7 @@ function PermisosModal({ permisos, onClose }) {
             </ul>
           </div>
         </div>
-      </div>
+      </dialog>
     </button>
   );
 }
