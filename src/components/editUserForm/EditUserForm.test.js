@@ -128,4 +128,20 @@ describe('EditUserForm', () => {
     fireEvent.blur(nombreInput);
     expect(nombreInput).toBeInTheDocument();
   });
+
+  test('muestra error de validación cuando el nombre se vacía y se intenta guardar', async () => {
+    renderForm();
+    const nombreInput = screen.getByDisplayValue('Carlos');
+    fireEvent.change(nombreInput, { target: { value: '' } });
+    fireEvent.click(screen.getByRole('button', { name: /guardar cambios/i }));
+    await waitFor(() => {
+      expect(screen.getByText(/nombre es obligatorio/i)).toBeInTheDocument();
+    });
+  });
+
+  test('hacer click en el overlay llama a onCancel', () => {
+    const { onCancel } = renderForm();
+    fireEvent.click(document.querySelector('.csf-overlay'));
+    expect(onCancel).toHaveBeenCalledTimes(1);
+  });
 });

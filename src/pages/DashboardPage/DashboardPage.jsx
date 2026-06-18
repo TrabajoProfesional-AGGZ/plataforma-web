@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { Users, ShieldCheck, Calendar, Trophy, ArrowUpRight } from 'lucide-react';
+import { Users, ShieldCheck, Trophy, ArrowUpRight, Building2 } from 'lucide-react';
 import './DashboardPage.css';
 
 const SECCIONES = [
@@ -19,11 +19,11 @@ const SECCIONES = [
     permiso: 'ver_usuarios',
   },
   {
-    path: '/dashboard',
-    titulo: 'Reservas',
-    descripcion: 'Crear, modificar, eliminar o consultar reservas.',
-    Icon: Calendar,
-    permiso: null,
+    path: '/instalaciones',
+    titulo: 'Reservas e Instalaciones',
+    descripcion: 'Administrar espacios físicos y reservas.',
+    Icon: Building2,
+    permiso: 'ver_instalaciones',
   },
   {
     path: '/dashboard',

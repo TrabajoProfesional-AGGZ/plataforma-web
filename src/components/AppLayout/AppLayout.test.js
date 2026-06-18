@@ -123,4 +123,28 @@ describe('AppLayout', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/');
     });
   });
+
+  test('hacer click fuera del dropdown lo cierra', () => {
+    renderLayout();
+    fireEvent.click(screen.getByRole('button', { name: 'admin@club.com' }));
+    expect(screen.getByRole('button', { name: /ver perfil/i })).toBeInTheDocument();
+    fireEvent.mouseDown(document.body);
+    expect(screen.queryByRole('button', { name: /ver perfil/i })).not.toBeInTheDocument();
+  });
+
+  test('hacer click en el backdrop cierra el sidebar', () => {
+    renderLayout();
+    fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
+    const backdrop = document.querySelector('.app-sidebar-backdrop');
+    fireEvent.click(backdrop);
+    expect(document.querySelector('.app-sidebar')).toHaveClass('hidden');
+  });
+
+  test('hacer click en un nav link cierra el sidebar', () => {
+    renderLayout(['ver_socios']);
+    fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
+    expect(document.querySelector('.app-sidebar')).not.toHaveClass('hidden');
+    fireEvent.click(screen.getByRole('link', { name: /socios/i }));
+    expect(document.querySelector('.app-sidebar')).toHaveClass('hidden');
+  });
 });

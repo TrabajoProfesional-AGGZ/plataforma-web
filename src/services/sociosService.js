@@ -28,3 +28,10 @@ export async function deleteSocio(id) {
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al eliminar socio');
 }
+
+export async function getSocioByNroSocio(nroSocio) {
+  const socios = await getSocios();
+  const socio = socios.find((s) => String(s.nro_socio) === String(nroSocio).trim());
+  if (!socio) throw new Error('socio-no-encontrado');
+  return socio;
+}

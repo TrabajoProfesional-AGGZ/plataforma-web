@@ -5,6 +5,7 @@ import SociosPage from './pages/SociosPage/SociosPage';
 import CambiarContrasenaPage from './pages/CambiarContrasenaPage/CambiarContrasenaPage';
 import PerfilPage from './pages/PerfilPage/PerfilPage';
 import UsuariosPage from './pages/UsuariosPage/UsuariosPage';
+import InstalacionesPage from './pages/InstalacionesPage/InstalacionesPage';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import AppLayout from './components/AppLayout/AppLayout';
 
@@ -19,6 +20,7 @@ function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/perfil" element={<PerfilPage />} />
             <Route path="/cambiar-contrasena" element={<CambiarContrasenaPage />} />
+            <Route path="/instalaciones" element={<InstalacionesPage />} />
           </Route>
         </Route>
 
