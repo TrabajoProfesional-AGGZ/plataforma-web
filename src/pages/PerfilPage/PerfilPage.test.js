@@ -8,14 +8,24 @@ jest.mock('../../hooks/useAuth');
 jest.mock('../../services/authService');
 import { useAuth } from '../../hooks/useAuth';
 
+jest.mock('../../components/permisosModal/PermisosModal', () => ({
+  PermisosModal: ({ permisos, onClose }) => (
+    <div>
+      <h2>Permisos</h2>
+      <ul>{permisos.map((p) => <li key={p}>{p}</li>)}</ul>
+      <button onClick={onClose}>Cerrar</button>
+    </div>
+  ),
+}));
+
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
 }));
 
-function renderPage(role = 'admin') {
-  useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, loading: false, role });
+function renderPage(role = 'admin', permisos = ['ver_socios', 'ver_usuarios']) {
+  useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, loading: false, role, permisos });
   return render(
     <MemoryRouter>
       <PerfilPage />
@@ -133,6 +143,43 @@ describe('PerfilPage', () => {
       fireEvent.focus(input);
       fireEvent.blur(input);
       expect(input).toBeInTheDocument();
+    });
+  });
+
+  describe('modal de permisos', () => {
+    test('muestra el botón Ver permisos cuando el usuario tiene permisos', () => {
+      renderPage();
+      expect(screen.getByRole('button', { name: /ver permisos/i })).toBeInTheDocument();
+    });
+
+    test('no muestra el botón Ver permisos si el usuario no tiene permisos', () => {
+      renderPage('admin', []);
+      expect(screen.queryByRole('button', { name: /ver permisos/i })).not.toBeInTheDocument();
+    });
+
+    test('el modal de permisos no se muestra al cargar la página', () => {
+      renderPage();
+      expect(screen.queryByRole('heading', { name: /^permisos$/i })).not.toBeInTheDocument();
+    });
+
+    test('el modal se abre al hacer click en Ver permisos', () => {
+      renderPage();
+      fireEvent.click(screen.getByRole('button', { name: /ver permisos/i }));
+      expect(screen.getByRole('heading', { name: /^permisos$/i })).toBeInTheDocument();
+    });
+
+    test('el modal se cierra al llamar onClose', () => {
+      renderPage();
+      fireEvent.click(screen.getByRole('button', { name: /ver permisos/i }));
+      fireEvent.click(screen.getByRole('button', { name: /cerrar/i }));
+      expect(screen.queryByRole('heading', { name: /^permisos$/i })).not.toBeInTheDocument();
+    });
+
+    test('el modal muestra los permisos del usuario', () => {
+      renderPage('admin', ['ver_socios', 'ver_usuarios']);
+      fireEvent.click(screen.getByRole('button', { name: /ver permisos/i }));
+      expect(screen.getByText('ver_socios')).toBeInTheDocument();
+      expect(screen.getByText('ver_usuarios')).toBeInTheDocument();
     });
   });
 });

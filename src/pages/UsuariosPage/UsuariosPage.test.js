@@ -56,6 +56,16 @@ jest.mock('../../components/cambiarRolForm/CambiarRolForm', () => ({
   ),
 }));
 
+jest.mock('../../components/permisosModal/PermisosModal', () => ({
+  PermisosModal: ({ permisos, onClose }) => (
+    <div>
+      <h2>Permisos</h2>
+      <ul>{permisos.map((p) => <li key={p}>{p}</li>)}</ul>
+      <button onClick={onClose}>Cerrar</button>
+    </div>
+  ),
+}));
+
 const usuarioMock = {
   id: 'uuid-0001',
   firebase_uid: 'firebase-uid-1',
@@ -130,7 +140,7 @@ describe('UsuariosPage', () => {
     });
   });
 
-  test('al hacer click en una fila muestra la card con permisos del usuario', async () => {
+  test('al hacer click en una fila muestra la card con datos del usuario', async () => {
     fetchUsuarios.mockResolvedValue([usuarioMock]);
     render(<UsuariosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
@@ -140,8 +150,6 @@ describe('UsuariosPage', () => {
     await waitFor(() => {
       expect(screen.getByText('carlos@club.com')).toBeInTheDocument();
       expect(screen.getAllByText('ADMIN').length).toBeGreaterThan(0);
-      expect(screen.getByText('ver_socios')).toBeInTheDocument();
-      expect(screen.getByText('editar_socios')).toBeInTheDocument();
     });
   });
 
@@ -626,6 +634,48 @@ describe('UsuariosPage', () => {
 
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByRole('heading', { name: /cambiar rol/i })).not.toBeInTheDocument();
+  });
+
+  // --- Modal de permisos ---
+
+  test('muestra el botón Ver permisos cuando el usuario tiene permisos', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /ver permisos/i })).toBeInTheDocument();
+    });
+  });
+
+  test('abre el modal de permisos al hacer click en Ver permisos', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /ver permisos/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /ver permisos/i }));
+
+    expect(screen.getByRole('heading', { name: /permisos/i })).toBeInTheDocument();
+  });
+
+  test('cierra el modal de permisos al llamar onClose', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+    await waitFor(() => expect(screen.getByRole('button', { name: /ver permisos/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /ver permisos/i }));
+    await waitFor(() => expect(screen.getByRole('heading', { name: /permisos/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /cerrar/i }));
+    expect(screen.queryByRole('heading', { name: /permisos/i })).not.toBeInTheDocument();
   });
 
   // --- Auto-edición de permisos ---
