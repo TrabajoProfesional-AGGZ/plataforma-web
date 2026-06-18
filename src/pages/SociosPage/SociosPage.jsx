@@ -50,7 +50,7 @@ function SociosPage() {
   const [resultado, setResultado] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { orden, setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
+  const { setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
 
   const [filtroEstado, setFiltroEstado] = useState('');
   const [filtroAbierto, setFiltroAbierto] = useState(false);
