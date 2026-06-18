@@ -1,10 +1,13 @@
 import { useState, useEffect } from 'react';
 import { Plus, ChevronLeft } from 'lucide-react';
 import { CreateDisciplinaForm } from '../../components/createDisciplinaForm/CreateDisciplinaForm';
+import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { getDisciplinas, createDisciplina, pausarDisciplina } from '../../services/disciplinasService';
 import { usePermiso } from '../../hooks/usePermiso';
 import logo from '../../assets/logo_socio.png';
 import './DisciplinasPage.css';
+import '../../styles/PageTableHeader.css';
+import '../../styles/ListDetailShared.css';
 
 function DisciplinasPage() {
   const puedeVerDisciplinas = usePermiso('ver_disciplinas');
@@ -60,7 +63,9 @@ function DisciplinasPage() {
     setPausarOpen(false);
     try {
       await pausarDisciplina(id);
-    } catch { /* silently ignore */ }
+    } catch (_e) {
+      // optimistic update already applied — ignore API errors
+    }
   }
 
   return (
@@ -185,26 +190,14 @@ function DisciplinasPage() {
         />
       )}
 
-      {/* ── Modal: Pausar disciplina ── */}
-      {pausarOpen && disciplinaActual && (
-        <div className="modal-overlay" onClick={() => setPausarOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Pausar disciplina</h2>
-            <p className="modal-confirmar-texto">
-              ¿Estás seguro de que querés pausar &ldquo;{disciplinaActual.nombre}&rdquo;?
-              La disciplina pasará al estado &ldquo;Pausada&rdquo; y no estará disponible para nuevas inscripciones.
-            </p>
-            <div className="modal-actions">
-              <button type="button" className="modal-button-cancel" onClick={() => setPausarOpen(false)}>
-                Cancelar
-              </button>
-              <button type="button" className="modal-button-danger" onClick={handlePausar}>
-                Pausar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDeleteModal
+        open={pausarOpen && !!disciplinaActual}
+        titulo="Pausar disciplina"
+        mensaje={`¿Estás seguro de que querés pausar "${disciplinaActual?.nombre}"? La disciplina pasará al estado "Pausada" y no estará disponible para nuevas inscripciones.`}
+        onConfirm={handlePausar}
+        onCancel={() => setPausarOpen(false)}
+        labelConfirmar="Pausar"
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, Plus } from 'lucide-react';
 import { fetchUsuarios, eliminarUsuario } from '../../services/usuariosService';
+import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { fetchRoles } from '../../services/rolesService';
 import { CreateUserForm } from '../../components/createUserForm/CreateUserForm';
 import { EditUserForm } from '../../components/editUserForm/EditUserForm';
@@ -10,6 +11,7 @@ import logo from '../../assets/logo_socio.png';
 import logoVerde from '../../assets/logo-verde.png';
 import logoAmarillo from '../../assets/logo-amarillo.png';
 import './UsuariosPage.css';
+import '../../styles/PageTableHeader.css';
 
 const ESTADO_CONFIG = {
   'Activo':   { logo: logoVerde,    bg: '#8ac98ab0', border: '#0D6E0D' },
@@ -423,25 +425,15 @@ function UsuariosPage() {
         />
       )}
 
-      {eliminarModalOpen && resultado && !Array.isArray(resultado) && (
-        <div className="modal-overlay" onClick={() => setEliminarModalOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Eliminar usuario</h2>
-            <p className="modal-confirmar-texto">
-              ¿Estás seguro de que querés eliminar a {resultado.nombre} {resultado.apellido}?
-            </p>
-            {errorModal && <p className="modal-error" role="alert">{errorModal}</p>}
-            <div className="modal-actions">
-              <button type="button" className="modal-button-cancel" onClick={() => setEliminarModalOpen(false)}>
-                Cancelar
-              </button>
-              <button type="button" className="modal-button-danger" onClick={handleEliminar} disabled={guardando}>
-                {guardando ? 'Eliminando...' : 'Eliminar'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDeleteModal
+        open={eliminarModalOpen && !!resultado && !Array.isArray(resultado)}
+        titulo="Eliminar usuario"
+        mensaje={`¿Estás seguro de que querés eliminar a ${resultado?.nombre} ${resultado?.apellido}?`}
+        onConfirm={handleEliminar}
+        onCancel={() => setEliminarModalOpen(false)}
+        guardando={guardando}
+        errorModal={errorModal}
+      />
 
       {cambiarRolModalOpen && resultado && !Array.isArray(resultado) && (
         <CambiarRolForm

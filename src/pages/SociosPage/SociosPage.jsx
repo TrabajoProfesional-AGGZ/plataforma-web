@@ -3,6 +3,7 @@ import { Search, Plus } from 'lucide-react';
 import { getSocios, deleteSocio } from '../../services/sociosService';
 import { CreateSocioForm } from '../../components/createForm/CreateSocioForm';
 import { EditSocioForm } from '../../components/editForm/EditSocioForm';
+import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { usePermiso } from '../../hooks/usePermiso';
 import logo from '../../assets/logo_socio.png';
 import logoVerde from '../../assets/logo-verde.png';
@@ -10,6 +11,8 @@ import logoRojo from '../../assets/logo-rojo.png';
 import logoAmarillo from '../../assets/logo-amarillo.png';
 import logoNaranja from '../../assets/logo-naranja.png'
 import './SociosPage.css';
+import '../../styles/SocioCard.css';
+import '../../styles/PageTableHeader.css';
 
 const ESTADO_CONFIG = {
   'Activo': { logo: logoVerde,    bg: '#a7daa7', border: '#0D6E0D' },
@@ -464,26 +467,15 @@ function SociosPage() {
         />
       )}
 
-      {/* Modal confirmar eliminación */}
-      {eliminarModalOpen && resultado && (
-        <div className="modal-overlay" onClick={() => setEliminarModalOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Eliminar socio</h2>
-            <p className="modal-confirmar-texto">
-              ¿Estás seguro de que querés eliminar al socio N°&nbsp;{resultado.nro_socio}?
-            </p>
-            {errorModal && <p className="modal-error" role="alert">{errorModal}</p>}
-            <div className="modal-actions">
-              <button type="button" className="modal-button-cancel" onClick={() => setEliminarModalOpen(false)}>
-                Cancelar
-              </button>
-              <button type="button" className="modal-button-danger" onClick={handleEliminar} disabled={guardando}>
-                {guardando ? 'Eliminando...' : 'Eliminar'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDeleteModal
+        open={eliminarModalOpen && !!resultado}
+        titulo="Eliminar socio"
+        mensaje={`¿Estás seguro de que querés eliminar al socio N° ${resultado?.nro_socio}?`}
+        onConfirm={handleEliminar}
+        onCancel={() => setEliminarModalOpen(false)}
+        guardando={guardando}
+        errorModal={errorModal}
+      />
     </div>
   );
 }

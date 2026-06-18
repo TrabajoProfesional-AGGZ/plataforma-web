@@ -3,24 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, AlertTriangle, ChevronRight } from 'lucide-react';
 import { cambiarRolUsuario } from '../../services/usuariosService';
 import '../createForm/CreateSocioForm.css';
-
-function StyledSelect({ error, children, ...props }) {
-  const [focused, setFocused] = useState(false);
-  return (
-    <select
-      {...props}
-      onFocus={(e) => { setFocused(true); props.onFocus?.(e); }}
-      onBlur={(e) => { setFocused(false); props.onBlur?.(e); }}
-      className={`csf-select${error ? ' csf-select--error' : ''}`}
-      style={{
-        background: focused ? '#ffffff' : '#f5f5f5',
-        borderColor: focused ? '#111111' : 'transparent',
-      }}
-    >
-      {children}
-    </select>
-  );
-}
+import { StyledSelect } from '../createForm/FormFields';
 
 export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
   const [fase, setFase] = useState('seleccion');

@@ -39,17 +39,7 @@
   font-size: 14px;
 }
 
-.instalaciones-tabla th {
-  text-align: left;
-  padding: 12px 20px;
-  border-bottom: 1px solid #111111;
-  color: #4a4a4a;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
+/* th styles → src/styles/PageTableHeader.css */
 
 .instalaciones-tabla td {
   padding: 14px 20px;
@@ -104,26 +94,7 @@
   border-color: #4a4a4a;
 }
 
-/* ── Buttons ── */
-.instalaciones-btn-crear {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  background-color: #111111;
-  color: #ffffff;
-  transition: background-color 0.15s;
-}
-
-.instalaciones-btn-crear:hover {
-  background-color: #4a4a4a;
-}
+/* btn-crear, btn-volver, detalle-*, btn-eliminar-inst → src/styles/ListDetailShared.css */
 
 /* ── Detail view ── */
 .instalaciones-nav {
@@ -131,83 +102,6 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 20px;
-}
-
-.instalaciones-btn-volver {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 12px;
-  border: 1px solid #111111;
-  border-radius: 6px;
-  background: #ffffff;
-  font-size: 14px;
-  font-weight: 500;
-  color: #111111;
-  cursor: pointer;
-  transition: background-color 0.15s;
-}
-
-.instalaciones-btn-volver:hover {
-  background-color: #f5f5f5;
-}
-
-.instalaciones-detalle-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 40px 24px 24px;
-}
-
-.instalaciones-detalle-nombre {
-  font-size: 22px;
-  font-weight: 700;
-  color: #111111;
-  text-align: center;
-  margin: 0 0 40px 0;
-}
-
-.instalaciones-detalle-card {
-  width: 100%;
-  max-width: 500px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  margin-bottom: 32px;
-}
-
-.instalaciones-detalle-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 24px;
-}
-
-.instalaciones-detalle-row-label {
-  color: #4a4a4a;
-  font-size: 14px;
-}
-
-.instalaciones-detalle-row-value {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.instalaciones-btn-eliminar-inst {
-  padding: 8px 20px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  background-color: #c0392b;
-  color: #ffffff;
-  border: none;
-  transition: background-color 0.15s, color 0.15s;
-}
-
-.instalaciones-btn-eliminar-inst:hover {
-  background-color: #96281b;
 }
 
 /* ── Botón agregar reserva (fuera del card) ── */
@@ -316,57 +210,7 @@
   justify-content: flex-end;
 }
 
-/* ── Socio card (idéntico al de SociosPage) ── */
-.socios-card {
-  border: 1px solid;
-  border-radius: 12px;
-  padding: 24px 28px;
-  max-width: 520px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.socios-card-inner {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 28px;
-}
-
-.socios-card-logo {
-  width: 80px;
-  height: auto;
-  flex-shrink: 0;
-}
-
-.socios-card-data {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  flex: 1;
-}
-
-.socios-card-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.socios-card-label {
-  font-weight: 500;
-  color: #4a4a4a;
-  min-width: 90px;
-  font-size: 15px;
-}
-
-.socios-card-row span:last-child {
-  color: #111111;
-  font-size: 14px;
-}
+/* .socios-card* → src/styles/SocioCard.css */
 
 .instalaciones-reserva-acciones {
   display: flex;
