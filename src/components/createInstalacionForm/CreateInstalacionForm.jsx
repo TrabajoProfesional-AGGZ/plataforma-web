@@ -122,7 +122,7 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
                   defaultChecked
                   {...register('activa')}
                 />
-                La instalación está activa y disponible para reservas
+                {' '}La instalación está activa y disponible para reservas
               </label>
             </div>
           </FormStep>

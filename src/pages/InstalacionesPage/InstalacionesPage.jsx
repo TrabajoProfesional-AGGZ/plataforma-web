@@ -71,14 +71,16 @@ function InstalacionesPage() {
   useEffect(() => {
     if (!anyModalOpen) return;
     function handleKeyDown(e) {
-      if (e.key !== 'Escape') return;
-      if (eliminarInstalacionOpen) setEliminarInstalacionOpen(false);
-      else if (eliminarReservaOpen) setEliminarReservaOpen(false);
-      else if (verSocioOpen) setVerSocioOpen(false);
+      if (e.key === 'Escape') {
+        // Al setear todos en false nos ahorramos los if/else anidados
+        setEliminarInstalacionOpen(false);
+        setEliminarReservaOpen(false);
+        setVerSocioOpen(false);
+      }
     }
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [anyModalOpen, eliminarInstalacionOpen, eliminarReservaOpen, verSocioOpen]);
+  }, [anyModalOpen]);
 
   // === Instalaciones ===
 
@@ -143,6 +145,207 @@ function InstalacionesPage() {
     setVerSocioOpen(true);
   }
 
+  // === Funciones de Renderizado Auxiliares ===
+
+  const renderContenidoInstalaciones = () => {
+    if (loadingInstalaciones) {
+      return (
+        <div className="instalaciones-loading">
+          <img src={logo} alt="" className="loading-logo" />
+        </div>
+      );
+    }
+    if (instalaciones.length === 0) {
+      return <p className="instalaciones-empty">No hay instalaciones registradas.</p>;
+    }
+    if (instalacionesFiltradas.length === 0) {
+      return <p className="instalaciones-empty">No hay instalaciones del tipo seleccionado.</p>;
+    }
+
+    return (
+      <div className="instalaciones-table-wrapper">
+        <table className="instalaciones-tabla">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Tipo</th>
+              <th>Capacidad máxima</th>
+              <th>Valor/hora</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {instalacionesFiltradas.map((inst) => (
+              <tr
+                key={inst.id}
+                className="instalaciones-tr-clickable"
+                onClick={() => { setInstalacionActual(inst); setVista('detalle'); }}
+              >
+                <td>{inst.nombre}</td>
+                <td>{inst.tipo}</td>
+                <td>{inst.capacidad_maxima} personas</td>
+                <td>${inst.valor_hora}/h</td>
+                <td>
+                  <span className={`instalaciones-badge ${inst.activa ? 'badge-activa' : 'badge-inactiva'}`}>
+                    {inst.activa ? 'Activa' : 'Inactiva'}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  const renderTablaReservas = () => {
+    if (reservasFiltradas.length === 0) {
+      return (
+        <p className="instalaciones-empty">
+          {filtroFecha && reservasDeInstalacion.length > 0
+            ? 'No hay reservas para la fecha seleccionada.'
+            : 'No hay reservas para esta instalación.'}
+        </p>
+      );
+    }
+
+    const reservasOrdenadas = [...reservasFiltradas].sort((a, b) =>
+      (a.fecha_reserva ?? a.fecha ?? '').localeCompare(b.fecha_reserva ?? b.fecha ?? '') ||
+      (a.hora_inicio ?? '').localeCompare(b.hora_inicio ?? '')
+    );
+
+    return (
+      <div className="instalaciones-table-wrapper">
+        <table className="instalaciones-tabla">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nro. de socio</th>
+              <th>Fecha</th>
+              <th>Inicio</th>
+              <th>Fin</th>
+              {puedeBorrarReserva && <th>Acciones</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {reservasOrdenadas.map((r) => (
+              <tr key={r.id}>
+                <td>{r.id}</td>
+                <td>
+                  {r.socio ? (
+                    <button
+                      type="button"
+                      className="instalaciones-nro-socio-link"
+                      onClick={() => abrirVerSocio(r.socio)}
+                    >
+                      {r.nro_socio}
+                    </button>
+                  ) : (
+                    r.nro_socio
+                  )}
+                </td>
+                <td>{r.fecha_reserva ?? r.fecha}</td>
+                <td>{r.hora_inicio}</td>
+                <td>{r.hora_fin}</td>
+                {puedeBorrarReserva && (
+                  <td>
+                    <div className="instalaciones-reserva-acciones">
+                      <button
+                        className="instalaciones-btn-reserva-eliminar"
+                        onClick={() => abrirEliminarReserva(r)}
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  </td>
+                )}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
+  };
+
+  const renderModalVerSocio = () => {
+    if (!verSocioOpen || !verSocioData) return null;
+    const cfg = estadoConfig(verSocioData.estado);
+    
+    return (
+      <div 
+        className="modal-overlay" 
+        role="presentation"
+        onClick={(e) => {
+          if (e.target === e.currentTarget) setVerSocioOpen(false);
+        }}
+        onKeyDown={(e) => {
+          if (e.target === e.currentTarget && (e.key === 'Escape' || e.key === 'Enter')) {
+            setVerSocioOpen(false);
+          }
+        }}
+      >
+        <dialog open className="instalaciones-ver-socio-wrapper">
+          <div className="socios-card" style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}>
+            <div className="socios-card-inner">
+              <img src={cfg.logo} alt="" className="socios-card-logo" />
+              <div className="socios-card-data">
+                <div className="socios-card-row">
+                  <span className="socios-card-label">N° Socio</span>
+                  <span>{verSocioData.nro_socio}</span>
+                </div>
+                <div className="socios-card-row">
+                  <span className="socios-card-label">Apellido y nombre</span>
+                  <span>{verSocioData.apellido} {verSocioData.nombre}</span>
+                </div>
+                {verSocioData.nro_documento && (
+                  <div className="socios-card-row">
+                    <span className="socios-card-label">DNI</span>
+                    <span>{verSocioData.nro_documento}</span>
+                  </div>
+                )}
+                {verSocioData.fecha_nacimiento && (
+                  <div className="socios-card-row">
+                    <span className="socios-card-label">Fecha de nacimiento</span>
+                    <span>{verSocioData.fecha_nacimiento}</span>
+                  </div>
+                )}
+                {verSocioData.email && (
+                  <div className="socios-card-row">
+                    <span className="socios-card-label">Email</span>
+                    <span>{verSocioData.email}</span>
+                  </div>
+                )}
+                {verSocioData.telefono && (
+                  <div className="socios-card-row">
+                    <span className="socios-card-label">Teléfono</span>
+                    <span>{verSocioData.telefono}</span>
+                  </div>
+                )}
+                {verSocioData.categoria && (
+                  <div className="socios-card-row">
+                    <span className="socios-card-label">Categoría</span>
+                    <span>{verSocioData.categoria?.nombre ?? verSocioData.categoria}</span>
+                  </div>
+                )}
+                {verSocioData.estado && (
+                  <div className="socios-card-row">
+                    <span className="socios-card-label">Estado</span>
+                    <span>{verSocioData.estado?.nombre ?? verSocioData.estado}</span>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+          <div className="instalaciones-ver-socio-cerrar">
+            <button type="button" className="modal-button-cancel" onClick={() => setVerSocioOpen(false)}>
+              Cerrar
+            </button>
+          </div>
+        </dialog>
+      </div>
+    );
+  };
+
   return (
     <div className="instalaciones-page">
       {/* ── Vista: Lista ── */}
@@ -178,48 +381,7 @@ function InstalacionesPage() {
               </div>
             </div>
 
-            {loadingInstalaciones ? (
-              <div className="instalaciones-loading">
-                <img src={logo} alt="" className="loading-logo" />
-              </div>
-            ) : instalaciones.length === 0 ? (
-              <p className="instalaciones-empty">No hay instalaciones registradas.</p>
-            ) : instalacionesFiltradas.length === 0 ? (
-              <p className="instalaciones-empty">No hay instalaciones del tipo seleccionado.</p>
-            ) : (
-              <div className="instalaciones-table-wrapper">
-                <table className="instalaciones-tabla">
-                  <thead>
-                    <tr>
-                      <th>Nombre</th>
-                      <th>Tipo</th>
-                      <th>Capacidad máxima</th>
-                      <th>Valor/hora</th>
-                      <th>Estado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {instalacionesFiltradas.map((inst) => (
-                      <tr
-                        key={inst.id}
-                        className="instalaciones-tr-clickable"
-                        onClick={() => { setInstalacionActual(inst); setVista('detalle'); }}
-                      >
-                        <td>{inst.nombre}</td>
-                        <td>{inst.tipo}</td>
-                        <td>{inst.capacidad_maxima} personas</td>
-                        <td>${inst.valor_hora}/h</td>
-                        <td>
-                          <span className={`instalaciones-badge ${inst.activa ? 'badge-activa' : 'badge-inactiva'}`}>
-                            {inst.activa ? 'Activa' : 'Inactiva'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+            {renderContenidoInstalaciones()}
           </div>
         </>
       )}
@@ -307,70 +469,7 @@ function InstalacionesPage() {
               )}
             </div>
 
-            {reservasVisible && (
-              reservasFiltradas.length === 0 ? (
-                <p className="instalaciones-empty">
-                  {filtroFecha && reservasDeInstalacion.length > 0
-                    ? 'No hay reservas para la fecha seleccionada.'
-                    : 'No hay reservas para esta instalación.'}
-                </p>
-              ) : (
-                <div className="instalaciones-table-wrapper">
-                  <table className="instalaciones-tabla">
-                    <thead>
-                      <tr>
-                        <th>ID</th>
-                        <th>Nro. de socio</th>
-                        <th>Fecha</th>
-                        <th>Inicio</th>
-                        <th>Fin</th>
-                        {puedeBorrarReserva && <th>Acciones</th>}
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {[...reservasFiltradas]
-                        .sort((a, b) =>
-                          (a.fecha_reserva ?? a.fecha ?? '').localeCompare(b.fecha_reserva ?? b.fecha ?? '') ||
-                          (a.hora_inicio ?? '').localeCompare(b.hora_inicio ?? '')
-                        )
-                        .map((r) => (
-                          <tr key={r.id}>
-                            <td>{r.id}</td>
-                            <td>
-                              {r.socio ? (
-                                <button
-                                  type="button"
-                                  className="instalaciones-nro-socio-link"
-                                  onClick={() => abrirVerSocio(r.socio)}
-                                >
-                                  {r.nro_socio}
-                                </button>
-                              ) : (
-                                r.nro_socio
-                              )}
-                            </td>
-                            <td>{r.fecha_reserva ?? r.fecha}</td>
-                            <td>{r.hora_inicio}</td>
-                            <td>{r.hora_fin}</td>
-                            {puedeBorrarReserva && (
-                              <td>
-                                <div className="instalaciones-reserva-acciones">
-                                  <button
-                                    className="instalaciones-btn-reserva-eliminar"
-                                    onClick={() => abrirEliminarReserva(r)}
-                                  >
-                                    Eliminar
-                                  </button>
-                                </div>
-                              </td>
-                            )}
-                          </tr>
-                        ))}
-                    </tbody>
-                  </table>
-                </div>
-              )
-            )}
+            {reservasVisible && renderTablaReservas()}
           </div>
         </>
       )}
@@ -412,71 +511,7 @@ function InstalacionesPage() {
       />
 
       {/* ── Modal: Ver socio ── */}
-      {verSocioOpen && verSocioData && (() => {
-        const cfg = estadoConfig(verSocioData.estado);
-        return (
-          <div className="modal-overlay" onClick={() => setVerSocioOpen(false)}>
-            <div className="instalaciones-ver-socio-wrapper" onClick={(e) => e.stopPropagation()}>
-              <div className="socios-card" style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}>
-                <div className="socios-card-inner">
-                  <img src={cfg.logo} alt="" className="socios-card-logo" />
-                  <div className="socios-card-data">
-                    <div className="socios-card-row">
-                      <span className="socios-card-label">N° Socio</span>
-                      <span>{verSocioData.nro_socio}</span>
-                    </div>
-                    <div className="socios-card-row">
-                      <span className="socios-card-label">Apellido y nombre</span>
-                      <span>{verSocioData.apellido} {verSocioData.nombre}</span>
-                    </div>
-                    {verSocioData.nro_documento && (
-                      <div className="socios-card-row">
-                        <span className="socios-card-label">DNI</span>
-                        <span>{verSocioData.nro_documento}</span>
-                      </div>
-                    )}
-                    {verSocioData.fecha_nacimiento && (
-                      <div className="socios-card-row">
-                        <span className="socios-card-label">Fecha de nacimiento</span>
-                        <span>{verSocioData.fecha_nacimiento}</span>
-                      </div>
-                    )}
-                    {verSocioData.email && (
-                      <div className="socios-card-row">
-                        <span className="socios-card-label">Email</span>
-                        <span>{verSocioData.email}</span>
-                      </div>
-                    )}
-                    {verSocioData.telefono && (
-                      <div className="socios-card-row">
-                        <span className="socios-card-label">Teléfono</span>
-                        <span>{verSocioData.telefono}</span>
-                      </div>
-                    )}
-                    {verSocioData.categoria && (
-                      <div className="socios-card-row">
-                        <span className="socios-card-label">Categoría</span>
-                        <span>{verSocioData.categoria?.nombre ?? verSocioData.categoria}</span>
-                      </div>
-                    )}
-                    {verSocioData.estado && (
-                      <div className="socios-card-row">
-                        <span className="socios-card-label">Estado</span>
-                        <span>{verSocioData.estado?.nombre ?? verSocioData.estado}</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="instalaciones-ver-socio-cerrar">
-                <button type="button" className="modal-button-cancel" onClick={() => setVerSocioOpen(false)}>
-                  Cerrar
-                </button>
-              </div>
-            </div>
-          </div>
-        );
-      })()}
+      {renderModalVerSocio()}
     </div>
   );
 }

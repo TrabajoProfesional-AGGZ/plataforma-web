@@ -13,6 +13,7 @@ import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFi
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
+import PropTypes from 'prop-types';
 
 const STEPS = [
   { id: 1, label: 'Datos', icon: User },
@@ -176,3 +177,10 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
     </MultiStepFormShell>
   );
 }
+
+CreateReservaForm.propTypes = {
+  onSuccess: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  instalaciones: PropTypes.array, // o PropTypes.arrayOf(PropTypes.object) dependiendo de qué guarde
+  instalacionPreseleccionada: PropTypes.string, // <-- Esta es la línea que te pedía el linter
+};
