@@ -512,4 +512,124 @@ describe('InstalacionesPage', () => {
     fireEvent.click(overlay);
     expect(screen.queryByText('García Juan')).not.toBeInTheDocument();
   });
+
+  // ── Tests de instalación inactiva ──
+
+  test('muestra el badge "Inactiva" para instalaciones con activa=false', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-inactiva', nombre: 'Cancha Vieja', tipo: 'Deportiva', capacidad_maxima: 5, valor_hora: 0, activa: false },
+    ]);
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Inactiva')).toBeInTheDocument());
+  });
+
+  test('muestra "Inactiva" en el detalle de una instalación con activa=false', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-inactiva', nombre: 'Cancha Vieja', tipo: 'Deportiva', capacidad_maxima: 5, valor_hora: 0, activa: false },
+    ]);
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Cancha Vieja')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Cancha Vieja'));
+    expect(screen.getAllByText('Inactiva').length).toBeGreaterThan(0);
+  });
+
+  // ── Test del filtro de tipo sin coincidencias ──
+
+  test('muestra "No hay instalaciones del tipo seleccionado" cuando el filtro no tiene coincidencias', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-dep', nombre: 'Cancha', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1000, activa: true },
+      { id: 'inst-soc', nombre: 'Salon', tipo: 'Social', capacidad_maxima: 50, valor_hora: 500, activa: true },
+    ]);
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Cancha')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Filtrar por tipo'), { target: { value: 'Deportiva' } });
+
+    fireEvent.click(screen.getByText('Cancha'));
+    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
+    fireEvent.click(ultimoBoton('Eliminar'));
+
+    await waitFor(() => {
+      expect(screen.getByText('No hay instalaciones del tipo seleccionado.')).toBeInTheDocument();
+    });
+  });
+
+  // ── Test del filtro de fecha sin coincidencias ──
+
+  test('muestra "No hay reservas para la fecha seleccionada" si el filtro no coincide con ninguna reserva', async () => {
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+    ]));
+
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('2026-08-01')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Filtrar por fecha'), { target: { value: '2026-09-15' } });
+
+    expect(screen.getByText('No hay reservas para la fecha seleccionada.')).toBeInTheDocument();
+    expect(screen.queryByText('2026-08-01')).not.toBeInTheDocument();
+  });
+
+  // ── Tests de Ver Socio con campos opcionales ──
+
+  test('el modal Ver Socio muestra todos los campos opcionales del socio', async () => {
+    const SOCIO_COMPLETO = {
+      id: 'socio-uuid-full',
+      nro_socio: '9999',
+      nombre: 'Ana',
+      apellido: 'Pérez',
+      nro_documento: '12345678',
+      fecha_nacimiento: '1990-05-20',
+      email: 'ana@example.com',
+      telefono: '11-1234-5678',
+      categoria: { nombre: 'Junior' },
+      estado: { nombre: 'Activo' },
+    };
+    getSocios.mockResolvedValue([SOCIO_COMPLETO]);
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_COMPLETO.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+    ]));
+
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('Ver Socio')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Ver Socio'));
+
+    expect(screen.getByText('12345678')).toBeInTheDocument();
+    expect(screen.getByText('1990-05-20')).toBeInTheDocument();
+    expect(screen.getByText('ana@example.com')).toBeInTheDocument();
+    expect(screen.getByText('11-1234-5678')).toBeInTheDocument();
+    expect(screen.getByText('Junior')).toBeInTheDocument();
+    expect(screen.getByText('Activo')).toBeInTheDocument();
+  });
+
+  test('el modal Ver Socio muestra categoría y estado cuando son strings', async () => {
+    const SOCIO_STRINGS = {
+      id: 'socio-uuid-str',
+      nro_socio: '8888',
+      nombre: 'Luis',
+      apellido: 'Torres',
+      categoria: 'Adulto',
+      estado: 'Moroso',
+    };
+    getSocios.mockResolvedValue([SOCIO_STRINGS]);
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-2', id_instalacion: instalacionId, id_socio: SOCIO_STRINGS.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+    ]));
+
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('Ver Socio')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Ver Socio'));
+
+    expect(screen.getByText('Adulto')).toBeInTheDocument();
+    expect(screen.getByText('Moroso')).toBeInTheDocument();
+  });
 });

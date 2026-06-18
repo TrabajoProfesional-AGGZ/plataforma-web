@@ -26,10 +26,6 @@ function estadoConfig(estado) {
   return ESTADO_CONFIG[nombre] ?? ESTADO_DEFAULT;
 }
 
-function genId() {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-}
-
 function InstalacionesPage() {
   const puedeVerInstalaciones = usePermiso('ver_instalaciones');
   const puedeCrearInstalacion = usePermiso('crear_instalacion');
@@ -98,12 +94,14 @@ function InstalacionesPage() {
   // === Instalaciones ===
 
   async function handleInstalacionCreada(data) {
-    const tempId = genId();
-    setInstalaciones((prev) => [...prev, { id: tempId, ...data }]);
     setCrearInstalacionFormOpen(false);
+    const tempId = `temp-${Date.now()}`;
+    setInstalaciones((prev) => [...prev, { ...data, id: tempId }]);
     try {
       const created = await createInstalacion(data);
-      setInstalaciones((prev) => prev.map((i) => i.id === tempId ? { ...i, id: created.id } : i));
+      setInstalaciones((prev) =>
+        prev.map((i) => (i.id === tempId ? { ...data, ...created } : i))
+      );
     } catch {
       setInstalaciones((prev) => prev.filter((i) => i.id !== tempId));
     }

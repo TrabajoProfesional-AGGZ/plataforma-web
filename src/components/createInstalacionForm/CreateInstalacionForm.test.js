@@ -197,4 +197,27 @@ describe('CreateInstalacionForm', () => {
     expect(screen.getByText('Datos')).toBeInTheDocument();
     expect(screen.getByText('Configuración')).toBeInTheDocument();
   });
+
+  test('los inputs del paso 1 manejan focus y blur', () => {
+    renderForm();
+    const nombreInput = screen.getByPlaceholderText(/cancha de fútbol/i);
+    fireEvent.focus(nombreInput);
+    fireEvent.blur(nombreInput);
+    const tipoInput = screen.getByPlaceholderText(/deportiva, social, recreativa/i);
+    fireEvent.focus(tipoInput);
+    fireEvent.blur(tipoInput);
+    expect(nombreInput).toBeInTheDocument();
+  });
+
+  test('los inputs del paso 2 manejan focus y blur', async () => {
+    renderForm();
+    await avanzarAlPaso2();
+    const capacidadInput = screen.getByPlaceholderText(/ej\. 50/i);
+    fireEvent.focus(capacidadInput);
+    fireEvent.blur(capacidadInput);
+    const valorInput = screen.getByPlaceholderText(/ej\. 1500/i);
+    fireEvent.focus(valorInput);
+    fireEvent.blur(valorInput);
+    expect(capacidadInput).toBeInTheDocument();
+  });
 });

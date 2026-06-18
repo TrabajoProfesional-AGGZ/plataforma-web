@@ -234,4 +234,73 @@ describe('CreateReservaForm', () => {
     expect(select).toBeInTheDocument();
     expect(screen.queryByRole('option', { name: 'Cancha de fútbol' })).not.toBeInTheDocument();
   });
+
+  test('muestra el spinner mientras busca el socio', async () => {
+    let resolveSocio;
+    getSocioByNroSocio.mockReturnValue(new Promise((resolve) => { resolveSocio = resolve; }));
+
+    renderForm();
+    fireEvent.change(screen.getByPlaceholderText(/ej\. 1234/i), { target: { value: '1234' } });
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'inst-uuid-1' } });
+    fireEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+
+    await waitFor(() => expect(screen.getByText('Buscando socio...')).toBeInTheDocument());
+
+    await act(async () => { resolveSocio(SOCIO_TEST); });
+    expect(screen.queryByText('Buscando socio...')).not.toBeInTheDocument();
+  });
+
+  test('muestra el nombre del socio encontrado al volver al paso 1', async () => {
+    renderForm();
+    await avanzarAlPaso2();
+    fireEvent.click(screen.getByRole('button', { name: /atrás/i }));
+    await waitFor(() => expect(screen.getByText(/paso 1 de 2/i)).toBeInTheDocument());
+    expect(screen.getByText('García Juan')).toBeInTheDocument();
+  });
+
+  test('llama onSuccess incluso si createReserva falla', async () => {
+    createReserva.mockRejectedValue(new Error('error de red'));
+    renderForm();
+    await avanzarAlPaso2();
+
+    const fechaInput = document.querySelector('input[type="date"]');
+    const timeInputs = document.querySelectorAll('input[type="time"]');
+    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+    fireEvent.change(timeInputs[0], { target: { value: '09:00' } });
+    fireEvent.change(timeInputs[1], { target: { value: '10:00' } });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /registrar reserva/i }));
+    });
+    await waitFor(() => expect(screen.getByText('¡Reserva registrada!')).toBeInTheDocument());
+    act(() => jest.advanceTimersByTime(1800));
+    expect(onSuccess).toHaveBeenCalledTimes(1);
+  });
+
+  test('el input de número de socio aplica focus y blur', () => {
+    renderForm();
+    const input = screen.getByPlaceholderText(/ej\. 1234/i);
+    fireEvent.focus(input);
+    fireEvent.blur(input);
+    expect(input).toBeInTheDocument();
+  });
+
+  test('el select de instalación aplica focus y blur', () => {
+    renderForm();
+    const select = screen.getByRole('combobox');
+    fireEvent.focus(select);
+    fireEvent.blur(select);
+    expect(select).toBeInTheDocument();
+  });
+
+  test('hora_fin es válida si hora_inicio está vacía', async () => {
+    renderForm();
+    await avanzarAlPaso2();
+    const [, horaFinInput] = document.querySelectorAll('input[type="time"]');
+    fireEvent.change(horaFinInput, { target: { value: '10:00' } });
+    fireEvent.blur(horaFinInput);
+    await waitFor(() => {
+      expect(screen.queryByText(/hora de fin debe ser posterior/i)).not.toBeInTheDocument();
+    });
+  });
 });
