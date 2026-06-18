@@ -6,6 +6,7 @@ import { PermisosModal } from '../../components/permisosModal/PermisosModal';
 import { Lock, Eye, EyeOff } from 'lucide-react';
 import '../../components/createForm/CreateSocioForm.css';
 import './PerfilPage.css';
+import '../../styles/shared.css';
 
 function PasswordInput({ id, value, onChange, autoComplete, required }) {
   const [show, setShow] = useState(false);

@@ -71,22 +71,6 @@
   padding-right: 88px;
 }
 
-.login-toggle-password {
-  position: absolute;
-  right: 12px;
-  background: none;
-  border: none;
-  color: #4a4a4a;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 0;
-}
-
-.login-toggle-password:hover {
-  color: #111111;
-}
-
 .login-success {
   background-color: #f0faf5;
   color: #1a7a4a;

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useChangePassword } from '../../hooks/useChangePassword';
 import './CambiarContrasenaPage.css';
+import '../../styles/shared.css';
 
 function PasswordField({ id, label, value, onChange, autoComplete }) {
   const [show, setShow] = useState(false);

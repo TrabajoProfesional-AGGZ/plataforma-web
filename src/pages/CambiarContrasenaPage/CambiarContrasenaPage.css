@@ -48,22 +48,6 @@
   border-color: #111111;
 }
 
-.toggle-password {
-  position: absolute;
-  right: 12px;
-  background: none;
-  border: none;
-  color: #4a4a4a;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 0;
-}
-
-.toggle-password:hover {
-  color: #111111;
-}
-
 .cambiar-contrasena-error {
   color: #c0392b;
   font-size: 13px;

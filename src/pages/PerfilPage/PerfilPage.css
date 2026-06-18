@@ -139,18 +139,3 @@
   box-sizing: border-box;
 }
 
-.perfil-toggle-password {
-  position: absolute;
-  right: 12px;
-  background: none;
-  border: none;
-  color: #4a4a4a;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 0;
-}
-
-.perfil-toggle-password:hover {
-  color: #111111;
-}

@@ -4,6 +4,7 @@ import { login } from '../../services/authService';
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen';
 import logoConTexto from '../../assets/logo_con_texto.png';
 import './LoginPage.css';
+import '../../styles/shared.css';
 
 function LoginPage() {
   const [email, setEmail] = useState('');
