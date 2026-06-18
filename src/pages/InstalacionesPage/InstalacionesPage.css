@@ -1,3 +1,7 @@
+/* empty, table-wrapper, tabla, td, tr-clickable, badge base, filtro-fecha/tipo, btn-toggle base → src/styles/ListPage.css
+   btn-crear, btn-volver, detalle-*, btn-eliminar-inst → src/styles/ListDetailShared.css
+   th styles → src/styles/PageTableHeader.css */
+
 .instalaciones-page {
   max-width: 900px;
   margin: 0 auto;
@@ -17,69 +21,7 @@
   margin-bottom: 16px;
 }
 
-.instalaciones-empty {
-  text-align: center;
-  padding: 48px 0;
-  color: #4a4a4a;
-  font-size: 15px;
-  margin: 0;
-}
-
-/* ── Table ── */
-.instalaciones-table-wrapper {
-  background-color: #ffffff;
-  border: 1px solid #111111;
-  border-radius: 8px;
-  overflow: hidden;
-}
-
-.instalaciones-tabla {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-}
-
-.instalaciones-tabla th {
-  text-align: left;
-  padding: 12px 20px;
-  border-bottom: 1px solid #111111;
-  color: #4a4a4a;
-  font-size: 12px;
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.instalaciones-tabla td {
-  padding: 14px 20px;
-  border-bottom: 1px solid #f0f0f0;
-  color: #111111;
-  vertical-align: middle;
-}
-
-.instalaciones-tabla tr:last-child td {
-  border-bottom: none;
-}
-
-.instalaciones-tr-clickable {
-  cursor: pointer;
-}
-
-.instalaciones-tr-clickable:hover td {
-  background-color: #f5f5f5;
-}
-
-/* ── Badges ── */
-.instalaciones-badge {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
-  border: 1px solid;
-}
-
+/* ── Badge color variants ─────────────────────────────────────── */
 .badge-si {
   background-color: #fff3cd;
   color: #856404;
@@ -104,28 +46,15 @@
   border-color: #4a4a4a;
 }
 
-/* ── Buttons ── */
-.instalaciones-btn-crear {
+/* ── Toggle: flex layout on top of shared btn-toggle base ─────── */
+.instalaciones-btn-toggle {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
+  gap: 5px;
   white-space: nowrap;
-  background-color: #111111;
-  color: #ffffff;
-  transition: background-color 0.15s;
 }
 
-.instalaciones-btn-crear:hover {
-  background-color: #4a4a4a;
-}
-
-/* ── Detail view ── */
+/* ── Detail view ─────────────────────────────────────────────── */
 .instalaciones-nav {
   display: flex;
   align-items: center;
@@ -133,91 +62,13 @@
   margin-bottom: 20px;
 }
 
-.instalaciones-btn-volver {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 12px;
-  border: 1px solid #111111;
-  border-radius: 6px;
-  background: #ffffff;
-  font-size: 14px;
-  font-weight: 500;
-  color: #111111;
-  cursor: pointer;
-  transition: background-color 0.15s;
-}
-
-.instalaciones-btn-volver:hover {
-  background-color: #f5f5f5;
-}
-
-.instalaciones-detalle-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 40px 24px 24px;
-}
-
-.instalaciones-detalle-nombre {
-  font-size: 22px;
-  font-weight: 700;
-  color: #111111;
-  text-align: center;
-  margin: 0 0 40px 0;
-}
-
-.instalaciones-detalle-card {
-  width: 100%;
-  max-width: 500px;
-  background-color: #ffffff;
-  border-radius: 12px;
-  overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-  margin-bottom: 32px;
-}
-
-.instalaciones-detalle-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 16px 24px;
-}
-
-.instalaciones-detalle-row-label {
-  color: #4a4a4a;
-  font-size: 14px;
-}
-
-.instalaciones-detalle-row-value {
-  font-size: 14px;
-  font-weight: 600;
-}
-
-.instalaciones-btn-eliminar-inst {
-  padding: 8px 20px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  background-color: #c0392b;
-  color: #ffffff;
-  border: none;
-  transition: background-color 0.15s, color 0.15s;
-}
-
-.instalaciones-btn-eliminar-inst:hover {
-  background-color: #96281b;
-}
-
-/* ── Botón agregar reserva (fuera del card) ── */
 .instalaciones-agregar-reserva {
   display: flex;
   justify-content: flex-end;
   margin-bottom: 20px;
 }
 
-/* ── Reservas section ── */
+/* ── Reservas section ─────────────────────────────────────────── */
 .instalaciones-reservas-section {
   margin-top: 8px;
 }
@@ -246,63 +97,18 @@
   text-align: center;
 }
 
-/* ── Filtro de fecha ── */
-.instalaciones-filtro-fecha {
-  padding: 6px 10px;
-  border: 1px solid #111111;
-  border-radius: 6px;
-  font-size: 13px;
-  color: #111111;
-  background-color: #ffffff;
+/* ── Nro. de socio clickeable ─────────────────────────────────── */
+.instalaciones-nro-socio-link {
   cursor: pointer;
-}
-
-/* ── Toggle mostrar/ocultar reservas ── */
-.instalaciones-btn-toggle {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 12px;
-  border: 1px solid #111111;
-  border-radius: 6px;
-  background: #ffffff;
-  font-size: 13px;
-  font-weight: 500;
+  text-decoration: underline;
   color: #111111;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color 0.15s;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
 }
 
-.instalaciones-btn-toggle:hover {
-  background-color: #f5f5f5;
-}
-
-/* ── Celda de socio con botón Ver Socio ── */
-.instalaciones-socio-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.instalaciones-btn-ver-socio {
-  padding: 3px 9px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  border: 1px solid #111111;
-  background-color: #ffffff;
-  color: #111111;
-  white-space: nowrap;
-  transition: background-color 0.15s;
-}
-
-.instalaciones-btn-ver-socio:hover {
-  background-color: #f5f5f5;
-}
-
-/* ── Modal Ver Socio (wrapper + card de socios) ── */
+/* ── Modal Ver Socio ──────────────────────────────────────────── */
 .instalaciones-ver-socio-wrapper {
   display: flex;
   flex-direction: column;
@@ -316,57 +122,7 @@
   justify-content: flex-end;
 }
 
-/* ── Socio card (idéntico al de SociosPage) ── */
-.socios-card {
-  border: 1px solid;
-  border-radius: 12px;
-  padding: 24px 28px;
-  max-width: 520px;
-  margin: 0 auto;
-  display: flex;
-  flex-direction: column;
-  text-align: left;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.socios-card-inner {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 28px;
-}
-
-.socios-card-logo {
-  width: 80px;
-  height: auto;
-  flex-shrink: 0;
-}
-
-.socios-card-data {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  flex: 1;
-}
-
-.socios-card-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.socios-card-label {
-  font-weight: 500;
-  color: #4a4a4a;
-  min-width: 90px;
-  font-size: 15px;
-}
-
-.socios-card-row span:last-child {
-  color: #111111;
-  font-size: 14px;
-}
+/* .socios-card* → src/styles/SocioCard.css */
 
 .instalaciones-reserva-acciones {
   display: flex;
@@ -403,7 +159,7 @@
   background-color: #96281b;
 }
 
-/* ── Secciones en vista lista ── */
+/* ── Secciones en vista lista ─────────────────────────────────── */
 .instalaciones-seccion-separator {
   margin-top: 32px;
 }
@@ -432,22 +188,12 @@
   justify-content: space-between;
 }
 
-.instalaciones-filtro-tipo {
-  padding: 6px 10px;
-  border: 1px solid #111111;
-  border-radius: 6px;
-  font-size: 13px;
-  color: #111111;
-  background-color: #ffffff;
-  cursor: pointer;
-}
-
 .instalaciones-placeholder {
   padding: 24px 0;
   font-style: italic;
 }
 
-/* ── Formulario inline de reserva (en detalle) ── */
+/* ── Formulario inline de reserva ─────────────────────────────── */
 .instalaciones-reserva-form {
   background-color: #ffffff;
   border: 1px solid #111111;
@@ -475,7 +221,7 @@
   justify-content: flex-end;
 }
 
-/* ── Checkbox field modifier (en modales simples) ── */
+/* ── Checkbox field modifier ──────────────────────────────────── */
 .modal-field.modal-field-checkbox {
   flex-direction: row;
   align-items: center;
@@ -491,7 +237,7 @@
   flex-shrink: 0;
 }
 
-/* ── Loading state ── */
+/* ── Loading state ────────────────────────────────────────────── */
 .instalaciones-loading {
   display: flex;
   justify-content: center;

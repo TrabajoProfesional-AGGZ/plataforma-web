@@ -1,0 +1,22 @@
+import { fetchTo } from '../utils/utils';
+
+export async function getDisciplinas() {
+  const res = await fetchTo('/api/v1/disciplinas', 'GET');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error('Error al obtener disciplinas');
+  const data = await res.json();
+  return data.disciplinas ?? data;
+}
+
+export async function createDisciplina(data) {
+  const res = await fetchTo('/api/v1/disciplinas', 'POST', data);
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error('Error al crear disciplina');
+  return res.json();
+}
+
+export async function pausarDisciplina(id) {
+  const res = await fetchTo(`/api/v1/disciplinas/${id}`, 'DELETE');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error('Error al pausar disciplina');
+}

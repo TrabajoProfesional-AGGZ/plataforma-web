@@ -1,17 +1,6 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { CreateReservaForm } from './CreateReservaForm';
 
-jest.mock('framer-motion', () => {
-  const React = require('react');
-  return {
-    motion: new Proxy({}, {
-      get: (_, tag) => ({ children, animate, initial, exit, transition, variants, custom, whileHover, whileTap, ...props }) =>
-        React.createElement(tag, props, children),
-    }),
-    AnimatePresence: ({ children }) => children,
-  };
-});
-
 jest.mock('../../assets/logo-verde.png', () => 'logo-verde.png');
 jest.mock('../../assets/logo_socio.png', () => 'logo_socio.png');
 
@@ -39,6 +28,19 @@ function renderForm(instalaciones = INSTALACIONES_TEST) {
   return render(
     <CreateReservaForm onSuccess={onSuccess} onCancel={onCancel} instalaciones={instalaciones} />
   );
+}
+
+async function llenarYEnviarPaso2(horaFin = '10:00') {
+  renderForm();
+  await avanzarAlPaso2();
+  const fechaInput = document.querySelector('input[type="date"]');
+  const timeInputs = document.querySelectorAll('input[type="time"]');
+  fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+  fireEvent.change(timeInputs[0], { target: { value: '09:00' } });
+  fireEvent.change(timeInputs[1], { target: { value: horaFin } });
+  await act(async () => {
+    fireEvent.click(screen.getByRole('button', { name: /registrar reserva/i }));
+  });
 }
 
 async function avanzarAlPaso2() {
@@ -180,18 +182,7 @@ describe('CreateReservaForm', () => {
   });
 
   test('muestra pantalla de éxito y llama onSuccess al confirmar con datos válidos', async () => {
-    renderForm();
-    await avanzarAlPaso2();
-
-    const fechaInput = document.querySelector('input[type="date"]');
-    const timeInputs = document.querySelectorAll('input[type="time"]');
-    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
-    fireEvent.change(timeInputs[0], { target: { value: '09:00' } });
-    fireEvent.change(timeInputs[1], { target: { value: '10:00' } });
-
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /registrar reserva/i }));
-    });
+    await llenarYEnviarPaso2();
     await waitFor(() => {
       expect(screen.getByText('¡Reserva registrada!')).toBeInTheDocument();
     });
@@ -200,18 +191,7 @@ describe('CreateReservaForm', () => {
   });
 
   test('llama a createReserva con el UUID del socio (no con el nro_socio)', async () => {
-    renderForm();
-    await avanzarAlPaso2();
-
-    const fechaInput = document.querySelector('input[type="date"]');
-    const timeInputs = document.querySelectorAll('input[type="time"]');
-    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
-    fireEvent.change(timeInputs[0], { target: { value: '09:00' } });
-    fireEvent.change(timeInputs[1], { target: { value: '11:00' } });
-
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /registrar reserva/i }));
-    });
+    await llenarYEnviarPaso2('11:00');
 
     expect(createReserva).toHaveBeenCalledWith({
       id_socio: 'socio-uuid-1',
@@ -260,18 +240,7 @@ describe('CreateReservaForm', () => {
 
   test('llama onSuccess incluso si createReserva falla', async () => {
     createReserva.mockRejectedValue(new Error('error de red'));
-    renderForm();
-    await avanzarAlPaso2();
-
-    const fechaInput = document.querySelector('input[type="date"]');
-    const timeInputs = document.querySelectorAll('input[type="time"]');
-    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
-    fireEvent.change(timeInputs[0], { target: { value: '09:00' } });
-    fireEvent.change(timeInputs[1], { target: { value: '10:00' } });
-
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /registrar reserva/i }));
-    });
+    await llenarYEnviarPaso2();
     await waitFor(() => expect(screen.getByText('¡Reserva registrada!')).toBeInTheDocument());
     act(() => jest.advanceTimersByTime(1800));
     expect(onSuccess).toHaveBeenCalledTimes(1);

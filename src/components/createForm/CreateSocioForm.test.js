@@ -3,20 +3,6 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CreateSocioForm } from './CreateSocioForm';
 
-jest.mock('framer-motion', () => {
-  const mockReact = require('react');
-  const motion = new Proxy({}, {
-    get: (_, tag) => {
-      return ({ children, whileHover, whileTap, initial, animate, exit, transition, variants, custom, ...props }) =>
-        mockReact.createElement(tag, props, children);
-    },
-  });
-  return {
-    motion,
-    AnimatePresence: ({ children }) => mockReact.createElement(mockReact.Fragment, null, children),
-  };
-});
-
 jest.mock('../../services/sociosService', () => ({
   createSocio: jest.fn(),
 }));

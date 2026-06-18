@@ -1,0 +1,50 @@
+.socios-card {
+  border: 1px solid;
+  border-radius: 12px;
+  padding: 24px 28px;
+  max-width: 520px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.socios-card-inner {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 28px;
+}
+
+.socios-card-logo {
+  width: 80px;
+  height: auto;
+  flex-shrink: 0;
+}
+
+.socios-card-data {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+}
+
+.socios-card-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.socios-card-label {
+  font-weight: 500;
+  color: #4a4a4a;
+  min-width: 90px;
+  font-size: 15px;
+}
+
+.socios-card-row span:last-child {
+  color: #111111;
+  font-size: 14px;
+}

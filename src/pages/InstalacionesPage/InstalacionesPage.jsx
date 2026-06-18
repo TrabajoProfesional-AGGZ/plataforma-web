@@ -2,29 +2,18 @@ import { useState, useEffect } from 'react';
 import { Plus, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { CreateInstalacionForm } from '../../components/createInstalacionForm/CreateInstalacionForm';
 import { CreateReservaForm } from '../../components/createReservaForm/CreateReservaForm';
+import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { getInstalaciones, createInstalacion, deleteInstalacion } from '../../services/instalacionesService';
 import { getReservas, deleteReserva } from '../../services/reservasService';
 import { getSocios } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
+import { estadoConfig } from '../../utils/estadoConfig';
 import logo from '../../assets/logo_socio.png';
-import logoVerde from '../../assets/logo-verde.png';
-import logoRojo from '../../assets/logo-rojo.png';
-import logoAmarillo from '../../assets/logo-amarillo.png';
-import logoNaranja from '../../assets/logo-naranja.png';
 import './InstalacionesPage.css';
-
-const ESTADO_CONFIG = {
-  'Activo':     { logo: logoVerde,    bg: '#a7daa7', border: '#0D6E0D' },
-  'Moroso':     { logo: logoRojo,     bg: '#f4bebe', border: '#A01414' },
-  'Inactivo':   { logo: logoAmarillo, bg: '#f5e9b2', border: '#9A6200' },
-  'Suspendido': { logo: logoNaranja,  bg: '#ffbd98',   border: '#f14701' },
-};
-const ESTADO_DEFAULT = { logo: logoAmarillo, bg: '#f5e9b2', border: '#9A6200' };
-
-function estadoConfig(estado) {
-  const nombre = estado?.nombre ?? estado ?? '';
-  return ESTADO_CONFIG[nombre] ?? ESTADO_DEFAULT;
-}
+import '../../styles/ListPage.css';
+import '../../styles/SocioCard.css';
+import '../../styles/PageTableHeader.css';
+import '../../styles/ListDetailShared.css';
 
 function InstalacionesPage() {
   const puedeVerInstalaciones = usePermiso('ver_instalaciones');
@@ -274,6 +263,7 @@ function InstalacionesPage() {
                 </div>
               ))}
             </div>
+            <p className="detalle-id">ID: {instalacionActual.id}</p>
           </div>
 
           {puedeBorrarInstalacion && (
@@ -329,11 +319,12 @@ function InstalacionesPage() {
                   <table className="instalaciones-tabla">
                     <thead>
                       <tr>
+                        <th>ID</th>
                         <th>Nro. de socio</th>
                         <th>Fecha</th>
                         <th>Inicio</th>
                         <th>Fin</th>
-                        <th>Acciones</th>
+                        {puedeBorrarReserva && <th>Acciones</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -344,34 +335,35 @@ function InstalacionesPage() {
                         )
                         .map((r) => (
                           <tr key={r.id}>
+                            <td>{r.id}</td>
                             <td>
-                              <div className="instalaciones-socio-cell">
-                                <span>{r.nro_socio}</span>
-                                {r.socio && (
-                                  <button
-                                    className="instalaciones-btn-ver-socio"
-                                    onClick={() => abrirVerSocio(r.socio)}
-                                  >
-                                    Ver Socio
-                                  </button>
-                                )}
-                              </div>
+                              {r.socio ? (
+                                <button
+                                  type="button"
+                                  className="instalaciones-nro-socio-link"
+                                  onClick={() => abrirVerSocio(r.socio)}
+                                >
+                                  {r.nro_socio}
+                                </button>
+                              ) : (
+                                r.nro_socio
+                              )}
                             </td>
                             <td>{r.fecha_reserva ?? r.fecha}</td>
                             <td>{r.hora_inicio}</td>
                             <td>{r.hora_fin}</td>
-                            <td>
-                              <div className="instalaciones-reserva-acciones">
-                                {puedeBorrarReserva && (
+                            {puedeBorrarReserva && (
+                              <td>
+                                <div className="instalaciones-reserva-acciones">
                                   <button
                                     className="instalaciones-btn-reserva-eliminar"
                                     onClick={() => abrirEliminarReserva(r)}
                                   >
                                     Eliminar
                                   </button>
-                                )}
-                              </div>
-                            </td>
+                                </div>
+                              </td>
+                            )}
                           </tr>
                         ))}
                     </tbody>
@@ -403,46 +395,21 @@ function InstalacionesPage() {
         />
       )}
 
-      {/* ── Modal: Eliminar instalación ── */}
-      {eliminarInstalacionOpen && instalacionActual && (
-        <div className="modal-overlay" onClick={() => setEliminarInstalacionOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Eliminar instalación</h2>
-            <p className="modal-confirmar-texto">
-              ¿Estás seguro de que querés eliminar &ldquo;{instalacionActual.nombre}&rdquo;?
-              También se eliminarán todas sus reservas.
-            </p>
-            <div className="modal-actions">
-              <button type="button" className="modal-button-cancel" onClick={() => setEliminarInstalacionOpen(false)}>
-                Cancelar
-              </button>
-              <button type="button" className="modal-button-danger" onClick={handleEliminarInstalacion}>
-                Eliminar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDeleteModal
+        open={eliminarInstalacionOpen && !!instalacionActual}
+        titulo="Eliminar instalación"
+        mensaje={`¿Estás seguro de que querés eliminar "${instalacionActual?.nombre}"? También se eliminarán todas sus reservas.`}
+        onConfirm={handleEliminarInstalacion}
+        onCancel={() => setEliminarInstalacionOpen(false)}
+      />
 
-      {/* ── Modal: Eliminar reserva ── */}
-      {eliminarReservaOpen && reservaActual && (
-        <div className="modal-overlay" onClick={() => setEliminarReservaOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Eliminar reserva</h2>
-            <p className="modal-confirmar-texto">
-              ¿Estás seguro de que querés eliminar esta reserva?
-            </p>
-            <div className="modal-actions">
-              <button type="button" className="modal-button-cancel" onClick={() => setEliminarReservaOpen(false)}>
-                Cancelar
-              </button>
-              <button type="button" className="modal-button-danger" onClick={handleEliminarReserva}>
-                Eliminar
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDeleteModal
+        open={eliminarReservaOpen && !!reservaActual}
+        titulo="Eliminar reserva"
+        mensaje="¿Estás seguro de que querés eliminar esta reserva?"
+        onConfirm={handleEliminarReserva}
+        onCancel={() => setEliminarReservaOpen(false)}
+      />
 
       {/* ── Modal: Ver socio ── */}
       {verSocioOpen && verSocioData && (() => {

@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { Users, ShieldCheck, Trophy, ArrowUpRight, Building2 } from 'lucide-react';
+import { Users, ShieldCheck, ArrowUpRight, Building2, Activity } from 'lucide-react';
 import './DashboardPage.css';
 
 const SECCIONES = [
@@ -26,11 +26,11 @@ const SECCIONES = [
     permiso: 'ver_instalaciones',
   },
   {
-    path: '/dashboard',
+    path: '/disciplinas',
     titulo: 'Disciplinas',
     descripcion: 'Crear, modificar, eliminar o consultar disciplinas.',
-    Icon: Trophy,
-    permiso: null,
+    Icon: Activity,
+    permiso: 'ver_disciplinas',
   },
 ];
 

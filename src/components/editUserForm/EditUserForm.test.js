@@ -4,20 +4,6 @@ import { EditUserForm } from './EditUserForm';
 
 jest.mock('../../firebase', () => ({ auth: { currentUser: { getIdToken: jest.fn().mockResolvedValue('token') } } }));
 
-jest.mock('framer-motion', () => {
-  const mockReact = require('react');
-  const motion = new Proxy({}, {
-    get: (_, tag) => {
-      return ({ children, whileHover, whileTap, initial, animate, exit, transition, variants, custom, ...props }) =>
-        mockReact.createElement(tag, props, children);
-    },
-  });
-  return {
-    motion,
-    AnimatePresence: ({ children }) => children,
-  };
-});
-
 jest.mock('../../services/usuariosService', () => ({
   editarUsuario: jest.fn(),
 }));
