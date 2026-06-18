@@ -9,6 +9,12 @@
   padding: 24px 16px;
 }
 
+button.csf-overlay {
+  border: none;
+  cursor: default;
+  width: 100%;
+}
+
 .csf-wrapper {
   width: 100%;
   max-width: 520px;
@@ -252,14 +258,14 @@
 }
 
 .csf-btn-next,
-.csf-btn-submit {
+.csf-btn-submit,
+.csf-btn-danger {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 12px 20px;
   border-radius: 12px;
   border: none;
-  background-color: #111111;
   color: #ffffff;
   font-size: 14px;
   font-family: inherit;
@@ -268,14 +274,28 @@
   transition: background-color 0.15s;
 }
 
+.csf-btn-submit:disabled,
+.csf-btn-danger:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.csf-btn-next,
+.csf-btn-submit {
+  background-color: #111111;
+}
+
 .csf-btn-next:hover,
 .csf-btn-submit:hover:not(:disabled) {
   background-color: #4a4a4a;
 }
 
-.csf-btn-submit:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+.csf-btn-danger {
+  background-color: #c0392b;
+}
+
+.csf-btn-danger:hover:not(:disabled) {
+  background-color: #96281b;
 }
 
 /* Spinner */
@@ -324,4 +344,63 @@
   margin: 8px 0 0;
   font-size: 14px;
   color: #4a4a4a;
+}
+
+/* Checkbox inline */
+.csf-checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #4a4a4a;
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  border-radius: 12px;
+  border: 2px solid transparent;
+  transition: border-color 0.2s, background-color 0.2s;
+  user-select: none;
+}
+
+.csf-checkbox-label:hover {
+  background-color: #ebebeb;
+}
+
+.csf-checkbox-input {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #111111;
+  flex-shrink: 0;
+}
+
+/* ── Búsqueda de socio por número ── */
+.csf-socio-encontrado {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #0D6E0D;
+  font-weight: 500;
+  margin-top: 6px;
+}
+
+.csf-socio-buscando {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: #4a4a4a;
+  margin-top: 6px;
+}
+
+.csf-socio-logo-spin {
+  width: 18px;
+  height: 18px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }

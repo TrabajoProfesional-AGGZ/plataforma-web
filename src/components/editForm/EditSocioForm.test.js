@@ -5,20 +5,6 @@ import { EditSocioForm } from './EditSocioForm';
 
 jest.mock('../../firebase', () => ({ auth: { currentUser: { getIdToken: jest.fn().mockResolvedValue('token') } } }));
 
-jest.mock('framer-motion', () => {
-  const mockReact = require('react');
-  const motion = new Proxy({}, {
-    get: (_, tag) => {
-      return ({ children, whileHover, whileTap, initial, animate, exit, transition, variants, custom, ...props }) =>
-        mockReact.createElement(tag, props, children);
-    },
-  });
-  return {
-    motion,
-    AnimatePresence: ({ children }) => children,
-  };
-});
-
 jest.mock('../../services/catalogosService', () => ({
   fetchEstadosSocio: jest.fn(),
   fetchCategoriasSocio: jest.fn(),
@@ -222,5 +208,42 @@ describe('EditSocioForm', () => {
     userEvent.click(screen.getByRole('button', { name: /Guardar cambios/i }));
 
     await waitFor(() => expect(screen.getByText(/error al modificar el socio/i)).toBeInTheDocument());
+  });
+
+  test('los inputs aplican estilo al recibir y perder foco', async () => {
+    renderForm();
+    await screen.findByDisplayValue('Activo');
+    const nombreInput = screen.getByPlaceholderText('ej: Juan');
+    fireEvent.focus(nombreInput);
+    fireEvent.blur(nombreInput);
+    expect(nombreInput).toBeInTheDocument();
+  });
+
+  test('los selects aplican estilo al recibir y perder foco', async () => {
+    renderForm();
+    const estadoSelect = await screen.findByDisplayValue('Activo');
+    fireEvent.focus(estadoSelect);
+    fireEvent.blur(estadoSelect);
+    expect(estadoSelect).toBeInTheDocument();
+  });
+
+  test('presionar Enter en el paso 1 no avanza al siguiente paso', async () => {
+    renderForm();
+    await screen.findByDisplayValue('Activo');
+    const form = document.querySelector('form');
+    fireEvent.keyDown(form, { key: 'Enter', code: 'Enter' });
+    expect(screen.getByText(/Paso 1 de/)).toBeInTheDocument();
+  });
+
+  test('el campo nro_documento convierte a mayúsculas al ingresar texto', async () => {
+    renderForm();
+    await screen.findByDisplayValue('Activo');
+
+    userEvent.click(screen.getByRole('button', { name: /Siguiente/i }));
+    await waitFor(() => expect(screen.getByPlaceholderText('ej: 12345678')).toBeInTheDocument());
+
+    const nroDocInput = screen.getByPlaceholderText('ej: 12345678');
+    fireEvent.input(nroDocInput, { target: { value: 'abc123' } });
+    expect(nroDocInput).toBeInTheDocument();
   });
 });

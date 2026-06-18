@@ -1,15 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, Plus } from 'lucide-react';
 import { fetchUsuarios, eliminarUsuario } from '../../services/usuariosService';
+import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { fetchRoles } from '../../services/rolesService';
 import { CreateUserForm } from '../../components/createUserForm/CreateUserForm';
 import { EditUserForm } from '../../components/editUserForm/EditUserForm';
 import { CambiarRolForm } from '../../components/cambiarRolForm/CambiarRolForm';
+import { PermisosModal } from '../../components/permisosModal/PermisosModal';
 import { usePermiso } from '../../hooks/usePermiso';
+import { useSortedList } from '../../hooks/useSortedList';
+import { useModalEscape } from '../../hooks/useModalEscape';
+import { useAuthContext } from '../../context/AuthContext';
 import logo from '../../assets/logo_socio.png';
 import logoVerde from '../../assets/logo-verde.png';
 import logoAmarillo from '../../assets/logo-amarillo.png';
 import './UsuariosPage.css';
+import '../../styles/ListPage.css';
+import '../../styles/ListDetailShared.css';
+import '../../styles/PageTableHeader.css';
 
 const ESTADO_CONFIG = {
   'Activo':   { logo: logoVerde,    bg: '#8ac98ab0', border: '#0D6E0D' },
@@ -21,8 +29,6 @@ function estadoConfig(nombre) {
   return ESTADO_CONFIG[nombre] ?? ESTADO_DEFAULT;
 }
 
-const ICONOS_ORDEN = { asc: ' ↑', desc: ' ↓', none: ' ↕' };
-
 function getValorOrden(usuario, campo) {
   if (campo === 'rol') return String(usuario.rol?.nombre ?? '').toLowerCase();
   if (campo === 'estado') return String(usuario.estado?.nombre ?? '').toLowerCase();
@@ -33,6 +39,7 @@ function UsuariosPage() {
   const puedeCrear = usePermiso('crear_usuario');
   const puedeEditar = usePermiso('editar_usuario');
   const puedeBorrar = usePermiso('borrar_usuario');
+  const { userData } = useAuthContext();
 
   const cacheUsuariosRef = useRef(null);
   const buscarTimeoutRef = useRef(null);
@@ -42,7 +49,7 @@ function UsuariosPage() {
   const [resultado, setResultado] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [orden, setOrden] = useState({ campo: null, dir: 'asc' });
+  const { setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
 
   const [filtroRol, setFiltroRol] = useState('');
   const [filtroAbierto, setFiltroAbierto] = useState(false);
@@ -54,6 +61,7 @@ function UsuariosPage() {
   const [editarModalOpen, setEditarModalOpen] = useState(false);
   const [eliminarModalOpen, setEliminarModalOpen] = useState(false);
   const [cambiarRolModalOpen, setCambiarRolModalOpen] = useState(false);
+  const [permisosModalOpen, setPermisosModalOpen] = useState(false);
   const [guardando, setGuardando] = useState(false);
   const [errorModal, setErrorModal] = useState('');
 
@@ -68,19 +76,12 @@ function UsuariosPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const anyModalOpen = crearModalOpen || editarModalOpen || eliminarModalOpen || cambiarRolModalOpen;
-  useEffect(() => {
-    if (!anyModalOpen) return;
-    function handleKeyDown(e) {
-      if (e.key !== 'Escape') return;
-      if (crearModalOpen) setCrearModalOpen(false);
-      else if (editarModalOpen) setEditarModalOpen(false);
-      else if (eliminarModalOpen) setEliminarModalOpen(false);
-      else if (cambiarRolModalOpen) setCambiarRolModalOpen(false);
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [anyModalOpen, crearModalOpen, editarModalOpen, eliminarModalOpen, cambiarRolModalOpen]);
+  useModalEscape([
+    [crearModalOpen, setCrearModalOpen],
+    [editarModalOpen, setEditarModalOpen],
+    [eliminarModalOpen, setEliminarModalOpen],
+    [cambiarRolModalOpen, setCambiarRolModalOpen],
+  ]);
 
   async function fetchYActualizarUsuarios() {
     setLoading(true);
@@ -142,30 +143,6 @@ function UsuariosPage() {
       return;
     }
     fetchYActualizarUsuarios();
-  }
-
-  function toggleOrden(campo) {
-    setOrden((prev) => {
-      if (prev.campo !== campo) return { campo, dir: 'asc' };
-      if (prev.dir === 'asc') return { campo, dir: 'desc' };
-      return { campo: null, dir: 'asc' };
-    });
-  }
-
-  function iconoOrden(campo) {
-    if (orden.campo !== campo) return ICONOS_ORDEN.none;
-    return ICONOS_ORDEN[orden.dir];
-  }
-
-  function aplicarOrden(lista) {
-    if (!orden.campo) return lista;
-    return [...lista].sort((a, b) => {
-      const va = getValorOrden(a, orden.campo);
-      const vb = getValorOrden(b, orden.campo);
-      if (va < vb) return orden.dir === 'asc' ? -1 : 1;
-      if (va > vb) return orden.dir === 'asc' ? 1 : -1;
-      return 0;
-    });
   }
 
   function abrirEditar() {
@@ -348,6 +325,7 @@ function UsuariosPage() {
       {!loading && modo === 'usuario' && resultado && !Array.isArray(resultado) && (() => {
         const cfg = estadoConfig(resultado.estado?.nombre);
         const permisos = resultado.rol?.permisos ?? [];
+        const esMismoUsuario = resultado.id === userData?.usuario_id;
         return (
           <div className="usuarios-card" style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}>
             <div className="usuarios-card-inner">
@@ -374,13 +352,14 @@ function UsuariosPage() {
                   <span>{resultado.estado?.nombre}</span>
                 </div>
                 {permisos.length > 0 && (
-                  <div className="usuarios-card-permisos">
-                    <span className="usuarios-card-label">Permisos</span>
-                    <div className="usuarios-permisos-lista">
-                      {permisos.map((p) => (
-                        <span key={p.id} className="usuarios-permiso-tag">{p.nombre}</span>
-                      ))}
-                    </div>
+                  <div className="usuarios-card-row">
+                    <button
+                      className="usuarios-btn-ver-permisos"
+                      style={{ '--card-bg': cfg.bg }}
+                      onClick={() => setPermisosModalOpen(true)}
+                    >
+                      Ver permisos
+                    </button>
                   </div>
                 )}
               </div>
@@ -392,7 +371,7 @@ function UsuariosPage() {
                 </button>
               )}
               <div className="usuarios-card-actions-right">
-                {puedeEditar && (
+                {puedeEditar && !esMismoUsuario && (
                   <button className="usuarios-btn-cambiar-rol" onClick={abrirCambiarRol}>
                     Cambiar rol
                   </button>
@@ -423,25 +402,15 @@ function UsuariosPage() {
         />
       )}
 
-      {eliminarModalOpen && resultado && !Array.isArray(resultado) && (
-        <div className="modal-overlay" onClick={() => setEliminarModalOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Eliminar usuario</h2>
-            <p className="modal-confirmar-texto">
-              ¿Estás seguro de que querés eliminar a {resultado.nombre} {resultado.apellido}?
-            </p>
-            {errorModal && <p className="modal-error" role="alert">{errorModal}</p>}
-            <div className="modal-actions">
-              <button type="button" className="modal-button-cancel" onClick={() => setEliminarModalOpen(false)}>
-                Cancelar
-              </button>
-              <button type="button" className="modal-button-danger" onClick={handleEliminar} disabled={guardando}>
-                {guardando ? 'Eliminando...' : 'Eliminar'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDeleteModal
+        open={eliminarModalOpen && !!resultado && !Array.isArray(resultado)}
+        titulo="Eliminar usuario"
+        mensaje={`¿Estás seguro de que querés eliminar a ${resultado?.nombre} ${resultado?.apellido}?`}
+        onConfirm={handleEliminar}
+        onCancel={() => setEliminarModalOpen(false)}
+        guardando={guardando}
+        errorModal={errorModal}
+      />
 
       {cambiarRolModalOpen && resultado && !Array.isArray(resultado) && (
         <CambiarRolForm
@@ -449,6 +418,13 @@ function UsuariosPage() {
           roles={roles}
           onSuccess={(actualizado) => { setResultado(actualizado); setCambiarRolModalOpen(false); }}
           onCancel={() => setCambiarRolModalOpen(false)}
+        />
+      )}
+
+      {permisosModalOpen && resultado && !Array.isArray(resultado) && (
+        <PermisosModal
+          permisos={(resultado.rol?.permisos ?? []).map((p) => p.nombre)}
+          onClose={() => setPermisosModalOpen(false)}
         />
       )}
     </div>

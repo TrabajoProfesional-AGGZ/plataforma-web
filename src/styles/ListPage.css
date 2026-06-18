@@ -1,0 +1,247 @@
+/* Shared styles for list pages: SociosPage, UsuariosPage, DisciplinasPage, InstalacionesPage */
+
+/* ── Toolbar ─────────────────────────────────────────────────── */
+.socios-toolbar,
+.usuarios-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.socios-toolbar-left,
+.usuarios-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 200px;
+}
+
+.socios-toolbar-right,
+.usuarios-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Search ──────────────────────────────────────────────────── */
+.socios-search-container,
+.usuarios-search-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #ffffff;
+  border: 1px solid #111111;
+  border-radius: 6px;
+  padding: 8px 12px;
+  flex: 1;
+}
+
+.socios-search-container svg,
+.usuarios-search-container svg {
+  color: #4a4a4a;
+  flex-shrink: 0;
+}
+
+.socios-search-input,
+.usuarios-search-input {
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #111111;
+  width: 100%;
+  font-size: 14px;
+}
+
+.socios-search-button, .socios-ver-todos-button,
+.usuarios-search-button, .usuarios-ver-todos-button {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.15s, color 0.15s;
+}
+
+.socios-search-loading,
+.usuarios-search-loading {
+  display: flex;
+  justify-content: center;
+  padding: 48px 0;
+}
+
+/* ── Feedback ────────────────────────────────────────────────── */
+.socios-error,
+.usuarios-error {
+  color: #c0392b;
+  font-size: 14px;
+  text-align: center;
+  background-color: #fdecea;
+  border: 1px solid #f5c6cb;
+  border-radius: 4px;
+  padding: 10px 14px;
+}
+
+.socios-no-encontrado,
+.usuarios-no-encontrado {
+  color: #4a4a4a;
+  font-size: 14px;
+  text-align: center;
+}
+
+/* ── Filters ─────────────────────────────────────────────────── */
+.socios-filtro-toggle,
+.usuarios-filtro-toggle,
+.instalaciones-btn-toggle {
+  padding: 6px 12px;
+  border: 1px solid #111111;
+  border-radius: 6px;
+  background: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  color: #111111;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.socios-filtro-toggle:hover,
+.usuarios-filtro-toggle:hover,
+.instalaciones-btn-toggle:hover {
+  background-color: #f5f5f5;
+}
+
+.socios-filtro-select, .usuarios-filtro-select,
+.instalaciones-filtro-fecha, .instalaciones-filtro-tipo {
+  border: 1px solid #111111;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 13px;
+  color: #111111;
+  background-color: #ffffff;
+  outline: none;
+  cursor: pointer;
+}
+
+.socios-filtro-select,
+.usuarios-filtro-select {
+  width: 100%;
+}
+
+.socios-filtro-select:focus,
+.usuarios-filtro-select:focus {
+  border-color: #111111;
+}
+
+/* ── Table wrapper ───────────────────────────────────────────── */
+.socios-table-wrapper, .usuarios-table-wrapper,
+.disciplinas-table-wrapper, .instalaciones-table-wrapper {
+  background-color: #ffffff;
+  border: 1px solid #111111;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.socios-table-empty,
+.usuarios-table-empty {
+  padding: 32px;
+  text-align: center;
+  color: #4a4a4a;
+  font-size: 14px;
+  margin: 0;
+}
+
+.disciplinas-empty,
+.instalaciones-empty {
+  text-align: center;
+  padding: 48px 0;
+  color: #4a4a4a;
+  font-size: 15px;
+  margin: 0;
+}
+
+/* ── Table base ──────────────────────────────────────────────── */
+.socios-table,
+.usuarios-tabla,
+.disciplinas-tabla,
+.instalaciones-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.socios-table td,
+.usuarios-tabla td,
+.disciplinas-tabla td,
+.instalaciones-tabla td {
+  padding: 14px 20px;
+  border-bottom: 1px solid #f0f0f0;
+  color: #111111;
+  vertical-align: middle;
+}
+
+.socios-table td,
+.usuarios-tabla td {
+  text-align: left;
+}
+
+.socios-table tr:last-child td,
+.usuarios-tabla tr:last-child td,
+.disciplinas-tabla tr:last-child td,
+.instalaciones-tabla tr:last-child td {
+  border-bottom: none;
+}
+
+.socios-tr-clickable,
+.usuarios-tr-clickable,
+.disciplinas-tr-clickable,
+.instalaciones-tr-clickable {
+  cursor: pointer;
+}
+
+.socios-tr-clickable:hover td,
+.usuarios-tr-clickable:hover td,
+.disciplinas-tr-clickable:hover td,
+.instalaciones-tr-clickable:hover td {
+  background-color: #f5f5f5;
+}
+
+/* ── Badge base ──────────────────────────────────────────────── */
+.disciplinas-badge,
+.instalaciones-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  border: 1px solid;
+}
+
+/* ── Estado cell ─────────────────────────────────────────────── */
+.socios-estado-cell,
+.usuarios-estado-cell {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #111111;
+  padding: 4px 10px 4px 6px;
+  border-radius: 8px;
+  border: 1px solid;
+}
+
+/* ── Card action buttons base ────────────────────────────────── */
+.socios-btn-eliminar, .socios-btn-editar,
+.usuarios-btn-eliminar, .usuarios-btn-editar, .usuarios-btn-cambiar-rol {
+  padding: 8px 20px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s;
+  border: none;
+}

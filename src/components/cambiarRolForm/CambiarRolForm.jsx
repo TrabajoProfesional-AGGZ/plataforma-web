@@ -3,24 +3,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Shield, AlertTriangle, ChevronRight } from 'lucide-react';
 import { cambiarRolUsuario } from '../../services/usuariosService';
 import '../createForm/CreateSocioForm.css';
+import { StyledSelect } from '../createForm/FormFields';
 
-function StyledSelect({ error, children, ...props }) {
-  const [focused, setFocused] = useState(false);
-  return (
-    <select
-      {...props}
-      onFocus={(e) => { setFocused(true); props.onFocus?.(e); }}
-      onBlur={(e) => { setFocused(false); props.onBlur?.(e); }}
-      className={`csf-select${error ? ' csf-select--error' : ''}`}
-      style={{
-        background: focused ? '#ffffff' : '#f5f5f5',
-        borderColor: focused ? '#111111' : 'transparent',
-      }}
-    >
-      {children}
-    </select>
-  );
-}
+const STEP_SHARED_PROPS = {
+  animate: { x: 0, opacity: 1 },
+  exit: { x: -52, opacity: 0 },
+  transition: { duration: 0.26, ease: 'easeInOut' },
+  className: 'csf-fields',
+};
 
 export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
   const [fase, setFase] = useState('seleccion');
@@ -67,10 +57,7 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
                 <motion.div
                   key="seleccion"
                   initial={{ x: 0, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: -52, opacity: 0 }}
-                  transition={{ duration: 0.26, ease: 'easeInOut' }}
-                  className="csf-fields"
+                  {...STEP_SHARED_PROPS}
                 >
                   <div className="csf-field">
                     <label className="csf-label">
@@ -117,10 +104,7 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
                 <motion.div
                   key="confirmacion"
                   initial={{ x: 52, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: -52, opacity: 0 }}
-                  transition={{ duration: 0.26, ease: 'easeInOut' }}
-                  className="csf-fields"
+                  {...STEP_SHARED_PROPS}
                 >
                   <div style={{
                     backgroundColor: '#fffbeb',

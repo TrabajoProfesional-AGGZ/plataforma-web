@@ -3,25 +3,17 @@ import { Search, Plus } from 'lucide-react';
 import { getSocios, deleteSocio } from '../../services/sociosService';
 import { CreateSocioForm } from '../../components/createForm/CreateSocioForm';
 import { EditSocioForm } from '../../components/editForm/EditSocioForm';
+import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { usePermiso } from '../../hooks/usePermiso';
+import { useSortedList } from '../../hooks/useSortedList';
+import { useModalEscape } from '../../hooks/useModalEscape';
+import { estadoConfig } from '../../utils/estadoConfig';
 import logo from '../../assets/logo_socio.png';
-import logoVerde from '../../assets/logo-verde.png';
-import logoRojo from '../../assets/logo-rojo.png';
-import logoAmarillo from '../../assets/logo-amarillo.png';
-import logoNaranja from '../../assets/logo-naranja.png'
 import './SociosPage.css';
-
-const ESTADO_CONFIG = {
-  'Activo': { logo: logoVerde,    bg: '#8ac98ab0', border: '#0D6E0D' },
-  'Moroso': { logo: logoRojo,     bg: '#f0b2b2d2', border: '#A01414' },
-  'Inactivo': {logo: logoAmarillo, bg: '#f4ecb5ee', border: '#9A6200' },
-  'Suspendido': {logo: logoNaranja, bg: '#ffbd98', border: '#f14701'}
-};
-const ESTADO_DEFAULT = { logo: logoAmarillo, bg: '#f4ecb5ee', border: '#9A6200' };
-
-function estadoConfig(estado) {
-  return ESTADO_CONFIG[estado] ?? ESTADO_DEFAULT;
-}
+import '../../styles/ListPage.css';
+import '../../styles/ListDetailShared.css';
+import '../../styles/SocioCard.css';
+import '../../styles/PageTableHeader.css';
 
 function getValorOrden(socio, campo) {
   const val = socio[campo];
@@ -29,7 +21,6 @@ function getValorOrden(socio, campo) {
   return String(val ?? '').toLowerCase();
 }
 
-const ICONOS_ORDEN = { asc: ' ↑', desc: ' ↓', none: ' ↕' };
 
 
 function SociosPage() {
@@ -45,7 +36,7 @@ function SociosPage() {
   const [resultado, setResultado] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [orden, setOrden] = useState({ campo: null, dir: 'asc' });
+  const { setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
 
   const [filtroEstado, setFiltroEstado] = useState('');
   const [filtroAbierto, setFiltroAbierto] = useState(false);
@@ -65,42 +56,11 @@ function SociosPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const anyModalOpen = crearModalOpen || editarModalOpen || eliminarModalOpen;
-  useEffect(() => {
-    if (!anyModalOpen) return;
-    function handleKeyDown(e) {
-      if (e.key !== 'Escape') return;
-      if (crearModalOpen) setCrearModalOpen(false);
-      else if (editarModalOpen) setEditarModalOpen(false);
-      else if (eliminarModalOpen) setEliminarModalOpen(false);
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [anyModalOpen, crearModalOpen, editarModalOpen, eliminarModalOpen]);
-
-  function toggleOrden(campo) {
-    setOrden(prev => {
-      if (prev.campo !== campo) return { campo, dir: 'asc' };
-      if (prev.dir === 'asc') return { campo, dir: 'desc' };
-      return { campo: null, dir: 'asc' };
-    });
-  }
-
-  function iconoOrden(campo) {
-    if (orden.campo !== campo) return ICONOS_ORDEN.none;
-    return ICONOS_ORDEN[orden.dir];
-  }
-
-  function aplicarOrden(socios) {
-    if (!orden.campo) return socios;
-    return [...socios].sort((a, b) => {
-      const va = getValorOrden(a, orden.campo);
-      const vb = getValorOrden(b, orden.campo);
-      if (va < vb) return orden.dir === 'asc' ? -1 : 1;
-      if (va > vb) return orden.dir === 'asc' ? 1 : -1;
-      return 0;
-    });
-  }
+  useModalEscape([
+    [crearModalOpen, setCrearModalOpen],
+    [editarModalOpen, setEditarModalOpen],
+    [eliminarModalOpen, setEliminarModalOpen],
+  ]);
 
   async function cargarSocios() {
     setLoading(true);
@@ -464,26 +424,15 @@ function SociosPage() {
         />
       )}
 
-      {/* Modal confirmar eliminación */}
-      {eliminarModalOpen && resultado && (
-        <div className="modal-overlay" onClick={() => setEliminarModalOpen(false)}>
-          <div className="modal" onClick={(e) => e.stopPropagation()}>
-            <h2 className="modal-title">Eliminar socio</h2>
-            <p className="modal-confirmar-texto">
-              ¿Estás seguro de que querés eliminar al socio N°&nbsp;{resultado.nro_socio}?
-            </p>
-            {errorModal && <p className="modal-error" role="alert">{errorModal}</p>}
-            <div className="modal-actions">
-              <button type="button" className="modal-button-cancel" onClick={() => setEliminarModalOpen(false)}>
-                Cancelar
-              </button>
-              <button type="button" className="modal-button-danger" onClick={handleEliminar} disabled={guardando}>
-                {guardando ? 'Eliminando...' : 'Eliminar'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ConfirmDeleteModal
+        open={eliminarModalOpen && !!resultado}
+        titulo="Eliminar socio"
+        mensaje={`¿Estás seguro de que querés eliminar al socio N° ${resultado?.nro_socio}?`}
+        onConfirm={handleEliminar}
+        onCancel={() => setEliminarModalOpen(false)}
+        guardando={guardando}
+        errorModal={errorModal}
+      />
     </div>
   );
 }

@@ -5,6 +5,11 @@ jest.mock('../../hooks/usePermiso', () => ({
   usePermiso: () => true,
 }));
 
+jest.mock('../../context/AuthContext', () => ({
+  useAuthContext: jest.fn(() => ({ userData: { usuario_id: 'uuid-9999' } })),
+}));
+import { useAuthContext } from '../../context/AuthContext';
+
 jest.mock('../../services/usuariosService', () => ({
   fetchUsuarios: jest.fn(),
   eliminarUsuario: jest.fn(),
@@ -51,6 +56,16 @@ jest.mock('../../components/cambiarRolForm/CambiarRolForm', () => ({
   ),
 }));
 
+jest.mock('../../components/permisosModal/PermisosModal', () => ({
+  PermisosModal: ({ permisos, onClose }) => ( // NOSONAR
+    <div>
+      <h2>Permisos</h2>
+      <ul>{permisos.map((p) => <li key={p}>{p}</li>)}</ul> {/* NOSONAR */}
+      <button onClick={onClose}>Cerrar</button>
+    </div>
+  ),
+}));
+
 const usuarioMock = {
   id: 'uuid-0001',
   firebase_uid: 'firebase-uid-1',
@@ -78,11 +93,20 @@ const rolesMock = [
   { id: 2, nombre: 'PRESIDENTE', permisos: [] },
 ];
 
+async function renderYAbrirCardUsuario() {
+  fetchUsuarios.mockResolvedValue([usuarioMock]);
+  render(<UsuariosPage />);
+  await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+  fireEvent.click(screen.getByText('Rodríguez'));
+  await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
+}
+
 describe('UsuariosPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     fetchUsuarios.mockResolvedValue([]);
     fetchRoles.mockResolvedValue(rolesMock);
+    useAuthContext.mockReturnValue({ userData: { usuario_id: 'uuid-9999' } });
   });
 
   test('renderiza el título, el campo de búsqueda y los botones', async () => {
@@ -124,7 +148,7 @@ describe('UsuariosPage', () => {
     });
   });
 
-  test('al hacer click en una fila muestra la card con permisos del usuario', async () => {
+  test('al hacer click en una fila muestra la card con datos del usuario', async () => {
     fetchUsuarios.mockResolvedValue([usuarioMock]);
     render(<UsuariosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
@@ -134,8 +158,6 @@ describe('UsuariosPage', () => {
     await waitFor(() => {
       expect(screen.getByText('carlos@club.com')).toBeInTheDocument();
       expect(screen.getAllByText('ADMIN').length).toBeGreaterThan(0);
-      expect(screen.getByText('ver_socios')).toBeInTheDocument();
-      expect(screen.getByText('editar_socios')).toBeInTheDocument();
     });
   });
 
@@ -284,13 +306,7 @@ describe('UsuariosPage', () => {
   // --- Modal editar ---
 
   test('abre el formulario de edición con los datos del usuario', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Rodríguez'));
-    await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
-
+    await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /editar/i }));
 
     await waitFor(() => {
@@ -300,13 +316,7 @@ describe('UsuariosPage', () => {
   });
 
   test('editar usuario exitoso cierra el modal', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Rodríguez'));
-    await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
-
+    await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /editar/i }));
     await waitFor(() => expect(screen.getByRole('heading', { name: /editar usuario/i })).toBeInTheDocument());
 
@@ -320,13 +330,7 @@ describe('UsuariosPage', () => {
   // --- Modal eliminar ---
 
   test('abre el modal de confirmación de eliminación', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Rodríguez'));
-    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
-
+    await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
 
     expect(screen.getByText(/eliminar usuario/i)).toBeInTheDocument();
@@ -334,14 +338,8 @@ describe('UsuariosPage', () => {
   });
 
   test('eliminar usuario exitoso recarga la lista', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
     eliminarUsuario.mockResolvedValue();
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Rodríguez'));
-    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
-
+    await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
     await waitFor(() => expect(screen.getByText(/eliminar usuario/i)).toBeInTheDocument());
 
@@ -355,14 +353,8 @@ describe('UsuariosPage', () => {
   });
 
   test('muestra error en el modal si falla la eliminación', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
     eliminarUsuario.mockRejectedValue(new Error('servicio-no-disponible'));
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Rodríguez'));
-    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
-
+    await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
     await waitFor(() => expect(screen.getByText(/eliminar usuario/i)).toBeInTheDocument());
 
@@ -377,13 +369,7 @@ describe('UsuariosPage', () => {
   // --- CambiarRolForm ---
 
   test('abre el formulario de cambio de rol', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Rodríguez'));
-    await waitFor(() => expect(screen.getByRole('button', { name: /cambiar rol/i })).toBeInTheDocument());
-
+    await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /cambiar rol/i }));
 
     expect(screen.getByRole('heading', { name: /cambiar rol/i })).toBeInTheDocument();
@@ -391,13 +377,7 @@ describe('UsuariosPage', () => {
   });
 
   test('cambiar rol exitoso cierra el formulario y actualiza la card', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Rodríguez'));
-    await waitFor(() => expect(screen.getByRole('button', { name: /cambiar rol/i })).toBeInTheDocument());
-
+    await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /cambiar rol/i }));
     await waitFor(() => expect(screen.getByRole('heading', { name: /cambiar rol/i })).toBeInTheDocument());
 
@@ -409,13 +389,7 @@ describe('UsuariosPage', () => {
   });
 
   test('cancelar cambio de rol cierra el formulario', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Rodríguez'));
-    await waitFor(() => expect(screen.getByRole('button', { name: /cambiar rol/i })).toBeInTheDocument());
-
+    await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /cambiar rol/i }));
     await waitFor(() => expect(screen.getByRole('heading', { name: /cambiar rol/i })).toBeInTheDocument());
 
@@ -435,14 +409,8 @@ describe('UsuariosPage', () => {
   });
 
   test('muestra error genérico si falla la eliminación', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
     eliminarUsuario.mockRejectedValue(new Error('error-desconocido'));
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Rodríguez'));
-    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
-
+    await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
     await waitFor(() => expect(screen.getByText(/eliminar usuario/i)).toBeInTheDocument());
 
@@ -457,13 +425,7 @@ describe('UsuariosPage', () => {
   // --- Cancelar modal eliminar ---
 
   test('cierra el modal de eliminación al hacer click en Cancelar', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Rodríguez'));
-    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
-
+    await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
     await waitFor(() => expect(screen.getByText(/eliminar usuario/i)).toBeInTheDocument());
 
@@ -472,30 +434,18 @@ describe('UsuariosPage', () => {
   });
 
   test('cierra el modal de eliminación al hacer click en el overlay', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Rodríguez'));
-    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
-
+    await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
     await waitFor(() => expect(screen.getByText(/eliminar usuario/i)).toBeInTheDocument());
 
-    fireEvent.click(document.querySelector('.modal-overlay'));
+    fireEvent.click(document.querySelector('.csf-overlay'));
     expect(screen.queryByText(/eliminar usuario/i)).not.toBeInTheDocument();
   });
 
   // --- Cancelar edición ---
 
   test('cancelar edición cierra el formulario', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Rodríguez'));
-    await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
-
+    await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /editar/i }));
     await waitFor(() => expect(screen.getByRole('heading', { name: /editar usuario/i })).toBeInTheDocument());
 
@@ -581,12 +531,7 @@ describe('UsuariosPage', () => {
   // --- ESC cierra otros modales ---
 
   test('ESC cierra el modal de edición', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Rodríguez'));
-    await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
+    await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /editar/i }));
     await waitFor(() => expect(screen.getByRole('heading', { name: /editar usuario/i })).toBeInTheDocument());
 
@@ -595,12 +540,7 @@ describe('UsuariosPage', () => {
   });
 
   test('ESC cierra el modal de eliminación', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Rodríguez'));
-    await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
+    await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
     await waitFor(() => expect(screen.getByText(/eliminar usuario/i)).toBeInTheDocument());
 
@@ -609,16 +549,59 @@ describe('UsuariosPage', () => {
   });
 
   test('ESC cierra el modal de cambiar rol', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Rodríguez'));
-    await waitFor(() => expect(screen.getByRole('button', { name: /cambiar rol/i })).toBeInTheDocument());
+    await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /cambiar rol/i }));
     await waitFor(() => expect(screen.getByRole('heading', { name: /cambiar rol/i })).toBeInTheDocument());
 
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByRole('heading', { name: /cambiar rol/i })).not.toBeInTheDocument();
+  });
+
+  // --- Modal de permisos ---
+
+  test('muestra el botón Ver permisos cuando el usuario tiene permisos', async () => {
+    await renderYAbrirCardUsuario();
+    expect(screen.getByRole('button', { name: /ver permisos/i })).toBeInTheDocument();
+  });
+
+  test('abre el modal de permisos al hacer click en Ver permisos', async () => {
+    await renderYAbrirCardUsuario();
+    fireEvent.click(screen.getByRole('button', { name: /ver permisos/i }));
+    expect(screen.getByRole('heading', { name: /permisos/i })).toBeInTheDocument();
+  });
+
+  test('cierra el modal de permisos al llamar onClose', async () => {
+    await renderYAbrirCardUsuario();
+    fireEvent.click(screen.getByRole('button', { name: /ver permisos/i }));
+    await waitFor(() => expect(screen.getByRole('heading', { name: /permisos/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /cerrar/i }));
+    expect(screen.queryByRole('heading', { name: /permisos/i })).not.toBeInTheDocument();
+  });
+
+  // --- Auto-edición de permisos ---
+
+  test('no muestra el botón Cambiar rol cuando el usuario seleccionado es el usuario logueado', async () => {
+    useAuthContext.mockReturnValue({ userData: { usuario_id: 'uuid-0001' } });
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+
+    await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: /cambiar rol/i })).not.toBeInTheDocument();
+  });
+
+  test('muestra el botón Cambiar rol cuando el usuario seleccionado no es el usuario logueado', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Rodríguez'));
+
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /cambiar rol/i })).toBeInTheDocument();
+    });
   });
 });

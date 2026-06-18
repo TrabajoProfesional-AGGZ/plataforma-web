@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { changePassword, logout } from '../../services/authService';
+import { useChangePassword } from '../../hooks/useChangePassword';
 import './CambiarContrasenaPage.css';
+import '../../styles/shared.css';
 
 function PasswordField({ id, label, value, onChange, autoComplete }) {
   const [show, setShow] = useState(false);
@@ -31,32 +31,7 @@ function PasswordField({ id, label, value, onChange, autoComplete }) {
 }
 
 function CambiarContrasenaPage() {
-  const [actual, setActual] = useState('');
-  const [nueva, setNueva] = useState('');
-  const [confirmar, setConfirmar] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
-
-  async function handleSubmit(e) {
-    e.preventDefault();
-    setError('');
-
-    if (nueva !== confirmar) {
-      setError('Las contraseñas nuevas no coinciden');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      await changePassword(actual, nueva);
-      await logout();
-      navigate('/', { state: { passwordChanged: true } });
-    } catch {
-      setError('Contraseña actual incorrecta o error al cambiar contraseña');
-      setLoading(false);
-    }
-  }
+  const { actual, setActual, nueva, setNueva, confirmar, setConfirmar, error, loading, handleSubmit } = useChangePassword();
 
   return (
     <div className="cambiar-contrasena-page">

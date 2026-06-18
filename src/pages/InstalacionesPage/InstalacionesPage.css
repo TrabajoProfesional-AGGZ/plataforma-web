@@ -1,0 +1,245 @@
+/* empty, table-wrapper, tabla, td, tr-clickable, badge base, filtro-fecha/tipo, btn-toggle base → src/styles/ListPage.css
+   btn-crear, btn-volver, detalle-*, btn-eliminar-inst → src/styles/ListDetailShared.css
+   th styles → src/styles/PageTableHeader.css */
+
+.instalaciones-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.instalaciones-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: #111111;
+  margin: 0 0 20px 0;
+  text-align: center;
+}
+
+.instalaciones-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 16px;
+}
+
+/* ── Badge color variants ─────────────────────────────────────── */
+.badge-si {
+  background-color: #fff3cd;
+  color: #856404;
+  border-color: #ffc107;
+}
+
+.badge-no {
+  background-color: #f5f5f5;
+  color: #4a4a4a;
+  border-color: #4a4a4a;
+}
+
+.badge-activa {
+  background-color: #d4edda;
+  color: #155724;
+  border-color: #28a745;
+}
+
+.badge-inactiva {
+  background-color: #f5f5f5;
+  color: #4a4a4a;
+  border-color: #4a4a4a;
+}
+
+/* ── Toggle: flex layout on top of shared btn-toggle base ─────── */
+.instalaciones-btn-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
+}
+
+/* ── Detail view ─────────────────────────────────────────────── */
+.instalaciones-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.instalaciones-agregar-reserva {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+
+/* ── Reservas section ─────────────────────────────────────────── */
+.instalaciones-reservas-section {
+  margin-top: 8px;
+}
+
+.instalaciones-reservas-controles {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.instalaciones-reservas-controles-izq {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.instalaciones-reservas-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111111;
+  margin: 0 0 12px 0;
+  text-align: center;
+}
+
+/* ── Nro. de socio clickeable ─────────────────────────────────── */
+.instalaciones-nro-socio-link {
+  cursor: pointer;
+  text-decoration: underline;
+  color: #111111;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+}
+
+/* ── Modal Ver Socio ──────────────────────────────────────────── */
+.instalaciones-ver-socio-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 520px;
+  width: 100%;
+}
+
+.instalaciones-ver-socio-cerrar {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* .socios-card* → src/styles/SocioCard.css */
+
+.instalaciones-reserva-acciones {
+  display: flex;
+  gap: 6px;
+}
+
+.instalaciones-btn-reserva-editar,
+.instalaciones-btn-reserva-eliminar {
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.instalaciones-btn-reserva-editar {
+  background-color: #ffffff;
+  color: #111111;
+  border: 1px solid #111111;
+}
+
+.instalaciones-btn-reserva-editar:hover {
+  background-color: #f5f5f5;
+}
+
+.instalaciones-btn-reserva-eliminar {
+  background-color: #c0392b;
+  color: #ffffff;
+  border: none;
+}
+
+.instalaciones-btn-reserva-eliminar:hover {
+  background-color: #96281b;
+}
+
+/* ── Secciones en vista lista ─────────────────────────────────── */
+.instalaciones-seccion-separator {
+  margin-top: 32px;
+}
+
+.instalaciones-seccion-separator:first-of-type {
+  margin-top: 0;
+}
+
+.instalaciones-seccion-header {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 16px;
+}
+
+.instalaciones-seccion-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #111111;
+  margin: 0 0 12px 0;
+  text-align: center;
+}
+
+.instalaciones-seccion-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.instalaciones-placeholder {
+  padding: 24px 0;
+  font-style: italic;
+}
+
+/* ── Formulario inline de reserva ─────────────────────────────── */
+.instalaciones-reserva-form {
+  background-color: #ffffff;
+  border: 1px solid #111111;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.instalaciones-reserva-form-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 12px;
+  align-items: start;
+  margin-bottom: 12px;
+}
+
+.instalaciones-reserva-horas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.instalaciones-reserva-form-actions {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ── Checkbox field modifier ──────────────────────────────────── */
+.modal-field.modal-field-checkbox {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.modal-field.modal-field-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  accent-color: #111111;
+  flex-shrink: 0;
+}
+
+/* ── Loading state ────────────────────────────────────────────── */
+.instalaciones-loading {
+  display: flex;
+  justify-content: center;
+  padding: 48px 0;
+}
