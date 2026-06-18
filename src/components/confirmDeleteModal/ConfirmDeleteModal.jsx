@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { AlertTriangle } from 'lucide-react';
+import PropTypes from 'prop-types';
 import '../createForm/CreateSocioForm.css';
 
 function ConfirmDeleteModal({
@@ -18,7 +19,14 @@ function ConfirmDeleteModal({
   if (!open) return null;
 
   return (
-    <div className="csf-overlay" onClick={onCancel}>
+    <div
+      className="csf-overlay"
+      role="button"
+      tabIndex={0}
+      aria-label="Cerrar"
+      onClick={onCancel}
+      onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') onCancel(); }}
+    >
       <div className="csf-wrapper" onClick={(e) => e.stopPropagation()}>
         <motion.div
           initial={{ opacity: 0, y: 16 }}
@@ -79,5 +87,18 @@ function ConfirmDeleteModal({
     </div>
   );
 }
+
+ConfirmDeleteModal.propTypes = {
+  open: PropTypes.bool.isRequired,
+  titulo: PropTypes.string.isRequired,
+  subtitulo: PropTypes.string,
+  mensaje: PropTypes.string.isRequired,
+  onConfirm: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+  guardando: PropTypes.bool,
+  errorModal: PropTypes.string,
+  labelConfirmar: PropTypes.string,
+  labelGuardando: PropTypes.string,
+};
 
 export default ConfirmDeleteModal;

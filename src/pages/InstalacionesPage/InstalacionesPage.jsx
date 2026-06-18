@@ -356,7 +356,10 @@ function InstalacionesPage() {
                               {r.socio ? (
                                 <span
                                   className="instalaciones-nro-socio-link"
+                                  role="button"
+                                  tabIndex={0}
                                   onClick={() => abrirVerSocio(r.socio)}
+                                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') abrirVerSocio(r.socio); }}
                                 >
                                   {r.nro_socio}
                                 </span>

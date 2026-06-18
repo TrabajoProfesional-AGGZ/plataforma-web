@@ -1,6 +1,7 @@
 import { useForm } from 'react-hook-form';
 import { AnimatePresence } from 'framer-motion';
 import { Activity, Users, DollarSign, Tag } from 'lucide-react';
+import PropTypes from 'prop-types';
 import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
@@ -104,7 +105,7 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
                 <StyledInput
                   {...register('concepto_cobro', {
                     validate: (v) => {
-                      if (getValues('arancelada') && !v?.trim()) {
+                      if (getValues('arancelada') && (!v || !v.trim())) {
                         return 'El concepto de cobro es requerido para disciplinas aranceladas';
                       }
                       return true;
@@ -121,3 +122,8 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
     </MultiStepFormShell>
   );
 }
+
+CreateDisciplinaForm.propTypes = {
+  onSuccess: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
+};

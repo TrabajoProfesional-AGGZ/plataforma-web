@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle } from 'lucide-react';
+import PropTypes from 'prop-types';
 
 export const slideVariants = {
   enter: (dir) => ({ x: dir > 0 ? 52 : -52, opacity: 0 }),
@@ -41,21 +42,34 @@ export function Field({ id, label, icon: Icon, error, children }) {
   );
 }
 
+Field.propTypes = {
+  id: PropTypes.string,
+  label: PropTypes.string.isRequired,
+  icon: PropTypes.elementType.isRequired,
+  error: PropTypes.string,
+  children: PropTypes.node.isRequired,
+};
+
 export function StyledInput({ error, ...props }) {
   const [focused, setFocused] = useState(false);
+  const bgColor = focused || error ? '#ffffff' : '#f5f5f5';
+  const borderColor = error ? '#c0392b' : focused ? '#111111' : 'transparent';
   return (
     <input
       {...props}
       onFocus={(e) => { setFocused(true); props.onFocus?.(e); }}
       onBlur={(e) => { setFocused(false); props.onBlur?.(e); }}
       className={`csf-input${error ? ' csf-input--error' : ''}`}
-      style={{
-        background: focused ? '#ffffff' : error ? '#ffffff' : '#f5f5f5',
-        borderColor: error ? '#c0392b' : focused ? '#111111' : 'transparent',
-      }}
+      style={{ background: bgColor, borderColor }}
     />
   );
 }
+
+StyledInput.propTypes = {
+  error: PropTypes.bool,
+  onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
+};
 
 export function FormStep({ direction, children }) {
   return (
@@ -73,20 +87,31 @@ export function FormStep({ direction, children }) {
   );
 }
 
+FormStep.propTypes = {
+  direction: PropTypes.number,
+  children: PropTypes.node.isRequired,
+};
+
 export function StyledSelect({ error, children, ...props }) {
   const [focused, setFocused] = useState(false);
+  const bgColor = focused || error ? '#ffffff' : '#f5f5f5';
+  const borderColor = error ? '#c0392b' : focused ? '#111111' : 'transparent';
   return (
     <select
       {...props}
       onFocus={(e) => { setFocused(true); props.onFocus?.(e); }}
       onBlur={(e) => { setFocused(false); props.onBlur?.(e); }}
       className={`csf-select${error ? ' csf-select--error' : ''}`}
-      style={{
-        background: focused ? '#ffffff' : error ? '#ffffff' : '#f5f5f5',
-        borderColor: error ? '#c0392b' : focused ? '#111111' : 'transparent',
-      }}
+      style={{ background: bgColor, borderColor }}
     >
       {children}
     </select>
   );
 }
+
+StyledSelect.propTypes = {
+  error: PropTypes.bool,
+  children: PropTypes.node.isRequired,
+  onFocus: PropTypes.func,
+  onBlur: PropTypes.func,
+};

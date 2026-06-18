@@ -1,5 +1,6 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
+import PropTypes from 'prop-types';
 import logoVerde from '../../assets/logo-verde.png';
 import './CreateSocioForm.css';
 
@@ -24,8 +25,15 @@ export function MultiStepFormShell({
   const progress = (step / steps.length) * 100;
 
   return (
-    <div className="csf-overlay" onClick={onCancel}>
-      <div className="csf-wrapper" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="csf-overlay"
+      role="button"
+      tabIndex={0}
+      aria-label="Cerrar formulario"
+      onClick={onCancel}
+      onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') onCancel(); }}
+    >
+      <div className="csf-wrapper" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
         <AnimatePresence mode="wait">
           {submitted ? (
             <motion.div
@@ -202,3 +210,22 @@ export function MultiStepFormShell({
     </div>
   );
 }
+
+MultiStepFormShell.propTypes = {
+  steps: PropTypes.arrayOf(PropTypes.shape({ id: PropTypes.number, label: PropTypes.string, icon: PropTypes.elementType })).isRequired,
+  step: PropTypes.number.isRequired,
+  submitted: PropTypes.bool.isRequired,
+  navGuard: PropTypes.bool,
+  isSubmitting: PropTypes.bool,
+  title: PropTypes.string,
+  successTitle: PropTypes.string,
+  successMessage: PropTypes.string,
+  submitLabel: PropTypes.string,
+  submitLoadingLabel: PropTypes.string,
+  onCancel: PropTypes.func.isRequired,
+  goBack: PropTypes.func,
+  goNext: PropTypes.func,
+  nextDisabled: PropTypes.bool,
+  onFormSubmit: PropTypes.func.isRequired,
+  children: PropTypes.node.isRequired,
+};

@@ -9,7 +9,7 @@ jest.mock('../../services/authService');
 import { useAuth } from '../../hooks/useAuth';
 
 jest.mock('../../components/permisosModal/PermisosModal', () => ({
-  PermisosModal: ({ permisos, onClose }) => (
+  PermisosModal: ({ permisos, onClose }) => ( // NOSONAR
     <div>
       <h2>Permisos</h2>
       <ul>{permisos.map((p) => <li key={p}>{p}</li>)}</ul>

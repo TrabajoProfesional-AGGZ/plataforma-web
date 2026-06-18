@@ -57,7 +57,7 @@ jest.mock('../../components/cambiarRolForm/CambiarRolForm', () => ({
 }));
 
 jest.mock('../../components/permisosModal/PermisosModal', () => ({
-  PermisosModal: ({ permisos, onClose }) => (
+  PermisosModal: ({ permisos, onClose }) => ( // NOSONAR
     <div>
       <h2>Permisos</h2>
       <ul>{permisos.map((p) => <li key={p}>{p}</li>)}</ul>

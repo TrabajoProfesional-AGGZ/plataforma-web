@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import PropTypes from 'prop-types';
 import { PERMISO_LABELS } from '../../utils/permisoLabels';
 import '../createForm/CreateSocioForm.css';
 import './PermisosModal.css';
@@ -13,8 +14,15 @@ function PermisosModal({ permisos, onClose }) {
   }, [onClose]);
 
   return (
-    <div className="csf-overlay" onClick={onClose}>
-      <div className="csf-wrapper permisos-modal-wrapper" onClick={(e) => e.stopPropagation()}>
+    <div
+      className="csf-overlay"
+      role="button"
+      tabIndex={0}
+      aria-label="Cerrar"
+      onClick={onClose}
+      onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') onClose(); }}
+    >
+      <div className="csf-wrapper permisos-modal-wrapper" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
         <div className="csf-outer-card">
           <div className="csf-header">
             <h1>Permisos</h1>
@@ -33,5 +41,10 @@ function PermisosModal({ permisos, onClose }) {
     </div>
   );
 }
+
+PermisosModal.propTypes = {
+  permisos: PropTypes.arrayOf(PropTypes.string).isRequired,
+  onClose: PropTypes.func.isRequired,
+};
 
 export { PermisosModal };

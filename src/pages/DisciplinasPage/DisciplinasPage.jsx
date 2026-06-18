@@ -56,6 +56,7 @@ function DisciplinasPage() {
 
   async function handlePausar() {
     const id = disciplinaActual.id;
+    const estadoAnterior = disciplinaActual.estado ?? 'Activa';
     setDisciplinas((prev) =>
       prev.map((d) => (d.id === id ? { ...d, estado: 'Pausada' } : d))
     );
@@ -64,9 +65,60 @@ function DisciplinasPage() {
     setPausarOpen(false);
     try {
       await pausarDisciplina(id);
-    } catch (_e) {
-      // optimistic update already applied — ignore API errors
+    } catch {
+      setDisciplinas((prev) =>
+        prev.map((d) => (d.id === id ? { ...d, estado: estadoAnterior } : d))
+      );
     }
+  }
+
+  function renderListaContenido() {
+    if (loading) {
+      return (
+        <div className="disciplinas-loading">
+          <img src={logo} alt="" className="loading-logo" />
+        </div>
+      );
+    }
+    if (disciplinas.length === 0) {
+      return <p className="disciplinas-empty">No hay disciplinas registradas.</p>;
+    }
+    return (
+      <div className="disciplinas-table-wrapper">
+        <table className="disciplinas-tabla">
+          <thead>
+            <tr>
+              <th>Nombre</th>
+              <th>Cupo máximo</th>
+              <th>Arancelada</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            {disciplinas.map((d) => (
+              <tr
+                key={d.id}
+                className="disciplinas-tr-clickable"
+                onClick={() => { setDisciplinaActual(d); setVista('detalle'); }}
+              >
+                <td>{d.nombre}</td>
+                <td>{d.cupo_maximo} personas</td>
+                <td>
+                  <span className={`disciplinas-badge ${d.arancelada ? 'badge-arancelada' : 'badge-no-arancelada'}`}>
+                    {d.arancelada ? 'Sí' : 'No'}
+                  </span>
+                </td>
+                <td>
+                  <span className={`disciplinas-badge ${d.estado === 'Pausada' ? 'badge-pausada' : 'badge-activa'}`}>
+                    {d.estado ?? 'Activa'}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
   }
 
   return (
@@ -85,48 +137,7 @@ function DisciplinasPage() {
             )}
           </div>
 
-          {loading ? (
-            <div className="disciplinas-loading">
-              <img src={logo} alt="" className="loading-logo" />
-            </div>
-          ) : disciplinas.length === 0 ? (
-            <p className="disciplinas-empty">No hay disciplinas registradas.</p>
-          ) : (
-            <div className="disciplinas-table-wrapper">
-              <table className="disciplinas-tabla">
-                <thead>
-                  <tr>
-                    <th>Nombre</th>
-                    <th>Cupo máximo</th>
-                    <th>Arancelada</th>
-                    <th>Estado</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {disciplinas.map((d) => (
-                    <tr
-                      key={d.id}
-                      className="disciplinas-tr-clickable"
-                      onClick={() => { setDisciplinaActual(d); setVista('detalle'); }}
-                    >
-                      <td>{d.nombre}</td>
-                      <td>{d.cupo_maximo} personas</td>
-                      <td>
-                        <span className={`disciplinas-badge ${d.arancelada ? 'badge-arancelada' : 'badge-no-arancelada'}`}>
-                          {d.arancelada ? 'Sí' : 'No'}
-                        </span>
-                      </td>
-                      <td>
-                        <span className={`disciplinas-badge ${d.estado === 'Pausada' ? 'badge-pausada' : 'badge-activa'}`}>
-                          {d.estado ?? 'Activa'}
-                        </span>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+          {renderListaContenido()}
         </>
       )}
 
