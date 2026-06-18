@@ -1,8 +1,12 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import InstalacionesPage from './InstalacionesPage';
 
+let mockPermisoOverrides = {};
 jest.mock('../../hooks/usePermiso', () => ({
-  usePermiso: () => true,
+  usePermiso: (permiso) => {
+    if (permiso in mockPermisoOverrides) return mockPermisoOverrides[permiso];
+    return true;
+  },
 }));
 
 jest.mock('../../services/instalacionesService', () => ({
@@ -77,6 +81,7 @@ let reservasStore = [];
 
 describe('InstalacionesPage', () => {
   beforeEach(() => {
+    mockPermisoOverrides = {};
     reservasStore = [];
     getInstalaciones.mockResolvedValue([]);
     createInstalacion.mockResolvedValue({ id: 'test-id' });
@@ -252,7 +257,7 @@ describe('InstalacionesPage', () => {
 
   // ── Tests de Ver Socio ──
 
-  test('el botón "Ver Socio" abre un card con los datos del socio', async () => {
+  test('hacer clic en el nro de socio abre un card con sus datos', async () => {
     getReservas.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
@@ -261,14 +266,14 @@ describe('InstalacionesPage', () => {
     crearInstalacionHelper();
     irAlDetalle();
 
-    await waitFor(() => expect(screen.getByText('Ver Socio')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Ver Socio'));
+    await waitFor(() => expect(screen.getByText('1234')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1234'));
 
     expect(screen.getByText('García Juan')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Cerrar' })).toBeInTheDocument();
   });
 
-  test('el card "Ver Socio" se cierra al hacer clic en Cerrar', async () => {
+  test('el card del socio se cierra al hacer clic en Cerrar', async () => {
     getReservas.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
@@ -277,15 +282,15 @@ describe('InstalacionesPage', () => {
     crearInstalacionHelper();
     irAlDetalle();
 
-    await waitFor(() => expect(screen.getByText('Ver Socio')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Ver Socio'));
+    await waitFor(() => expect(screen.getByText('1234')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1234'));
     expect(screen.getByText('García Juan')).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Cerrar' }));
     expect(screen.queryByText('García Juan')).not.toBeInTheDocument();
   });
 
-  test('ESC cierra el card "Ver Socio"', async () => {
+  test('ESC cierra el card del socio', async () => {
     getReservas.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
@@ -294,8 +299,8 @@ describe('InstalacionesPage', () => {
     crearInstalacionHelper();
     irAlDetalle();
 
-    await waitFor(() => expect(screen.getByText('Ver Socio')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Ver Socio'));
+    await waitFor(() => expect(screen.getByText('1234')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1234'));
     expect(screen.getByText('García Juan')).toBeInTheDocument();
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByText('García Juan')).not.toBeInTheDocument();
@@ -495,7 +500,7 @@ describe('InstalacionesPage', () => {
     });
   });
 
-  test('hacer click en el overlay del modal "Ver Socio" lo cierra', async () => {
+  test('hacer click en el overlay del card del socio lo cierra', async () => {
     getReservas.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
@@ -504,8 +509,8 @@ describe('InstalacionesPage', () => {
     crearInstalacionHelper();
     irAlDetalle();
 
-    await waitFor(() => expect(screen.getByText('Ver Socio')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Ver Socio'));
+    await waitFor(() => expect(screen.getByText('1234')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1234'));
     expect(screen.getByText('García Juan')).toBeInTheDocument();
 
     const overlay = document.querySelector('.instalaciones-ver-socio-wrapper')?.closest('.modal-overlay');
@@ -597,8 +602,8 @@ describe('InstalacionesPage', () => {
     crearInstalacionHelper();
     irAlDetalle();
 
-    await waitFor(() => expect(screen.getByText('Ver Socio')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Ver Socio'));
+    await waitFor(() => expect(screen.getByText('9999')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('9999'));
 
     expect(screen.getByText('12345678')).toBeInTheDocument();
     expect(screen.getByText('1990-05-20')).toBeInTheDocument();
@@ -606,6 +611,45 @@ describe('InstalacionesPage', () => {
     expect(screen.getByText('11-1234-5678')).toBeInTheDocument();
     expect(screen.getByText('Junior')).toBeInTheDocument();
     expect(screen.getByText('Activo')).toBeInTheDocument();
+  });
+
+  // ── Tests de IDs y columna Acciones ──
+
+  test('muestra el ID de la instalación bajo el detalle del card', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-known-id', nombre: 'Pileta', tipo: 'Deportiva', capacidad_maxima: 20, valor_hora: 2000, activa: true },
+    ]);
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Pileta')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Pileta'));
+    expect(screen.getByText('ID: inst-known-id')).toBeInTheDocument();
+  });
+
+  test('muestra la columna ID en la tabla de reservas', async () => {
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'reserva-id-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-09-01', hora_inicio: '10:00', hora_fin: '11:00' },
+    ]));
+
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('2026-09-01')).toBeInTheDocument());
+    expect(screen.getByText('reserva-id-1')).toBeInTheDocument();
+  });
+
+  test('no muestra la columna Acciones si el usuario no tiene permiso borrar_reserva', async () => {
+    mockPermisoOverrides = { borrar_reserva: false };
+    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-perm', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-09-10', hora_inicio: '12:00', hora_fin: '13:00' },
+    ]));
+
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('2026-09-10')).toBeInTheDocument());
+    expect(screen.queryByRole('columnheader', { name: 'Acciones' })).not.toBeInTheDocument();
   });
 
   test('el modal Ver Socio muestra categoría y estado cuando son strings', async () => {
@@ -626,8 +670,8 @@ describe('InstalacionesPage', () => {
     crearInstalacionHelper();
     irAlDetalle();
 
-    await waitFor(() => expect(screen.getByText('Ver Socio')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Ver Socio'));
+    await waitFor(() => expect(screen.getByText('8888')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('8888'));
 
     expect(screen.getByText('Adulto')).toBeInTheDocument();
     expect(screen.getByText('Moroso')).toBeInTheDocument();

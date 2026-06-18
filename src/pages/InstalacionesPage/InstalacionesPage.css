@@ -172,28 +172,11 @@
   background-color: #f5f5f5;
 }
 
-/* ── Celda de socio con botón Ver Socio ── */
-.instalaciones-socio-cell {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.instalaciones-btn-ver-socio {
-  padding: 3px 9px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
+/* ── Nro. de socio clickeable ── */
+.instalaciones-nro-socio-link {
   cursor: pointer;
-  border: 1px solid #111111;
-  background-color: #ffffff;
+  text-decoration: underline;
   color: #111111;
-  white-space: nowrap;
-  transition: background-color 0.15s;
-}
-
-.instalaciones-btn-ver-socio:hover {
-  background-color: #f5f5f5;
 }
 
 /* ── Modal Ver Socio (wrapper + card de socios) ── */

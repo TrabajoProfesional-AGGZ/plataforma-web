@@ -170,6 +170,7 @@ function DisciplinasPage() {
                 </div>
               ))}
             </div>
+            <p className="detalle-id">ID: {disciplinaActual.id}</p>
           </div>
 
           {puedeBorrarDisciplina && (

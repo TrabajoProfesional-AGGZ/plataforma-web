@@ -210,6 +210,16 @@ describe('DisciplinasPage', () => {
     expect(screen.queryByText('Concepto de cobro')).not.toBeInTheDocument();
   });
 
+  test('muestra el ID de la disciplina bajo el detalle del card', async () => {
+    getDisciplinas.mockResolvedValue([
+      { id: 'disc-known-id', nombre: 'Básquet', cupo_maximo: 12, arancelada: false, concepto_cobro: '', estado: 'Activa' },
+    ]);
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Básquet')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Básquet'));
+    expect(screen.getByText('ID: disc-known-id')).toBeInTheDocument();
+  });
+
   test('muestra badge "Pausada" para disciplinas con estado Pausada', async () => {
     getDisciplinas.mockResolvedValue([
       { id: 'disc-1', nombre: 'Yoga', cupo_maximo: 10, arancelada: false, concepto_cobro: '', estado: 'Pausada' },

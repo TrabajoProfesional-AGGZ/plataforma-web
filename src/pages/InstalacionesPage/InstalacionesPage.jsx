@@ -278,6 +278,7 @@ function InstalacionesPage() {
                 </div>
               ))}
             </div>
+            <p className="detalle-id">ID: {instalacionActual.id}</p>
           </div>
 
           {puedeBorrarInstalacion && (
@@ -333,11 +334,12 @@ function InstalacionesPage() {
                   <table className="instalaciones-tabla">
                     <thead>
                       <tr>
+                        <th>ID</th>
                         <th>Nro. de socio</th>
                         <th>Fecha</th>
                         <th>Inicio</th>
                         <th>Fin</th>
-                        <th>Acciones</th>
+                        {puedeBorrarReserva && <th>Acciones</th>}
                       </tr>
                     </thead>
                     <tbody>
@@ -348,34 +350,34 @@ function InstalacionesPage() {
                         )
                         .map((r) => (
                           <tr key={r.id}>
+                            <td>{r.id}</td>
                             <td>
-                              <div className="instalaciones-socio-cell">
-                                <span>{r.nro_socio}</span>
-                                {r.socio && (
-                                  <button
-                                    className="instalaciones-btn-ver-socio"
-                                    onClick={() => abrirVerSocio(r.socio)}
-                                  >
-                                    Ver Socio
-                                  </button>
-                                )}
-                              </div>
+                              {r.socio ? (
+                                <span
+                                  className="instalaciones-nro-socio-link"
+                                  onClick={() => abrirVerSocio(r.socio)}
+                                >
+                                  {r.nro_socio}
+                                </span>
+                              ) : (
+                                r.nro_socio
+                              )}
                             </td>
                             <td>{r.fecha_reserva ?? r.fecha}</td>
                             <td>{r.hora_inicio}</td>
                             <td>{r.hora_fin}</td>
-                            <td>
-                              <div className="instalaciones-reserva-acciones">
-                                {puedeBorrarReserva && (
+                            {puedeBorrarReserva && (
+                              <td>
+                                <div className="instalaciones-reserva-acciones">
                                   <button
                                     className="instalaciones-btn-reserva-eliminar"
                                     onClick={() => abrirEliminarReserva(r)}
                                   >
                                     Eliminar
                                   </button>
-                                )}
-                              </div>
-                            </td>
+                                </div>
+                              </td>
+                            )}
                           </tr>
                         ))}
                     </tbody>
