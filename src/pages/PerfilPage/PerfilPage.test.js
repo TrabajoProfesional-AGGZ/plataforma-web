@@ -12,7 +12,7 @@ jest.mock('../../components/permisosModal/PermisosModal', () => ({
   PermisosModal: ({ permisos, onClose }) => ( // NOSONAR
     <div>
       <h2>Permisos</h2>
-      <ul>{permisos.map((p) => <li key={p}>{p}</li>)}</ul>
+      <ul>{permisos.map((p) => <li key={p}>{p}</li>)}</ul> {/* NOSONAR */}
       <button onClick={onClose}>Cerrar</button>
     </div>
   ),

@@ -25,15 +25,14 @@ export function MultiStepFormShell({
   const progress = (step / steps.length) * 100;
 
   return (
-    <div
+    <button
+      type="button"
       className="csf-overlay"
-      role="button"
-      tabIndex={0}
       aria-label="Cerrar formulario"
       onClick={onCancel}
       onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') onCancel(); }}
     >
-      <div className="csf-wrapper" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
+      <div role="dialog" aria-modal="true" className="csf-wrapper" onClick={(e) => e.stopPropagation()} onKeyDown={(e) => e.stopPropagation()}>
         <AnimatePresence mode="wait">
           {submitted ? (
             <motion.div
@@ -207,7 +206,7 @@ export function MultiStepFormShell({
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </button>
   );
 }
 

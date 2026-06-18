@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useMultiStepFormState } from './useMultiStepFormState';
 
-export function useMultiStepForm(stepFields, useFormOptions = { mode: 'onTouched' }) {
+const DEFAULT_FORM_OPTIONS = { mode: 'onTouched' };
+
+export function useMultiStepForm(stepFields, useFormOptions = DEFAULT_FORM_OPTIONS) {
   const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
   const [formError, setFormError] = useState('');
   const {

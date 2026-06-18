@@ -29,6 +29,10 @@ export function FieldError({ message }) {
   );
 }
 
+FieldError.propTypes = {
+  message: PropTypes.string,
+};
+
 export function Field({ id, label, icon: Icon, error, children }) {
   return (
     <div className="csf-field">
@@ -50,10 +54,16 @@ Field.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
+function getBorderColor(error, focused) {
+  if (error) return '#c0392b';
+  if (focused) return '#111111';
+  return 'transparent';
+}
+
 export function StyledInput({ error, ...props }) {
   const [focused, setFocused] = useState(false);
   const bgColor = focused || error ? '#ffffff' : '#f5f5f5';
-  const borderColor = error ? '#c0392b' : focused ? '#111111' : 'transparent';
+  const borderColor = getBorderColor(error, focused);
   return (
     <input
       {...props}
@@ -95,7 +105,7 @@ FormStep.propTypes = {
 export function StyledSelect({ error, children, ...props }) {
   const [focused, setFocused] = useState(false);
   const bgColor = focused || error ? '#ffffff' : '#f5f5f5';
-  const borderColor = error ? '#c0392b' : focused ? '#111111' : 'transparent';
+  const borderColor = getBorderColor(error, focused);
   return (
     <select
       {...props}

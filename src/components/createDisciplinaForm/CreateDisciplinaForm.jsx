@@ -92,12 +92,8 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
                 Arancelada
               </span>
               <label className="csf-checkbox-label">
-                <input
-                  type="checkbox"
-                  className="csf-checkbox-input"
-                  {...register('arancelada')}
-                />
-                La disciplina tiene un arancel asociado
+                <input type="checkbox" className="csf-checkbox-input" {...register('arancelada')} />
+                <span>La disciplina tiene un arancel asociado</span>
               </label>
             </div>
             {arancelada && (
@@ -105,7 +101,7 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
                 <StyledInput
                   {...register('concepto_cobro', {
                     validate: (v) => {
-                      if (getValues('arancelada') && (!v || !v.trim())) {
+                      if (getValues('arancelada') && !v?.trim()) {
                         return 'El concepto de cobro es requerido para disciplinas aranceladas';
                       }
                       return true;

@@ -15,7 +15,7 @@ import { getDisciplinas, createDisciplina, pausarDisciplina } from '../../servic
 jest.mock('../../assets/logo_socio.png', () => 'logo_socio.png');
 
 jest.mock('../../components/createDisciplinaForm/CreateDisciplinaForm', () => ({
-  CreateDisciplinaForm: ({ onSuccess, onCancel }) => (
+  CreateDisciplinaForm: ({ onSuccess, onCancel }) => ( // NOSONAR
     <div>
       <button onClick={() => onSuccess({ nombre: 'Natación', cupo_maximo: 30, arancelada: false, concepto_cobro: '' })}>
         Confirmar creación

@@ -19,15 +19,14 @@ function ConfirmDeleteModal({
   if (!open) return null;
 
   return (
-    <div
+    <button
+      type="button"
       className="csf-overlay"
-      role="button"
-      tabIndex={0}
       aria-label="Cerrar"
       onClick={onCancel}
       onKeyDown={(e) => { if (e.key === 'Escape' || e.key === 'Enter') onCancel(); }}
     >
-      <div className="csf-wrapper" onClick={(e) => e.stopPropagation()}>
+      <div role="dialog" aria-modal="true" className="csf-wrapper" onClick={(e) => e.stopPropagation()}>
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -84,7 +83,7 @@ function ConfirmDeleteModal({
           </div>
         </motion.div>
       </div>
-    </div>
+    </button>
   );
 }
 

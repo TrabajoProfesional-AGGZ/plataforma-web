@@ -9,6 +9,12 @@
   padding: 24px 16px;
 }
 
+button.csf-overlay {
+  border: none;
+  cursor: default;
+  width: 100%;
+}
+
 .csf-wrapper {
   width: 100%;
   max-width: 520px;

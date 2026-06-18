@@ -15,10 +15,10 @@ export function validarFechaNacimiento(v) {
   if (Number.isNaN(d.getTime())) return 'Fecha inválida';
   if (d > now) return 'La fecha no puede ser futura';
   if (now.getFullYear() - d.getFullYear() > 120) return 'Fecha inválida';
-  return true;
+  return undefined;
 }
 
 export function validarFechaNacimientoOpcional(v) {
-  if (!v) return true;
+  if (!v) return undefined;
   return validarFechaNacimiento(v);
 }

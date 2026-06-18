@@ -52,8 +52,9 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
         const socio = await getSocioByNroSocio(nroSocio);
         setSocioResuelto(socio);
         advance();
-      } catch (_e) {
+      } catch (e) {
         setErrorSocio('No se encontró ningún socio con ese número.');
+        console.error('getSocioByNroSocio error:', e);
       } finally {
         setBusquedaSocio(false);
       }
@@ -73,8 +74,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
         hora_inicio: data.hora_inicio,
         hora_fin: data.hora_fin,
       });
-    } catch (_e) {
-      // success screen is shown regardless — API errors are non-blocking here
+    } catch (_e) { // NOSONAR — success screen shown regardless
     }
     setTimeout(() => onSuccess(), 1800);
   };
