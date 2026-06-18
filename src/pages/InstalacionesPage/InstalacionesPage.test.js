@@ -372,7 +372,7 @@ describe('InstalacionesPage', () => {
     irAlDetalle();
     fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
     expect(screen.getByText(/estás seguro/i)).toBeInTheDocument();
-    fireEvent.click(document.querySelector('.modal-overlay'));
+    fireEvent.click(document.querySelector('.csf-overlay'));
     expect(screen.queryByText(/estás seguro/i)).not.toBeInTheDocument();
   });
 
@@ -435,7 +435,7 @@ describe('InstalacionesPage', () => {
     await waitFor(() => expect(screen.getByText('2026-07-01')).toBeInTheDocument());
     fireEvent.click(ultimoBoton('Eliminar'));
     expect(screen.getByText(/estás seguro/i)).toBeInTheDocument();
-    fireEvent.click(document.querySelector('.modal-overlay'));
+    fireEvent.click(document.querySelector('.csf-overlay'));
     expect(screen.queryByText(/estás seguro/i)).not.toBeInTheDocument();
     expect(screen.getByText('2026-07-01')).toBeInTheDocument();
   });

@@ -482,7 +482,7 @@ describe('UsuariosPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
     await waitFor(() => expect(screen.getByText(/eliminar usuario/i)).toBeInTheDocument());
 
-    fireEvent.click(document.querySelector('.modal-overlay'));
+    fireEvent.click(document.querySelector('.csf-overlay'));
     expect(screen.queryByText(/eliminar usuario/i)).not.toBeInTheDocument();
   });
 

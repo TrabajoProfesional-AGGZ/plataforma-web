@@ -150,7 +150,7 @@ describe('DisciplinasPage', () => {
     irAlDetalle();
     fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
     expect(screen.getByText(/pausar disciplina/i)).toBeInTheDocument();
-    fireEvent.click(document.querySelector('.modal-overlay'));
+    fireEvent.click(document.querySelector('.csf-overlay'));
     expect(screen.queryByText(/pausar disciplina/i)).not.toBeInTheDocument();
   });
 

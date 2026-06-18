@@ -375,7 +375,7 @@ describe('SociosPage', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
-    const modal = screen.getByRole('heading', { name: /eliminar socio/i }).closest('.modal');
+    const modal = screen.getByRole('heading', { name: /eliminar socio/i }).closest('.csf-outer-card');
     fireEvent.click(within(modal).getByRole('button', { name: /eliminar/i }));
 
     await waitFor(() => {
@@ -474,7 +474,7 @@ describe('SociosPage', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
-    const modal = screen.getByRole('heading', { name: /eliminar socio/i }).closest('.modal');
+    const modal = screen.getByRole('heading', { name: /eliminar socio/i }).closest('.csf-outer-card');
     fireEvent.click(within(modal).getByRole('button', { name: /eliminar/i }));
 
     await waitFor(() => {
@@ -497,7 +497,7 @@ describe('SociosPage', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
-    const modal = screen.getByRole('heading', { name: /eliminar socio/i }).closest('.modal');
+    const modal = screen.getByRole('heading', { name: /eliminar socio/i }).closest('.csf-outer-card');
     fireEvent.click(within(modal).getByRole('button', { name: /eliminar/i }));
 
     await waitFor(() => {
@@ -543,7 +543,7 @@ describe('SociosPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
     await waitFor(() => expect(screen.getByRole('heading', { name: /eliminar socio/i })).toBeInTheDocument());
 
-    fireEvent.click(document.querySelector('.modal-overlay'));
+    fireEvent.click(document.querySelector('.csf-overlay'));
     expect(screen.queryByRole('heading', { name: /eliminar socio/i })).not.toBeInTheDocument();
   });
 
