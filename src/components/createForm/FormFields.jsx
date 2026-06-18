@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, User, CreditCard, Phone, Mail } from 'lucide-react';
 import PropTypes from 'prop-types';
 
 export const slideVariants = {
@@ -100,6 +100,54 @@ export function FormStep({ direction, children }) {
 FormStep.propTypes = {
   direction: PropTypes.number,
   children: PropTypes.node.isRequired,
+};
+
+export const SOCIOS_STEPS = [
+  { id: 1, label: 'Personal', icon: User },
+  { id: 2, label: 'Documento', icon: CreditCard },
+  { id: 3, label: 'Contacto', icon: Phone },
+];
+
+export function DocTypeOptions() {
+  return (
+    <>
+      <option value="">Seleccionar...</option>
+      <option value="DNI">DNI — Documento Nacional de Identidad</option>
+      <option value="LE">LE — Libreta de Enrolamiento</option>
+      <option value="PAS">PAS — Pasaporte</option>
+    </>
+  );
+}
+
+export function DocHint() {
+  return (
+    <div className="csf-hint">
+      Ingresá el número tal como aparece en el documento, sin puntos ni espacios.
+    </div>
+  );
+}
+
+const EMAIL_PATTERN = { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Ingresá un correo válido' };
+
+export function EmailField({ register, errors, required = false, placeholder = 'maria@ejemplo.com' }) {
+  const rules = { pattern: EMAIL_PATTERN, ...(required && { required: 'El correo es requerido' }) };
+  return (
+    <Field label="Correo electrónico" icon={Mail} error={errors.email?.message}>
+      <StyledInput
+        {...register('email', rules)}
+        type="email"
+        placeholder={placeholder}
+        error={!!errors.email}
+      />
+    </Field>
+  );
+}
+
+EmailField.propTypes = {
+  register: PropTypes.func.isRequired,
+  errors: PropTypes.object.isRequired,
+  required: PropTypes.bool,
+  placeholder: PropTypes.string,
 };
 
 export function StyledSelect({ error, children, ...props }) {

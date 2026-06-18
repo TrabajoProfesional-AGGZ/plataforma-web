@@ -5,6 +5,13 @@ import { cambiarRolUsuario } from '../../services/usuariosService';
 import '../createForm/CreateSocioForm.css';
 import { StyledSelect } from '../createForm/FormFields';
 
+const STEP_SHARED_PROPS = {
+  animate: { x: 0, opacity: 1 },
+  exit: { x: -52, opacity: 0 },
+  transition: { duration: 0.26, ease: 'easeInOut' },
+  className: 'csf-fields',
+};
+
 export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
   const [fase, setFase] = useState('seleccion');
   const [rolSeleccionado, setRolSeleccionado] = useState(usuario.rol?.nombre ?? '');
@@ -50,10 +57,7 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
                 <motion.div
                   key="seleccion"
                   initial={{ x: 0, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: -52, opacity: 0 }}
-                  transition={{ duration: 0.26, ease: 'easeInOut' }}
-                  className="csf-fields"
+                  {...STEP_SHARED_PROPS}
                 >
                   <div className="csf-field">
                     <label className="csf-label">
@@ -100,10 +104,7 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
                 <motion.div
                   key="confirmacion"
                   initial={{ x: 52, opacity: 0 }}
-                  animate={{ x: 0, opacity: 1 }}
-                  exit={{ x: -52, opacity: 0 }}
-                  transition={{ duration: 0.26, ease: 'easeInOut' }}
-                  className="csf-fields"
+                  {...STEP_SHARED_PROPS}
                 >
                   <div style={{
                     backgroundColor: '#fffbeb',

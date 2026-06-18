@@ -2,21 +2,17 @@ import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import {
   User, CreditCard, Phone,
-  Calendar, Mail, MapPin, Activity, Tag,
+  Calendar, MapPin, Activity, Tag,
 } from 'lucide-react';
 import { updateSocio } from '../../services/sociosService';
 import { validarFechaNacimientoOpcional, getDocNumberRules } from '../../utils/formValidators';
 import { fetchEstadosSocio, fetchCategoriasSocio } from '../../services/catalogosService';
 import '../createForm/CreateSocioForm.css';
-import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFields';
+import { Field, StyledInput, StyledSelect, FormStep, SOCIOS_STEPS, DocHint, EmailField } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepForm } from '../../hooks/useMultiStepForm';
 
-const STEPS = [
-  { id: 1, label: 'Personal', icon: User },
-  { id: 2, label: 'Documento', icon: CreditCard },
-  { id: 3, label: 'Contacto', icon: Phone },
-];
+const STEPS = SOCIOS_STEPS;
 
 const stepFields = {
   1: ['nombre', 'apellido', 'fecha_nacimiento', 'genero', 'estado', 'categoria'],
@@ -169,27 +165,13 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
                 style={{ textTransform: 'uppercase' }}
               />
             </Field>
-            <div className="csf-hint">
-              Ingresá el número tal como aparece en el documento, sin puntos ni espacios.
-            </div>
+            <DocHint />
           </FormStep>
         )}
 
         {step === 3 && (
           <FormStep key="step3" direction={direction}>
-            <Field label="Correo electrónico" icon={Mail} error={errors.email?.message}>
-              <StyledInput
-                {...register('email', {
-                  pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: 'Ingresá un correo válido',
-                  },
-                })}
-                type="email"
-                placeholder="ej: juan@ejemplo.com"
-                error={!!errors.email}
-              />
-            </Field>
+            <EmailField register={register} errors={errors} placeholder="ej: juan@ejemplo.com" />
             <div className="csf-grid-2">
               <Field label="Teléfono" icon={Phone} error={errors.telefono?.message}>
                 <StyledInput

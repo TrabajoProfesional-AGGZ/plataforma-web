@@ -6,28 +6,14 @@ import { EditSocioForm } from '../../components/editForm/EditSocioForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
+import { useModalEscape } from '../../hooks/useModalEscape';
+import { estadoConfig } from '../../utils/estadoConfig';
 import logo from '../../assets/logo_socio.png';
-import logoVerde from '../../assets/logo-verde.png';
-import logoRojo from '../../assets/logo-rojo.png';
-import logoAmarillo from '../../assets/logo-amarillo.png';
-import logoNaranja from '../../assets/logo-naranja.png'
 import './SociosPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/ListDetailShared.css';
 import '../../styles/SocioCard.css';
 import '../../styles/PageTableHeader.css';
-
-const ESTADO_CONFIG = {
-  'Activo': { logo: logoVerde,    bg: '#a7daa7', border: '#0D6E0D' },
-  'Moroso': { logo: logoRojo,     bg: '#f4bebe', border: '#A01414' },
-  'Inactivo': {logo: logoAmarillo, bg: '#f5e9b2', border: '#9A6200' },
-  'Suspendido': {logo: logoNaranja, bg: '#ffbd98', border: '#f14701'}
-};
-const ESTADO_DEFAULT = { logo: logoAmarillo, bg: '#f4ecb5ee', border: '#9A6200' };
-
-function estadoConfig(estado) {
-  return ESTADO_CONFIG[estado] ?? ESTADO_DEFAULT;
-}
 
 function getValorOrden(socio, campo) {
   const val = socio[campo];
@@ -70,18 +56,11 @@ function SociosPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const anyModalOpen = crearModalOpen || editarModalOpen || eliminarModalOpen;
-  useEffect(() => {
-    if (!anyModalOpen) return;
-    function handleKeyDown(e) {
-      if (e.key !== 'Escape') return;
-      if (crearModalOpen) setCrearModalOpen(false);
-      else if (editarModalOpen) setEditarModalOpen(false);
-      else if (eliminarModalOpen) setEliminarModalOpen(false);
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [anyModalOpen, crearModalOpen, editarModalOpen, eliminarModalOpen]);
+  useModalEscape([
+    [crearModalOpen, setCrearModalOpen],
+    [editarModalOpen, setEditarModalOpen],
+    [eliminarModalOpen, setEliminarModalOpen],
+  ]);
 
   async function cargarSocios() {
     setLoading(true);

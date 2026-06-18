@@ -1,20 +1,16 @@
 import { AnimatePresence } from 'framer-motion';
 import {
   User, CreditCard, Phone,
-  Calendar, Mail, MapPin,
+  Calendar, MapPin,
 } from 'lucide-react';
 import { createSocio } from '../../services/sociosService';
 import { validarFechaNacimiento, getDocNumberRules } from '../../utils/formValidators';
-import { Field, StyledInput, StyledSelect, FormStep } from './FormFields';
+import { Field, StyledInput, StyledSelect, FormStep, SOCIOS_STEPS, DocTypeOptions, DocHint, EmailField } from './FormFields';
 import { MultiStepFormShell } from './MultiStepFormShell';
 import { useMultiStepForm } from '../../hooks/useMultiStepForm';
 import './CreateSocioForm.css';
 
-const STEPS = [
-  { id: 1, label: 'Personal', icon: User },
-  { id: 2, label: 'Documento', icon: CreditCard },
-  { id: 3, label: 'Contacto', icon: Phone },
-];
+const STEPS = SOCIOS_STEPS;
 
 const stepFields = {
   1: ['firstName', 'lastName', 'birthDate', 'gender'],
@@ -124,10 +120,7 @@ export function CreateSocioForm({ onSuccess, onCancel }) {
                 {...register('docType', { required: 'Seleccioná un tipo' })}
                 error={!!errors.docType}
               >
-                <option value="">Seleccionar...</option>
-                <option value="DNI">DNI — Documento Nacional de Identidad</option>
-                <option value="LE">LE — Libreta de Enrolamiento</option>
-                <option value="PAS">PAS — Pasaporte</option>
+                <DocTypeOptions />
               </StyledSelect>
             </Field>
             <Field label="Número de documento" icon={CreditCard} error={errors.docNumber?.message}>
@@ -139,28 +132,13 @@ export function CreateSocioForm({ onSuccess, onCancel }) {
                 style={{ textTransform: 'uppercase' }}
               />
             </Field>
-            <div className="csf-hint">
-              Ingresá el número tal como aparece en el documento, sin puntos ni espacios.
-            </div>
+            <DocHint />
           </FormStep>
         )}
 
         {step === 3 && (
           <FormStep key="step3" direction={direction}>
-            <Field label="Correo electrónico" icon={Mail} error={errors.email?.message}>
-              <StyledInput
-                {...register('email', {
-                  required: 'El correo es requerido',
-                  pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: 'Ingresá un correo válido',
-                  },
-                })}
-                type="email"
-                placeholder="maria@ejemplo.com"
-                error={!!errors.email}
-              />
-            </Field>
+            <EmailField register={register} errors={errors} required />
             <Field label="Teléfono (opcional)" icon={Phone} error={errors.phone?.message}>
               <StyledInput
                 {...register('phone', {

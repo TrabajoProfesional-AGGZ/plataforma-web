@@ -8,7 +8,7 @@ import { crearUsuario } from '../../services/usuariosService';
 import { validarFechaNacimiento, getDocNumberRules } from '../../utils/formValidators';
 import { fetchRoles } from '../../services/rolesService';
 import '../createForm/CreateSocioForm.css';
-import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFields';
+import { Field, StyledInput, StyledSelect, FormStep, DocTypeOptions, DocHint, EmailField } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepForm } from '../../hooks/useMultiStepForm';
 
@@ -123,10 +123,7 @@ export function CreateUserForm({ onSuccess, onCancel }) {
                 {...register('tipoDoc', { required: 'Seleccioná un tipo' })}
                 error={!!errors.tipoDoc}
               >
-                <option value="">Seleccionar...</option>
-                <option value="DNI">DNI — Documento Nacional de Identidad</option>
-                <option value="LE">LE — Libreta de Enrolamiento</option>
-                <option value="PAS">PAS — Pasaporte</option>
+                <DocTypeOptions />
               </StyledSelect>
             </Field>
             <Field label="Número de documento" icon={CreditCard} error={errors.nroDocumento?.message}>
@@ -138,28 +135,13 @@ export function CreateUserForm({ onSuccess, onCancel }) {
                 style={{ textTransform: 'uppercase' }}
               />
             </Field>
-            <div className="csf-hint">
-              Ingresá el número tal como aparece en el documento, sin puntos ni espacios.
-            </div>
+            <DocHint />
           </FormStep>
         )}
 
         {step === 3 && (
           <FormStep key="step3" direction={direction}>
-            <Field label="Correo electrónico" icon={Mail} error={errors.email?.message}>
-              <StyledInput
-                {...register('email', {
-                  required: 'El correo es requerido',
-                  pattern: {
-                    value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                    message: 'Ingresá un correo válido',
-                  },
-                })}
-                type="email"
-                placeholder="maria@ejemplo.com"
-                error={!!errors.email}
-              />
-            </Field>
+            <EmailField register={register} errors={errors} required />
             <Field label="Contraseña" icon={Lock} error={errors.password?.message}>
               <StyledInput
                 {...register('password', {

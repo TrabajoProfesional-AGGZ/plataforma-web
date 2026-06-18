@@ -9,6 +9,7 @@ import { CambiarRolForm } from '../../components/cambiarRolForm/CambiarRolForm';
 import { PermisosModal } from '../../components/permisosModal/PermisosModal';
 import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
+import { useModalEscape } from '../../hooks/useModalEscape';
 import { useAuthContext } from '../../context/AuthContext';
 import logo from '../../assets/logo_socio.png';
 import logoVerde from '../../assets/logo-verde.png';
@@ -75,19 +76,12 @@ function UsuariosPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const anyModalOpen = crearModalOpen || editarModalOpen || eliminarModalOpen || cambiarRolModalOpen || permisosModalOpen;
-  useEffect(() => {
-    if (!anyModalOpen) return;
-    function handleKeyDown(e) {
-      if (e.key !== 'Escape') return;
-      if (crearModalOpen) setCrearModalOpen(false);
-      else if (editarModalOpen) setEditarModalOpen(false);
-      else if (eliminarModalOpen) setEliminarModalOpen(false);
-      else if (cambiarRolModalOpen) setCambiarRolModalOpen(false);
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [anyModalOpen, crearModalOpen, editarModalOpen, eliminarModalOpen, cambiarRolModalOpen, permisosModalOpen]);
+  useModalEscape([
+    [crearModalOpen, setCrearModalOpen],
+    [editarModalOpen, setEditarModalOpen],
+    [eliminarModalOpen, setEliminarModalOpen],
+    [cambiarRolModalOpen, setCambiarRolModalOpen],
+  ]);
 
   async function fetchYActualizarUsuarios() {
     setLoading(true);

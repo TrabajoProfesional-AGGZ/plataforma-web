@@ -7,29 +7,13 @@ import { getInstalaciones, createInstalacion, deleteInstalacion } from '../../se
 import { getReservas, deleteReserva } from '../../services/reservasService';
 import { getSocios } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
+import { estadoConfig } from '../../utils/estadoConfig';
 import logo from '../../assets/logo_socio.png';
-import logoVerde from '../../assets/logo-verde.png';
-import logoRojo from '../../assets/logo-rojo.png';
-import logoAmarillo from '../../assets/logo-amarillo.png';
-import logoNaranja from '../../assets/logo-naranja.png';
 import './InstalacionesPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/SocioCard.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
-
-const ESTADO_CONFIG = {
-  'Activo':     { logo: logoVerde,    bg: '#a7daa7', border: '#0D6E0D' },
-  'Moroso':     { logo: logoRojo,     bg: '#f4bebe', border: '#A01414' },
-  'Inactivo':   { logo: logoAmarillo, bg: '#f5e9b2', border: '#9A6200' },
-  'Suspendido': { logo: logoNaranja,  bg: '#ffbd98',   border: '#f14701' },
-};
-const ESTADO_DEFAULT = { logo: logoAmarillo, bg: '#f5e9b2', border: '#9A6200' };
-
-function estadoConfig(estado) {
-  const nombre = estado?.nombre ?? estado ?? '';
-  return ESTADO_CONFIG[nombre] ?? ESTADO_DEFAULT;
-}
 
 function InstalacionesPage() {
   const puedeVerInstalaciones = usePermiso('ver_instalaciones');
