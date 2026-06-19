@@ -30,6 +30,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
   const [busquedaSocio, setBusquedaSocio] = useState(false);
   const [errorSocio, setErrorSocio] = useState('');
   const [socioResuelto, setSocioResuelto] = useState(null);
+  const [submitError, setSubmitError] = useState('');
 
   const {
     register,
@@ -66,7 +67,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
   };
 
   const onSubmit = async (data) => {
-    setSubmitted(true);
+    setSubmitError('');
     try {
       await createReserva({
         id_socio: socioResuelto.id,
@@ -75,9 +76,15 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
         hora_inicio: data.hora_inicio,
         hora_fin: data.hora_fin,
       });
-    } catch (_e) { // NOSONAR — success screen shown regardless
+      setSubmitted(true);
+      setTimeout(() => onSuccess(), 1800);
+    } catch (e) {
+      setSubmitError(
+        e.message === 'superposicion'
+          ? 'Ya existe una reserva en ese horario para esta instalación.'
+          : 'No se pudo registrar la reserva. Intentá de nuevo.'
+      );
     }
-    setTimeout(() => onSuccess(), 1800);
   };
 
   return (
@@ -171,6 +178,12 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
                 />
               </Field>
             </div>
+            {submitError && (
+              <p className="csf-error">
+                <AlertCircle size={12} />
+                {submitError}
+              </p>
+            )}
           </FormStep>
         )}
       </AnimatePresence>

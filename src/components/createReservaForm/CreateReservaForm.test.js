@@ -238,12 +238,23 @@ describe('CreateReservaForm', () => {
     expect(screen.getByText('García Juan')).toBeInTheDocument();
   });
 
-  test('llama onSuccess incluso si createReserva falla', async () => {
+  test('muestra error genérico si createReserva falla con error de red', async () => {
     createReserva.mockRejectedValue(new Error('error de red'));
     await llenarYEnviarPaso2();
-    await waitFor(() => expect(screen.getByText('¡Reserva registrada!')).toBeInTheDocument());
-    act(() => jest.advanceTimersByTime(1800));
-    expect(onSuccess).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(screen.getByText('No se pudo registrar la reserva. Intentá de nuevo.')).toBeInTheDocument();
+    });
+    expect(onSuccess).not.toHaveBeenCalled();
+    expect(screen.queryByText('¡Reserva registrada!')).not.toBeInTheDocument();
+  });
+
+  test('muestra error de superposición cuando createReserva lanza "superposicion"', async () => {
+    createReserva.mockRejectedValue(new Error('superposicion'));
+    await llenarYEnviarPaso2();
+    await waitFor(() => {
+      expect(screen.getByText('Ya existe una reserva en ese horario para esta instalación.')).toBeInTheDocument();
+    });
+    expect(onSuccess).not.toHaveBeenCalled();
   });
 
   test('el input de número de socio aplica focus y blur', () => {

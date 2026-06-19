@@ -8,6 +8,7 @@ import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
 import { useModalEscape } from '../../hooks/useModalEscape';
 import { estadoConfig } from '../../utils/estadoConfig';
+import { SocioAccionesExtra } from '../../components/socioAccionesExtra/SocioAccionesExtra';
 import logo from '../../assets/logo_socio.png';
 import './SociosPage.css';
 import '../../styles/ListPage.css';
@@ -277,6 +278,7 @@ function SociosPage() {
                   <span className="socios-card-label">Estado</span>
                   <span>{resultado.estado.nombre}</span>
                 </div>
+                <SocioAccionesExtra idSocio={resultado.id} nroSocio={resultado.nro_socio} />
               </div>
             </div>
             <div className="socios-card-actions">

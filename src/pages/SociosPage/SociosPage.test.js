@@ -1,6 +1,8 @@
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import SociosPage from './SociosPage';
 
+jest.mock('../../firebase', () => ({ auth: {} }));
+
 jest.mock('../../hooks/usePermiso', () => ({
   usePermiso: () => true,
 }));

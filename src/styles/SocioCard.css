@@ -48,3 +48,41 @@
   color: #111111;
   font-size: 14px;
 }
+
+/* ── Ver Socio Modal (compartido) ───────────────────────────── */
+.ver-socio-modal-wrapper {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-width: 520px;
+  width: 100%;
+}
+
+.ver-socio-btn-x {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  width: 28px;
+  height: 28px;
+  background: #111111;
+  color: #ffffff;
+  border: none;
+  border-radius: 50%;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Nro. de socio clickeable (compartido) ──────────────────── */
+.nro-socio-link {
+  cursor: pointer;
+  text-decoration: underline;
+  color: #111111;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+}

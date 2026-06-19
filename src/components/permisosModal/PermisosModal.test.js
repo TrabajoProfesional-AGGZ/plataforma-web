@@ -38,4 +38,11 @@ describe('PermisosModal', () => {
     fireEvent.click(screen.getByRole('heading', { name: /permisos/i }));
     expect(onClose).not.toHaveBeenCalled();
   });
+
+  test('llama a onClose al presionar Enter en el overlay', () => {
+    const { container } = render(<PermisosModal permisos={['ver_socios']} onClose={onClose} />);
+    const overlay = container.querySelector('.csf-overlay');
+    fireEvent.keyDown(overlay, { key: 'Enter' });
+    expect(onClose).toHaveBeenCalledTimes(1);
+  });
 });

@@ -20,3 +20,19 @@ export async function pausarDisciplina(id) {
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al pausar disciplina');
 }
+
+export async function getSociosByDisciplina(idDisciplina) {
+  const res = await fetchTo(`/api/v1/socios/por-disciplina/${idDisciplina}`, 'GET');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error('Error al obtener socios de la disciplina');
+  const data = await res.json();
+  return data.socios ?? data;
+}
+
+export async function getDisciplinasBySocio(idSocio) {
+  const res = await fetchTo(`/api/v1/disciplinas/por-socio/${idSocio}`, 'GET');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error('Error al obtener disciplinas del socio');
+  const data = await res.json();
+  return data.disciplinas ?? data;
+}

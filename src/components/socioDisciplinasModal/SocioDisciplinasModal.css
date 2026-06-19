@@ -1,0 +1,89 @@
+.socio-disciplinas-wrapper {
+  max-width: 420px;
+}
+
+.socio-modal-loading {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0;
+}
+
+.socio-modal-loading .loading-logo {
+  width: 48px;
+  animation: spin 3s linear infinite, pulse 1.4s ease-in-out infinite;
+}
+
+.socio-modal-empty {
+  color: #4a4a4a;
+  font-size: 14px;
+  text-align: center;
+  padding: 8px 0;
+}
+
+.socio-modal-lista {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 280px;
+  overflow-y: auto;
+}
+
+.socio-modal-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: #f5f5f5;
+  border-radius: 6px;
+}
+
+.socio-modal-item-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+}
+
+.socio-modal-item-nombre {
+  font-size: 14px;
+  color: #111111;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.socio-modal-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.socio-modal-badge.badge-activa {
+  background: #d4edda;
+  color: #155724;
+}
+
+.socio-modal-badge.badge-pausada {
+  background: #fff3cd;
+  color: #9a6200;
+}
+
+.socio-modal-btn-ver {
+  background: #111111;
+  color: #ffffff;
+  border: none;
+  border-radius: 6px;
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
