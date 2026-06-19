@@ -4,7 +4,7 @@ import { CreateInstalacionForm } from '../../components/createInstalacionForm/Cr
 import { CreateReservaForm } from '../../components/createReservaForm/CreateReservaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { getInstalaciones, createInstalacion, deleteInstalacion } from '../../services/instalacionesService';
-import { getReservas, deleteReserva } from '../../services/reservasService';
+import { getReservasPorInstalacion, getReservasPorSocio, deleteReserva } from '../../services/reservasService';
 import { getSocios } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
 import { estadoConfig } from '../../utils/estadoConfig';
@@ -38,6 +38,8 @@ function InstalacionesPage() {
 
   const [filtroTipo, setFiltroTipo] = useState('');
   const [filtroFecha, setFiltroFecha] = useState('');
+  const [filtroNroSocio, setFiltroNroSocio] = useState('');
+  const [reservasBusqueda, setReservasBusqueda] = useState(null);
   const [reservasVisible, setReservasVisible] = useState(true);
   const [verSocioData, setVerSocioData] = useState(null);
   const [verSocioOpen, setVerSocioOpen] = useState(false);
@@ -52,9 +54,27 @@ function InstalacionesPage() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function cargarReservas(instalacionId) {
-    const [reservasData, sociosData] = await Promise.all([getReservas(instalacionId), getSocios()]);
+    const [reservasData, sociosData] = await Promise.all([getReservasPorInstalacion(instalacionId), getSocios()]);
     const socioMap = Object.fromEntries(sociosData.map((s) => [s.id, s]));
     setReservas(reservasData.map((r) => ({
+      ...r,
+      nro_socio: r.nro_socio ?? socioMap[r.id_socio]?.nro_socio ?? r.id_socio,
+      socio: socioMap[r.id_socio] ?? null,
+    })));
+    setReservasBusqueda(null);
+    setFiltroNroSocio('');
+  }
+
+  async function buscarPorSocio(nroSocio) {
+    if (!nroSocio.trim()) {
+      setReservasBusqueda(null);
+      return;
+    }
+    const todas = await getReservasPorSocio(nroSocio.trim());
+    const deEstaInstalacion = todas.filter((r) => (r.id_instalacion ?? r.instalacion_id) === instalacionActual?.id);
+    const sociosData = await getSocios();
+    const socioMap = Object.fromEntries(sociosData.map((s) => [s.id, s]));
+    setReservasBusqueda(deEstaInstalacion.map((r) => ({
       ...r,
       nro_socio: r.nro_socio ?? socioMap[r.id_socio]?.nro_socio ?? r.id_socio,
       socio: socioMap[r.id_socio] ?? null,
@@ -121,9 +141,10 @@ function InstalacionesPage() {
 
   const reservasDeInstalacion = reservas.filter((r) => (r.instalacion_id ?? r.id_instalacion) === instalacionActual?.id);
 
+  const baseReservas = reservasBusqueda ?? reservasDeInstalacion;
   const reservasFiltradas = filtroFecha
-    ? reservasDeInstalacion.filter((r) => (r.fecha_reserva ?? r.fecha) === filtroFecha)
-    : reservasDeInstalacion;
+    ? baseReservas.filter((r) => (r.fecha_reserva ?? r.fecha) === filtroFecha)
+    : baseReservas;
 
   function abrirEliminarReserva(reserva) {
     setReservaActual(reserva);
@@ -284,7 +305,7 @@ function InstalacionesPage() {
           }
         }}
       >
-        <dialog open className="instalaciones-ver-socio-wrapper">
+        <div className="instalaciones-ver-socio-wrapper">
           <div className="socios-card" style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}>
             <div className="socios-card-inner">
               <img src={cfg.logo} alt="" className="socios-card-logo" />
@@ -341,7 +362,7 @@ function InstalacionesPage() {
               Cerrar
             </button>
           </div>
-        </dialog>
+        </div>
       </div>
     );
   };
@@ -447,6 +468,23 @@ function InstalacionesPage() {
                     value={filtroFecha}
                     onChange={(e) => setFiltroFecha(e.target.value)}
                     aria-label="Filtrar por fecha"
+                  />
+                )}
+                {puedeVerReservas && (
+                  <input
+                    type="text"
+                    className="instalaciones-filtro-fecha"
+                    placeholder="Filtrar por N° de socio"
+                    value={filtroNroSocio}
+                    aria-label="Filtrar por número de socio"
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      setFiltroNroSocio(val);
+                      if (!val.trim()) setReservasBusqueda(null);
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') buscarPorSocio(filtroNroSocio).catch(() => {});
+                    }}
                   />
                 )}
                 <button

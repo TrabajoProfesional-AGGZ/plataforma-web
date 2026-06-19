@@ -60,6 +60,18 @@
   margin-bottom: 20px;
 }
 
+/* ── Socios inscriptos section ───────────────────────────────── */
+.disciplinas-socios-section {
+  margin-top: 28px;
+}
+
+.disciplinas-socios-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #111111;
+  margin: 0 0 12px 0;
+}
+
 /* ── Loading state ────────────────────────────────────────────── */
 .disciplinas-loading {
   display: flex;

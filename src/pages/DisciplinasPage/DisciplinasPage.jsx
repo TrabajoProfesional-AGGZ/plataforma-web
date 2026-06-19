@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Plus, ChevronLeft } from 'lucide-react';
 import { CreateDisciplinaForm } from '../../components/createDisciplinaForm/CreateDisciplinaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
-import { getDisciplinas, createDisciplina, pausarDisciplina } from '../../services/disciplinasService';
+import { getDisciplinas, createDisciplina, pausarDisciplina, getSociosByDisciplina } from '../../services/disciplinasService';
 import { usePermiso } from '../../hooks/usePermiso';
 import logo from '../../assets/logo_socio.png';
 import './DisciplinasPage.css';
@@ -21,6 +21,8 @@ function DisciplinasPage() {
   const [loading, setLoading] = useState(false);
   const [crearOpen, setCrearOpen] = useState(false);
   const [pausarOpen, setPausarOpen] = useState(false);
+  const [sociosDisciplina, setSociosDisciplina] = useState([]);
+  const [loadingSociosDisciplina, setLoadingSociosDisciplina] = useState(false);
 
   useEffect(() => {
     if (!puedeVerDisciplinas) return;
@@ -39,6 +41,18 @@ function DisciplinasPage() {
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [pausarOpen]);
+
+  useEffect(() => {
+    if (!disciplinaActual) {
+      setSociosDisciplina([]);
+      return;
+    }
+    setLoadingSociosDisciplina(true);
+    getSociosByDisciplina(disciplinaActual.id)
+      .then((data) => setSociosDisciplina(data))
+      .catch(() => setSociosDisciplina([]))
+      .finally(() => setLoadingSociosDisciplina(false));
+  }, [disciplinaActual]); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleDisciplinaCreada(data) {
     setCrearOpen(false);
@@ -183,6 +197,42 @@ function DisciplinasPage() {
               ))}
             </div>
             <p className="detalle-id">ID: {disciplinaActual.id}</p>
+          </div>
+
+          <div className="disciplinas-socios-section">
+            <h3 className="disciplinas-socios-title">Socios inscriptos</h3>
+            {loadingSociosDisciplina ? (
+              <div className="disciplinas-loading">
+                <img src={logo} alt="" className="loading-logo" />
+              </div>
+            ) : sociosDisciplina.length === 0 ? (
+              <p className="disciplinas-empty">No hay socios inscriptos en esta disciplina.</p>
+            ) : (
+              <div className="disciplinas-table-wrapper">
+                <table className="disciplinas-tabla">
+                  <thead>
+                    <tr>
+                      <th>N° Socio</th>
+                      <th>Apellido y nombre</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sociosDisciplina.map((s) => (
+                      <tr key={s.id}>
+                        <td>{s.nro_socio}</td>
+                        <td>{s.apellido} {s.nombre}</td>
+                        <td>
+                          <span className={`disciplinas-badge ${s.estado?.nombre === 'Activo' || s.estado === 'Activo' ? 'badge-activa' : 'badge-pausada'}`}>
+                            {s.estado?.nombre ?? s.estado ?? '—'}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
 
           {puedeBorrarDisciplina && (
