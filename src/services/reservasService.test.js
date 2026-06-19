@@ -1,4 +1,4 @@
-import { getReservas, createReserva, deleteReserva } from './reservasService';
+import { getReservas, getReservasPorInstalacion, getReservasPorSocio, createReserva, deleteReserva } from './reservasService';
 
 jest.mock('../utils/utils', () => ({ fetchTo: jest.fn() }));
 import { fetchTo } from '../utils/utils';
@@ -44,6 +44,67 @@ describe('reservasService', () => {
     });
   });
 
+  describe('getReservasPorInstalacion', () => {
+    test('llama al endpoint correcto con el ID de instalación', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => [{ id: 'r-1', id_instalacion: 'inst-1' }],
+      });
+
+      const result = await getReservasPorInstalacion('inst-1');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/reservas/por-instalacion/inst-1', 'GET');
+      expect(result).toHaveLength(1);
+    });
+
+    test('devuelve array desde clave reservas si está presente', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ reservas: [{ id: 'r-2' }] }),
+      });
+
+      const result = await getReservasPorInstalacion('inst-2');
+      expect(result).toHaveLength(1);
+    });
+
+    test('lanza servicio-no-disponible en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(getReservasPorInstalacion('inst-1')).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza error genérico cuando la respuesta no es ok', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
+      await expect(getReservasPorInstalacion('inst-1')).rejects.toThrow('Error al obtener reservas');
+    });
+  });
+
+  describe('getReservasPorSocio', () => {
+    test('llama al endpoint correcto con el nro de socio', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => [{ id: 'r-3', id_socio: 'socio-1' }],
+      });
+
+      const result = await getReservasPorSocio('1234');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/reservas/por-socio/1234', 'GET');
+      expect(result).toHaveLength(1);
+    });
+
+    test('lanza servicio-no-disponible en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(getReservasPorSocio('1234')).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza error genérico cuando la respuesta no es ok', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
+      await expect(getReservasPorSocio('1234')).rejects.toThrow('Error al obtener reservas');
+    });
+  });
+
   describe('createReserva', () => {
     const datos = {
       id_socio: 'socio-uuid-1',
@@ -68,6 +129,11 @@ describe('reservasService', () => {
     test('lanza servicio-no-disponible en 500', async () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
       await expect(createReserva(datos)).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza "superposicion" cuando la respuesta es 409', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 409 });
+      await expect(createReserva(datos)).rejects.toThrow('superposicion');
     });
 
     test('lanza error genérico en 400', async () => {

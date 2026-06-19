@@ -17,10 +17,11 @@ jest.mock('../../services/instalacionesService', () => ({
 import { getInstalaciones, createInstalacion, deleteInstalacion } from '../../services/instalacionesService';
 
 jest.mock('../../services/reservasService', () => ({
-  getReservas: jest.fn(),
+  getReservasPorInstalacion: jest.fn(),
+  getReservasPorSocio: jest.fn(),
   deleteReserva: jest.fn(),
 }));
-import { getReservas, deleteReserva } from '../../services/reservasService';
+import { getReservasPorInstalacion, getReservasPorSocio, deleteReserva } from '../../services/reservasService';
 
 jest.mock('../../services/sociosService', () => ({
   getSocios: jest.fn(),
@@ -54,7 +55,7 @@ jest.mock('../../components/createReservaForm/CreateReservaForm', () => ({
 }));
 
 function mockUnaReserva() {
-  getReservas.mockImplementation((instalacionId) => Promise.resolve([
+  getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
     { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
   ]));
 }
@@ -92,7 +93,8 @@ describe('InstalacionesPage', () => {
     getInstalaciones.mockResolvedValue([]);
     createInstalacion.mockResolvedValue({ id: 'test-id' });
     deleteInstalacion.mockResolvedValue(undefined);
-    getReservas.mockImplementation(() => Promise.resolve([...reservasStore]));
+    getReservasPorInstalacion.mockImplementation(() => Promise.resolve([...reservasStore]));
+    getReservasPorSocio.mockResolvedValue([]);
     deleteReserva.mockResolvedValue(undefined);
     getSocios.mockResolvedValue([SOCIO_MOCK]);
   });
@@ -186,7 +188,7 @@ describe('InstalacionesPage', () => {
     crearInstalacionHelper();
     irAlDetalle();
 
-    await waitFor(() => expect(getReservas).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(getReservasPorInstalacion).toHaveBeenCalledTimes(1));
 
     fireEvent.click(screen.getByRole('button', { name: /agregar reserva/i }));
     await act(async () => {
@@ -194,7 +196,7 @@ describe('InstalacionesPage', () => {
     });
 
     await waitFor(() => {
-      expect(getReservas).toHaveBeenCalledTimes(2);
+      expect(getReservasPorInstalacion).toHaveBeenCalledTimes(2);
     });
   });
 
@@ -208,7 +210,7 @@ describe('InstalacionesPage', () => {
   });
 
   test('muestra las reservas cargadas en la tabla', async () => {
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+    getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
 
@@ -225,7 +227,7 @@ describe('InstalacionesPage', () => {
   // ── Tests de filtro de fecha ──
 
   test('el filtro de fecha muestra solo reservas de esa fecha', async () => {
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+    getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
       { id: 'r-2', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-05', hora_inicio: '14:00', hora_fin: '15:00' },
     ]));
@@ -243,7 +245,7 @@ describe('InstalacionesPage', () => {
   });
 
   test('limpiar el filtro de fecha muestra todas las reservas', async () => {
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+    getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
       { id: 'r-2', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-05', hora_inicio: '14:00', hora_fin: '15:00' },
     ]));
@@ -368,7 +370,7 @@ describe('InstalacionesPage', () => {
   });
 
   test('elimina una reserva correctamente', async () => {
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+    getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-10-05', hora_inicio: '16:00', hora_fin: '18:00' },
     ]));
 
@@ -384,7 +386,7 @@ describe('InstalacionesPage', () => {
   });
 
   test('cancela la eliminación de una reserva', async () => {
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+    getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-10-10', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
 
@@ -399,7 +401,7 @@ describe('InstalacionesPage', () => {
   });
 
   test('ESC cierra el modal de eliminar reserva', async () => {
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+    getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-07-02', hora_inicio: '10:00', hora_fin: '12:00' },
     ]));
 
@@ -415,7 +417,7 @@ describe('InstalacionesPage', () => {
   });
 
   test('cierra el modal de eliminar reserva al hacer clic en el overlay', async () => {
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+    getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-07-01', hora_inicio: '09:00', hora_fin: '10:00' },
     ]));
 
@@ -544,7 +546,7 @@ describe('InstalacionesPage', () => {
   // ── Test del filtro de fecha sin coincidencias ──
 
   test('muestra "No hay reservas para la fecha seleccionada" si el filtro no coincide con ninguna reserva', async () => {
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+    getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
 
@@ -576,7 +578,7 @@ describe('InstalacionesPage', () => {
       estado: { nombre: 'Activo' },
     };
     getSocios.mockResolvedValue([SOCIO_COMPLETO]);
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+    getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_COMPLETO.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
 
@@ -608,7 +610,7 @@ describe('InstalacionesPage', () => {
   });
 
   test('muestra la columna ID en la tabla de reservas', async () => {
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+    getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'reserva-id-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-09-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
 
@@ -622,7 +624,7 @@ describe('InstalacionesPage', () => {
 
   test('no muestra la columna Acciones si el usuario no tiene permiso borrar_reserva', async () => {
     mockPermisoOverrides = { borrar_reserva: false };
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+    getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'r-perm', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-09-10', hora_inicio: '12:00', hora_fin: '13:00' },
     ]));
 
@@ -644,7 +646,7 @@ describe('InstalacionesPage', () => {
       estado: 'Moroso',
     };
     getSocios.mockResolvedValue([SOCIO_STRINGS]);
-    getReservas.mockImplementation((instalacionId) => Promise.resolve([
+    getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'r-2', id_instalacion: instalacionId, id_socio: SOCIO_STRINGS.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
 
@@ -657,5 +659,91 @@ describe('InstalacionesPage', () => {
 
     expect(screen.getByText('Adulto')).toBeInTheDocument();
     expect(screen.getByText('Moroso')).toBeInTheDocument();
+  });
+
+  // ── Tests de nuevo endpoint por instalación (punto 7) ──
+
+  test('usa getReservasPorInstalacion para cargar reservas del detalle', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-known', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+    ]);
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Test')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Test'));
+    await waitFor(() => expect(getReservasPorInstalacion).toHaveBeenCalled());
+    expect(getReservasPorInstalacion).toHaveBeenCalledWith('inst-known');
+  });
+
+  // ── Tests de búsqueda por N° de socio (punto 7) ──
+
+  test('muestra el input de filtro por N° de socio en la vista de detalle', async () => {
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+    expect(screen.getByLabelText('Filtrar por número de socio')).toBeInTheDocument();
+  });
+
+  test('buscar por N° de socio llama a getReservasPorSocio y muestra resultados filtrados', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-busqueda', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+    ]);
+    getReservasPorSocio.mockResolvedValue([
+      { id: 'r-socio', id_instalacion: 'inst-busqueda', id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-09-20', hora_inicio: '09:00', hora_fin: '10:00' },
+    ]);
+
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Test')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Test'));
+
+    const inputSocio = await screen.findByLabelText('Filtrar por número de socio');
+    fireEvent.change(inputSocio, { target: { value: '1234' } });
+    await act(async () => {
+      fireEvent.keyDown(inputSocio, { key: 'Enter' });
+    });
+
+    await waitFor(() => {
+      expect(getReservasPorSocio).toHaveBeenCalledWith('1234');
+      expect(screen.getByText('2026-09-20')).toBeInTheDocument();
+    });
+  });
+
+  test('limpiar el filtro por N° de socio vuelve a mostrar todas las reservas', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-limpiar', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+    ]);
+    getReservasPorInstalacion.mockResolvedValue([
+      { id: 'r-inst', id_instalacion: 'inst-limpiar', id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-10-01', hora_inicio: '08:00', hora_fin: '09:00' },
+    ]);
+    getReservasPorSocio.mockResolvedValue([]);
+
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Test')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Test'));
+
+    await waitFor(() => expect(screen.getByText('2026-10-01')).toBeInTheDocument());
+
+    const inputSocio = screen.getByLabelText('Filtrar por número de socio');
+    fireEvent.change(inputSocio, { target: { value: '9999' } });
+    await act(async () => {
+      fireEvent.keyDown(inputSocio, { key: 'Enter' });
+    });
+
+    await waitFor(() => expect(screen.getByText('No hay reservas para esta instalación.')).toBeInTheDocument());
+
+    fireEvent.change(inputSocio, { target: { value: '' } });
+    expect(screen.getByText('2026-10-01')).toBeInTheDocument();
+  });
+
+  // ── Test de bug dialog→div (punto 9) ──
+
+  test('el wrapper del card de socio es un div, no un dialog', async () => {
+    mockUnaReserva();
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByText('1234')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('1234'));
+    expect(document.querySelector('dialog')).not.toBeInTheDocument();
+    expect(document.querySelector('.instalaciones-ver-socio-wrapper')).toBeInTheDocument();
   });
 });

@@ -9,8 +9,9 @@ jest.mock('../../services/disciplinasService', () => ({
   getDisciplinas: jest.fn(),
   createDisciplina: jest.fn(),
   pausarDisciplina: jest.fn(),
+  getSociosByDisciplina: jest.fn(),
 }));
-import { getDisciplinas, createDisciplina, pausarDisciplina } from '../../services/disciplinasService';
+import { getDisciplinas, createDisciplina, pausarDisciplina, getSociosByDisciplina } from '../../services/disciplinasService';
 
 jest.mock('../../assets/logo_socio.png', () => 'logo_socio.png');
 
@@ -51,6 +52,7 @@ describe('DisciplinasPage', () => {
     getDisciplinas.mockResolvedValue([]);
     createDisciplina.mockResolvedValue({ id: 'test-id' });
     pausarDisciplina.mockResolvedValue(undefined);
+    getSociosByDisciplina.mockResolvedValue([]);
   });
 
   test('muestra el título "Disciplinas"', async () => {
@@ -226,5 +228,86 @@ describe('DisciplinasPage', () => {
     ]);
     await renderPage();
     await waitFor(() => expect(screen.getByText('Pausada')).toBeInTheDocument());
+  });
+
+  // ── Tests de socios inscriptos (punto 8) ──
+
+  test('muestra la sección "Socios inscriptos" en la vista de detalle', async () => {
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByText('Socios inscriptos')).toBeInTheDocument());
+  });
+
+  test('muestra mensaje vacío cuando no hay socios inscriptos', async () => {
+    getSociosByDisciplina.mockResolvedValue([]);
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => {
+      expect(screen.getByText('No hay socios inscriptos en esta disciplina.')).toBeInTheDocument();
+    });
+  });
+
+  test('muestra la tabla con socios cuando getSociosByDisciplina devuelve resultados', async () => {
+    getSociosByDisciplina.mockResolvedValue([
+      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
+      { id: 's-2', nro_socio: '2002', nombre: 'Carlos', apellido: 'Ruiz', estado: { nombre: 'Moroso' } },
+    ]);
+
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+
+    await waitFor(() => {
+      expect(screen.getByText('2001')).toBeInTheDocument();
+      expect(screen.getByText('López Ana')).toBeInTheDocument();
+      expect(screen.getByText('2002')).toBeInTheDocument();
+      expect(screen.getByText('Ruiz Carlos')).toBeInTheDocument();
+    });
+  });
+
+  test('llama getSociosByDisciplina con el id de la disciplina actual', async () => {
+    getDisciplinas.mockResolvedValue([
+      { id: 'disc-uuid-conocido', nombre: 'Natación', cupo_maximo: 30, arancelada: false, concepto_cobro: '', estado: 'Activa' },
+    ]);
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Natación')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Natación'));
+    await waitFor(() => {
+      expect(getSociosByDisciplina).toHaveBeenCalledWith('disc-uuid-conocido');
+    });
+  });
+
+  test('limpia los socios al volver a la lista', async () => {
+    getSociosByDisciplina.mockResolvedValue([
+      { id: 's-1', nro_socio: '3001', nombre: 'Pedro', apellido: 'García', estado: { nombre: 'Activo' } },
+    ]);
+
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('3001')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /volver/i }));
+
+    expect(screen.queryByText('3001')).not.toBeInTheDocument();
+    expect(screen.queryByText('Socios inscriptos')).not.toBeInTheDocument();
+  });
+
+  test('muestra estado como string si el socio no tiene objeto estado', async () => {
+    getSociosByDisciplina.mockResolvedValue([
+      { id: 's-3', nro_socio: '4001', nombre: 'Laura', apellido: 'Díaz', estado: 'Activo' },
+    ]);
+
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+
+    await waitFor(() => {
+      expect(screen.getByText('4001')).toBeInTheDocument();
+      expect(screen.getByText('Activo')).toBeInTheDocument();
+    });
   });
 });
