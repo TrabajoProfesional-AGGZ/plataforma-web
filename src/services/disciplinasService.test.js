@@ -1,4 +1,4 @@
-import { getDisciplinas, createDisciplina, pausarDisciplina, getSociosByDisciplina } from './disciplinasService';
+import { getDisciplinas, createDisciplina, pausarDisciplina, getSociosByDisciplina, getDisciplinasBySocio } from './disciplinasService';
 
 jest.mock('../utils/utils', () => ({ fetchTo: jest.fn() }));
 import { fetchTo } from '../utils/utils';
@@ -123,6 +123,42 @@ describe('disciplinasService', () => {
     test('lanza error genérico cuando la respuesta no es ok', async () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
       await expect(getSociosByDisciplina('disc-uuid-1')).rejects.toThrow('Error al obtener socios de la disciplina');
+    });
+  });
+
+  describe('getDisciplinasBySocio', () => {
+    test('llama al endpoint correcto con el ID del socio', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => [{ id: 'd-1', nombre: 'Natación', estado: { nombre: 'Activa' } }],
+      });
+
+      const result = await getDisciplinasBySocio('socio-uuid-1');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/disciplinas/por-socio/socio-uuid-1', 'GET');
+      expect(result).toHaveLength(1);
+    });
+
+    test('devuelve array desde clave disciplinas si está presente', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ disciplinas: [{ id: 'd-2' }, { id: 'd-3' }] }),
+      });
+
+      const result = await getDisciplinasBySocio('socio-uuid-2');
+      expect(result).toHaveLength(2);
+    });
+
+    test('lanza servicio-no-disponible en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(getDisciplinasBySocio('socio-uuid-1')).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza error genérico cuando la respuesta no es ok', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
+      await expect(getDisciplinasBySocio('socio-uuid-1')).rejects.toThrow('Error al obtener disciplinas del socio');
     });
   });
 });

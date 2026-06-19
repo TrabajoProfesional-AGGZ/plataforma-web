@@ -1,5 +1,8 @@
 import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import InstalacionesPage from './InstalacionesPage';
+
+jest.mock('../../firebase', () => ({ auth: {} }));
 
 let mockPermisoOverrides = {};
 jest.mock('../../hooks/usePermiso', () => ({
@@ -62,7 +65,7 @@ function mockUnaReserva() {
 
 // Helpers
 async function renderPage() {
-  render(<InstalacionesPage />);
+  render(<MemoryRouter><InstalacionesPage /></MemoryRouter>);
   await waitFor(() =>
     expect(document.querySelector('.instalaciones-loading')).not.toBeInTheDocument()
   );
@@ -274,7 +277,7 @@ describe('InstalacionesPage', () => {
     fireEvent.click(screen.getByText('1234'));
 
     expect(screen.getByText('García Juan')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Cerrar' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '×' })).toBeInTheDocument();
   });
 
   test('el card del socio se cierra al hacer clic en Cerrar', async () => {
@@ -286,7 +289,7 @@ describe('InstalacionesPage', () => {
     fireEvent.click(screen.getByText('1234'));
     expect(screen.getByText('García Juan')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Cerrar' }));
+    fireEvent.click(screen.getByRole('button', { name: '×' }));
     expect(screen.queryByText('García Juan')).not.toBeInTheDocument();
   });
 
@@ -497,7 +500,7 @@ describe('InstalacionesPage', () => {
     fireEvent.click(screen.getByText('1234'));
     expect(screen.getByText('García Juan')).toBeInTheDocument();
 
-    const overlay = document.querySelector('.instalaciones-ver-socio-wrapper')?.closest('.modal-overlay');
+    const overlay = document.querySelector('.ver-socio-modal-wrapper')?.closest('.modal-overlay');
     fireEvent.click(overlay);
     expect(screen.queryByText('García Juan')).not.toBeInTheDocument();
   });
@@ -744,6 +747,6 @@ describe('InstalacionesPage', () => {
     await waitFor(() => expect(screen.getByText('1234')).toBeInTheDocument());
     fireEvent.click(screen.getByText('1234'));
     expect(document.querySelector('dialog')).not.toBeInTheDocument();
-    expect(document.querySelector('.instalaciones-ver-socio-wrapper')).toBeInTheDocument();
+    expect(document.querySelector('.ver-socio-modal-wrapper')).toBeInTheDocument();
   });
 });

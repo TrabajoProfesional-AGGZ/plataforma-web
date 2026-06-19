@@ -1,5 +1,8 @@
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { MemoryRouter } from 'react-router-dom';
 import DisciplinasPage from './DisciplinasPage';
+
+jest.mock('../../firebase', () => ({ auth: {} }));
 
 jest.mock('../../hooks/usePermiso', () => ({
   usePermiso: () => true,
@@ -27,7 +30,7 @@ jest.mock('../../components/createDisciplinaForm/CreateDisciplinaForm', () => ({
 }));
 
 async function renderPage() {
-  render(<DisciplinasPage />);
+  render(<MemoryRouter><DisciplinasPage /></MemoryRouter>);
   await waitFor(() =>
     expect(document.querySelector('.disciplinas-loading')).not.toBeInTheDocument()
   );

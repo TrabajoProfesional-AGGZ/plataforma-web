@@ -1,4 +1,4 @@
-import { getReservas, getReservasPorInstalacion, getReservasPorSocio, createReserva, deleteReserva } from './reservasService';
+import { getReservas, getReservasPorInstalacion, getReservasPorSocio, createReserva, deleteReserva, getReservasHistoricas, getReservasHistoricasPorInstalacion } from './reservasService';
 
 jest.mock('../utils/utils', () => ({ fetchTo: jest.fn() }));
 import { fetchTo } from '../utils/utils';
@@ -159,6 +159,67 @@ describe('reservasService', () => {
     test('lanza error genérico cuando la respuesta no es ok', async () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
       await expect(deleteReserva('inst-1', 'reserva-1')).rejects.toThrow('Error al eliminar reserva');
+    });
+  });
+
+  describe('getReservasHistoricas', () => {
+    test('llama al endpoint historicas y devuelve el array', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => [{ id: 'r-1', estado: 'Finalizada' }],
+      });
+
+      const result = await getReservasHistoricas();
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/reservas/historicas', 'GET');
+      expect(result).toHaveLength(1);
+    });
+
+    test('devuelve array desde clave reservas si está presente', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ reservas: [{ id: 'r-2' }, { id: 'r-3' }] }),
+      });
+
+      const result = await getReservasHistoricas();
+      expect(result).toHaveLength(2);
+    });
+
+    test('lanza servicio-no-disponible en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(getReservasHistoricas()).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza error genérico cuando la respuesta no es ok', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
+      await expect(getReservasHistoricas()).rejects.toThrow('Error al obtener reservas históricas');
+    });
+  });
+
+  describe('getReservasHistoricasPorInstalacion', () => {
+    test('llama al endpoint correcto con el ID de instalación', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => [{ id: 'r-4', estado: 'Confirmada' }, { id: 'r-5', estado: 'Finalizada' }],
+      });
+
+      const result = await getReservasHistoricasPorInstalacion('inst-1');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/reservas/historicas/por-instalacion/inst-1', 'GET');
+      expect(result).toHaveLength(2);
+    });
+
+    test('lanza servicio-no-disponible en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(getReservasHistoricasPorInstalacion('inst-1')).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza error genérico cuando la respuesta no es ok', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 403 });
+      await expect(getReservasHistoricasPorInstalacion('inst-1')).rejects.toThrow('Error al obtener reservas históricas');
     });
   });
 });
