@@ -17,6 +17,10 @@ jest.mock('../../services/disciplinasService', () => ({
 import { getDisciplinas, createDisciplina, pausarDisciplina, getSociosByDisciplina } from '../../services/disciplinasService';
 
 jest.mock('../../assets/logo_socio.png', () => 'logo_socio.png');
+jest.mock('../../assets/logo-verde.png', () => 'logo-verde.png');
+jest.mock('../../assets/logo-rojo.png', () => 'logo-rojo.png');
+jest.mock('../../assets/logo-amarillo.png', () => 'logo-amarillo.png');
+jest.mock('../../assets/logo-naranja.png', () => 'logo-naranja.png');
 
 jest.mock('../../components/createDisciplinaForm/CreateDisciplinaForm', () => ({
   CreateDisciplinaForm: ({ onSuccess, onCancel }) => ( // NOSONAR
@@ -25,6 +29,15 @@ jest.mock('../../components/createDisciplinaForm/CreateDisciplinaForm', () => ({
         Confirmar creación
       </button>
       <button onClick={onCancel}>Cancelar creación</button>
+    </div>
+  ),
+}));
+
+jest.mock('../../components/verSocioModal/VerSocioModal', () => ({
+  VerSocioModal: ({ socio, onClose }) => (
+    <div data-testid="ver-socio-modal">
+      <span>{socio.nro_socio}</span>
+      <button onClick={onClose}>Cerrar socio</button>
     </div>
   ),
 }));
@@ -311,6 +324,80 @@ describe('DisciplinasPage', () => {
     await waitFor(() => {
       expect(screen.getByText('4001')).toBeInTheDocument();
       expect(screen.getByText('Activo')).toBeInTheDocument();
+    });
+  });
+
+  test('hacer clic en el N° de socio abre el modal del socio', async () => {
+    getSociosByDisciplina.mockResolvedValue([
+      { id: 's-4', nro_socio: '5001', nombre: 'María', apellido: 'González', estado: { nombre: 'Activo' } },
+    ]);
+
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('5001')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('5001'));
+
+    expect(screen.getByTestId('ver-socio-modal')).toBeInTheDocument();
+  });
+
+  test('cerrar el modal del socio lo desmonta', async () => {
+    getSociosByDisciplina.mockResolvedValue([
+      { id: 's-5', nro_socio: '6001', nombre: 'Pedro', apellido: 'Ríos', estado: { nombre: 'Activo' } },
+    ]);
+
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('6001')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('6001'));
+    expect(screen.getByTestId('ver-socio-modal')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Cerrar socio' }));
+    expect(screen.queryByTestId('ver-socio-modal')).not.toBeInTheDocument();
+  });
+
+  test('navega al detalle cuando hay disciplinaId en location.state', async () => {
+    getDisciplinas.mockResolvedValue([
+      { id: 'disc-state', nombre: 'Yoga', cupo_maximo: 10, arancelada: false, concepto_cobro: '', estado: 'Activa' },
+    ]);
+
+    render(
+      <MemoryRouter initialEntries={[{ pathname: '/disciplinas', state: { disciplinaId: 'disc-state' } }]}>
+        <DisciplinasPage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(screen.getByRole('button', { name: /volver/i })).toBeInTheDocument());
+    expect(screen.getAllByText('Yoga').length).toBeGreaterThan(0);
+  });
+
+  test('limpia la lista de socios si getSociosByDisciplina falla', async () => {
+    getSociosByDisciplina.mockRejectedValueOnce(new Error('error de red'));
+
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+
+    await waitFor(() => {
+      expect(screen.getByText('No hay socios inscriptos en esta disciplina.')).toBeInTheDocument();
+    });
+  });
+
+  test('revierte la disciplina optimista si pausarDisciplina falla', async () => {
+    pausarDisciplina.mockRejectedValueOnce(new Error('error de red'));
+
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
+    fireEvent.click(ultimoBoton('Pausar'));
+
+    await waitFor(() => {
+      expect(screen.getByText('Activa')).toBeInTheDocument();
     });
   });
 });

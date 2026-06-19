@@ -165,7 +165,7 @@ function InstalacionesPage() {
 
   async function handleEliminarReserva() {
     const { id } = reservaActual;
-    setReservas((prev) => prev.filter((r) => r.id !== id));
+    setReservas((prev) => prev.map((r) => r.id === id ? { ...r, estado: 'Cancelada' } : r));
     setEliminarReservaOpen(false);
     setReservaActual(null);
     try {
@@ -244,7 +244,7 @@ function InstalacionesPage() {
     );
   };
 
-  const renderTablaReservas = (datos, { mostrarEstado = false, mensajeVacio = null } = {}) => {
+  const renderTablaReservas = (datos, { mostrarEstado = false, mostrarAcciones = false, mensajeVacio = null } = {}) => {
     if (datos.length === 0) {
       return (
         <p className="instalaciones-empty">
@@ -271,7 +271,7 @@ function InstalacionesPage() {
               <th>Inicio</th>
               <th>Fin</th>
               {mostrarEstado && <th>Estado</th>}
-              {!mostrarEstado && puedeBorrarReserva && <th>Acciones</th>}
+              {mostrarAcciones && puedeBorrarReserva && <th>Acciones</th>}
             </tr>
           </thead>
           <tbody>
@@ -295,15 +295,17 @@ function InstalacionesPage() {
                 <td>{r.hora_inicio}</td>
                 <td>{r.hora_fin}</td>
                 {mostrarEstado && <td>{r.estado}</td>}
-                {!mostrarEstado && puedeBorrarReserva && (
+                {mostrarAcciones && puedeBorrarReserva && (
                   <td>
                     <div className="instalaciones-reserva-acciones">
-                      <button
-                        className="instalaciones-btn-reserva-eliminar"
-                        onClick={() => abrirEliminarReserva(r)}
-                      >
-                        Eliminar
-                      </button>
+                      {r.estado !== 'Cancelada' && (
+                        <button
+                          className="instalaciones-btn-reserva-eliminar"
+                          onClick={() => abrirEliminarReserva(r)}
+                        >
+                          Eliminar
+                        </button>
+                      )}
                     </div>
                   </td>
                 )}
@@ -463,7 +465,7 @@ function InstalacionesPage() {
             {reservasVisible && (
               <>
                 {vistaReservas === 'activas'
-                  ? renderTablaReservas(reservasFiltradas)
+                  ? renderTablaReservas(reservasFiltradas, { mostrarEstado: true, mostrarAcciones: true })
                   : renderTablaReservas(reservasHistoricas, { mostrarEstado: true, mensajeVacio: 'No hay reservas históricas para esta instalación.' })}
                 {puedeVerReservas && (
                   <div className="instalaciones-vista-toggle">

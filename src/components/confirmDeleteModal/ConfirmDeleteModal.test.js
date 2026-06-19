@@ -87,4 +87,18 @@ describe('ConfirmDeleteModal', () => {
     render(<ConfirmDeleteModal {...defaultProps} errorModal={null} />);
     expect(screen.queryByRole('alert')).not.toBeInTheDocument();
   });
+
+  test('llama a onCancel al presionar ESC en el overlay', () => {
+    const { container } = render(<ConfirmDeleteModal {...defaultProps} />);
+    const overlay = container.querySelector('.csf-overlay');
+    fireEvent.keyDown(overlay, { key: 'Escape' });
+    expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
+  });
+
+  test('llama a onCancel al presionar Enter en el overlay', () => {
+    const { container } = render(<ConfirmDeleteModal {...defaultProps} />);
+    const overlay = container.querySelector('.csf-overlay');
+    fireEvent.keyDown(overlay, { key: 'Enter' });
+    expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
+  });
 });

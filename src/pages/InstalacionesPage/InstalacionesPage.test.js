@@ -23,8 +23,9 @@ jest.mock('../../services/reservasService', () => ({
   getReservasPorInstalacion: jest.fn(),
   getReservasPorSocio: jest.fn(),
   deleteReserva: jest.fn(),
+  getReservasHistoricasPorInstalacion: jest.fn(),
 }));
-import { getReservasPorInstalacion, getReservasPorSocio, deleteReserva } from '../../services/reservasService';
+import { getReservasPorInstalacion, getReservasPorSocio, deleteReserva, getReservasHistoricasPorInstalacion } from '../../services/reservasService';
 
 jest.mock('../../services/sociosService', () => ({
   getSocios: jest.fn(),
@@ -100,6 +101,7 @@ describe('InstalacionesPage', () => {
     getReservasPorSocio.mockResolvedValue([]);
     deleteReserva.mockResolvedValue(undefined);
     getSocios.mockResolvedValue([SOCIO_MOCK]);
+    getReservasHistoricasPorInstalacion.mockResolvedValue([]);
   });
 
   test('muestra el título "Reservas e Instalaciones"', async () => {
@@ -372,9 +374,9 @@ describe('InstalacionesPage', () => {
     expect(screen.queryByText(/estás seguro/i)).not.toBeInTheDocument();
   });
 
-  test('elimina una reserva correctamente', async () => {
+  test('cancela una reserva y la mantiene visible con estado "Cancelada"', async () => {
     getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-10-05', hora_inicio: '16:00', hora_fin: '18:00' },
+      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-10-05', hora_inicio: '16:00', hora_fin: '18:00', estado: 'Confirmada' },
     ]));
 
     await renderPage();
@@ -384,8 +386,8 @@ describe('InstalacionesPage', () => {
     await waitFor(() => expect(screen.getByText('2026-10-05')).toBeInTheDocument());
     fireEvent.click(ultimoBoton('Eliminar'));
     fireEvent.click(ultimoBoton('Eliminar'));
-    expect(screen.queryByText('2026-10-05')).not.toBeInTheDocument();
-    expect(screen.getByText('No hay reservas para esta instalación.')).toBeInTheDocument();
+    expect(screen.getByText('2026-10-05')).toBeInTheDocument();
+    expect(screen.getByText('Cancelada')).toBeInTheDocument();
   });
 
   test('cancela la eliminación de una reserva', async () => {
@@ -748,5 +750,105 @@ describe('InstalacionesPage', () => {
     fireEvent.click(screen.getByText('1234'));
     expect(document.querySelector('dialog')).not.toBeInTheDocument();
     expect(document.querySelector('.ver-socio-modal-wrapper')).toBeInTheDocument();
+  });
+
+  // ── Tests de location.state (punto 10) ──
+
+  test('navega al detalle de instalación cuando hay instalacionId en location.state', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-state-test', nombre: 'Cancha de tenis', tipo: 'Deportiva', capacidad_maxima: 4, valor_hora: 1000, activa: true },
+    ]);
+
+    render(
+      <MemoryRouter initialEntries={[{ pathname: '/instalaciones', state: { instalacionId: 'inst-state-test' } }]}>
+        <InstalacionesPage />
+      </MemoryRouter>
+    );
+
+    await waitFor(() => expect(screen.getByRole('button', { name: /volver/i })).toBeInTheDocument());
+    expect(screen.getAllByText('Cancha de tenis').length).toBeGreaterThan(0);
+  });
+
+  // ── Tests de reservas históricas ──
+
+  test('muestra reservas históricas al hacer clic en "Ver reservas históricas"', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-hist', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+    ]);
+    getReservasPorInstalacion.mockResolvedValue([]);
+    getReservasHistoricasPorInstalacion.mockResolvedValue([
+      { id: 'hist-1', id_instalacion: 'inst-hist', id_socio: SOCIO_MOCK.id, fecha_reserva: '2025-01-01', hora_inicio: '10:00', hora_fin: '11:00', estado: 'Completada' },
+    ]);
+
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Test')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Test'));
+
+    await waitFor(() => expect(screen.getByRole('button', { name: /ver reservas históricas/i })).toBeInTheDocument());
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /ver reservas históricas/i }));
+    });
+
+    await waitFor(() => expect(screen.getByText('2025-01-01')).toBeInTheDocument());
+    expect(getReservasHistoricasPorInstalacion).toHaveBeenCalledWith('inst-hist');
+  });
+
+  test('vuelve a las reservas activas al hacer clic en "Ver reservas activas"', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-toggle', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+    ]);
+    getReservasPorInstalacion.mockResolvedValue([
+      { id: 'r-act', id_instalacion: 'inst-toggle', id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+    ]);
+    getReservasHistoricasPorInstalacion.mockResolvedValue([
+      { id: 'hist-2', id_instalacion: 'inst-toggle', id_socio: SOCIO_MOCK.id, fecha_reserva: '2025-03-15', hora_inicio: '14:00', hora_fin: '15:00', estado: 'Completada' },
+    ]);
+
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Test')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Test'));
+
+    await waitFor(() => expect(screen.getByText('2026-08-01')).toBeInTheDocument());
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /ver reservas históricas/i }));
+    });
+    await waitFor(() => expect(screen.getByText('2025-03-15')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /ver reservas activas/i }));
+    expect(screen.queryByText('2025-03-15')).not.toBeInTheDocument();
+    expect(screen.getByText('2026-08-01')).toBeInTheDocument();
+  });
+
+  // ── Test de buscarPorSocio con input vacío via Enter ──
+
+  test('presionar Enter con el filtro de socio vacío limpia los resultados de búsqueda', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-busq-vacia', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+    ]);
+    getReservasPorInstalacion.mockResolvedValue([
+      { id: 'r-base', id_instalacion: 'inst-busq-vacia', id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-09-01', hora_inicio: '10:00', hora_fin: '11:00' },
+    ]);
+    getReservasPorSocio.mockResolvedValue([]);
+
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Test')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Test'));
+    await waitFor(() => expect(screen.getByText('2026-09-01')).toBeInTheDocument());
+
+    const inputSocio = screen.getByLabelText('Filtrar por número de socio');
+
+    fireEvent.change(inputSocio, { target: { value: '9999' } });
+    await act(async () => {
+      fireEvent.keyDown(inputSocio, { key: 'Enter' });
+    });
+    await waitFor(() => expect(screen.getByText('No hay reservas para esta instalación.')).toBeInTheDocument());
+
+    fireEvent.change(inputSocio, { target: { value: '' } });
+    await act(async () => {
+      fireEvent.keyDown(inputSocio, { key: 'Enter' });
+    });
+
+    expect(screen.getByText('2026-09-01')).toBeInTheDocument();
   });
 });
