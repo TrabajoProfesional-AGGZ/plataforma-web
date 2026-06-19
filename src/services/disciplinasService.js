@@ -28,3 +28,11 @@ export async function getSociosByDisciplina(idDisciplina) {
   const data = await res.json();
   return data.socios ?? data;
 }
+
+export async function getDisciplinasBySocio(idSocio) {
+  const res = await fetchTo(`/api/v1/disciplinas/por-socio/${idSocio}`, 'GET');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error('Error al obtener disciplinas del socio');
+  const data = await res.json();
+  return data.disciplinas ?? data;
+}

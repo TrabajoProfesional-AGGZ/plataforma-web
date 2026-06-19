@@ -38,3 +38,19 @@ export async function deleteReserva(instalacionId, reservaId) {
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al eliminar reserva');
 }
+
+export async function getReservasHistoricas() {
+  const res = await fetchTo('/api/v1/reservas/historicas', 'GET');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error('Error al obtener reservas históricas');
+  const data = await res.json();
+  return data.reservas ?? data;
+}
+
+export async function getReservasHistoricasPorInstalacion(instalacionId) {
+  const res = await fetchTo(`/api/v1/reservas/historicas/por-instalacion/${instalacionId}`, 'GET');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error('Error al obtener reservas históricas');
+  const data = await res.json();
+  return data.reservas ?? data;
+}

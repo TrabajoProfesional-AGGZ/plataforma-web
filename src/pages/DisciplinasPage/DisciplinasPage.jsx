@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Plus, ChevronLeft } from 'lucide-react';
 import { CreateDisciplinaForm } from '../../components/createDisciplinaForm/CreateDisciplinaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { getDisciplinas, createDisciplina, pausarDisciplina, getSociosByDisciplina } from '../../services/disciplinasService';
 import { usePermiso } from '../../hooks/usePermiso';
+import { VerSocioModal } from '../../components/verSocioModal/VerSocioModal';
 import logo from '../../assets/logo_socio.png';
 import './DisciplinasPage.css';
 import '../../styles/ListPage.css';
@@ -11,6 +13,7 @@ import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
 
 function DisciplinasPage() {
+  const location = useLocation();
   const puedeVerDisciplinas = usePermiso('ver_disciplinas');
   const puedeCrearDisciplina = usePermiso('crear_disciplina');
   const puedeBorrarDisciplina = usePermiso('borrar_disciplina');
@@ -23,6 +26,8 @@ function DisciplinasPage() {
   const [pausarOpen, setPausarOpen] = useState(false);
   const [sociosDisciplina, setSociosDisciplina] = useState([]);
   const [loadingSociosDisciplina, setLoadingSociosDisciplina] = useState(false);
+  const [verSocioData, setVerSocioData] = useState(null);
+  const [verSocioOpen, setVerSocioOpen] = useState(false);
 
   useEffect(() => {
     if (!puedeVerDisciplinas) return;
@@ -34,13 +39,22 @@ function DisciplinasPage() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!pausarOpen) return;
+    if (!pausarOpen && !verSocioOpen) return;
     function handleKeyDown(e) {
-      if (e.key === 'Escape') setPausarOpen(false);
+      if (e.key === 'Escape') {
+        setPausarOpen(false);
+        setVerSocioOpen(false);
+      }
     }
     document.addEventListener('keydown', handleKeyDown);
     return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [pausarOpen]);
+  }, [pausarOpen, verSocioOpen]);
+
+  useEffect(() => {
+    if (!location.state?.disciplinaId || disciplinas.length === 0) return;
+    const found = disciplinas.find((d) => d.id === location.state.disciplinaId);
+    if (found) { setDisciplinaActual(found); setVista('detalle'); }
+  }, [disciplinas]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (!disciplinaActual) {
@@ -84,6 +98,11 @@ function DisciplinasPage() {
         prev.map((d) => (d.id === id ? { ...d, estado: estadoAnterior } : d))
       );
     }
+  }
+
+  function abrirVerSocio(socio) {
+    setVerSocioData(socio);
+    setVerSocioOpen(true);
   }
 
   function renderListaContenido() {
@@ -220,7 +239,15 @@ function DisciplinasPage() {
                   <tbody>
                     {sociosDisciplina.map((s) => (
                       <tr key={s.id}>
-                        <td>{s.nro_socio}</td>
+                        <td>
+                          <button
+                            type="button"
+                            className="nro-socio-link"
+                            onClick={() => abrirVerSocio(s)}
+                          >
+                            {s.nro_socio}
+                          </button>
+                        </td>
                         <td>{s.apellido} {s.nombre}</td>
                         <td>
                           <span className={`disciplinas-badge ${s.estado?.nombre === 'Activo' || s.estado === 'Activo' ? 'badge-activa' : 'badge-pausada'}`}>
@@ -261,6 +288,10 @@ function DisciplinasPage() {
         onCancel={() => setPausarOpen(false)}
         labelConfirmar="Pausar"
       />
+
+      {verSocioOpen && verSocioData && (
+        <VerSocioModal socio={verSocioData} onClose={() => setVerSocioOpen(false)} />
+      )}
     </div>
   );
 }

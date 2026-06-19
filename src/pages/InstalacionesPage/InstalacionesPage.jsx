@@ -1,13 +1,14 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { Plus, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { CreateInstalacionForm } from '../../components/createInstalacionForm/CreateInstalacionForm';
 import { CreateReservaForm } from '../../components/createReservaForm/CreateReservaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { getInstalaciones, createInstalacion, deleteInstalacion } from '../../services/instalacionesService';
-import { getReservasPorInstalacion, getReservasPorSocio, deleteReserva } from '../../services/reservasService';
+import { getReservasPorInstalacion, getReservasPorSocio, deleteReserva, getReservasHistoricasPorInstalacion } from '../../services/reservasService';
 import { getSocios } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
-import { estadoConfig } from '../../utils/estadoConfig';
+import { VerSocioModal } from '../../components/verSocioModal/VerSocioModal';
 import logo from '../../assets/logo_socio.png';
 import './InstalacionesPage.css';
 import '../../styles/ListPage.css';
@@ -16,6 +17,7 @@ import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
 
 function InstalacionesPage() {
+  const location = useLocation();
   const puedeVerInstalaciones = usePermiso('ver_instalaciones');
   const puedeCrearInstalacion = usePermiso('crear_instalacion');
   const puedeBorrarInstalacion = usePermiso('borrar_instalacion');
@@ -43,6 +45,8 @@ function InstalacionesPage() {
   const [reservasVisible, setReservasVisible] = useState(true);
   const [verSocioData, setVerSocioData] = useState(null);
   const [verSocioOpen, setVerSocioOpen] = useState(false);
+  const [vistaReservas, setVistaReservas] = useState('activas');
+  const [reservasHistoricas, setReservasHistoricas] = useState([]);
 
   useEffect(() => {
     if (!puedeVerInstalaciones) return;
@@ -83,8 +87,16 @@ function InstalacionesPage() {
 
   useEffect(() => {
     if (!instalacionActual || !puedeVerReservas) return;
+    setVistaReservas('activas');
+    setReservasHistoricas([]);
     cargarReservas(instalacionActual.id).catch(() => {});
   }, [instalacionActual]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
+    if (!location.state?.instalacionId || instalaciones.length === 0) return;
+    const found = instalaciones.find((i) => i.id === location.state.instalacionId);
+    if (found) { setInstalacionActual(found); setVista('detalle'); }
+  }, [instalaciones]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const anyModalOpen = eliminarInstalacionOpen || eliminarReservaOpen || verSocioOpen;
 
@@ -161,6 +173,19 @@ function InstalacionesPage() {
     } catch { /* silently ignore */ }
   }
 
+  async function cargarReservasHistoricas(instalacionId) {
+    const [reservasData, sociosData] = await Promise.all([
+      getReservasHistoricasPorInstalacion(instalacionId),
+      getSocios(),
+    ]);
+    const socioMap = Object.fromEntries(sociosData.map((s) => [s.id, s]));
+    setReservasHistoricas(reservasData.map((r) => ({
+      ...r,
+      nro_socio: r.nro_socio ?? socioMap[r.id_socio]?.nro_socio ?? r.id_socio,
+      socio: socioMap[r.id_socio] ?? null,
+    })));
+  }
+
   function abrirVerSocio(socio) {
     setVerSocioData(socio);
     setVerSocioOpen(true);
@@ -219,18 +244,18 @@ function InstalacionesPage() {
     );
   };
 
-  const renderTablaReservas = () => {
-    if (reservasFiltradas.length === 0) {
+  const renderTablaReservas = (datos, { mostrarEstado = false, mensajeVacio = null } = {}) => {
+    if (datos.length === 0) {
       return (
         <p className="instalaciones-empty">
-          {filtroFecha && reservasDeInstalacion.length > 0
+          {mensajeVacio ?? (filtroFecha && reservasDeInstalacion.length > 0
             ? 'No hay reservas para la fecha seleccionada.'
-            : 'No hay reservas para esta instalación.'}
+            : 'No hay reservas para esta instalación.')}
         </p>
       );
     }
 
-    const reservasOrdenadas = [...reservasFiltradas].sort((a, b) =>
+    const reservasOrdenadas = [...datos].sort((a, b) =>
       (a.fecha_reserva ?? a.fecha ?? '').localeCompare(b.fecha_reserva ?? b.fecha ?? '') ||
       (a.hora_inicio ?? '').localeCompare(b.hora_inicio ?? '')
     );
@@ -245,7 +270,8 @@ function InstalacionesPage() {
               <th>Fecha</th>
               <th>Inicio</th>
               <th>Fin</th>
-              {puedeBorrarReserva && <th>Acciones</th>}
+              {mostrarEstado && <th>Estado</th>}
+              {!mostrarEstado && puedeBorrarReserva && <th>Acciones</th>}
             </tr>
           </thead>
           <tbody>
@@ -256,7 +282,7 @@ function InstalacionesPage() {
                   {r.socio ? (
                     <button
                       type="button"
-                      className="instalaciones-nro-socio-link"
+                      className="nro-socio-link"
                       onClick={() => abrirVerSocio(r.socio)}
                     >
                       {r.nro_socio}
@@ -268,7 +294,8 @@ function InstalacionesPage() {
                 <td>{r.fecha_reserva ?? r.fecha}</td>
                 <td>{r.hora_inicio}</td>
                 <td>{r.hora_fin}</td>
-                {puedeBorrarReserva && (
+                {mostrarEstado && <td>{r.estado}</td>}
+                {!mostrarEstado && puedeBorrarReserva && (
                   <td>
                     <div className="instalaciones-reserva-acciones">
                       <button
@@ -290,81 +317,7 @@ function InstalacionesPage() {
 
   const renderModalVerSocio = () => {
     if (!verSocioOpen || !verSocioData) return null;
-    const cfg = estadoConfig(verSocioData.estado);
-    
-    return (
-      <div 
-        className="modal-overlay" 
-        role="presentation"
-        onClick={(e) => {
-          if (e.target === e.currentTarget) setVerSocioOpen(false);
-        }}
-        onKeyDown={(e) => {
-          if (e.target === e.currentTarget && (e.key === 'Escape' || e.key === 'Enter')) {
-            setVerSocioOpen(false);
-          }
-        }}
-      >
-        <div className="instalaciones-ver-socio-wrapper">
-          <div className="socios-card" style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}>
-            <div className="socios-card-inner">
-              <img src={cfg.logo} alt="" className="socios-card-logo" />
-              <div className="socios-card-data">
-                <div className="socios-card-row">
-                  <span className="socios-card-label">N° Socio</span>
-                  <span>{verSocioData.nro_socio}</span>
-                </div>
-                <div className="socios-card-row">
-                  <span className="socios-card-label">Apellido y nombre</span>
-                  <span>{verSocioData.apellido} {verSocioData.nombre}</span>
-                </div>
-                {verSocioData.nro_documento && (
-                  <div className="socios-card-row">
-                    <span className="socios-card-label">DNI</span>
-                    <span>{verSocioData.nro_documento}</span>
-                  </div>
-                )}
-                {verSocioData.fecha_nacimiento && (
-                  <div className="socios-card-row">
-                    <span className="socios-card-label">Fecha de nacimiento</span>
-                    <span>{verSocioData.fecha_nacimiento}</span>
-                  </div>
-                )}
-                {verSocioData.email && (
-                  <div className="socios-card-row">
-                    <span className="socios-card-label">Email</span>
-                    <span>{verSocioData.email}</span>
-                  </div>
-                )}
-                {verSocioData.telefono && (
-                  <div className="socios-card-row">
-                    <span className="socios-card-label">Teléfono</span>
-                    <span>{verSocioData.telefono}</span>
-                  </div>
-                )}
-                {verSocioData.categoria && (
-                  <div className="socios-card-row">
-                    <span className="socios-card-label">Categoría</span>
-                    <span>{verSocioData.categoria?.nombre ?? verSocioData.categoria}</span>
-                  </div>
-                )}
-                {verSocioData.estado && (
-                  <div className="socios-card-row">
-                    <span className="socios-card-label">Estado</span>
-                    <span>{verSocioData.estado?.nombre ?? verSocioData.estado}</span>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-          <div className="instalaciones-ver-socio-cerrar">
-            <button type="button" className="modal-button-cancel" onClick={() => setVerSocioOpen(false)}>
-              Cerrar
-            </button>
-          </div>
-        </div>
-      </div>
-    );
+    return <VerSocioModal socio={verSocioData} onClose={() => setVerSocioOpen(false)} />;
   };
 
   return (
@@ -507,7 +460,32 @@ function InstalacionesPage() {
               )}
             </div>
 
-            {reservasVisible && renderTablaReservas()}
+            {reservasVisible && (
+              <>
+                {vistaReservas === 'activas'
+                  ? renderTablaReservas(reservasFiltradas)
+                  : renderTablaReservas(reservasHistoricas, { mostrarEstado: true, mensajeVacio: 'No hay reservas históricas para esta instalación.' })}
+                {puedeVerReservas && (
+                  <div className="instalaciones-vista-toggle">
+                    {vistaReservas === 'activas' ? (
+                      <button
+                        className="instalaciones-btn-vista-toggle"
+                        onClick={() => cargarReservasHistoricas(instalacionActual.id).then(() => setVistaReservas('historicas')).catch(() => {})}
+                      >
+                        Ver reservas históricas
+                      </button>
+                    ) : (
+                      <button
+                        className="instalaciones-btn-vista-toggle"
+                        onClick={() => setVistaReservas('activas')}
+                      >
+                        Ver reservas activas
+                      </button>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
           </div>
         </>
       )}

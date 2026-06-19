@@ -35,7 +35,7 @@ export function MultiStepFormShell({
         if (e.target === e.currentTarget && (e.key === 'Escape' || e.key === 'Enter')) onCancel();
       }}
     >
-      <dialog open className="csf-wrapper">
+      <div className="csf-wrapper">
         <AnimatePresence mode="wait">
           {submitted ? (
             <motion.div
@@ -208,7 +208,7 @@ export function MultiStepFormShell({
             </motion.div>
           )}
         </AnimatePresence>
-      </dialog>
+      </div>
     </div>
   );
 }
