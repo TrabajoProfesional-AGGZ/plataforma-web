@@ -120,39 +120,26 @@ describe('sociosService', () => {
   });
 
   describe('getSocioByNroSocio', () => {
-    const SOCIOS = [
-      { id: 'uuid-100', nro_socio: 100, nombre: 'Ana', apellido: 'López' },
-      { id: 'uuid-200', nro_socio: 200, nombre: 'Pedro', apellido: 'Gómez' },
-    ];
-
-    function mockGetSocios(socios) {
+    test('llama al endpoint correcto con el nro de socio', async () => {
       fetchTo.mockResolvedValueOnce({
         ok: true,
         status: 200,
-        json: async () => ({ socios }),
+        json: async () => ({ id: 'uuid-1000', nro_socio: 1000, nombre: 'Ana' }),
       });
-    }
 
-    test('devuelve el socio cuando el nro_socio coincide', async () => {
-      mockGetSocios(SOCIOS);
-      const result = await getSocioByNroSocio(100);
-      expect(result).toEqual(SOCIOS[0]);
+      await getSocioByNroSocio(1000);
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/socios/por-nro-socio/1000', 'GET');
     });
 
-    test('funciona cuando nro_socio se pasa como string', async () => {
-      mockGetSocios(SOCIOS);
-      const result = await getSocioByNroSocio('200');
-      expect(result).toEqual(SOCIOS[1]);
-    });
-
-    test('lanza socio-no-encontrado si ningún socio coincide', async () => {
-      mockGetSocios(SOCIOS);
+    test('lanza socio-no-encontrado en 404', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
       await expect(getSocioByNroSocio(9999)).rejects.toThrow('socio-no-encontrado');
     });
 
-    test('propaga el error si getSocios falla con 500', async () => {
+    test('lanza servicio-no-disponible en 500', async () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
-      await expect(getSocioByNroSocio(100)).rejects.toThrow('servicio-no-disponible');
+      await expect(getSocioByNroSocio(1000)).rejects.toThrow('servicio-no-disponible');
     });
   });
 });

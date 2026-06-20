@@ -28,6 +28,7 @@ function DisciplinasPage() {
   const [loadingSociosDisciplina, setLoadingSociosDisciplina] = useState(false);
   const [verSocioData, setVerSocioData] = useState(null);
   const [verSocioOpen, setVerSocioOpen] = useState(false);
+  const [filtroDisciplinaSocio, setFiltroDisciplinaSocio] = useState('');
 
   useEffect(() => {
     if (!puedeVerDisciplinas) return;
@@ -59,8 +60,10 @@ function DisciplinasPage() {
   useEffect(() => {
     if (!disciplinaActual) {
       setSociosDisciplina([]);
+      setFiltroDisciplinaSocio('');
       return;
     }
+    setFiltroDisciplinaSocio('');
     setLoadingSociosDisciplina(true);
     getSociosByDisciplina(disciplinaActual.id)
       .then((data) => setSociosDisciplina(data))
@@ -99,6 +102,10 @@ function DisciplinasPage() {
       );
     }
   }
+
+  const sociosDisciplinaFiltrados = filtroDisciplinaSocio.trim()
+    ? sociosDisciplina.filter((s) => String(s.nro_socio).includes(filtroDisciplinaSocio.trim()))
+    : sociosDisciplina;
 
   function abrirVerSocio(socio) {
     setVerSocioData(socio);
@@ -227,38 +234,52 @@ function DisciplinasPage() {
             ) : sociosDisciplina.length === 0 ? (
               <p className="disciplinas-empty">No hay socios inscriptos en esta disciplina.</p>
             ) : (
-              <div className="disciplinas-table-wrapper">
-                <table className="disciplinas-tabla">
-                  <thead>
-                    <tr>
-                      <th>N° Socio</th>
-                      <th>Apellido y nombre</th>
-                      <th>Estado</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {sociosDisciplina.map((s) => (
-                      <tr key={s.id}>
-                        <td>
-                          <button
-                            type="button"
-                            className="nro-socio-link"
-                            onClick={() => abrirVerSocio(s)}
-                          >
-                            {s.nro_socio}
-                          </button>
-                        </td>
-                        <td>{s.apellido} {s.nombre}</td>
-                        <td>
-                          <span className={`disciplinas-badge ${s.estado?.nombre === 'Activo' || s.estado === 'Activo' ? 'badge-activa' : 'badge-pausada'}`}>
-                            {s.estado?.nombre ?? s.estado ?? '—'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              <>
+                <input
+                  type="text"
+                  className="disciplinas-filtro-socio"
+                  placeholder="Filtrar por N° de socio"
+                  value={filtroDisciplinaSocio}
+                  onChange={(e) => setFiltroDisciplinaSocio(e.target.value)}
+                  aria-label="Filtrar por número de socio"
+                />
+                {sociosDisciplinaFiltrados.length === 0 ? (
+                  <p className="disciplinas-empty">No hay socios con ese número.</p>
+                ) : (
+                  <div className="disciplinas-table-wrapper">
+                    <table className="disciplinas-tabla">
+                      <thead>
+                        <tr>
+                          <th>N° Socio</th>
+                          <th>Apellido y nombre</th>
+                          <th>Estado</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sociosDisciplinaFiltrados.map((s) => (
+                          <tr key={s.id}>
+                            <td>
+                              <button
+                                type="button"
+                                className="nro-socio-link"
+                                onClick={() => abrirVerSocio(s)}
+                              >
+                                {s.nro_socio}
+                              </button>
+                            </td>
+                            <td>{s.apellido} {s.nombre}</td>
+                            <td>
+                              <span className={`disciplinas-badge ${s.estado?.nombre === 'Activo' || s.estado === 'Activo' ? 'badge-activa' : 'badge-pausada'}`}>
+                                {s.estado?.nombre ?? s.estado ?? '—'}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </>
             )}
           </div>
 

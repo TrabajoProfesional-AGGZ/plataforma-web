@@ -1,6 +1,6 @@
 import { useRef, useEffect, useLayoutEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, ShieldCheck, ChevronRight, Building2, Activity } from 'lucide-react';
+import { LayoutDashboard, Users, ShieldCheck, ChevronRight, Building2, Trophy } from 'lucide-react';
 import { logout } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
 import texto from '../../assets/texto.png';
@@ -12,7 +12,7 @@ const NAV_ITEMS_BASE = [
   { to: '/socios', label: 'Socios', desc: 'Consultar y gestionar el padrón', Icon: Users, permiso: 'ver_socios' },
   { to: '/usuarios', label: 'Usuarios', desc: 'Usuarios administrativos y roles', Icon: ShieldCheck, permiso: 'ver_usuarios' },
   { to: '/instalaciones', label: 'Reservas e Instalaciones', desc: 'Administrar espacios físicos y reservas', Icon: Building2, permiso: 'ver_instalaciones' },
-  { to: '/disciplinas', label: 'Disciplinas', desc: 'Gestionar disciplinas del club', Icon: Activity, permiso: 'ver_disciplinas' },
+  { to: '/disciplinas', label: 'Disciplinas', desc: 'Gestionar disciplinas del club', Icon: Trophy, permiso: 'ver_disciplinas' },
 ];
 
 function AppLayout() {

@@ -158,6 +158,10 @@ function InstalacionesPage() {
     ? baseReservas.filter((r) => (r.fecha_reserva ?? r.fecha) === filtroFecha)
     : baseReservas;
 
+  const reservasHistoricasFiltradas = filtroNroSocio.trim()
+    ? reservasHistoricas.filter((r) => String(r.nro_socio) === filtroNroSocio.trim())
+    : reservasHistoricas;
+
   function abrirEliminarReserva(reserva) {
     setReservaActual(reserva);
     setEliminarReservaOpen(true);
@@ -438,7 +442,9 @@ function InstalacionesPage() {
                       if (!val.trim()) setReservasBusqueda(null);
                     }}
                     onKeyDown={(e) => {
-                      if (e.key === 'Enter') buscarPorSocio(filtroNroSocio).catch(() => {});
+                      if (e.key === 'Enter' && vistaReservas === 'activas') {
+                        buscarPorSocio(filtroNroSocio).catch(() => {});
+                      }
                     }}
                   />
                 )}
@@ -466,20 +472,28 @@ function InstalacionesPage() {
               <>
                 {vistaReservas === 'activas'
                   ? renderTablaReservas(reservasFiltradas, { mostrarEstado: true, mostrarAcciones: true })
-                  : renderTablaReservas(reservasHistoricas, { mostrarEstado: true, mensajeVacio: 'No hay reservas históricas para esta instalación.' })}
+                  : renderTablaReservas(reservasHistoricasFiltradas, { mostrarEstado: true, mensajeVacio: 'No hay reservas históricas para esta instalación.' })}
                 {puedeVerReservas && (
                   <div className="instalaciones-vista-toggle">
                     {vistaReservas === 'activas' ? (
                       <button
                         className="instalaciones-btn-vista-toggle"
-                        onClick={() => cargarReservasHistoricas(instalacionActual.id).then(() => setVistaReservas('historicas')).catch(() => {})}
+                        onClick={() => {
+                          setFiltroNroSocio('');
+                          setReservasBusqueda(null);
+                          cargarReservasHistoricas(instalacionActual.id).then(() => setVistaReservas('historicas')).catch(() => {});
+                        }}
                       >
                         Ver reservas históricas
                       </button>
                     ) : (
                       <button
                         className="instalaciones-btn-vista-toggle"
-                        onClick={() => setVistaReservas('activas')}
+                        onClick={() => {
+                          setFiltroNroSocio('');
+                          setReservasBusqueda(null);
+                          setVistaReservas('activas');
+                        }}
                       >
                         Ver reservas activas
                       </button>
