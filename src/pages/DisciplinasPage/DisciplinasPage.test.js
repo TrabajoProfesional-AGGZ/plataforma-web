@@ -374,6 +374,111 @@ describe('DisciplinasPage', () => {
     expect(screen.getAllByText('Yoga').length).toBeGreaterThan(0);
   });
 
+  // ── Tests del buscador por N° de socio en socios inscriptos (Tarea 3) ──
+
+  test('muestra el input de filtro cuando hay socios inscriptos', async () => {
+    getSociosByDisciplina.mockResolvedValue([
+      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
+    ]);
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByLabelText('Filtrar por número de socio')).toBeInTheDocument());
+  });
+
+  test('no muestra el input de filtro cuando no hay socios inscriptos', async () => {
+    getSociosByDisciplina.mockResolvedValue([]);
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByText('No hay socios inscriptos en esta disciplina.')).toBeInTheDocument());
+    expect(screen.queryByLabelText('Filtrar por número de socio')).not.toBeInTheDocument();
+  });
+
+  test('tipear en el filtro reduce la tabla de socios en tiempo real', async () => {
+    getSociosByDisciplina.mockResolvedValue([
+      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
+      { id: 's-2', nro_socio: '2002', nombre: 'Carlos', apellido: 'Ruiz', estado: { nombre: 'Moroso' } },
+    ]);
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByText('2001')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Filtrar por número de socio'), { target: { value: '2001' } });
+
+    expect(screen.getByText('2001')).toBeInTheDocument();
+    expect(screen.queryByText('2002')).not.toBeInTheDocument();
+  });
+
+  test('limpiar el filtro vuelve a mostrar todos los socios', async () => {
+    getSociosByDisciplina.mockResolvedValue([
+      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
+      { id: 's-2', nro_socio: '2002', nombre: 'Carlos', apellido: 'Ruiz', estado: { nombre: 'Moroso' } },
+    ]);
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByText('2001')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Filtrar por número de socio'), { target: { value: '2001' } });
+    expect(screen.queryByText('2002')).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByLabelText('Filtrar por número de socio'), { target: { value: '' } });
+    expect(screen.getByText('2001')).toBeInTheDocument();
+    expect(screen.getByText('2002')).toBeInTheDocument();
+  });
+
+  test('muestra mensaje cuando el filtro no coincide con ningún socio', async () => {
+    getSociosByDisciplina.mockResolvedValue([
+      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
+    ]);
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByText('2001')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Filtrar por número de socio'), { target: { value: '9999' } });
+
+    expect(screen.queryByText('2001')).not.toBeInTheDocument();
+    expect(screen.getByText('No hay socios con ese número.')).toBeInTheDocument();
+  });
+
+  test('el filtro acepta coincidencia parcial del número de socio', async () => {
+    getSociosByDisciplina.mockResolvedValue([
+      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
+      { id: 's-2', nro_socio: '3001', nombre: 'Carlos', apellido: 'Ruiz', estado: { nombre: 'Moroso' } },
+    ]);
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByText('2001')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Filtrar por número de socio'), { target: { value: '001' } });
+
+    expect(screen.getByText('2001')).toBeInTheDocument();
+    expect(screen.getByText('3001')).toBeInTheDocument();
+  });
+
+  test('el filtro se resetea al salir y volver al detalle de una disciplina', async () => {
+    getSociosByDisciplina.mockResolvedValue([
+      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
+    ]);
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByLabelText('Filtrar por número de socio')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Filtrar por número de socio'), { target: { value: '9999' } });
+    expect(screen.getByLabelText('Filtrar por número de socio').value).toBe('9999');
+
+    fireEvent.click(screen.getByRole('button', { name: /volver/i }));
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByLabelText('Filtrar por número de socio')).toBeInTheDocument());
+    expect(screen.getByLabelText('Filtrar por número de socio').value).toBe('');
+  });
+
   test('limpia la lista de socios si getSociosByDisciplina falla', async () => {
     getSociosByDisciplina.mockRejectedValueOnce(new Error('error de red'));
 

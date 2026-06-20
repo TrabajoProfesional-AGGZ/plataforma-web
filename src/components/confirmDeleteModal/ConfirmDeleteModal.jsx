@@ -29,7 +29,7 @@ function ConfirmDeleteModal({
         if (e.target === e.currentTarget && (e.key === 'Escape' || e.key === 'Enter')) onCancel();
       }}
     >
-      <dialog open className="csf-wrapper">
+      <div className="csf-wrapper">
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
@@ -85,7 +85,7 @@ function ConfirmDeleteModal({
             </div>
           </div>
         </motion.div>
-      </dialog>
+      </div>
     </div>
   );
 }
