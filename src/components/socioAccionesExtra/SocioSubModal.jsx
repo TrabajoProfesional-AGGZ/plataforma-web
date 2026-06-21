@@ -18,7 +18,7 @@ function SocioSubModal({ titulo, wrapperClass, onClose, children }) {
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       onKeyDown={(e) => { if (e.target === e.currentTarget && e.key === 'Escape') onClose(); }}
     >
-      <dialog open className={`csf-wrapper ${wrapperClass}`}>
+      <div className={`csf-wrapper ${wrapperClass}`}>
         <div className="csf-outer-card">
           <div className="csf-header">
             <h1>{titulo}</h1>
@@ -27,7 +27,7 @@ function SocioSubModal({ titulo, wrapperClass, onClose, children }) {
             {children}
           </div>
         </div>
-      </dialog>
+      </div>
     </div>
   );
 }

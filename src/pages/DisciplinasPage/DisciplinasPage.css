@@ -72,6 +72,24 @@
   margin: 0 0 12px 0;
 }
 
+/* ── Filtro socios inscriptos ────────────────────────────────── */
+.disciplinas-filtro-socio {
+  width: 220px;
+  padding: 8px 12px;
+  border: 1px solid #111111;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  color: #111111;
+  background-color: #ffffff;
+  outline: none;
+  margin-bottom: 12px;
+}
+
+.disciplinas-filtro-socio:focus {
+  border-color: #111111;
+}
+
 /* ── Loading state ────────────────────────────────────────────── */
 .disciplinas-loading {
   display: flex;

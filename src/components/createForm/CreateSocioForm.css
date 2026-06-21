@@ -373,6 +373,26 @@ button.csf-overlay {
 }
 
 /* ── Búsqueda de socio por número ── */
+.csf-socio-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.csf-socio-input-row > :first-child {
+  flex: 1;
+}
+
+.csf-socio-nombre-inline {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #0D6E0D;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
 .csf-socio-encontrado {
   display: flex;
   align-items: center;

@@ -42,11 +42,24 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
 
   useEscapeKey(onCancel);
 
+  const nroSocioField = register('nro_socio', { required: 'El número de socio es requerido' });
+
+  const previewSocio = async (value) => {
+    if (!value?.trim()) return;
+    try {
+      const socio = await getSocioByNroSocio(value.trim());
+      setSocioResuelto(socio);
+    } catch {
+      // preview silently fails; goNext shows the error
+    }
+  };
+
   const goNext = async () => {
     const valid = await trigger(stepFields[step]);
     if (!valid) return;
 
     if (step === 1) {
+      if (socioResuelto) { advance(); return; }
       const nroSocio = getValues('nro_socio');
       setBusquedaSocio(true);
       setErrorSocio('');
@@ -107,18 +120,29 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
         {step === 1 && (
           <FormStep key="step1" direction={direction}>
             <Field label="Número de socio" icon={Hash} error={errors.nro_socio?.message}>
-              <StyledInput
-                {...register('nro_socio', { required: 'El número de socio es requerido' })}
-                type="text"
-                placeholder="Ej. 1234"
-                error={!!errors.nro_socio}
-              />
-              {socioResuelto && (
-                <p className="csf-socio-encontrado">
-                  <CheckCircle2 size={13} color="#0D6E0D" />
-                  {socioResuelto.apellido} {socioResuelto.nombre}
-                </p>
-              )}
+              <div className="csf-socio-input-row">
+                <StyledInput
+                  {...nroSocioField}
+                  type="text"
+                  placeholder="Ej. 1234"
+                  error={!!errors.nro_socio}
+                  onChange={(e) => {
+                    setSocioResuelto(null);
+                    setErrorSocio('');
+                    nroSocioField.onChange(e);
+                  }}
+                  onBlur={(e) => {
+                    previewSocio(e.target.value);
+                    nroSocioField.onBlur(e);
+                  }}
+                />
+                {socioResuelto && (
+                  <span className="csf-socio-nombre-inline">
+                    <CheckCircle2 size={13} color="#0D6E0D" />
+                    {socioResuelto.apellido} {socioResuelto.nombre}
+                  </span>
+                )}
+              </div>
               {errorSocio && (
                 <p className="csf-error">
                   <AlertCircle size={12} />

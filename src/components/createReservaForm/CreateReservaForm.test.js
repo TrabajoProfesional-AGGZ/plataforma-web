@@ -283,4 +283,71 @@ describe('CreateReservaForm', () => {
       expect(screen.queryByText(/hora de fin debe ser posterior/i)).not.toBeInTheDocument();
     });
   });
+
+  // ── Tests del preview inline al perder el foco (Tarea 1) ──
+
+  test('al perder el foco con un nro válido, muestra el nombre del socio inline sin hacer clic en Siguiente', async () => {
+    renderForm();
+    const input = screen.getByPlaceholderText(/ej\. 1234/i);
+    fireEvent.change(input, { target: { value: '1234' } });
+    await act(async () => { fireEvent.blur(input); });
+    await waitFor(() => expect(screen.getByText('García Juan')).toBeInTheDocument());
+  });
+
+  test('al cambiar el campo después del preview, limpia el nombre del socio', async () => {
+    renderForm();
+    const input = screen.getByPlaceholderText(/ej\. 1234/i);
+    fireEvent.change(input, { target: { value: '1234' } });
+    await act(async () => { fireEvent.blur(input); });
+    await waitFor(() => expect(screen.getByText('García Juan')).toBeInTheDocument());
+    await act(async () => { fireEvent.change(input, { target: { value: '5678' } }); });
+    await waitFor(() => expect(screen.queryByText('García Juan')).not.toBeInTheDocument());
+  });
+
+  test('al editar el campo después de un error de goNext, limpia el mensaje de error', async () => {
+    getSocioByNroSocio.mockRejectedValueOnce(new Error('not found')).mockResolvedValue(SOCIO_TEST);
+    renderForm();
+    const input = screen.getByPlaceholderText(/ej\. 1234/i);
+    fireEvent.change(input, { target: { value: '9999' } });
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'inst-uuid-1' } });
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+    });
+    await waitFor(() => expect(screen.getByText(/no se encontró ningún socio/i)).toBeInTheDocument());
+    await act(async () => { fireEvent.change(input, { target: { value: '1234' } }); });
+    await waitFor(() => expect(screen.queryByText(/no se encontró ningún socio/i)).not.toBeInTheDocument());
+  });
+
+  test('avanzar con socioResuelto ya cargado por el preview no llama de nuevo a la API', async () => {
+    renderForm();
+    const input = screen.getByPlaceholderText(/ej\. 1234/i);
+    fireEvent.change(input, { target: { value: '1234' } });
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'inst-uuid-1' } });
+    await act(async () => { fireEvent.blur(input); });
+    await waitFor(() => expect(screen.getByText('García Juan')).toBeInTheDocument());
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+    });
+    await waitFor(() => expect(screen.getByText(/paso 2 de 2/i)).toBeInTheDocument());
+
+    expect(getSocioByNroSocio).toHaveBeenCalledTimes(1);
+  });
+
+  test('el preview falla silenciosamente sin mostrar error al usuario', async () => {
+    getSocioByNroSocio.mockRejectedValue(new Error('not found'));
+    renderForm();
+    const input = screen.getByPlaceholderText(/ej\. 1234/i);
+    fireEvent.change(input, { target: { value: '9999' } });
+    await act(async () => { fireEvent.blur(input); });
+    await waitFor(() => {});
+    expect(screen.queryByText(/no se encontró ningún socio/i)).not.toBeInTheDocument();
+  });
+
+  test('perder el foco con el campo vacío no llama a getSocioByNroSocio', async () => {
+    renderForm();
+    const input = screen.getByPlaceholderText(/ej\. 1234/i);
+    await act(async () => { fireEvent.blur(input); });
+    expect(getSocioByNroSocio).not.toHaveBeenCalled();
+  });
 });

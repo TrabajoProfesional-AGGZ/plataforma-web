@@ -30,7 +30,6 @@ function SociosPage() {
   const puedeBorrar = usePermiso('borrar_socio');
 
   const cacheSociosRef = useRef(null);
-  const buscarTimeoutRef = useRef(null);
 
   const [nroSocio, setNroSocio] = useState('');
   const [modo, setModo] = useState('idle'); // idle | socio | lista | no-encontrado
@@ -51,9 +50,6 @@ function SociosPage() {
 
   useEffect(() => {
     cargarSocios();
-    return () => {
-      if (buscarTimeoutRef.current) clearTimeout(buscarTimeoutRef.current);
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -95,37 +91,21 @@ function SociosPage() {
   async function handleBuscar(e) {
     e.preventDefault();
     if (!nroSocio.trim()) return;
-    const socios = cacheSociosRef.current;
-    if (socios !== null) {
-      if (buscarTimeoutRef.current) clearTimeout(buscarTimeoutRef.current);
-      setLoading(true);
-      const nro = nroSocio.trim();
-      buscarTimeoutRef.current = setTimeout(() => {
-        buscarTimeoutRef.current = null;
-        const encontrado = socios.find(s => s.nro_socio === nro);
-        if (encontrado) {
-          setResultado([encontrado]);
-          setModo('lista');
-        } else {
-          setModo('no-encontrado');
-          setResultado(null);
-        }
-        setLoading(false);
-      }, 400);
-      return;
-    }
     setLoading(true);
     setError(null);
     try {
-      const data = await getSocios();
-      cacheSociosRef.current = data;
-      const encontrado = data.find(s => s.nro_socio === nroSocio.trim());
-      if (encontrado) {
-        setResultado([encontrado]);
-        setModo('lista');
-      } else {
+      let socios = cacheSociosRef.current;
+      if (socios === null) {
+        socios = await getSocios();
+        cacheSociosRef.current = socios;
+      }
+      const encontrados = socios.filter(s => String(s.nro_socio) === String(nroSocio.trim()));
+      if (encontrados.length === 0) {
         setModo('no-encontrado');
         setResultado(null);
+      } else {
+        setResultado(encontrados);
+        setModo('lista');
       }
     } catch (err) {
       if (err.message === 'servicio-no-disponible') {
@@ -139,11 +119,6 @@ function SociosPage() {
   }
 
   function handleVerTodos() {
-    if (buscarTimeoutRef.current) {
-      clearTimeout(buscarTimeoutRef.current);
-      buscarTimeoutRef.current = null;
-      setLoading(false);
-    }
     setNroSocio('');
     setOrden({ campo: null, dir: 'asc' });
     setFiltroEstado('');

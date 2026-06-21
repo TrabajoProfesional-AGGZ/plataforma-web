@@ -30,8 +30,9 @@ export async function deleteSocio(id) {
 }
 
 export async function getSocioByNroSocio(nroSocio) {
-  const socios = await getSocios();
-  const socio = socios.find((s) => String(s.nro_socio) === String(nroSocio).trim());
-  if (!socio) throw new Error('socio-no-encontrado');
-  return socio;
+  const res = await fetchTo(`/api/v1/socios/por-nro-socio/${nroSocio}`, 'GET');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (res.status === 404) throw new Error('socio-no-encontrado');
+  if (!res.ok) throw new Error('Error al buscar socio');
+  return res.json();
 }

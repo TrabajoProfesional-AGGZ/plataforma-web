@@ -820,6 +820,138 @@ describe('InstalacionesPage', () => {
     expect(screen.getByText('2026-08-01')).toBeInTheDocument();
   });
 
+  // ── Tests del bug fix en vista histórica (Tarea 2) ──
+
+  test('al volver a reservas activas después de buscar, las reservas activas son visibles', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-bugfix', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+    ]);
+    getReservasPorInstalacion.mockResolvedValue([
+      { id: 'r-act', id_instalacion: 'inst-bugfix', id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-11-01', hora_inicio: '10:00', hora_fin: '11:00' },
+    ]);
+    getReservasPorSocio.mockResolvedValue([]);
+    getReservasHistoricasPorInstalacion.mockResolvedValue([]);
+
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Test')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Test'));
+    await waitFor(() => expect(screen.getByText('2026-11-01')).toBeInTheDocument());
+
+    const inputSocio = screen.getByLabelText('Filtrar por número de socio');
+    fireEvent.change(inputSocio, { target: { value: '9999' } });
+    await act(async () => {
+      fireEvent.keyDown(inputSocio, { key: 'Enter' });
+    });
+    await waitFor(() => expect(screen.getByText('No hay reservas para esta instalación.')).toBeInTheDocument());
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /ver reservas históricas/i }));
+    });
+    fireEvent.click(screen.getByRole('button', { name: /ver reservas activas/i }));
+
+    expect(screen.getByText('2026-11-01')).toBeInTheDocument();
+  });
+
+  test('en la vista histórica el filtro por N° de socio filtra client-side sin llamar a la API', async () => {
+    const SOCIO2 = { id: 'socio-2', nro_socio: '9999', nombre: 'Maria', apellido: 'Perez' };
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-cs', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+    ]);
+    getSocios.mockResolvedValue([SOCIO_MOCK, SOCIO2]);
+    getReservasPorInstalacion.mockResolvedValue([]);
+    getReservasHistoricasPorInstalacion.mockResolvedValue([
+      { id: 'h1', id_instalacion: 'inst-cs', id_socio: SOCIO_MOCK.id, fecha_reserva: '2025-01-10', hora_inicio: '10:00', hora_fin: '11:00', estado: 'Completada' },
+      { id: 'h2', id_instalacion: 'inst-cs', id_socio: SOCIO2.id, fecha_reserva: '2025-02-20', hora_inicio: '14:00', hora_fin: '15:00', estado: 'Completada' },
+    ]);
+
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Test')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Test'));
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /ver reservas históricas/i }));
+    });
+    await waitFor(() => expect(screen.getByText('2025-01-10')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Filtrar por número de socio'), { target: { value: '1234' } });
+
+    expect(screen.getByText('2025-01-10')).toBeInTheDocument();
+    expect(screen.queryByText('2025-02-20')).not.toBeInTheDocument();
+    expect(getReservasPorSocio).not.toHaveBeenCalled();
+  });
+
+  test('presionar Enter en la vista histórica no llama a getReservasPorSocio', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-ent', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+    ]);
+    getReservasPorInstalacion.mockResolvedValue([]);
+    getReservasHistoricasPorInstalacion.mockResolvedValue([]);
+
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Test')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Test'));
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /ver reservas históricas/i }));
+    });
+    await waitFor(() => expect(screen.getByRole('button', { name: /ver reservas activas/i })).toBeInTheDocument());
+
+    const inputSocio = screen.getByLabelText('Filtrar por número de socio');
+    fireEvent.change(inputSocio, { target: { value: '1234' } });
+    await act(async () => {
+      fireEvent.keyDown(inputSocio, { key: 'Enter' });
+    });
+
+    expect(getReservasPorSocio).not.toHaveBeenCalled();
+  });
+
+  test('al cambiar a la vista histórica, el filtro de N° de socio se limpia', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-rst', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+    ]);
+    getReservasPorInstalacion.mockResolvedValue([]);
+    getReservasHistoricasPorInstalacion.mockResolvedValue([]);
+
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Test')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Test'));
+
+    const inputSocio = screen.getByLabelText('Filtrar por número de socio');
+    fireEvent.change(inputSocio, { target: { value: '1234' } });
+    expect(inputSocio.value).toBe('1234');
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /ver reservas históricas/i }));
+    });
+    await waitFor(() => expect(screen.getByRole('button', { name: /ver reservas activas/i })).toBeInTheDocument());
+
+    expect(screen.getByLabelText('Filtrar por número de socio').value).toBe('');
+  });
+
+  test('al volver a la vista activa, el filtro de N° de socio se limpia', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-rst2', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+    ]);
+    getReservasPorInstalacion.mockResolvedValue([]);
+    getReservasHistoricasPorInstalacion.mockResolvedValue([]);
+
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Test')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Test'));
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /ver reservas históricas/i }));
+    });
+    await waitFor(() => expect(screen.getByRole('button', { name: /ver reservas activas/i })).toBeInTheDocument());
+
+    const inputSocio = screen.getByLabelText('Filtrar por número de socio');
+    fireEvent.change(inputSocio, { target: { value: '9999' } });
+    expect(inputSocio.value).toBe('9999');
+
+    fireEvent.click(screen.getByRole('button', { name: /ver reservas activas/i }));
+    expect(screen.getByLabelText('Filtrar por número de socio').value).toBe('');
+  });
+
   // ── Test de buscarPorSocio con input vacío via Enter ──
 
   test('presionar Enter con el filtro de socio vacío limpia los resultados de búsqueda', async () => {
