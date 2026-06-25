@@ -238,3 +238,10 @@
   justify-content: center;
   padding: 48px 0;
 }
+
+/* ── Lista de socios en celda de reserva ──────────────────────── */
+.reserva-socios-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
