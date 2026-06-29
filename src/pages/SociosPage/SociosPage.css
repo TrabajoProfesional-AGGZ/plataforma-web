@@ -10,8 +10,8 @@
 .socios-title {
   font-size: 32px;
   font-weight: 600;
-  color: #111111;
-  margin: 0 0 24px 0;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-6) 0;
   text-align: center;
 }
 
@@ -19,30 +19,30 @@
 .socios-search-form {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   flex: 1;
   max-width: 420px;
 }
 
 /* ── Button color variants ────────────────────────────────────── */
 .socios-search-button {
-  background-color: #111111;
-  color: #ffffff;
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
   border: none;
 }
 
 .socios-search-button:hover:not(:disabled) {
-  background-color: #4a4a4a;
+  background-color: var(--color-text-secondary);
 }
 
 .socios-ver-todos-button {
-  background-color: #ffffff;
-  color: #111111;
-  border: 1px solid #111111;
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-strong);
 }
 
 .socios-ver-todos-button:hover:not(:disabled) {
-  background-color: #f5f5f5;
+  background-color: var(--color-bg);
 }
 
 .socios-search-button:disabled,
@@ -53,12 +53,12 @@
 }
 
 .socios-crear-button:hover:not(:disabled) {
-  background-color: #4a4a4a;
+  background-color: var(--color-text-secondary);
 }
 
 /* ── Error override (adds margin-bottom) ─────────────────────── */
 .socios-error {
-  margin-bottom: 12px;
+  margin-bottom: var(--space-3);
 }
 
 /* ── Filters layout ───────────────────────────────────────────── */
@@ -66,15 +66,15 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 12px;
-  margin-bottom: 12px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
   flex-wrap: wrap;
 }
 
 .socios-filtros-dropdowns {
   display: flex;
   flex-direction: row;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 .socios-filtros-grupo {
@@ -88,7 +88,7 @@
 }
 
 .socios-th-sort:hover {
-  color: #111111;
+  color: var(--color-text-primary);
 }
 
 /* ── Estado logo ──────────────────────────────────────────────── */
@@ -101,24 +101,24 @@
 .socios-card-actions {
   display: flex;
   justify-content: space-between;
-  margin-top: 20px;
+  margin-top: var(--space-5);
 }
 
 /* ── Card action button colors ────────────────────────────────── */
 .socios-btn-editar {
-  background-color: #111111;
-  color: #ffffff;
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
 }
 
 .socios-btn-editar:hover {
-  background-color: #4a4a4a;
+  background-color: var(--color-text-secondary);
 }
 
 .socios-btn-eliminar {
-  background-color: #c0392b;
-  color: #ffffff;
+  background-color: var(--color-danger);
+  color: var(--color-surface);
 }
 
 .socios-btn-eliminar:hover {
-  background-color: #96281b;
+  background-color: var(--color-danger-hover);
 }

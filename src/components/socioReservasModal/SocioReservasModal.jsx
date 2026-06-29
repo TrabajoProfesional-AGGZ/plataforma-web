@@ -41,7 +41,7 @@ function SocioReservasModal({ nroSocio, onClose }) {
                   {instalacionMap[r.id_instalacion] ?? r.id_instalacion}
                 </span>
                 <span className="socio-reservas-detalle">
-                  {r.fecha_reserva} · {r.hora_inicio}–{r.hora_fin}
+                  {r.fecha_reserva} · {r.hora_inicio?.slice(0, 5)}–{r.hora_fin?.slice(0, 5)}
                 </span>
                 <span className="socio-reservas-estado">{r.estado}</span>
               </div>

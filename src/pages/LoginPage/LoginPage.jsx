@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { login } from '../../services/authService';
 import LoadingScreen from '../../components/LoadingScreen/LoadingScreen';
-import logoConTexto from '../../assets/logo_con_texto.png';
+import logoSocioAlt from '../../assets/logo_socio_alt.png';
 import './LoginPage.css';
 import '../../styles/shared.css';
 
@@ -36,56 +36,61 @@ function LoginPage() {
   }
 
   return (
-    <div className="login-container">
-      <img src={logoConTexto} alt="SocioUnido" className="login-logo" />
-      <p className="login-tagline">Porque el club es de los socios, y la gestión es de <strong>SocioUnido</strong></p>
-      <form onSubmit={handleSubmit} className="login-form">
-        <div className="login-field">
-          <label htmlFor="email">Email</label>
-          <input
-            id="email"
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            autoComplete="email"
-          />
-        </div>
-        <div className="login-field">
-          <label htmlFor="password">Contraseña</label>
-          <div className="login-password-wrapper">
+    <div className="login-split">
+      <div className="login-panel-left">
+        <img src={logoSocioAlt} alt="SocioUnido" className="login-logo-left" />
+      </div>
+
+      <div className="login-panel-right">
+        <p className="login-tagline">Porque el club es de los socios, y la gestión es de <strong>SocioUnido</strong></p>
+        <form onSubmit={handleSubmit} className="login-form">
+          <div className="login-field">
+            <label htmlFor="email">Email</label>
             <input
-              id="password"
-              type={showPassword ? 'text' : 'password'}
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
-              autoComplete="current-password"
+              autoComplete="email"
             />
-            <button
-              type="button"
-              className="login-toggle-password"
-              onClick={() => setShowPassword((v) => !v)}
-              aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-            >
-              {showPassword ? 'Ocultar' : 'Mostrar'}
-            </button>
           </div>
-        </div>
-        {passwordChanged && (
-          <p className="login-success" role="status">
-            Contraseña actualizada correctamente
-          </p>
-        )}
-        {error && (
-          <p className="login-error" role="alert">
-            {error}
-          </p>
-        )}
-        <button type="submit" className="login-button" disabled={loading}>
-          {loading ? 'Ingresando...' : 'Ingresar'}
-        </button>
-      </form>
+          <div className="login-field">
+            <label htmlFor="password">Contraseña</label>
+            <div className="login-password-wrapper">
+              <input
+                id="password"
+                type={showPassword ? 'text' : 'password'}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                autoComplete="current-password"
+              />
+              <button
+                type="button"
+                className="login-toggle-password"
+                onClick={() => setShowPassword((v) => !v)}
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+              >
+                {showPassword ? 'Ocultar' : 'Mostrar'}
+              </button>
+            </div>
+          </div>
+          {passwordChanged && (
+            <p className="login-success" role="status">
+              Contraseña actualizada correctamente
+            </p>
+          )}
+          {error && (
+            <p className="login-error" role="alert">
+              {error}
+            </p>
+          )}
+          <button type="submit" className="login-button" disabled={loading}>
+            {loading ? 'Ingresando...' : 'Ingresar'}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }

@@ -49,8 +49,33 @@ function SociosPage() {
   const [errorModal, setErrorModal] = useState('');
 
   useEffect(() => {
-    cargarSocios();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    let cancelled = false;
+
+    async function inicializarSocios() {
+      setLoading(true);
+      setError(null);
+      try {
+        const socios = await getSocios();
+        if (!cancelled) {
+          cacheSociosRef.current = socios;
+          setResultado(socios);
+          setModo('lista');
+        }
+      } catch (err) {
+        if (!cancelled) {
+          if (err.message === 'servicio-no-disponible') {
+            setError('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
+          } else {
+            setError('Error al obtener los socios. Intentá de nuevo.');
+          }
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    inicializarSocios();
+    return () => { cancelled = true; };
   }, []);
 
   useModalEscape([

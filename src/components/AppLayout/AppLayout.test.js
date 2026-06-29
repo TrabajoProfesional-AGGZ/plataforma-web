@@ -76,40 +76,26 @@ describe('AppLayout', () => {
     expect(screen.queryByRole('link', { name: /cambiar contraseña/i })).not.toBeInTheDocument();
   });
 
-  test('el logo de texto es un botón visible en el header', () => {
+  test('el sidebar arranca expandido al iniciar sesión', () => {
     renderLayout();
-    expect(screen.getByRole('button', { name: /ir al dashboard/i })).toBeInTheDocument();
+    expect(document.querySelector('.app-sidebar')).not.toHaveClass('collapsed');
   });
 
-  test('hacer click en el logo de texto navega a /dashboard', () => {
-    renderLayout();
-    fireEvent.click(screen.getByRole('button', { name: /ir al dashboard/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
-  });
-
-  test('el sidebar arranca cerrado al iniciar sesión', () => {
-    renderLayout();
-    expect(document.querySelector('.app-sidebar')).toHaveClass('hidden');
-  });
-
-  test('hacer click en el contenido principal cierra el sidebar si está abierto', () => {
+  test('el botón toggle colapsa el sidebar', () => {
     renderLayout();
     const sidebar = document.querySelector('.app-sidebar');
-
+    expect(sidebar).not.toHaveClass('collapsed');
     fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
-    expect(sidebar).not.toHaveClass('hidden');
-
-    fireEvent.click(screen.getByRole('main'));
-    expect(sidebar).toHaveClass('hidden');
+    expect(sidebar).toHaveClass('collapsed');
   });
 
-  test('hacer click en el contenido principal no abre el sidebar si está cerrado', () => {
+  test('el botón toggle expande el sidebar si está colapsado', () => {
     renderLayout();
     const sidebar = document.querySelector('.app-sidebar');
-    expect(sidebar).toHaveClass('hidden');
-
-    fireEvent.click(screen.getByRole('main'));
-    expect(sidebar).toHaveClass('hidden');
+    fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
+    expect(sidebar).toHaveClass('collapsed');
+    fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
+    expect(sidebar).not.toHaveClass('collapsed');
   });
 
   test('llama a logout y redirige al login al hacer clic en cerrar sesión', async () => {
@@ -130,21 +116,5 @@ describe('AppLayout', () => {
     expect(screen.getByRole('button', { name: /ver perfil/i })).toBeInTheDocument();
     fireEvent.mouseDown(document.body);
     expect(screen.queryByRole('button', { name: /ver perfil/i })).not.toBeInTheDocument();
-  });
-
-  test('hacer click en el backdrop cierra el sidebar', () => {
-    renderLayout();
-    fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
-    const backdrop = document.querySelector('.app-sidebar-backdrop');
-    fireEvent.click(backdrop);
-    expect(document.querySelector('.app-sidebar')).toHaveClass('hidden');
-  });
-
-  test('hacer click en un nav link cierra el sidebar', () => {
-    renderLayout(['ver_socios']);
-    fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
-    expect(document.querySelector('.app-sidebar')).not.toHaveClass('hidden');
-    fireEvent.click(screen.getByRole('link', { name: /socios/i }));
-    expect(document.querySelector('.app-sidebar')).toHaveClass('hidden');
   });
 });

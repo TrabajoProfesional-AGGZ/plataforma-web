@@ -294,8 +294,8 @@ function InstalacionesPage() {
                   </div>
                 </td>
                 <td>{r.fecha_reserva ?? r.fecha}</td>
-                <td>{r.hora_inicio}</td>
-                <td>{r.hora_fin}</td>
+                <td>{r.hora_inicio?.slice(0, 5)}</td>
+                <td>{r.hora_fin?.slice(0, 5)}</td>
                 {mostrarEstado && <td>{r.estado}</td>}
                 {mostrarAcciones && puedeBorrarReserva && (
                   <td>
