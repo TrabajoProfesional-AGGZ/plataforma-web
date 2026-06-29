@@ -7,6 +7,7 @@ import texto from '../../assets/texto.png';
 import logoSocio from '../../assets/logo_socio.png';
 import './AppLayout.css';
 
+
 const NAV_ITEMS_BASE = [
   { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard, permiso: null },
   { to: '/socios', label: 'Socios', Icon: Users, permiso: 'ver_socios' },
@@ -20,7 +21,6 @@ function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [navigating, setNavigating] = useState(false);
   const dropdownRef = useRef(null);
   const isFirstRender = useRef(true);
@@ -54,15 +54,9 @@ function AppLayout() {
 
   return (
     <div className="app-layout">
-      <aside className={`app-sidebar${sidebarCollapsed ? ' collapsed' : ''}`}>
+      <aside className="app-sidebar">
         <div className="sidebar-header">
-          <button
-            onClick={() => setSidebarCollapsed(v => !v)}
-            className="sidebar-toggle"
-            aria-label="Alternar menú lateral"
-          >
-            <img src={logoSocio} alt="SocioUnido" className="sidebar-logo-icon" />
-          </button>
+          <img src={logoSocio} alt="SocioUnido" className="sidebar-logo-icon" />
         </div>
 
         <nav className="sidebar-nav">
@@ -71,7 +65,6 @@ function AppLayout() {
               key={to}
               to={to}
               className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
-              title={sidebarCollapsed ? label : undefined}
             >
               <Icon size={26} aria-hidden="true" />
               <span className="sidebar-link-label">{label}</span>
@@ -80,7 +73,7 @@ function AppLayout() {
         </nav>
 
         <div className="sidebar-footer">
-          {!sidebarCollapsed && <p>SocioUnido v1.0</p>}
+          <p>SocioUnido v1.0</p>
         </div>
       </aside>
 

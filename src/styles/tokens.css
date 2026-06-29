@@ -47,4 +47,8 @@
   /* Sidebar widths */
   --sidebar-width: 245px;
   --sidebar-width-collapsed: 80px;
+
+  /* Typography */
+  --font-sans: 'Outfit', -apple-system, sans-serif;
+  --font-numeric: 'Outfit', -apple-system, sans-serif;
 }

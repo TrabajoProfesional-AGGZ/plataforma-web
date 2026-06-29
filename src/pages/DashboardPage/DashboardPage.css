@@ -11,6 +11,8 @@
   color: var(--color-text-primary);
   margin: 0 0 var(--space-2) 0;
   text-align: center;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
 .dashboard-subtitle {
@@ -23,11 +25,17 @@
 /* ── Section cards grid ─────────────────────────────────── */
 .dashboard-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: var(--space-4);
   width: 100%;
   max-width: 900px;
   margin-bottom: var(--space-8);
+}
+
+@media (max-width: 700px) {
+  .dashboard-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 .dashboard-card {

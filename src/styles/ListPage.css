@@ -8,6 +8,8 @@
   color: var(--color-text-primary);
   margin: 0 0 var(--space-6) 0;
   text-align: center;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
 /* ── Ver-todos / secondary button ────────────────────────────── */
@@ -239,6 +241,7 @@
   border-bottom: 1px solid #f0f0f0;
   color: var(--color-text-primary);
   vertical-align: middle;
+  font-variant-numeric: tabular-nums;
 }
 
 .socios-table td,
@@ -264,7 +267,7 @@
 .usuarios-tr-clickable:hover td,
 .disciplinas-tr-clickable:hover td,
 .instalaciones-tr-clickable:hover td {
-  background-color: #f9f9f9;
+  background-color: #f0f0f0;
 }
 
 /* ── Badge base ──────────────────────────────────────────────── */

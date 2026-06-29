@@ -1,6 +1,6 @@
 .login-split {
   display: flex;
-  height: 100vh;
+  min-height: 100dvh;
 }
 
 /* ── Left panel (decorative) ─────────────────────────────── */

@@ -76,28 +76,6 @@ describe('AppLayout', () => {
     expect(screen.queryByRole('link', { name: /cambiar contraseña/i })).not.toBeInTheDocument();
   });
 
-  test('el sidebar arranca expandido al iniciar sesión', () => {
-    renderLayout();
-    expect(document.querySelector('.app-sidebar')).not.toHaveClass('collapsed');
-  });
-
-  test('el botón toggle colapsa el sidebar', () => {
-    renderLayout();
-    const sidebar = document.querySelector('.app-sidebar');
-    expect(sidebar).not.toHaveClass('collapsed');
-    fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
-    expect(sidebar).toHaveClass('collapsed');
-  });
-
-  test('el botón toggle expande el sidebar si está colapsado', () => {
-    renderLayout();
-    const sidebar = document.querySelector('.app-sidebar');
-    fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
-    expect(sidebar).toHaveClass('collapsed');
-    fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
-    expect(sidebar).not.toHaveClass('collapsed');
-  });
-
   test('llama a logout y redirige al login al hacer clic en cerrar sesión', async () => {
     authService.logout.mockResolvedValueOnce();
     renderLayout();
