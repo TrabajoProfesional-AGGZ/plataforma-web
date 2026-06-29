@@ -79,7 +79,7 @@ describe('LoginPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /ingresar/i }));
 
     await waitFor(() => {
-      expect(document.querySelector('.loading-logo')).toBeInTheDocument();
+      expect(document.querySelector('.login-exit-overlay')).toBeInTheDocument();
     });
   });
 
