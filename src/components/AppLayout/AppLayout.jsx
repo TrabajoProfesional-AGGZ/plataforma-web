@@ -25,6 +25,11 @@ function AppLayout() {
   const dropdownRef = useRef(null);
   const isFirstRender = useRef(true);
 
+  const navRef = useRef(null);
+  const indicatorRef = useRef(null);
+  const prevActiveIndexRef = useRef(-1);
+  const animTimersRef = useRef([]);
+
   useLayoutEffect(() => {
     if (isFirstRender.current) {
       isFirstRender.current = false;
@@ -34,6 +39,61 @@ function AppLayout() {
     const timer = setTimeout(() => setNavigating(false), 700);
     return () => clearTimeout(timer);
   }, [location.pathname]);
+
+  useLayoutEffect(() => {
+    if (!navRef.current || !indicatorRef.current) return;
+
+    const linkEls = Array.from(navRef.current.querySelectorAll('.sidebar-link'));
+    const to = linkEls.findIndex(el => el.classList.contains('active'));
+    if (to === -1) return;
+
+    const from = prevActiveIndexRef.current;
+    const el = indicatorRef.current;
+
+    animTimersRef.current.forEach(clearTimeout);
+    animTimersRef.current = [];
+
+    const snap = (idx) => {
+      el.style.transition = 'none';
+      el.style.transform = `translateY(${linkEls[idx].offsetTop}px)`;
+      el.style.height = `${linkEls[idx].offsetHeight}px`;
+      el.style.opacity = '1';
+    };
+
+    const slide = (idx) => {
+      el.style.transition = 'transform 0.07s ease-out';
+      el.style.transform = `translateY(${linkEls[idx].offsetTop}px)`;
+      el.style.height = `${linkEls[idx].offsetHeight}px`;
+    };
+
+    if (from === -1) {
+      snap(to);
+      prevActiveIndexRef.current = to;
+      return;
+    }
+
+    if (from === to) return;
+
+    const step = from < to ? 1 : -1;
+    let current = from + step;
+
+    const doStep = () => {
+      slide(current);
+      if (current !== to) {
+        current += step;
+        const t = setTimeout(doStep, 50);
+        animTimersRef.current.push(t);
+      } else {
+        prevActiveIndexRef.current = to;
+      }
+    };
+
+    doStep();
+  }, [location.pathname]);
+
+  useEffect(() => {
+    return () => { animTimersRef.current.forEach(clearTimeout); };
+  }, []);
 
   useEffect(() => {
     function handleClickOutside(e) {
@@ -59,7 +119,8 @@ function AppLayout() {
           <img src={logoSocio} alt="SocioUnido" className="sidebar-logo-icon" />
         </div>
 
-        <nav className="sidebar-nav">
+        <nav className="sidebar-nav" ref={navRef}>
+          <div ref={indicatorRef} className="sidebar-active-bg" />
           {navItems.map(({ to, label, Icon }) => (
             <NavLink
               key={to}
