@@ -7,19 +7,7 @@
   margin: 0 auto;
 }
 
-.instalaciones-title {
-  font-size: 32px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0 0 var(--space-5) 0;
-  text-align: center;
-}
-
-.instalaciones-toolbar {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: var(--space-4);
-}
+/* .instalaciones-title, .instalaciones-toolbar → src/styles/ListDetailShared.css */
 
 /* ── Badge color variants ─────────────────────────────────────── */
 .badge-si {
@@ -89,7 +77,8 @@
   flex-wrap: wrap;
 }
 
-.instalaciones-reservas-title {
+.instalaciones-reservas-title,
+.instalaciones-seccion-title {
   font-size: 20px;
   font-weight: 600;
   color: var(--color-text-primary);
@@ -169,13 +158,7 @@
   margin-bottom: var(--space-4);
 }
 
-.instalaciones-seccion-title {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0 0 var(--space-3) 0;
-  text-align: center;
-}
+/* .instalaciones-seccion-title — shared with .instalaciones-reservas-title above */
 
 .instalaciones-seccion-toolbar {
   display: flex;

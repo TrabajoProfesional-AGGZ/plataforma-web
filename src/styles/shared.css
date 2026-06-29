@@ -1,5 +1,19 @@
 /* Shared styles used across multiple pages */
 
+/* ── Primary action button (shared across pages) ─────────────── */
+.cambiar-contrasena-button,
+.perfil-cambiar-button {
+  padding: 10px var(--space-5);
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
 /* ── Toggle show/hide password button ────────────────────────── */
 .toggle-password,
 .login-toggle-password,

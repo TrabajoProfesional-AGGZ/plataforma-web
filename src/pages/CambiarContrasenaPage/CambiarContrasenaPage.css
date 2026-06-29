@@ -69,16 +69,8 @@
   align-items: center;
 }
 
+/* .cambiar-contrasena-button base → src/styles/shared.css */
 .cambiar-contrasena-button {
-  padding: 10px var(--space-5);
-  background-color: var(--color-text-primary);
-  color: var(--color-surface);
-  border: none;
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
   align-self: flex-start;
 }
 

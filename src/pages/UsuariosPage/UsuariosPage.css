@@ -1,18 +1,11 @@
 /* Toolbar, search, filters, table base, estado-cell, btn base → src/styles/ListPage.css
    btn-crear → src/styles/ListDetailShared.css
-   th styles → src/styles/PageTableHeader.css */
+   th styles → src/styles/PageTableHeader.css
+   usuarios-title, usuarios-ver-todos-button, usuarios-filtros*, usuarios-th-sort → src/styles/ListPage.css */
 
 .usuarios-page {
   max-width: 900px;
   margin: 0 auto;
-}
-
-.usuarios-title {
-  font-size: 32px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0 0 var(--space-6) 0;
-  text-align: center;
 }
 
 /* ── Search form ──────────────────────────────────────────────── */
@@ -35,16 +28,6 @@
   background-color: var(--color-text-secondary);
 }
 
-.usuarios-ver-todos-button {
-  background-color: var(--color-surface);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border-strong);
-}
-
-.usuarios-ver-todos-button:hover:not(:disabled) {
-  background-color: var(--color-bg);
-}
-
 .usuarios-search-button:disabled,
 .usuarios-ver-todos-button:disabled,
 .usuarios-crear-button:disabled {
@@ -54,36 +37,6 @@
 
 .usuarios-crear-button:hover:not(:disabled) {
   background-color: var(--color-text-secondary);
-}
-
-/* ── Filters layout ───────────────────────────────────────────── */
-.usuarios-filtros {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-3);
-  flex-wrap: wrap;
-}
-
-.usuarios-filtros-dropdowns {
-  display: flex;
-  flex-direction: row;
-  gap: var(--space-2);
-}
-
-.usuarios-filtros-grupo {
-  width: 180px;
-}
-
-/* ── Table sort ───────────────────────────────────────────────── */
-.usuarios-th-sort {
-  cursor: pointer;
-  user-select: none;
-}
-
-.usuarios-th-sort:hover {
-  color: var(--color-text-primary);
 }
 
 /* ── Rol badge ────────────────────────────────────────────────── */

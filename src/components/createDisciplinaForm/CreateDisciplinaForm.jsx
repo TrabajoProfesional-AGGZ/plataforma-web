@@ -1,5 +1,4 @@
 import { useForm } from 'react-hook-form';
-import { AnimatePresence } from 'framer-motion';
 import { Activity, Users, DollarSign, Tag } from 'lucide-react';
 import PropTypes from 'prop-types';
 import '../createForm/CreateSocioForm.css';
@@ -56,9 +55,9 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
       onCancel={onCancel}
       goBack={goBack}
       goNext={goNext}
+      direction={direction}
       onFormSubmit={handleSubmit(onSubmit)}
     >
-      <AnimatePresence mode="wait" custom={direction}>
         {step === 1 && (
           <FormStep key="step1" direction={direction}>
             <Field label="Nombre de la disciplina" icon={Activity} error={errors.nombre?.message}>
@@ -114,7 +113,6 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
             )}
           </FormStep>
         )}
-      </AnimatePresence>
     </MultiStepFormShell>
   );
 }

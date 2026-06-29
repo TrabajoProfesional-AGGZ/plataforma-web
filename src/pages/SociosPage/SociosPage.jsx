@@ -6,6 +6,7 @@ import { EditSocioForm } from '../../components/editForm/EditSocioForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
+import { useListState } from '../../hooks/useListState';
 import { useModalEscape } from '../../hooks/useModalEscape';
 import { estadoConfig } from '../../utils/estadoConfig';
 import { SocioAccionesExtra } from '../../components/socioAccionesExtra/SocioAccionesExtra';
@@ -33,9 +34,7 @@ function SociosPage() {
 
   const [nroSocio, setNroSocio] = useState('');
   const [modo, setModo] = useState('idle'); // idle | socio | lista | no-encontrado
-  const [resultado, setResultado] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { resultado, setResultado, loading, setLoading, error, setError } = useListState();
   const { setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
 
   const [filtroEstado, setFiltroEstado] = useState('');
@@ -76,7 +75,7 @@ function SociosPage() {
 
     inicializarSocios();
     return () => { cancelled = true; };
-  }, []);
+  }, [setError, setLoading, setResultado]);
 
   useModalEscape([
     [crearModalOpen, setCrearModalOpen],

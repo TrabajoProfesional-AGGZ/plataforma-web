@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
 import {
   User, CreditCard, Mail, Shield,
   Calendar, Lock,
@@ -8,7 +7,7 @@ import { crearUsuario } from '../../services/usuariosService';
 import { validarFechaNacimiento, getDocNumberRules } from '../../utils/formValidators';
 import { fetchRoles } from '../../services/rolesService';
 import '../createForm/CreateSocioForm.css';
-import { Field, StyledInput, StyledSelect, FormStep, DocTypeOptions, DocHint, EmailField } from '../createForm/FormFields';
+import { Field, StyledInput, StyledSelect, FormStep, DocTypeOptions, DocNumberField, EmailField } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepForm } from '../../hooks/useMultiStepForm';
 
@@ -84,9 +83,9 @@ export function CreateUserForm({ onSuccess, onCancel }) {
       onCancel={onCancel}
       goBack={goBack}
       goNext={goNext}
+      direction={direction}
       onFormSubmit={handleSubmit(onSubmit)}
     >
-      <AnimatePresence mode="wait" custom={direction}>
         {step === 1 && (
           <FormStep key="step1" direction={direction}>
             <div className="csf-grid-2">
@@ -126,16 +125,7 @@ export function CreateUserForm({ onSuccess, onCancel }) {
                 <DocTypeOptions />
               </StyledSelect>
             </Field>
-            <Field label="Número de documento" icon={CreditCard} error={errors.nroDocumento?.message}>
-              <StyledInput
-                {...nroDocumentoRegister}
-                onInput={(e) => { e.target.value = e.target.value.toUpperCase(); }}
-                placeholder="Ej. 12345678"
-                error={!!errors.nroDocumento}
-                style={{ textTransform: 'uppercase' }}
-              />
-            </Field>
-            <DocHint />
+            <DocNumberField docNumberRegister={nroDocumentoRegister} errors={errors} fieldKey="nroDocumento" />
           </FormStep>
         )}
 
@@ -173,7 +163,6 @@ export function CreateUserForm({ onSuccess, onCancel }) {
             {formError && <p className="csf-form-error">{formError}</p>}
           </FormStep>
         )}
-      </AnimatePresence>
     </MultiStepFormShell>
   );
 }

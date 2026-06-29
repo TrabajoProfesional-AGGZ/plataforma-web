@@ -1,11 +1,10 @@
-import { AnimatePresence } from 'framer-motion';
 import {
   User, CreditCard, Phone,
   Calendar, MapPin,
 } from 'lucide-react';
 import { createSocio } from '../../services/sociosService';
 import { validarFechaNacimiento, getDocNumberRules } from '../../utils/formValidators';
-import { Field, StyledInput, StyledSelect, FormStep, SOCIOS_STEPS, DocTypeOptions, DocHint, EmailField } from './FormFields';
+import { Field, StyledInput, StyledSelect, FormStep, SOCIOS_STEPS, DocTypeOptions, DocNumberField, EmailField } from './FormFields';
 import { MultiStepFormShell } from './MultiStepFormShell';
 import { useMultiStepForm } from '../../hooks/useMultiStepForm';
 import './CreateSocioForm.css';
@@ -70,9 +69,9 @@ export function CreateSocioForm({ onSuccess, onCancel }) {
       onCancel={onCancel}
       goBack={goBack}
       goNext={goNext}
+      direction={direction}
       onFormSubmit={handleSubmit(onSubmit)}
     >
-      <AnimatePresence mode="wait" custom={direction}>
         {step === 1 && (
           <FormStep key="step1" direction={direction}>
             <div className="csf-grid-2">
@@ -123,16 +122,7 @@ export function CreateSocioForm({ onSuccess, onCancel }) {
                 <DocTypeOptions />
               </StyledSelect>
             </Field>
-            <Field label="Número de documento" icon={CreditCard} error={errors.docNumber?.message}>
-              <StyledInput
-                {...docNumberRegister}
-                onInput={(e) => { e.target.value = e.target.value.toUpperCase(); }}
-                placeholder="Ej. 12345678"
-                error={!!errors.docNumber}
-                style={{ textTransform: 'uppercase' }}
-              />
-            </Field>
-            <DocHint />
+            <DocNumberField docNumberRegister={docNumberRegister} errors={errors} fieldKey="docNumber" />
           </FormStep>
         )}
 
@@ -164,7 +154,6 @@ export function CreateSocioForm({ onSuccess, onCancel }) {
             {formError && <p className="csf-form-error">{formError}</p>}
           </FormStep>
         )}
-      </AnimatePresence>
     </MultiStepFormShell>
   );
 }

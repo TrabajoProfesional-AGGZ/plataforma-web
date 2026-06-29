@@ -7,19 +7,7 @@
   margin: 0 auto;
 }
 
-.disciplinas-title {
-  font-size: 32px;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0 0 var(--space-5) 0;
-  text-align: center;
-}
-
-.disciplinas-toolbar {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: var(--space-4);
-}
+/* .disciplinas-title, .disciplinas-toolbar → src/styles/ListDetailShared.css */
 
 /* ── Badge color variants ─────────────────────────────────────── */
 .badge-activa {

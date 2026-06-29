@@ -1,5 +1,63 @@
 /* Shared styles for list pages: SociosPage, UsuariosPage, DisciplinasPage, InstalacionesPage */
 
+/* ── Page title ──────────────────────────────────────────────── */
+.socios-title,
+.usuarios-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-6) 0;
+  text-align: center;
+}
+
+/* ── Ver-todos / secondary button ────────────────────────────── */
+.socios-ver-todos-button,
+.usuarios-ver-todos-button {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-strong);
+}
+
+.socios-ver-todos-button:hover:not(:disabled),
+.usuarios-ver-todos-button:hover:not(:disabled) {
+  background-color: var(--color-bg);
+}
+
+/* ── Filters layout ───────────────────────────────────────────── */
+.socios-filtros,
+.usuarios-filtros {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.socios-filtros-dropdowns,
+.usuarios-filtros-dropdowns {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-2);
+}
+
+.socios-filtros-grupo,
+.usuarios-filtros-grupo {
+  width: 180px;
+}
+
+/* ── Table sort ───────────────────────────────────────────────── */
+.socios-th-sort,
+.usuarios-th-sort {
+  cursor: pointer;
+  user-select: none;
+}
+
+.socios-th-sort:hover,
+.usuarios-th-sort:hover {
+  color: var(--color-text-primary);
+}
+
 /* ── Toolbar ─────────────────────────────────────────────────── */
 .socios-toolbar,
 .usuarios-toolbar {
@@ -234,14 +292,8 @@
   border: 1px solid;
 }
 
-/* ── Card action buttons base ────────────────────────────────── */
+/* ── Card action buttons base → src/styles/ListDetailShared.css ── */
 .socios-btn-eliminar, .socios-btn-editar,
 .usuarios-btn-eliminar, .usuarios-btn-editar, .usuarios-btn-cambiar-rol {
-  padding: var(--space-2) var(--space-5);
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
   transition: background-color var(--transition-fast), color var(--transition-fast);
-  border: none;
 }

@@ -1,3 +1,21 @@
+/* ── Page title (shared between Disciplinas and Instalaciones) ─── */
+.disciplinas-title,
+.instalaciones-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-5) 0;
+  text-align: center;
+}
+
+/* ── Toolbar (shared between Disciplinas and Instalaciones) ────── */
+.disciplinas-toolbar,
+.instalaciones-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-4);
+}
+
 .disciplinas-btn-crear,
 .instalaciones-btn-crear,
 .socios-crear-button,
@@ -99,15 +117,24 @@
 }
 
 .disciplinas-btn-eliminar,
-.instalaciones-btn-eliminar-inst {
+.instalaciones-btn-eliminar-inst,
+.socios-btn-eliminar,
+.socios-btn-editar,
+.usuarios-btn-eliminar,
+.usuarios-btn-editar,
+.usuarios-btn-cambiar-rol {
   padding: var(--space-2) var(--space-5);
   border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+  border: none;
+}
+
+.disciplinas-btn-eliminar,
+.instalaciones-btn-eliminar-inst {
   background-color: var(--color-danger);
   color: var(--color-surface);
-  border: none;
   transition: background-color var(--transition-fast);
 }
 

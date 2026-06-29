@@ -2,6 +2,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import PropTypes from 'prop-types';
 import logoVerde from '../../assets/logo-verde.png';
+import { ModalOverlay } from './ModalOverlay';
 import './CreateSocioForm.css';
 
 export function MultiStepFormShell({
@@ -20,22 +21,13 @@ export function MultiStepFormShell({
   goNext,
   nextDisabled = false,
   onFormSubmit,
+  direction,
   children,
 }) {
   const progress = (step / steps.length) * 100;
 
   return (
-    <div
-      className="csf-overlay"
-      role="presentation"
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onCancel();
-      }}
-      onKeyDown={(e) => {
-        if (e.target === e.currentTarget && (e.key === 'Escape' || e.key === 'Enter')) onCancel();
-      }}
-    >
-      <div className="csf-wrapper">
+    <ModalOverlay onClose={onCancel}>
         <AnimatePresence mode="wait">
           {submitted ? (
             <motion.div
@@ -139,7 +131,11 @@ export function MultiStepFormShell({
                   onSubmit={onFormSubmit}
                   onKeyDown={(e) => { if (e.key === 'Enter' && step < steps.length) e.preventDefault(); }}
                 >
-                  {children}
+                  {direction !== undefined ? (
+                    <AnimatePresence mode="wait" custom={direction}>
+                      {children}
+                    </AnimatePresence>
+                  ) : children}
 
                   <div className={`csf-nav ${step > 1 ? 'csf-nav--between' : 'csf-nav--end'}`}>
                     {step > 1 && (
@@ -208,8 +204,7 @@ export function MultiStepFormShell({
             </motion.div>
           )}
         </AnimatePresence>
-      </div>
-    </div>
+    </ModalOverlay>
   );
 }
 
@@ -229,5 +224,6 @@ MultiStepFormShell.propTypes = {
   goNext: PropTypes.func,
   nextDisabled: PropTypes.bool,
   onFormSubmit: PropTypes.func.isRequired,
+  direction: PropTypes.number,
   children: PropTypes.node.isRequired,
 };
