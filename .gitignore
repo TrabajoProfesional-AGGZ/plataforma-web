@@ -36,6 +36,7 @@ Thumbs.db
 CLAUDE.md
 TODO.md
 HANDOFF.md
+skills/
 
 # Firebase Admin SDK key (NUNCA commitear)
 serviceAccountKey.json
