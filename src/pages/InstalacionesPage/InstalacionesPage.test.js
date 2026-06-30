@@ -60,7 +60,7 @@ jest.mock('../../components/createReservaForm/CreateReservaForm', () => ({
 
 function mockUnaReserva() {
   getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
-    { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+    { id: 'r-1', id_instalacion: instalacionId, socios: [SOCIO_MOCK],fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
   ]));
 }
 
@@ -107,11 +107,6 @@ describe('InstalacionesPage', () => {
   test('muestra el título "Reservas e Instalaciones"', async () => {
     await renderPage();
     expect(screen.getByText('Reservas e Instalaciones')).toBeInTheDocument();
-  });
-
-  test('muestra la sección Instalaciones en la vista de lista', async () => {
-    await renderPage();
-    expect(screen.getByRole('heading', { name: 'Instalaciones' })).toBeInTheDocument();
   });
 
   test('no muestra el botón "Nueva reserva" en la vista de lista', async () => {
@@ -216,7 +211,7 @@ describe('InstalacionesPage', () => {
 
   test('muestra las reservas cargadas en la tabla', async () => {
     getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+      { id: 'r-1', id_instalacion: instalacionId, socios: [SOCIO_MOCK],fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
 
     await renderPage();
@@ -233,8 +228,8 @@ describe('InstalacionesPage', () => {
 
   test('el filtro de fecha muestra solo reservas de esa fecha', async () => {
     getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
-      { id: 'r-2', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-05', hora_inicio: '14:00', hora_fin: '15:00' },
+      { id: 'r-1', id_instalacion: instalacionId, socios: [SOCIO_MOCK],fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+      { id: 'r-2', id_instalacion: instalacionId, socios: [SOCIO_MOCK],fecha_reserva: '2026-08-05', hora_inicio: '14:00', hora_fin: '15:00' },
     ]));
 
     await renderPage();
@@ -251,8 +246,8 @@ describe('InstalacionesPage', () => {
 
   test('limpiar el filtro de fecha muestra todas las reservas', async () => {
     getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
-      { id: 'r-2', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-05', hora_inicio: '14:00', hora_fin: '15:00' },
+      { id: 'r-1', id_instalacion: instalacionId, socios: [SOCIO_MOCK],fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+      { id: 'r-2', id_instalacion: instalacionId, socios: [SOCIO_MOCK],fecha_reserva: '2026-08-05', hora_inicio: '14:00', hora_fin: '15:00' },
     ]));
 
     await renderPage();
@@ -376,7 +371,7 @@ describe('InstalacionesPage', () => {
 
   test('cancela una reserva y la mantiene visible con estado "Cancelada"', async () => {
     getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-10-05', hora_inicio: '16:00', hora_fin: '18:00', estado: 'Confirmada' },
+      { id: 'r-1', id_instalacion: instalacionId, socios: [SOCIO_MOCK],fecha_reserva: '2026-10-05', hora_inicio: '16:00', hora_fin: '18:00', estado: 'Confirmada' },
     ]));
 
     await renderPage();
@@ -392,7 +387,7 @@ describe('InstalacionesPage', () => {
 
   test('cancela la eliminación de una reserva', async () => {
     getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-10-10', hora_inicio: '10:00', hora_fin: '11:00' },
+      { id: 'r-1', id_instalacion: instalacionId, socios: [SOCIO_MOCK],fecha_reserva: '2026-10-10', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
 
     await renderPage();
@@ -407,7 +402,7 @@ describe('InstalacionesPage', () => {
 
   test('ESC cierra el modal de eliminar reserva', async () => {
     getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-07-02', hora_inicio: '10:00', hora_fin: '12:00' },
+      { id: 'r-1', id_instalacion: instalacionId, socios: [SOCIO_MOCK],fecha_reserva: '2026-07-02', hora_inicio: '10:00', hora_fin: '12:00' },
     ]));
 
     await renderPage();
@@ -423,7 +418,7 @@ describe('InstalacionesPage', () => {
 
   test('cierra el modal de eliminar reserva al hacer clic en el overlay', async () => {
     getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-07-01', hora_inicio: '09:00', hora_fin: '10:00' },
+      { id: 'r-1', id_instalacion: instalacionId, socios: [SOCIO_MOCK],fecha_reserva: '2026-07-01', hora_inicio: '09:00', hora_fin: '10:00' },
     ]));
 
     await renderPage();
@@ -552,7 +547,7 @@ describe('InstalacionesPage', () => {
 
   test('muestra "No hay reservas para la fecha seleccionada" si el filtro no coincide con ninguna reserva', async () => {
     getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+      { id: 'r-1', id_instalacion: instalacionId, socios: [SOCIO_MOCK],fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
 
     await renderPage();
@@ -584,7 +579,7 @@ describe('InstalacionesPage', () => {
     };
     getSocios.mockResolvedValue([SOCIO_COMPLETO]);
     getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-1', id_instalacion: instalacionId, id_socio: SOCIO_COMPLETO.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+      { id: 'r-1', id_instalacion: instalacionId, socios: [{ id: SOCIO_COMPLETO.id, nro_socio: SOCIO_COMPLETO.nro_socio, nombre: SOCIO_COMPLETO.nombre, apellido: SOCIO_COMPLETO.apellido }], fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
 
     await renderPage();
@@ -616,7 +611,7 @@ describe('InstalacionesPage', () => {
 
   test('muestra la columna ID en la tabla de reservas', async () => {
     getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'reserva-id-1', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-09-01', hora_inicio: '10:00', hora_fin: '11:00' },
+      { id: 'reserva-id-1', id_instalacion: instalacionId, socios: [SOCIO_MOCK],fecha_reserva: '2026-09-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
 
     await renderPage();
@@ -630,7 +625,7 @@ describe('InstalacionesPage', () => {
   test('no muestra la columna Acciones si el usuario no tiene permiso borrar_reserva', async () => {
     mockPermisoOverrides = { borrar_reserva: false };
     getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-perm', id_instalacion: instalacionId, id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-09-10', hora_inicio: '12:00', hora_fin: '13:00' },
+      { id: 'r-perm', id_instalacion: instalacionId, socios: [SOCIO_MOCK],fecha_reserva: '2026-09-10', hora_inicio: '12:00', hora_fin: '13:00' },
     ]));
 
     await renderPage();
@@ -652,7 +647,7 @@ describe('InstalacionesPage', () => {
     };
     getSocios.mockResolvedValue([SOCIO_STRINGS]);
     getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
-      { id: 'r-2', id_instalacion: instalacionId, id_socio: SOCIO_STRINGS.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+      { id: 'r-2', id_instalacion: instalacionId, socios: [SOCIO_STRINGS], fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
 
     await renderPage();
@@ -693,7 +688,7 @@ describe('InstalacionesPage', () => {
       { id: 'inst-busqueda', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
     ]);
     getReservasPorSocio.mockResolvedValue([
-      { id: 'r-socio', id_instalacion: 'inst-busqueda', id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-09-20', hora_inicio: '09:00', hora_fin: '10:00' },
+      { id: 'r-socio', id_instalacion: 'inst-busqueda', socios: [SOCIO_MOCK],fecha_reserva: '2026-09-20', hora_inicio: '09:00', hora_fin: '10:00' },
     ]);
 
     await renderPage();
@@ -717,7 +712,7 @@ describe('InstalacionesPage', () => {
       { id: 'inst-limpiar', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
     ]);
     getReservasPorInstalacion.mockResolvedValue([
-      { id: 'r-inst', id_instalacion: 'inst-limpiar', id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-10-01', hora_inicio: '08:00', hora_fin: '09:00' },
+      { id: 'r-inst', id_instalacion: 'inst-limpiar', socios: [SOCIO_MOCK],fecha_reserva: '2026-10-01', hora_inicio: '08:00', hora_fin: '09:00' },
     ]);
     getReservasPorSocio.mockResolvedValue([]);
 
@@ -777,7 +772,7 @@ describe('InstalacionesPage', () => {
     ]);
     getReservasPorInstalacion.mockResolvedValue([]);
     getReservasHistoricasPorInstalacion.mockResolvedValue([
-      { id: 'hist-1', id_instalacion: 'inst-hist', id_socio: SOCIO_MOCK.id, fecha_reserva: '2025-01-01', hora_inicio: '10:00', hora_fin: '11:00', estado: 'Completada' },
+      { id: 'hist-1', id_instalacion: 'inst-hist', socios: [SOCIO_MOCK],fecha_reserva: '2025-01-01', hora_inicio: '10:00', hora_fin: '11:00', estado: 'Completada' },
     ]);
 
     await renderPage();
@@ -798,10 +793,10 @@ describe('InstalacionesPage', () => {
       { id: 'inst-toggle', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
     ]);
     getReservasPorInstalacion.mockResolvedValue([
-      { id: 'r-act', id_instalacion: 'inst-toggle', id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
+      { id: 'r-act', id_instalacion: 'inst-toggle', socios: [SOCIO_MOCK],fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]);
     getReservasHistoricasPorInstalacion.mockResolvedValue([
-      { id: 'hist-2', id_instalacion: 'inst-toggle', id_socio: SOCIO_MOCK.id, fecha_reserva: '2025-03-15', hora_inicio: '14:00', hora_fin: '15:00', estado: 'Completada' },
+      { id: 'hist-2', id_instalacion: 'inst-toggle', socios: [SOCIO_MOCK],fecha_reserva: '2025-03-15', hora_inicio: '14:00', hora_fin: '15:00', estado: 'Completada' },
     ]);
 
     await renderPage();
@@ -827,7 +822,7 @@ describe('InstalacionesPage', () => {
       { id: 'inst-bugfix', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
     ]);
     getReservasPorInstalacion.mockResolvedValue([
-      { id: 'r-act', id_instalacion: 'inst-bugfix', id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-11-01', hora_inicio: '10:00', hora_fin: '11:00' },
+      { id: 'r-act', id_instalacion: 'inst-bugfix', socios: [SOCIO_MOCK],fecha_reserva: '2026-11-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]);
     getReservasPorSocio.mockResolvedValue([]);
     getReservasHistoricasPorInstalacion.mockResolvedValue([]);
@@ -860,8 +855,8 @@ describe('InstalacionesPage', () => {
     getSocios.mockResolvedValue([SOCIO_MOCK, SOCIO2]);
     getReservasPorInstalacion.mockResolvedValue([]);
     getReservasHistoricasPorInstalacion.mockResolvedValue([
-      { id: 'h1', id_instalacion: 'inst-cs', id_socio: SOCIO_MOCK.id, fecha_reserva: '2025-01-10', hora_inicio: '10:00', hora_fin: '11:00', estado: 'Completada' },
-      { id: 'h2', id_instalacion: 'inst-cs', id_socio: SOCIO2.id, fecha_reserva: '2025-02-20', hora_inicio: '14:00', hora_fin: '15:00', estado: 'Completada' },
+      { id: 'h1', id_instalacion: 'inst-cs', socios: [SOCIO_MOCK],fecha_reserva: '2025-01-10', hora_inicio: '10:00', hora_fin: '11:00', estado: 'Completada' },
+      { id: 'h2', id_instalacion: 'inst-cs', socios: [SOCIO2], fecha_reserva: '2025-02-20', hora_inicio: '14:00', hora_fin: '15:00', estado: 'Completada' },
     ]);
 
     await renderPage();
@@ -959,7 +954,7 @@ describe('InstalacionesPage', () => {
       { id: 'inst-busq-vacia', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
     ]);
     getReservasPorInstalacion.mockResolvedValue([
-      { id: 'r-base', id_instalacion: 'inst-busq-vacia', id_socio: SOCIO_MOCK.id, fecha_reserva: '2026-09-01', hora_inicio: '10:00', hora_fin: '11:00' },
+      { id: 'r-base', id_instalacion: 'inst-busq-vacia', socios: [SOCIO_MOCK],fecha_reserva: '2026-09-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]);
     getReservasPorSocio.mockResolvedValue([]);
 

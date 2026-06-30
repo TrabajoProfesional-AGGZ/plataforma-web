@@ -5,14 +5,14 @@
 .cambiar-contrasena-title {
   font-size: 24px;
   font-weight: 600;
-  color: #111111;
-  margin: 0 0 24px 0;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-6) 0;
 }
 
 .cambiar-contrasena-form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .cambiar-contrasena-field {
@@ -24,7 +24,7 @@
 .cambiar-contrasena-field label {
   font-size: 14px;
   font-weight: 500;
-  color: #4a4a4a;
+  color: var(--color-text-secondary);
 }
 
 .password-wrapper {
@@ -36,26 +36,27 @@
 .password-wrapper input {
   width: 100%;
   padding: 10px 80px 10px 12px;
-  border: 1px solid #4a4a4a;
-  border-radius: 4px;
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   outline: none;
-  transition: border-color 0.15s ease;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   box-sizing: border-box;
 }
 
 .password-wrapper input:focus {
-  border-color: #111111;
+  border-color: var(--color-border-strong);
+  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.06);
 }
 
 .cambiar-contrasena-error {
-  color: #c0392b;
+  color: var(--color-danger);
   font-size: 13px;
   margin: 0;
   background-color: #fdf2f2;
   border: 1px solid #f5c6cb;
-  border-radius: 4px;
-  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
 }
 
 .cambiar-contrasena-exito {
@@ -64,26 +65,18 @@
   margin: 0;
   background-color: #f0faf5;
   border: 1px solid #b7dfc8;
-  border-radius: 4px;
-  padding: 8px 12px;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
   align-items: center;
 }
 
+/* .cambiar-contrasena-button base → src/styles/shared.css */
 .cambiar-contrasena-button {
-  padding: 10px 20px;
-  background-color: #111111;
-  color: #ffffff;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
   align-self: flex-start;
 }
 
 .cambiar-contrasena-button:hover:not(:disabled) {
-  background-color: #4a4a4a;
+  background-color: var(--color-text-secondary);
 }
 
 .cambiar-contrasena-button:disabled {

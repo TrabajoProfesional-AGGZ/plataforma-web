@@ -9,6 +9,7 @@ import { CambiarRolForm } from '../../components/cambiarRolForm/CambiarRolForm';
 import { PermisosModal } from '../../components/permisosModal/PermisosModal';
 import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
+import { useListState } from '../../hooks/useListState';
 import { useModalEscape } from '../../hooks/useModalEscape';
 import { useAuthContext } from '../../context/AuthContext';
 import logo from '../../assets/logo_socio.png';
@@ -46,9 +47,7 @@ function UsuariosPage() {
 
   const [busqueda, setBusqueda] = useState('');
   const [modo, setModo] = useState('lista');
-  const [resultado, setResultado] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { resultado, setResultado, loading, setLoading, error, setError } = useListState();
   const { setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
 
   const [filtroRol, setFiltroRol] = useState('');
@@ -66,11 +65,37 @@ function UsuariosPage() {
   const [errorModal, setErrorModal] = useState('');
 
   useEffect(() => {
-    fetchYActualizarUsuarios();
+    let cancelled = false;
+
+    async function cargarInicial() {
+      setLoading(true);
+      setError(null);
+      try {
+        const usuarios = await fetchUsuarios();
+        if (!cancelled) {
+          cacheUsuariosRef.current = usuarios;
+          setResultado(usuarios);
+          setModo('lista');
+        }
+      } catch (err) {
+        if (!cancelled) {
+          if (err.message === 'servicio-no-disponible') {
+            setError('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
+          } else {
+            setError('Error al obtener los usuarios. Intentá de nuevo.');
+          }
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    cargarInicial();
     fetchRoles()
       .then((data) => setRoles(Array.isArray(data) ? data : []))
       .catch(() => {});
     return () => {
+      cancelled = true;
       if (buscarTimeoutRef.current) clearTimeout(buscarTimeoutRef.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -295,7 +320,15 @@ function UsuariosPage() {
                       <tr
                         key={u.id}
                         className="usuarios-tr-clickable"
-                        onClick={() => { setResultado(u); setModo('usuario'); }}
+                        onClick={() => {
+                          if (buscarTimeoutRef.current) {
+                            clearTimeout(buscarTimeoutRef.current);
+                            buscarTimeoutRef.current = null;
+                            setLoading(false);
+                          }
+                          setResultado(u);
+                          setModo('usuario');
+                        }}
                       >
                         <td>{u.apellido}</td>
                         <td>{u.nombre}</td>
@@ -327,35 +360,34 @@ function UsuariosPage() {
         const permisos = resultado.rol?.permisos ?? [];
         const esMismoUsuario = resultado.id === userData?.usuario_id;
         return (
-          <div className="usuarios-card" style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}>
+          <div className="usuarios-card">
             <div className="usuarios-card-inner">
-              <img src={cfg.logo} alt="" className="usuarios-card-logo" />
+              <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
+                <img src={cfg.logo} alt="" className="detalle-logo-img" />
+              </div>
               <div className="usuarios-card-data">
-                <div className="usuarios-card-row">
-                  <span className="usuarios-card-label">Apellido y nombre</span>
-                  <span>{resultado.apellido} {resultado.nombre}</span>
+                <div className="detalle-card-data-header">
+                  <span className="detalle-full-name">{resultado.apellido} {resultado.nombre}</span>
+                  <span className="detalle-estado-badge" style={{ backgroundColor: cfg.bg, color: cfg.border, borderColor: cfg.border }}>
+                    {resultado.estado?.nombre}
+                  </span>
                 </div>
                 <div className="usuarios-card-row">
                   <span className="usuarios-card-label">Email</span>
                   <span>{resultado.email}</span>
                 </div>
                 <div className="usuarios-card-row">
-                  <span className="usuarios-card-label">Fecha de nacimiento</span>
+                  <span className="usuarios-card-label">Nacimiento</span>
                   <span>{resultado.fecha_nacimiento}</span>
                 </div>
                 <div className="usuarios-card-row">
                   <span className="usuarios-card-label">Rol</span>
                   <span>{resultado.rol?.nombre}</span>
                 </div>
-                <div className="usuarios-card-row">
-                  <span className="usuarios-card-label">Estado</span>
-                  <span>{resultado.estado?.nombre}</span>
-                </div>
                 {permisos.length > 0 && (
                   <div className="usuarios-card-row">
                     <button
                       className="usuarios-btn-ver-permisos"
-                      style={{ '--card-bg': cfg.bg }}
                       onClick={() => setPermisosModalOpen(true)}
                     >
                       Ver permisos

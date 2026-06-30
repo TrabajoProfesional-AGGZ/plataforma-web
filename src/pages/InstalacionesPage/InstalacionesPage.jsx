@@ -62,8 +62,7 @@ function InstalacionesPage() {
     const socioMap = Object.fromEntries(sociosData.map((s) => [s.id, s]));
     setReservas(reservasData.map((r) => ({
       ...r,
-      nro_socio: r.nro_socio ?? socioMap[r.id_socio]?.nro_socio ?? r.id_socio,
-      socio: socioMap[r.id_socio] ?? null,
+      socios: (r.socios ?? []).map((s) => socioMap[s.id] ?? s),
     })));
     setReservasBusqueda(null);
     setFiltroNroSocio('');
@@ -80,8 +79,7 @@ function InstalacionesPage() {
     const socioMap = Object.fromEntries(sociosData.map((s) => [s.id, s]));
     setReservasBusqueda(deEstaInstalacion.map((r) => ({
       ...r,
-      nro_socio: r.nro_socio ?? socioMap[r.id_socio]?.nro_socio ?? r.id_socio,
-      socio: socioMap[r.id_socio] ?? null,
+      socios: (r.socios ?? []).map((s) => socioMap[s.id] ?? s),
     })));
   }
 
@@ -159,7 +157,7 @@ function InstalacionesPage() {
     : baseReservas;
 
   const reservasHistoricasFiltradas = filtroNroSocio.trim()
-    ? reservasHistoricas.filter((r) => String(r.nro_socio) === filtroNroSocio.trim())
+    ? reservasHistoricas.filter((r) => r.socios?.some((s) => String(s.nro_socio) === filtroNroSocio.trim()))
     : reservasHistoricas;
 
   function abrirEliminarReserva(reserva) {
@@ -185,8 +183,7 @@ function InstalacionesPage() {
     const socioMap = Object.fromEntries(sociosData.map((s) => [s.id, s]));
     setReservasHistoricas(reservasData.map((r) => ({
       ...r,
-      nro_socio: r.nro_socio ?? socioMap[r.id_socio]?.nro_socio ?? r.id_socio,
-      socio: socioMap[r.id_socio] ?? null,
+      socios: (r.socios ?? []).map((s) => socioMap[s.id] ?? s),
     })));
   }
 
@@ -270,7 +267,7 @@ function InstalacionesPage() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Nro. de socio</th>
+              <th>Socio(s)</th>
               <th>Fecha</th>
               <th>Inicio</th>
               <th>Fin</th>
@@ -283,21 +280,22 @@ function InstalacionesPage() {
               <tr key={r.id}>
                 <td>{r.id}</td>
                 <td>
-                  {r.socio ? (
-                    <button
-                      type="button"
-                      className="nro-socio-link"
-                      onClick={() => abrirVerSocio(r.socio)}
-                    >
-                      {r.nro_socio}
-                    </button>
-                  ) : (
-                    r.nro_socio
-                  )}
+                  <div className="reserva-socios-list">
+                    {(r.socios ?? []).map((socio) => (
+                      <button
+                        key={socio.id}
+                        type="button"
+                        className="nro-socio-link"
+                        onClick={() => abrirVerSocio(socio)}
+                      >
+                        {socio.nro_socio}
+                      </button>
+                    ))}
+                  </div>
                 </td>
                 <td>{r.fecha_reserva ?? r.fecha}</td>
-                <td>{r.hora_inicio}</td>
-                <td>{r.hora_fin}</td>
+                <td>{r.hora_inicio?.slice(0, 5)}</td>
+                <td>{r.hora_fin?.slice(0, 5)}</td>
                 {mostrarEstado && <td>{r.estado}</td>}
                 {mostrarAcciones && puedeBorrarReserva && (
                   <td>
@@ -335,7 +333,6 @@ function InstalacionesPage() {
 
           <div className="instalaciones-seccion-separator">
             <div className="instalaciones-seccion-header">
-              <h2 className="instalaciones-seccion-title">Instalaciones</h2>
               <div className="instalaciones-seccion-toolbar">
                 <div>
                   {tiposDisponibles.length > 0 && (

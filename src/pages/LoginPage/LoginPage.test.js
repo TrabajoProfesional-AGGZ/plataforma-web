@@ -1,10 +1,16 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import LoginPage from './LoginPage';
 import * as authService from '../../services/authService';
 
 jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../services/authService');
+
+let mockReducedMotion = false;
+jest.mock('framer-motion', () => {
+  const actual = jest.requireActual('framer-motion');
+  return { ...actual, useReducedMotion: () => mockReducedMotion };
+});
 
 const renderLoginPage = (initialState = {}) =>
   render(
@@ -79,7 +85,7 @@ describe('LoginPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /ingresar/i }));
 
     await waitFor(() => {
-      expect(document.querySelector('.loading-logo')).toBeInTheDocument();
+      expect(document.querySelector('.login-exit-overlay')).toBeInTheDocument();
     });
   });
 
@@ -93,5 +99,29 @@ describe('LoginPage', () => {
     expect(passwordInput).toHaveAttribute('type', 'text');
     fireEvent.click(screen.getByRole('button', { name: /ocultar contraseña/i }));
     expect(passwordInput).toHaveAttribute('type', 'password');
+  });
+});
+
+describe('LoginPage - con movimiento reducido preferido', () => {
+  beforeEach(() => {
+    mockReducedMotion = true;
+  });
+
+  afterEach(() => {
+    mockReducedMotion = false;
+  });
+
+  test('navega directamente al dashboard sin overlay de animación tras login exitoso', async () => {
+    authService.login.mockResolvedValueOnce();
+    renderLoginPage();
+
+    fireEvent.change(screen.getByLabelText(/email/i), { target: { value: 'admin@test.com' } });
+    fireEvent.change(screen.getByLabelText('Contraseña'), { target: { value: 'pass' } });
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /ingresar/i }));
+    });
+
+    expect(document.querySelector('.login-exit-overlay')).not.toBeInTheDocument();
   });
 });

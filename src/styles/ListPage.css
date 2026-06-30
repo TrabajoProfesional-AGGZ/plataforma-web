@@ -1,13 +1,73 @@
 /* Shared styles for list pages: SociosPage, UsuariosPage, DisciplinasPage, InstalacionesPage */
 
+/* ── Page title ──────────────────────────────────────────────── */
+.socios-title,
+.usuarios-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-6) 0;
+  text-align: center;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/* ── Ver-todos / secondary button ────────────────────────────── */
+.socios-ver-todos-button,
+.usuarios-ver-todos-button {
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-medium);
+}
+
+.socios-ver-todos-button:hover:not(:disabled),
+.usuarios-ver-todos-button:hover:not(:disabled) {
+  background-color: var(--color-bg);
+}
+
+/* ── Filters layout ───────────────────────────────────────────── */
+.socios-filtros,
+.usuarios-filtros {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.socios-filtros-dropdowns,
+.usuarios-filtros-dropdowns {
+  display: flex;
+  flex-direction: row;
+  gap: var(--space-2);
+}
+
+.socios-filtros-grupo,
+.usuarios-filtros-grupo {
+  width: 180px;
+}
+
+/* ── Table sort ───────────────────────────────────────────────── */
+.socios-th-sort,
+.usuarios-th-sort {
+  cursor: pointer;
+  user-select: none;
+}
+
+.socios-th-sort:hover,
+.usuarios-th-sort:hover {
+  color: var(--color-text-primary);
+}
+
 /* ── Toolbar ─────────────────────────────────────────────────── */
 .socios-toolbar,
 .usuarios-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 16px;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
   flex-wrap: wrap;
 }
 
@@ -15,7 +75,7 @@
 .usuarios-toolbar-left {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   flex: 1;
   min-width: 200px;
 }
@@ -24,7 +84,7 @@
 .usuarios-toolbar-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
 }
 
 /* ── Search ──────────────────────────────────────────────────── */
@@ -32,17 +92,23 @@
 .usuarios-search-container {
   display: flex;
   align-items: center;
-  gap: 8px;
-  background-color: #ffffff;
-  border: 1px solid #111111;
-  border-radius: 6px;
-  padding: 8px 12px;
+  gap: var(--space-2);
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
   flex: 1;
+  transition: border-color var(--transition-fast);
+}
+
+.socios-search-container:focus-within,
+.usuarios-search-container:focus-within {
+  border-color: var(--color-border-strong);
 }
 
 .socios-search-container svg,
 .usuarios-search-container svg {
-  color: #4a4a4a;
+  color: var(--color-text-secondary);
   flex-shrink: 0;
 }
 
@@ -51,44 +117,44 @@
   border: none;
   outline: none;
   background: transparent;
-  color: #111111;
+  color: var(--color-text-primary);
   width: 100%;
   font-size: 14px;
 }
 
 .socios-search-button, .socios-ver-todos-button,
 .usuarios-search-button, .usuarios-ver-todos-button {
-  padding: 8px 16px;
-  border-radius: 6px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-sm);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  transition: background-color 0.15s, color 0.15s;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .socios-search-loading,
 .usuarios-search-loading {
   display: flex;
   justify-content: center;
-  padding: 48px 0;
+  padding: var(--space-12) 0;
 }
 
 /* ── Feedback ────────────────────────────────────────────────── */
 .socios-error,
 .usuarios-error {
-  color: #c0392b;
+  color: var(--color-danger);
   font-size: 14px;
   text-align: center;
   background-color: #fdecea;
   border: 1px solid #f5c6cb;
-  border-radius: 4px;
+  border-radius: var(--radius-sm);
   padding: 10px 14px;
 }
 
 .socios-no-encontrado,
 .usuarios-no-encontrado {
-  color: #4a4a4a;
+  color: var(--color-text-secondary);
   font-size: 14px;
   text-align: center;
 }
@@ -97,31 +163,31 @@
 .socios-filtro-toggle,
 .usuarios-filtro-toggle,
 .instalaciones-btn-toggle {
-  padding: 6px 12px;
-  border: 1px solid #111111;
-  border-radius: 6px;
-  background: #ffffff;
+  padding: 6px var(--space-3);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
   font-size: 13px;
   font-weight: 500;
-  color: #111111;
+  color: var(--color-text-primary);
   cursor: pointer;
-  transition: background-color 0.15s;
+  transition: background-color var(--transition-fast);
 }
 
 .socios-filtro-toggle:hover,
 .usuarios-filtro-toggle:hover,
 .instalaciones-btn-toggle:hover {
-  background-color: #f5f5f5;
+  background-color: var(--color-bg);
 }
 
 .socios-filtro-select, .usuarios-filtro-select,
 .instalaciones-filtro-fecha, .instalaciones-filtro-tipo {
-  border: 1px solid #111111;
-  border-radius: 6px;
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-sm);
   padding: 6px 10px;
   font-size: 13px;
-  color: #111111;
-  background-color: #ffffff;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
   outline: none;
   cursor: pointer;
 }
@@ -133,23 +199,24 @@
 
 .socios-filtro-select:focus,
 .usuarios-filtro-select:focus {
-  border-color: #111111;
+  border-color: var(--color-border-strong);
 }
 
 /* ── Table wrapper ───────────────────────────────────────────── */
 .socios-table-wrapper, .usuarios-table-wrapper,
 .disciplinas-table-wrapper, .instalaciones-table-wrapper {
-  background-color: #ffffff;
-  border: 1px solid #111111;
-  border-radius: 8px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-md);
   overflow: hidden;
+  box-shadow: var(--shadow-sm);
 }
 
 .socios-table-empty,
 .usuarios-table-empty {
-  padding: 32px;
+  padding: var(--space-8);
   text-align: center;
-  color: #4a4a4a;
+  color: var(--color-text-secondary);
   font-size: 14px;
   margin: 0;
 }
@@ -157,8 +224,8 @@
 .disciplinas-empty,
 .instalaciones-empty {
   text-align: center;
-  padding: 48px 0;
-  color: #4a4a4a;
+  padding: var(--space-12) 0;
+  color: var(--color-text-secondary);
   font-size: 15px;
   margin: 0;
 }
@@ -177,10 +244,11 @@
 .usuarios-tabla td,
 .disciplinas-tabla td,
 .instalaciones-tabla td {
-  padding: 14px 20px;
-  border-bottom: 1px solid #f0f0f0;
-  color: #111111;
+  padding: var(--space-3) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-primary);
   vertical-align: middle;
+  font-variant-numeric: tabular-nums;
 }
 
 .socios-table td,
@@ -206,7 +274,7 @@
 .usuarios-tr-clickable:hover td,
 .disciplinas-tr-clickable:hover td,
 .instalaciones-tr-clickable:hover td {
-  background-color: #f5f5f5;
+  background-color: #f8f8f8;
 }
 
 /* ── Badge base ──────────────────────────────────────────────── */
@@ -214,7 +282,7 @@
 .instalaciones-badge {
   display: inline-block;
   padding: 3px 10px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 500;
   border: 1px solid;
@@ -225,23 +293,17 @@
 .usuarios-estado-cell {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   font-size: 13px;
   font-weight: 500;
-  color: #111111;
+  color: var(--color-text-primary);
   padding: 4px 10px 4px 6px;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   border: 1px solid;
 }
 
-/* ── Card action buttons base ────────────────────────────────── */
+/* ── Card action buttons base → src/styles/ListDetailShared.css ── */
 .socios-btn-eliminar, .socios-btn-editar,
 .usuarios-btn-eliminar, .usuarios-btn-editar, .usuarios-btn-cambiar-rol {
-  padding: 8px 20px;
-  border-radius: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.15s, color 0.15s;
-  border: none;
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }

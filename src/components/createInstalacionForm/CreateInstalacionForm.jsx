@@ -1,5 +1,4 @@
 import { useForm } from 'react-hook-form';
-import { AnimatePresence } from 'framer-motion';
 import { Building2, Settings, CheckCircle2, Users, DollarSign, Tag } from 'lucide-react';
 import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, FormStep } from '../createForm/FormFields';
@@ -60,9 +59,9 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
       onCancel={onCancel}
       goBack={goBack}
       goNext={goNext}
+      direction={direction}
       onFormSubmit={handleSubmit(onSubmit)}
     >
-      <AnimatePresence mode="wait" custom={direction}>
         {step === 1 && (
           <FormStep key="step1" direction={direction}>
             <Field label="Nombre de la instalación" icon={Building2} error={errors.nombre?.message}>
@@ -128,7 +127,6 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
             </div>
           </FormStep>
         )}
-      </AnimatePresence>
     </MultiStepFormShell>
   );
 }

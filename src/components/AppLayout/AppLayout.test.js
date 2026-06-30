@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, act } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import AppLayout from './AppLayout';
 import * as authService from '../../services/authService';
@@ -7,15 +7,20 @@ jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../services/authService');
 jest.mock('../../hooks/useAuth');
 import { useAuth } from '../../hooks/useAuth';
+import { useLocation } from 'react-router-dom';
 
 const mockNavigate = jest.fn();
 jest.mock('react-router-dom', () => ({
   ...jest.requireActual('react-router-dom'),
   useNavigate: () => mockNavigate,
+  useLocation: jest.fn(),
 }));
+
+const defaultLocation = { pathname: '/dashboard', search: '', hash: '', state: null, key: 'default' };
 
 function renderLayout(permisos = []) {
   useAuth.mockReturnValue({ user: { uid: '1', email: 'admin@club.com' }, loading: false, permisos });
+  useLocation.mockReturnValue(defaultLocation);
   return render(
     <MemoryRouter>
       <AppLayout />
@@ -28,22 +33,9 @@ describe('AppLayout', () => {
     jest.clearAllMocks();
   });
 
-  test('muestra el email del usuario como botón en el header', () => {
+  test('muestra el email del usuario como texto en el header', () => {
     renderLayout();
-    expect(screen.getByRole('button', { name: 'admin@club.com' })).toBeInTheDocument();
-  });
-
-  test('muestra "Ver perfil" en el dropdown al hacer clic en el email', () => {
-    renderLayout();
-    fireEvent.click(screen.getByRole('button', { name: 'admin@club.com' }));
-    expect(screen.getByRole('button', { name: /ver perfil/i })).toBeInTheDocument();
-  });
-
-  test('navega a /perfil al hacer clic en "Ver perfil"', () => {
-    renderLayout();
-    fireEvent.click(screen.getByRole('button', { name: 'admin@club.com' }));
-    fireEvent.click(screen.getByRole('button', { name: /ver perfil/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/perfil');
+    expect(screen.getByText('admin@club.com')).toBeInTheDocument();
   });
 
   test('muestra el link de dashboard sin permisos', () => {
@@ -76,42 +68,6 @@ describe('AppLayout', () => {
     expect(screen.queryByRole('link', { name: /cambiar contraseña/i })).not.toBeInTheDocument();
   });
 
-  test('el logo de texto es un botón visible en el header', () => {
-    renderLayout();
-    expect(screen.getByRole('button', { name: /ir al dashboard/i })).toBeInTheDocument();
-  });
-
-  test('hacer click en el logo de texto navega a /dashboard', () => {
-    renderLayout();
-    fireEvent.click(screen.getByRole('button', { name: /ir al dashboard/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
-  });
-
-  test('el sidebar arranca cerrado al iniciar sesión', () => {
-    renderLayout();
-    expect(document.querySelector('.app-sidebar')).toHaveClass('hidden');
-  });
-
-  test('hacer click en el contenido principal cierra el sidebar si está abierto', () => {
-    renderLayout();
-    const sidebar = document.querySelector('.app-sidebar');
-
-    fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
-    expect(sidebar).not.toHaveClass('hidden');
-
-    fireEvent.click(screen.getByRole('main'));
-    expect(sidebar).toHaveClass('hidden');
-  });
-
-  test('hacer click en el contenido principal no abre el sidebar si está cerrado', () => {
-    renderLayout();
-    const sidebar = document.querySelector('.app-sidebar');
-    expect(sidebar).toHaveClass('hidden');
-
-    fireEvent.click(screen.getByRole('main'));
-    expect(sidebar).toHaveClass('hidden');
-  });
-
   test('llama a logout y redirige al login al hacer clic en cerrar sesión', async () => {
     authService.logout.mockResolvedValueOnce();
     renderLayout();
@@ -122,29 +78,5 @@ describe('AppLayout', () => {
       expect(authService.logout).toHaveBeenCalledTimes(1);
       expect(mockNavigate).toHaveBeenCalledWith('/');
     });
-  });
-
-  test('hacer click fuera del dropdown lo cierra', () => {
-    renderLayout();
-    fireEvent.click(screen.getByRole('button', { name: 'admin@club.com' }));
-    expect(screen.getByRole('button', { name: /ver perfil/i })).toBeInTheDocument();
-    fireEvent.mouseDown(document.body);
-    expect(screen.queryByRole('button', { name: /ver perfil/i })).not.toBeInTheDocument();
-  });
-
-  test('hacer click en el backdrop cierra el sidebar', () => {
-    renderLayout();
-    fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
-    const backdrop = document.querySelector('.app-sidebar-backdrop');
-    fireEvent.click(backdrop);
-    expect(document.querySelector('.app-sidebar')).toHaveClass('hidden');
-  });
-
-  test('hacer click en un nav link cierra el sidebar', () => {
-    renderLayout(['ver_socios']);
-    fireEvent.click(screen.getByRole('button', { name: /alternar menú lateral/i }));
-    expect(document.querySelector('.app-sidebar')).not.toHaveClass('hidden');
-    fireEvent.click(screen.getByRole('link', { name: /socios/i }));
-    expect(document.querySelector('.app-sidebar')).toHaveClass('hidden');
   });
 });

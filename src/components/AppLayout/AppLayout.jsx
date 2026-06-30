@@ -1,48 +1,85 @@
-import { useRef, useEffect, useLayoutEffect, useState } from 'react';
+import { useRef, useEffect, useLayoutEffect } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, ShieldCheck, ChevronRight, Building2, Trophy } from 'lucide-react';
+import { LayoutDashboard, Users, ShieldCheck, Building2, Trophy, Newspaper, Settings } from 'lucide-react';
 import { logout } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
 import texto from '../../assets/texto.png';
 import logoSocio from '../../assets/logo_socio.png';
 import './AppLayout.css';
 
+
 const NAV_ITEMS_BASE = [
-  { to: '/dashboard', label: 'Dashboard', desc: 'Inicio y resumen general', Icon: LayoutDashboard, permiso: null },
-  { to: '/socios', label: 'Socios', desc: 'Consultar y gestionar el padrón', Icon: Users, permiso: 'ver_socios' },
-  { to: '/usuarios', label: 'Usuarios', desc: 'Usuarios administrativos y roles', Icon: ShieldCheck, permiso: 'ver_usuarios' },
-  { to: '/instalaciones', label: 'Reservas e Instalaciones', desc: 'Administrar espacios físicos y reservas', Icon: Building2, permiso: 'ver_instalaciones' },
-  { to: '/disciplinas', label: 'Disciplinas', desc: 'Gestionar disciplinas del club', Icon: Trophy, permiso: 'ver_disciplinas' },
+  { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard, permiso: null },
+  { to: '/socios', label: 'Socios', Icon: Users, permiso: 'ver_socios' },
+  { to: '/usuarios', label: 'Usuarios', Icon: ShieldCheck, permiso: 'ver_usuarios' },
+  { to: '/instalaciones', label: 'Reservas e Instalaciones', Icon: Building2, permiso: 'ver_instalaciones' },
+  { to: '/disciplinas', label: 'Disciplinas', Icon: Trophy, permiso: 'ver_disciplinas' },
+  { to: '/noticias', label: 'Noticias', Icon: Newspaper, permiso: 'ver_noticias' },
+  { to: '/perfil', label: 'Perfil', Icon: Settings, permiso: ''}
 ];
 
 function AppLayout() {
   const { user, permisos } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [navigating, setNavigating] = useState(false);
-  const dropdownRef = useRef(null);
-  const isFirstRender = useRef(true);
+  const navRef = useRef(null);
+  const indicatorRef = useRef(null);
+  const prevActiveIndexRef = useRef(-1);
+  const animTimersRef = useRef([]);
 
   useLayoutEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
+    if (!navRef.current || !indicatorRef.current) return;
+
+    const linkEls = Array.from(navRef.current.querySelectorAll('.sidebar-link'));
+    const to = linkEls.findIndex(el => el.classList.contains('active'));
+    if (to === -1) return;
+
+    const from = prevActiveIndexRef.current;
+    const el = indicatorRef.current;
+
+    animTimersRef.current.forEach(clearTimeout);
+    animTimersRef.current = [];
+
+    const snap = (idx) => {
+      el.style.transition = 'none';
+      el.style.transform = `translateY(${linkEls[idx].offsetTop}px)`;
+      el.style.height = `${linkEls[idx].offsetHeight}px`;
+      el.style.opacity = '1';
+    };
+
+    const slide = (idx) => {
+      el.style.transition = 'transform 0.08s ease-out';
+      el.style.transform = `translateY(${linkEls[idx].offsetTop}px)`;
+      el.style.height = `${linkEls[idx].offsetHeight}px`;
+    };
+
+    if (from === -1) {
+      snap(to);
+      prevActiveIndexRef.current = to;
       return;
     }
-    setNavigating(true);
-    const timer = setTimeout(() => setNavigating(false), 700);
-    return () => clearTimeout(timer);
+
+    if (from === to) return;
+
+    const step = from < to ? 1 : -1;
+    let current = from + step;
+
+    const doStep = () => {
+      slide(current);
+      if (current !== to) {
+        current += step;
+        const t = setTimeout(doStep, 50);
+        animTimersRef.current.push(t);
+      } else {
+        prevActiveIndexRef.current = to;
+      }
+    };
+
+    doStep();
   }, [location.pathname]);
 
   useEffect(() => {
-    function handleClickOutside(e) {
-      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
-        setDropdownOpen(false);
-      }
-    }
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    return () => { animTimersRef.current.forEach(clearTimeout); };
   }, []);
 
   async function handleLogout() {
@@ -54,99 +91,47 @@ function AppLayout() {
 
   return (
     <div className="app-layout">
-      {/* Backdrop */}
-      <div
-        className={`app-sidebar-backdrop${sidebarOpen ? ' visible' : ''}`}
-        onClick={() => setSidebarOpen(false)}
-        aria-hidden="true"
-      />
+      <aside className="app-sidebar">
+        <div className="sidebar-header">
+          <img src={logoSocio} alt="SocioUnido" className="sidebar-logo-icon" />
+        </div>
 
-      {/* Sidebar overlay */}
-      <nav className={`app-sidebar${sidebarOpen ? '' : ' hidden'}`}>
-        <div className="app-sidebar-nav">
-          {navItems.map(({ to, label, desc, Icon }) => (
+        <nav className="sidebar-nav" ref={navRef}>
+          <div ref={indicatorRef} className="sidebar-active-bg" />
+          {navItems.map(({ to, label, Icon }) => (
             <NavLink
               key={to}
               to={to}
-              className={({ isActive }) => isActive ? 'sidebar-link active' : 'sidebar-link'}
-              onClick={() => setSidebarOpen(false)}
+              className={({ isActive }) => `sidebar-link${isActive ? ' active' : ''}`}
             >
-              <Icon size={18} aria-hidden="true" />
-              <div className="sidebar-link-content">
-                <span className="sidebar-link-label">{label}</span>
-                <span className="sidebar-link-desc">{desc}</span>
-              </div>
-              <ChevronRight size={14} className="sidebar-link-chevron" aria-hidden="true" />
+              <Icon size={26} aria-hidden="true" />
+              <span className="sidebar-link-label">{label}</span>
             </NavLink>
           ))}
-        </div>
+        </nav>
 
-        <div className="app-sidebar-footer">
+        <div className="sidebar-footer">
           <p>SocioUnido v1.0</p>
         </div>
-      </nav>
+      </aside>
 
-      {/* Header */}
-      <header className="app-header">
-        <div className="app-header-left">
-          <button
-            className="app-sidebar-toggle"
-            onClick={() => setSidebarOpen((v) => !v)}
-            aria-label="Alternar menú lateral"
-          >
-            <img
-              src={logoSocio}
-              alt=""
-              className={`app-header-logo-icon${sidebarOpen ? ' logo-rotated' : ''}`}
-            />
-          </button>
-        </div>
-
-        <div className="app-header-center">
-          <button
-            className="app-header-logo-button"
-            onClick={() => navigate('/dashboard')}
-            aria-label="Ir al dashboard"
-          >
+      <div className="app-main">
+        <header className="app-header">
+          <button className="app-header-logo-btn" onClick={() => navigate('/dashboard')}>
             <img src={texto} alt="SocioUnido" className="app-header-logo" />
           </button>
-        </div>
-
-        <div className="app-header-right">
-          <div className="app-user-dropdown" ref={dropdownRef}>
-            <button
-              className="app-email-button"
-              onClick={() => setDropdownOpen((v) => !v)}
-            >
-              {user?.email}
+          <div className="app-header-actions">
+            <span className="app-email-text">{user?.email}</span>
+            <button className="app-logout-button" onClick={handleLogout}>
+              Cerrar sesión
             </button>
-            {dropdownOpen && (
-              <div className="app-dropdown-menu">
-                <button
-                  className="app-dropdown-item"
-                  onClick={() => { setDropdownOpen(false); navigate('/perfil'); }}
-                >
-                  Ver perfil
-                </button>
-              </div>
-            )}
           </div>
-          <button className="app-logout-button" onClick={handleLogout}>
-            Cerrar sesión
-          </button>
-        </div>
-      </header>
+        </header>
 
-      {/* Main */}
-      <main className="app-content" onClick={() => setSidebarOpen(false)}>
-        {navigating ? (
-          <div className="app-page-loading">
-            <img src={logoSocio} alt="" className="loading-logo" />
-          </div>
-        ) : (
+        <main className="app-content">
           <Outlet />
-        )}
-      </main>
+        </main>
+      </div>
     </div>
   );
 }

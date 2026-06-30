@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { Users, ShieldCheck, ArrowUpRight, Building2, Trophy } from 'lucide-react';
+import { Users, ShieldCheck, ArrowUpRight, Building2, Trophy, Newspaper } from 'lucide-react';
 import './DashboardPage.css';
 
 const SECCIONES = [
@@ -32,6 +32,13 @@ const SECCIONES = [
     Icon: Trophy,
     permiso: 'ver_disciplinas',
   },
+  {
+    path: '/noticias',
+    titulo: 'Noticias',
+    descripcion: 'Crear noticias o avisos para los socios',
+    Icon: Newspaper,
+    permiso: 'ver_noticias',
+  }
 ];
 
 

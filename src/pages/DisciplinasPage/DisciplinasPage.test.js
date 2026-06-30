@@ -209,13 +209,13 @@ describe('DisciplinasPage', () => {
 
   test('muestra el concepto de cobro en detalle si la disciplina es arancelada', async () => {
     getDisciplinas.mockResolvedValue([
-      { id: 'disc-1', nombre: 'Tenis', cupo_maximo: 15, arancelada: true, concepto_cobro: 'Cuota tenis', estado: 'Activa' },
+      { id: 'disc-1', nombre: 'Tenis', cupo_maximo: 15, arancelada: true, id_concepto_cobro: 101, estado: 'Activa' },
     ]);
     await renderPage();
     await waitFor(() => expect(screen.getByText('Tenis')).toBeInTheDocument());
     fireEvent.click(screen.getByText('Tenis'));
     expect(screen.getByText('Concepto de cobro')).toBeInTheDocument();
-    expect(screen.getByText('Cuota tenis')).toBeInTheDocument();
+    expect(screen.getByText('101')).toBeInTheDocument();
   });
 
   test('no muestra concepto de cobro en detalle si no es arancelada', async () => {

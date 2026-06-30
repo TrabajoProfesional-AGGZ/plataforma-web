@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { AnimatePresence } from 'framer-motion';
 import {
   User, Clock, CheckCircle2, AlertCircle,
-  Calendar, Building2, Hash,
+  Calendar, Building2, Hash, X,
 } from 'lucide-react';
 import { createReserva } from '../../services/reservasService';
 import { getSocioByNroSocio } from '../../services/sociosService';
@@ -21,15 +21,18 @@ const STEPS = [
 ];
 
 const stepFields = {
-  1: ['nro_socio', 'id_instalacion'],
+  1: ['id_instalacion'],
   2: ['fecha_reserva', 'hora_inicio', 'hora_fin'],
 };
 
 export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], instalacionPreseleccionada = '' }) {
   const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
+  const [nroSocioInput, setNroSocioInput] = useState('');
   const [busquedaSocio, setBusquedaSocio] = useState(false);
   const [errorSocio, setErrorSocio] = useState('');
-  const [socioResuelto, setSocioResuelto] = useState(null);
+  const [socioPreview, setSocioPreview] = useState(null);
+  const [sociosAgregados, setSociosAgregados] = useState([]);
+  const [errorListaSocios, setErrorListaSocios] = useState('');
   const [submitError, setSubmitError] = useState('');
 
   const {
@@ -42,16 +45,56 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
 
   useEscapeKey(onCancel);
 
-  const nroSocioField = register('nro_socio', { required: 'El número de socio es requerido' });
-
   const previewSocio = async (value) => {
     if (!value?.trim()) return;
     try {
       const socio = await getSocioByNroSocio(value.trim());
-      setSocioResuelto(socio);
+      setSocioPreview(socio);
     } catch {
-      // preview silently fails; goNext shows the error
+      // preview silently fails
     }
+  };
+
+  const agregarSocio = async () => {
+    const nro = nroSocioInput.trim();
+    if (!nro) return;
+
+    if (sociosAgregados.some((s) => s.nro_socio === nro)) {
+      setErrorSocio('Este socio ya fue agregado.');
+      return;
+    }
+
+    const socioYaResuelto = socioPreview?.nro_socio === nro ? socioPreview : null;
+    if (socioYaResuelto) {
+      setSociosAgregados((prev) => [...prev, socioYaResuelto]);
+      setNroSocioInput('');
+      setSocioPreview(null);
+      setErrorSocio('');
+      setErrorListaSocios('');
+      return;
+    }
+
+    setBusquedaSocio(true);
+    setErrorSocio('');
+    try {
+      const socio = await getSocioByNroSocio(nro);
+      if (sociosAgregados.some((s) => s.id === socio.id)) {
+        setErrorSocio('Este socio ya fue agregado.');
+        return;
+      }
+      setSociosAgregados((prev) => [...prev, socio]);
+      setNroSocioInput('');
+      setSocioPreview(null);
+      setErrorListaSocios('');
+    } catch {
+      setErrorSocio('No se encontró ningún socio con ese número.');
+    } finally {
+      setBusquedaSocio(false);
+    }
+  };
+
+  const removerSocio = (id) => {
+    setSociosAgregados((prev) => prev.filter((s) => s.id !== id));
   };
 
   const goNext = async () => {
@@ -59,20 +102,11 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
     if (!valid) return;
 
     if (step === 1) {
-      if (socioResuelto) { advance(); return; }
-      const nroSocio = getValues('nro_socio');
-      setBusquedaSocio(true);
-      setErrorSocio('');
-      try {
-        const socio = await getSocioByNroSocio(nroSocio);
-        setSocioResuelto(socio);
-        advance();
-      } catch (e) {
-        setErrorSocio('No se encontró ningún socio con ese número.');
-        console.error('getSocioByNroSocio error:', e);
-      } finally {
-        setBusquedaSocio(false);
+      if (sociosAgregados.length === 0) {
+        setErrorListaSocios('Debe agregar al menos un socio.');
+        return;
       }
+      advance();
       return;
     }
 
@@ -83,7 +117,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
     setSubmitError('');
     try {
       await createReserva({
-        id_socio: socioResuelto.id,
+        ids_socios: sociosAgregados.map((s) => s.id),
         id_instalacion: data.id_instalacion,
         fecha_reserva: data.fecha_reserva,
         hora_inicio: data.hora_inicio,
@@ -119,35 +153,36 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
       <AnimatePresence mode="wait" custom={direction}>
         {step === 1 && (
           <FormStep key="step1" direction={direction}>
-            <Field label="Número de socio" icon={Hash} error={errors.nro_socio?.message}>
+            <Field label="Agregar socio" icon={Hash} error={errorSocio}>
               <div className="csf-socio-input-row">
                 <StyledInput
-                  {...nroSocioField}
                   type="text"
                   placeholder="Ej. 1234"
-                  error={!!errors.nro_socio}
+                  value={nroSocioInput}
                   onChange={(e) => {
-                    setSocioResuelto(null);
+                    setNroSocioInput(e.target.value);
+                    setSocioPreview(null);
                     setErrorSocio('');
-                    nroSocioField.onChange(e);
                   }}
-                  onBlur={(e) => {
-                    previewSocio(e.target.value);
-                    nroSocioField.onBlur(e);
+                  onBlur={(e) => previewSocio(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') { e.preventDefault(); agregarSocio(); }
                   }}
                 />
-                {socioResuelto && (
-                  <span className="csf-socio-nombre-inline">
-                    <CheckCircle2 size={13} color="#0D6E0D" />
-                    {socioResuelto.apellido} {socioResuelto.nombre}
-                  </span>
-                )}
+                <button
+                  type="button"
+                  className="csf-btn-agregar-socio"
+                  onClick={agregarSocio}
+                  disabled={busquedaSocio || !nroSocioInput.trim()}
+                >
+                  Agregar
+                </button>
               </div>
-              {errorSocio && (
-                <p className="csf-error">
-                  <AlertCircle size={12} />
-                  {errorSocio}
-                </p>
+              {socioPreview && socioPreview.nro_socio === nroSocioInput.trim() && (
+                <span className="csf-socio-nombre-inline">
+                  <CheckCircle2 size={13} color="#0D6E0D" />
+                  {socioPreview.apellido} {socioPreview.nombre}
+                </span>
               )}
               {busquedaSocio && (
                 <div className="csf-socio-buscando">
@@ -156,6 +191,32 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
                 </div>
               )}
             </Field>
+
+            {sociosAgregados.length > 0 && (
+              <div className="csf-socios-lista">
+                {sociosAgregados.map((socio) => (
+                  <div key={socio.id} className="csf-socio-chip">
+                    <span>{socio.nro_socio} — {socio.apellido} {socio.nombre}</span>
+                    <button
+                      type="button"
+                      className="csf-socio-chip-remove"
+                      onClick={() => removerSocio(socio.id)}
+                      aria-label={`Quitar socio ${socio.nro_socio}`}
+                    >
+                      <X size={13} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {errorListaSocios && (
+              <p className="csf-error">
+                <AlertCircle size={12} />
+                {errorListaSocios}
+              </p>
+            )}
+
             <Field label="Instalación" icon={Building2} error={errors.id_instalacion?.message}>
               <StyledSelect
                 {...register('id_instalacion', { required: 'Debe seleccionar una instalación' })}
@@ -218,6 +279,6 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
 CreateReservaForm.propTypes = {
   onSuccess: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-  instalaciones: PropTypes.array, // o PropTypes.arrayOf(PropTypes.object) dependiendo de qué guarde
-  instalacionPreseleccionada: PropTypes.string, // <-- Esta es la línea que te pedía el linter
+  instalaciones: PropTypes.array,
+  instalacionPreseleccionada: PropTypes.string,
 };

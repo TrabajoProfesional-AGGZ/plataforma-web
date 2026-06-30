@@ -6,6 +6,7 @@ import { EditSocioForm } from '../../components/editForm/EditSocioForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
+import { useListState } from '../../hooks/useListState';
 import { useModalEscape } from '../../hooks/useModalEscape';
 import { estadoConfig } from '../../utils/estadoConfig';
 import { SocioAccionesExtra } from '../../components/socioAccionesExtra/SocioAccionesExtra';
@@ -33,9 +34,7 @@ function SociosPage() {
 
   const [nroSocio, setNroSocio] = useState('');
   const [modo, setModo] = useState('idle'); // idle | socio | lista | no-encontrado
-  const [resultado, setResultado] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { resultado, setResultado, loading, setLoading, error, setError } = useListState();
   const { setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
 
   const [filtroEstado, setFiltroEstado] = useState('');
@@ -49,9 +48,34 @@ function SociosPage() {
   const [errorModal, setErrorModal] = useState('');
 
   useEffect(() => {
-    cargarSocios();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    let cancelled = false;
+
+    async function inicializarSocios() {
+      setLoading(true);
+      setError(null);
+      try {
+        const socios = await getSocios();
+        if (!cancelled) {
+          cacheSociosRef.current = socios;
+          setResultado(socios);
+          setModo('lista');
+        }
+      } catch (err) {
+        if (!cancelled) {
+          if (err.message === 'servicio-no-disponible') {
+            setError('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
+          } else {
+            setError('Error al obtener los socios. Intentá de nuevo.');
+          }
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    inicializarSocios();
+    return () => { cancelled = true; };
+  }, [setError, setLoading, setResultado]);
 
   useModalEscape([
     [crearModalOpen, setCrearModalOpen],
@@ -215,24 +239,28 @@ function SociosPage() {
       {!loading && modo === 'socio' && resultado && (() => {
         const cfg = estadoConfig(resultado.estado.nombre);
         return (
-          <div className="socios-card" style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}>
+          <div className="socios-card">
             <div className="socios-card-inner">
-              <img src={cfg.logo} alt="" className="socios-card-logo" />
+              <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
+                <img src={cfg.logo} alt="" className="detalle-logo-img" />
+              </div>
               <div className="socios-card-data">
+                <div className="detalle-card-data-header">
+                  <span className="detalle-full-name">{resultado.apellido} {resultado.nombre}</span>
+                  <span className="detalle-estado-badge" style={{ backgroundColor: cfg.bg, color: cfg.border, borderColor: cfg.border }}>
+                    {resultado.estado.nombre}
+                  </span>
+                </div>
                 <div className="socios-card-row">
                   <span className="socios-card-label">N° Socio</span>
                   <span>{resultado.nro_socio}</span>
-                </div>
-                <div className="socios-card-row">
-                  <span className="socios-card-label">Apellido y nombre</span>
-                  <span>{resultado.apellido} {resultado.nombre}</span>
                 </div>
                 <div className="socios-card-row">
                   <span className="socios-card-label">DNI</span>
                   <span>{resultado.nro_documento}</span>
                 </div>
                 <div className="socios-card-row">
-                  <span className="socios-card-label">Fecha de nacimiento</span>
+                  <span className="socios-card-label">Nacimiento</span>
                   <span>{resultado.fecha_nacimiento}</span>
                 </div>
                 <div className="socios-card-row">
@@ -248,10 +276,6 @@ function SociosPage() {
                 <div className="socios-card-row">
                   <span className="socios-card-label">Categoría</span>
                   <span>{resultado.categoria.nombre}</span>
-                </div>
-                <div className="socios-card-row">
-                  <span className="socios-card-label">Estado</span>
-                  <span>{resultado.estado.nombre}</span>
                 </div>
                 <SocioAccionesExtra idSocio={resultado.id} nroSocio={resultado.nro_socio} />
               </div>

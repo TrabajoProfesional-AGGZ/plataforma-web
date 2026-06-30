@@ -1,5 +1,13 @@
 import { fetchTo } from '../utils/utils';
 
+async function fetchReservas(url, errorMsg = 'Error al obtener reservas') {
+  const res = await fetchTo(url, 'GET');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error(errorMsg);
+  const data = await res.json();
+  return data.reservas ?? data;
+}
+
 export async function getReservas(instalacionId) {
   const res = await fetchTo('/api/v1/reservas', 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
@@ -10,19 +18,11 @@ export async function getReservas(instalacionId) {
 }
 
 export async function getReservasPorInstalacion(instalacionId) {
-  const res = await fetchTo(`/api/v1/reservas/por-instalacion/${instalacionId}`, 'GET');
-  if (res.status >= 500) throw new Error('servicio-no-disponible');
-  if (!res.ok) throw new Error('Error al obtener reservas');
-  const data = await res.json();
-  return data.reservas ?? data;
+  return fetchReservas(`/api/v1/reservas/por-instalacion/${instalacionId}`);
 }
 
 export async function getReservasPorSocio(nroSocio) {
-  const res = await fetchTo(`/api/v1/reservas/por-socio/${nroSocio}`, 'GET');
-  if (res.status >= 500) throw new Error('servicio-no-disponible');
-  if (!res.ok) throw new Error('Error al obtener reservas');
-  const data = await res.json();
-  return data.reservas ?? data;
+  return fetchReservas(`/api/v1/reservas/por-socio/${nroSocio}`);
 }
 
 export async function createReserva(data) {
@@ -40,17 +40,9 @@ export async function deleteReserva(instalacionId, reservaId) {
 }
 
 export async function getReservasHistoricas() {
-  const res = await fetchTo('/api/v1/reservas/historicas', 'GET');
-  if (res.status >= 500) throw new Error('servicio-no-disponible');
-  if (!res.ok) throw new Error('Error al obtener reservas históricas');
-  const data = await res.json();
-  return data.reservas ?? data;
+  return fetchReservas('/api/v1/reservas/historicas', 'Error al obtener reservas históricas');
 }
 
 export async function getReservasHistoricasPorInstalacion(instalacionId) {
-  const res = await fetchTo(`/api/v1/reservas/historicas/por-instalacion/${instalacionId}`, 'GET');
-  if (res.status >= 500) throw new Error('servicio-no-disponible');
-  if (!res.ok) throw new Error('Error al obtener reservas históricas');
-  const data = await res.json();
-  return data.reservas ?? data;
+  return fetchReservas(`/api/v1/reservas/historicas/por-instalacion/${instalacionId}`, 'Error al obtener reservas históricas');
 }
