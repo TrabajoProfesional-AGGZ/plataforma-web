@@ -15,7 +15,7 @@ const NAV_ITEMS_BASE = [
   { to: '/instalaciones', label: 'Reservas e Instalaciones', Icon: Building2, permiso: 'ver_instalaciones' },
   { to: '/disciplinas', label: 'Disciplinas', Icon: Trophy, permiso: 'ver_disciplinas' },
   { to: '/noticias', label: 'Noticias', Icon: Newspaper, permiso: 'ver_noticias' },
-  { to: '/perfil', label: 'Ver perfil', Icon: Settings, permiso: ''}
+  { to: '/perfil', label: 'Perfil', Icon: Settings, permiso: ''}
 ];
 
 function AppLayout() {

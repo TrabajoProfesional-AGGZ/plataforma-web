@@ -199,20 +199,40 @@ function NoticiasPage() {
           )}
 
           {!loadingDetalle && !errorDetalle && noticiaActual && (
-            <div className="noticias-diario">
-              <div className="noticias-diario-fechas">
-                <span>Publicado: {noticiaActual.fecha_publicacion}</span>
-                <span>Vence: {noticiaActual.fecha_expiracion}</span>
-              </div>
+            <article className="noticias-diario">
+              <header className="noticias-diario-masthead">
+                <span className="noticias-diario-seccion">Noticias del Club</span>
+                <div className="noticias-diario-masthead-right">
+                  <span className="noticias-diario-fecha">Fecha de publicación: {noticiaActual.fecha_publicacion}</span>
+                  {noticiaActual.fecha_expiracion && (
+                    <span className="noticias-diario-fecha">Fecha de vencimiento: {noticiaActual.fecha_expiracion}</span>
+                  )}
+                </div>
+              </header>
+
               <h1 className="noticias-diario-titulo">{noticiaActual.titulo}</h1>
+
+              <hr className="noticias-diario-rule" />
+
               {noticiaActual.imagen && (
-                <img
-                  src={noticiaActual.imagen}
-                  alt="Imagen de la noticia"
-                  className="noticias-diario-imagen"
-                />
+                <figure className="noticias-diario-figura">
+                  <img
+                    src={noticiaActual.imagen}
+                    alt="Imagen de la noticia"
+                    className="noticias-diario-imagen"
+                  />
+                </figure>
               )}
-              <p className="noticias-diario-cuerpo">{noticiaActual.cuerpo}</p>
+
+              <div className="noticias-diario-cuerpo">
+                {(noticiaActual.cuerpo || '').split(/\n\n+/).map((parrafo, i) => (
+                  <p key={i}>
+                    {parrafo.split('\n').map((linea, j, arr) =>
+                      j < arr.length - 1 ? [linea, <br key={j} />] : linea
+                    )}
+                  </p>
+                ))}
+              </div>
 
               <div className="noticias-detalle-actions">
                 {puedeEditarNoticia && (
@@ -226,7 +246,7 @@ function NoticiasPage() {
                   </button>
                 )}
               </div>
-            </div>
+            </article>
           )}
         </>
       )}

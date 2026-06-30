@@ -116,49 +116,91 @@
   padding: 10px 14px;
 }
 
-/* ── Vista diario ─────────────────────────────────────────────── */
+/* ── Vista diario (newspaper article) ─────────────────────────── */
 .noticias-diario {
-  position: relative;
-  max-width: 700px;
+  max-width: 680px;
   margin: 0 auto;
-  padding: var(--space-6) 0;
+  padding: 0;
 }
 
-.noticias-diario-fechas {
-  position: absolute;
-  top: var(--space-6);
-  right: 0;
+.noticias-diario-masthead {
+  border-top: 3px solid var(--color-text-primary);
+  padding-top: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.noticias-diario-seccion {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+}
+
+.noticias-diario-masthead-right {
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 4px;
-  font-size: 13px;
+}
+
+.noticias-diario-fecha {
+  font-size: 12px;
   color: var(--color-text-secondary);
 }
 
 .noticias-diario-titulo {
-  font-size: 28px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 44px;
   font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   color: var(--color-text-primary);
-  text-align: center;
+  text-align: left;
+  margin: 0 0 var(--space-3) 0;
+}
+
+
+.noticias-diario-rule {
+  border: none;
+  border-top: 1px solid var(--color-text-primary);
+  margin: var(--space-4) 0;
+}
+
+.noticias-diario-figura {
   margin: 0 0 var(--space-6) 0;
-  padding-right: 140px;
 }
 
 .noticias-diario-imagen {
   width: 100%;
-  max-height: 360px;
+  max-height: 440px;
   object-fit: cover;
-  border-radius: var(--radius-md);
-  margin-bottom: var(--space-6);
+  border-radius: 0;
+  display: block;
 }
 
 .noticias-diario-cuerpo {
-  font-size: 16px;
-  line-height: 1.7;
-  color: var(--color-text-primary);
-  white-space: pre-wrap;
   margin: 0 0 var(--space-8) 0;
+}
+
+.noticias-diario-cuerpo p {
+  font-size: 17px;
+  line-height: 1.78;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-4) 0;
+}
+
+.noticias-diario-cuerpo p:first-child::first-letter {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 4.8em;
+  font-weight: 700;
+  line-height: 0.8;
+  float: left;
+  margin: 6px 8px 0 0;
+  color: var(--color-text-primary);
 }
 
 /* ── Detail action buttons ────────────────────────────────────── */
