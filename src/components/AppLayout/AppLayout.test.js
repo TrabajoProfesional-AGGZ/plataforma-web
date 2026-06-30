@@ -79,25 +79,4 @@ describe('AppLayout', () => {
       expect(mockNavigate).toHaveBeenCalledWith('/');
     });
   });
-
-  test('muestra animación de carga al cambiar de ruta', () => {
-    useAuth.mockReturnValue({ user: { uid: '1', email: 'admin@club.com' }, loading: false, permisos: [] });
-    useLocation.mockReturnValue(defaultLocation);
-    const { rerender } = render(
-      <MemoryRouter>
-        <AppLayout />
-      </MemoryRouter>
-    );
-
-    act(() => {
-      useLocation.mockReturnValue({ pathname: '/socios', search: '', hash: '', state: null, key: 'socios' });
-      rerender(
-        <MemoryRouter>
-          <AppLayout />
-        </MemoryRouter>
-      );
-    });
-
-    expect(document.querySelector('.app-page-loading')).toBeInTheDocument();
-  });
 });

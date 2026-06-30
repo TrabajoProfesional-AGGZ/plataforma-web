@@ -1,4 +1,4 @@
-import { useRef, useEffect, useLayoutEffect, useState } from 'react';
+import { useRef, useEffect, useLayoutEffect } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Users, ShieldCheck, Building2, Trophy, Newspaper, Settings } from 'lucide-react';
 import { logout } from '../../services/authService';
@@ -22,23 +22,10 @@ function AppLayout() {
   const { user, permisos } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [navigating, setNavigating] = useState(false);
-  const isFirstRender = useRef(true);
-
   const navRef = useRef(null);
   const indicatorRef = useRef(null);
   const prevActiveIndexRef = useRef(-1);
   const animTimersRef = useRef([]);
-
-  useLayoutEffect(() => {
-    if (isFirstRender.current) {
-      isFirstRender.current = false;
-      return;
-    }
-    setNavigating(true);
-    const timer = setTimeout(() => setNavigating(false), 700);
-    return () => clearTimeout(timer);
-  }, [location.pathname]);
 
   useLayoutEffect(() => {
     if (!navRef.current || !indicatorRef.current) return;
@@ -142,13 +129,7 @@ function AppLayout() {
         </header>
 
         <main className="app-content">
-          {navigating ? (
-            <div className="app-page-loading">
-              <img src={logoSocio} alt="" className="loading-logo" />
-            </div>
-          ) : (
-            <Outlet />
-          )}
+          <Outlet />
         </main>
       </div>
     </div>

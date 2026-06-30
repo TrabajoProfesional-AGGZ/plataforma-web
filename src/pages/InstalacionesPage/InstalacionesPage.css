@@ -97,7 +97,7 @@
 
 .instalaciones-btn-vista-toggle {
   background: none;
-  border: 1px solid var(--color-border-strong);
+  border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
   padding: 6px 14px;
   font-size: 13px;
@@ -126,7 +126,7 @@
 .instalaciones-btn-reserva-editar {
   background-color: var(--color-surface);
   color: var(--color-text-primary);
-  border: 1px solid var(--color-border-strong);
+  border: 1px solid var(--color-border-medium);
 }
 
 .instalaciones-btn-reserva-editar:hover {
@@ -174,7 +174,7 @@
 /* ── Formulario inline de reserva ─────────────────────────────── */
 .instalaciones-reserva-form {
   background-color: var(--color-surface);
-  border: 1px solid var(--color-border-strong);
+  border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-md);
   padding: var(--space-5);
   margin-bottom: var(--space-5);
