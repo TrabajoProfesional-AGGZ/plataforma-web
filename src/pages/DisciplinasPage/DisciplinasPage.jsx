@@ -199,7 +199,7 @@ function DisciplinasPage() {
                 { label: 'Cupo máximo', value: `${disciplinaActual.cupo_maximo} personas` },
                 { label: 'Arancelada', value: disciplinaActual.arancelada ? 'Sí' : 'No' },
                 ...(disciplinaActual.arancelada
-                  ? [{ label: 'Concepto de cobro', value: disciplinaActual.concepto_cobro }]
+                  ? [{ label: 'Concepto de cobro', value: disciplinaActual.id_concepto_cobro }]
                   : []),
                 {
                   label: 'Estado',
