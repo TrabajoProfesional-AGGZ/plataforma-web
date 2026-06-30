@@ -132,6 +132,31 @@ const EMAIL_PATTERN = {
   message: 'Ingresá un correo válido' 
 };
 
+export function DocNumberField({ docNumberRegister, errors, fieldKey, label = 'Número de documento', placeholder = 'Ej. 12345678' }) {
+  return (
+    <>
+      <Field label={label} icon={CreditCard} error={errors[fieldKey]?.message}>
+        <StyledInput
+          {...docNumberRegister}
+          onInput={(e) => { e.target.value = e.target.value.toUpperCase(); }}
+          placeholder={placeholder}
+          error={!!errors[fieldKey]}
+          style={{ textTransform: 'uppercase' }}
+        />
+      </Field>
+      <DocHint />
+    </>
+  );
+}
+
+DocNumberField.propTypes = {
+  docNumberRegister: PropTypes.object.isRequired,
+  errors: PropTypes.object.isRequired,
+  fieldKey: PropTypes.string.isRequired,
+  label: PropTypes.string,
+  placeholder: PropTypes.string,
+};
+
 export function EmailField({ register, errors, required = false, placeholder = 'maria@ejemplo.com' }) {
   const rules = { pattern: EMAIL_PATTERN, ...(required && { required: 'El correo es requerido' }) };
   return (

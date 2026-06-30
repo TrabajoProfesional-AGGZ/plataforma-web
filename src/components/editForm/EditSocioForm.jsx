@@ -1,14 +1,13 @@
 import { useState, useEffect } from 'react';
-import { AnimatePresence } from 'framer-motion';
 import {
-  User, CreditCard, Phone,
+  User, Phone,
   Calendar, MapPin, Activity, Tag,
 } from 'lucide-react';
 import { updateSocio } from '../../services/sociosService';
 import { validarFechaNacimientoOpcional, getDocNumberRules } from '../../utils/formValidators';
 import { fetchEstadosSocio, fetchCategoriasSocio } from '../../services/catalogosService';
 import '../createForm/CreateSocioForm.css';
-import { Field, StyledInput, StyledSelect, FormStep, SOCIOS_STEPS, DocHint, EmailField } from '../createForm/FormFields';
+import { Field, StyledInput, StyledSelect, FormStep, SOCIOS_STEPS, DocNumberField, EmailField } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepForm } from '../../hooks/useMultiStepForm';
 
@@ -91,9 +90,9 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
       onCancel={onCancel}
       goBack={goBack}
       goNext={goNext}
+      direction={direction}
       onFormSubmit={handleSubmit(onSubmit)}
     >
-      <AnimatePresence mode="wait" custom={direction}>
         {step === 1 && (
           <FormStep key="step1" direction={direction}>
             <div className="csf-grid-2">
@@ -156,16 +155,7 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
 
         {step === 2 && (
           <FormStep key="step2" direction={direction}>
-            <Field label="N° de documento" icon={CreditCard} error={errors.nro_documento?.message}>
-              <StyledInput
-                {...docNumberRegister}
-                onInput={(e) => { e.target.value = e.target.value.toUpperCase(); }}
-                placeholder="ej: 12345678"
-                error={!!errors.nro_documento}
-                style={{ textTransform: 'uppercase' }}
-              />
-            </Field>
-            <DocHint />
+            <DocNumberField docNumberRegister={docNumberRegister} errors={errors} fieldKey="nro_documento" label="N° de documento" placeholder="ej: 12345678" />
           </FormStep>
         )}
 
@@ -199,7 +189,6 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
             {formError && <p className="csf-form-error">{formError}</p>}
           </FormStep>
         )}
-      </AnimatePresence>
     </MultiStepFormShell>
   );
 }

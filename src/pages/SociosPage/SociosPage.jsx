@@ -6,6 +6,7 @@ import { EditSocioForm } from '../../components/editForm/EditSocioForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
+import { useListState } from '../../hooks/useListState';
 import { useModalEscape } from '../../hooks/useModalEscape';
 import { estadoConfig } from '../../utils/estadoConfig';
 import { SocioAccionesExtra } from '../../components/socioAccionesExtra/SocioAccionesExtra';
@@ -33,9 +34,7 @@ function SociosPage() {
 
   const [nroSocio, setNroSocio] = useState('');
   const [modo, setModo] = useState('idle'); // idle | socio | lista | no-encontrado
-  const [resultado, setResultado] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { resultado, setResultado, loading, setLoading, error, setError } = useListState();
   const { setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
 
   const [filtroEstado, setFiltroEstado] = useState('');
@@ -49,9 +48,34 @@ function SociosPage() {
   const [errorModal, setErrorModal] = useState('');
 
   useEffect(() => {
-    cargarSocios();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    let cancelled = false;
+
+    async function inicializarSocios() {
+      setLoading(true);
+      setError(null);
+      try {
+        const socios = await getSocios();
+        if (!cancelled) {
+          cacheSociosRef.current = socios;
+          setResultado(socios);
+          setModo('lista');
+        }
+      } catch (err) {
+        if (!cancelled) {
+          if (err.message === 'servicio-no-disponible') {
+            setError('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
+          } else {
+            setError('Error al obtener los socios. Intentá de nuevo.');
+          }
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    inicializarSocios();
+    return () => { cancelled = true; };
+  }, [setError, setLoading, setResultado]);
 
   useModalEscape([
     [crearModalOpen, setCrearModalOpen],

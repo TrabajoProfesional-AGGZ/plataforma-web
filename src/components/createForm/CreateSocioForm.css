@@ -5,8 +5,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 200;
-  padding: 24px 16px;
+  z-index: var(--z-modal);
+  padding: var(--space-6) var(--space-4);
 }
 
 button.csf-overlay {
@@ -22,27 +22,27 @@ button.csf-overlay {
 
 .csf-outer-card {
   background-color: #f0f0f0;
-  border-radius: 20px;
+  border-radius: var(--radius-xl);
   padding: 28px 28px 24px;
 }
 
 /* Header */
 .csf-header {
-  margin-bottom: 24px;
+  margin-bottom: var(--space-6);
 }
 
 .csf-header h1 {
   margin: 0;
   font-size: 26px;
   font-weight: 700;
-  color: #111111;
+  color: var(--color-text-primary);
   text-align: center;
 }
 
 .csf-header p {
   margin: 4px 0 0;
   font-size: 14px;
-  color: #4a4a4a;
+  color: var(--color-text-secondary);
   text-align: center;
 }
 
@@ -50,7 +50,7 @@ button.csf-overlay {
 .csf-steps {
   display: flex;
   align-items: center;
-  margin-bottom: 12px;
+  margin-bottom: var(--space-3);
 }
 
 .csf-step-item {
@@ -82,48 +82,48 @@ button.csf-overlay {
 .csf-step-label {
   font-size: 11px;
   letter-spacing: 0.04em;
-  color: #4a4a4a;
+  color: var(--color-text-secondary);
 }
 
 .csf-step-label--active {
-  color: #111111;
+  color: var(--color-text-primary);
   font-weight: 600;
 }
 
 .csf-connector {
   flex: 1;
   height: 1px;
-  margin: 0 8px 20px;
-  border-radius: 999px;
+  margin: 0 var(--space-2) 20px;
+  border-radius: var(--radius-full);
   overflow: hidden;
-  background-color: #e0e0e0;
+  background-color: var(--color-border);
 }
 
 .csf-connector-fill {
   height: 100%;
-  border-radius: 999px;
-  background-color: #111111;
+  border-radius: var(--radius-full);
+  background-color: var(--color-text-primary);
 }
 
 /* Progress bar */
 .csf-progress {
   height: 4px;
-  border-radius: 999px;
+  border-radius: var(--radius-full);
   overflow: hidden;
-  background-color: #e0e0e0;
+  background-color: var(--color-border);
   margin-bottom: 28px;
 }
 
 .csf-progress-fill {
   height: 100%;
-  border-radius: 999px;
-  background-color: #111111;
+  border-radius: var(--radius-full);
+  background-color: var(--color-text-primary);
 }
 
 /* Card */
 .csf-card {
-  border-radius: 16px;
-  padding: 32px;
+  border-radius: var(--radius-lg);
+  padding: var(--space-8);
   overflow: hidden;
 }
 
@@ -131,13 +131,13 @@ button.csf-overlay {
 .csf-fields {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--space-5);
 }
 
 .csf-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: var(--space-4);
 }
 
 .csf-field {
@@ -149,36 +149,36 @@ button.csf-overlay {
 .csf-label {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   font-size: 14px;
-  color: #4a4a4a;
+  color: var(--color-text-secondary);
 }
 
 .csf-input,
 .csf-select {
   width: 100%;
-  border-radius: 12px;
-  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
   outline: none;
   font-size: 14px;
   font-family: inherit;
-  color: #111111;
+  color: var(--color-text-primary);
   border: 2px solid transparent;
-  background-color: #f5f5f5;
-  transition: background-color 0.2s, border-color 0.2s;
+  background-color: var(--color-bg);
+  transition: background-color var(--transition-normal), border-color var(--transition-normal);
   box-sizing: border-box;
 }
 
 .csf-input:focus,
 .csf-select:focus {
-  background-color: #ffffff;
-  border-color: #111111;
+  background-color: var(--color-surface);
+  border-color: var(--color-border-strong);
 }
 
 .csf-input--error,
 .csf-select--error {
-  border-color: #c0392b;
-  background-color: #ffffff;
+  border-color: var(--color-danger);
+  background-color: var(--color-surface);
 }
 
 .csf-input::placeholder {
@@ -195,35 +195,35 @@ button.csf-overlay {
   align-items: center;
   gap: 6px;
   font-size: 13px;
-  color: #c0392b;
+  color: var(--color-danger);
   overflow: hidden;
 }
 
 .csf-hint {
-  background-color: #f5f5f5;
-  border-radius: 12px;
-  padding: 12px 16px;
+  background-color: var(--color-bg);
+  border-radius: var(--radius-md);
+  padding: var(--space-3) var(--space-4);
   font-size: 13px;
   line-height: 1.6;
-  color: #4a4a4a;
+  color: var(--color-text-secondary);
 }
 
 /* Error global en el formulario */
 .csf-form-error {
   background-color: #fdecea;
   border: 1px solid #f5c6cb;
-  border-radius: 8px;
+  border-radius: var(--radius-sm);
   padding: 10px 14px;
   font-size: 13px;
-  color: #c0392b;
+  color: var(--color-danger);
   text-align: center;
 }
 
 /* Navigation */
 .csf-nav {
   display: flex;
-  margin-top: 32px;
-  gap: 12px;
+  margin-top: var(--space-8);
+  gap: var(--space-3);
 }
 
 .csf-nav--end {
@@ -234,42 +234,39 @@ button.csf-overlay {
   justify-content: space-between;
 }
 
-.csf-btn-back {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  border-radius: 12px;
-  border: 2px solid #e0e0e0;
-  background: transparent;
-  color: #4a4a4a;
-  font-size: 14px;
-  font-family: inherit;
-  font-weight: 500;
-  cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-}
-
-.csf-btn-back:hover {
-  border-color: #4a4a4a;
-  color: #111111;
-}
-
+.csf-btn-back,
 .csf-btn-next,
 .csf-btn-submit,
 .csf-btn-danger {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
-  border-radius: 12px;
-  border: none;
-  color: #ffffff;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  border-radius: var(--radius-md);
   font-size: 14px;
   font-family: inherit;
   font-weight: 500;
   cursor: pointer;
-  transition: background-color 0.15s;
+}
+
+.csf-btn-back {
+  border: 2px solid var(--color-border);
+  background: transparent;
+  color: var(--color-text-secondary);
+  transition: border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.csf-btn-back:hover {
+  border-color: var(--color-text-secondary);
+  color: var(--color-text-primary);
+}
+
+.csf-btn-next,
+.csf-btn-submit,
+.csf-btn-danger {
+  border: none;
+  color: var(--color-surface);
+  transition: background-color var(--transition-fast);
 }
 
 .csf-btn-submit:disabled,
@@ -280,27 +277,27 @@ button.csf-overlay {
 
 .csf-btn-next,
 .csf-btn-submit {
-  background-color: #111111;
+  background-color: var(--color-text-primary);
 }
 
 .csf-btn-next:hover,
 .csf-btn-submit:hover:not(:disabled) {
-  background-color: #4a4a4a;
+  background-color: var(--color-text-secondary);
 }
 
 .csf-btn-danger {
-  background-color: #c0392b;
+  background-color: var(--color-danger);
 }
 
 .csf-btn-danger:hover:not(:disabled) {
-  background-color: #96281b;
+  background-color: var(--color-danger-hover);
 }
 
 /* Spinner */
 .csf-spinner {
   width: 16px;
   height: 16px;
-  border: 2px solid #ffffff;
+  border: 2px solid var(--color-surface);
   border-top-color: transparent;
   border-radius: 50%;
   display: block;
@@ -311,7 +308,7 @@ button.csf-overlay {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 24px;
+  gap: var(--space-6);
   text-align: center;
   max-width: 320px;
   margin: 0 auto;
@@ -335,13 +332,13 @@ button.csf-overlay {
   margin: 0;
   font-size: 24px;
   font-weight: 700;
-  color: #111111;
+  color: var(--color-text-primary);
 }
 
 .csf-success p {
-  margin: 8px 0 0;
+  margin: var(--space-2) 0 0;
   font-size: 14px;
-  color: #4a4a4a;
+  color: var(--color-text-secondary);
 }
 
 /* Checkbox inline */
@@ -351,12 +348,12 @@ button.csf-overlay {
   gap: 10px;
   cursor: pointer;
   font-size: 14px;
-  color: #4a4a4a;
-  padding: 12px 16px;
-  background-color: #f5f5f5;
-  border-radius: 12px;
+  color: var(--color-text-secondary);
+  padding: var(--space-3) var(--space-4);
+  background-color: var(--color-bg);
+  border-radius: var(--radius-md);
   border: 2px solid transparent;
-  transition: border-color 0.2s, background-color 0.2s;
+  transition: border-color var(--transition-normal), background-color var(--transition-normal);
   user-select: none;
 }
 
@@ -368,7 +365,7 @@ button.csf-overlay {
   width: 16px;
   height: 16px;
   cursor: pointer;
-  accent-color: #111111;
+  accent-color: var(--color-text-primary);
   flex-shrink: 0;
 }
 
@@ -406,9 +403,9 @@ button.csf-overlay {
 .csf-socio-buscando {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2);
   font-size: 13px;
-  color: #4a4a4a;
+  color: var(--color-text-secondary);
   margin-top: 6px;
 }
 
@@ -425,16 +422,16 @@ button.csf-overlay {
 
 /* ── Agregar socio button (CreateReservaForm) ──────────────────── */
 .csf-btn-agregar-socio {
-  padding: 8px 14px;
-  background-color: #111111;
-  color: #ffffff;
+  padding: var(--space-2) 14px;
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
-  transition: background-color 0.15s;
+  transition: background-color var(--transition-fast);
 }
 
 .csf-btn-agregar-socio:hover:not(:disabled) {
@@ -451,33 +448,33 @@ button.csf-overlay {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-top: 8px;
+  margin-top: var(--space-2);
 }
 
 .csf-socio-chip {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background-color: #f5f5f5;
+  background-color: var(--color-bg);
   border: 1px solid #d0d0d0;
-  border-radius: 6px;
+  border-radius: var(--radius-sm);
   padding: 6px 10px;
   font-size: 13px;
-  color: #111111;
+  color: var(--color-text-primary);
 }
 
 .csf-socio-chip-remove {
   background: none;
   border: none;
   cursor: pointer;
-  color: #4a4a4a;
+  color: var(--color-text-secondary);
   display: flex;
   align-items: center;
   padding: 0;
-  margin-left: 8px;
-  transition: color 0.15s;
+  margin-left: var(--space-2);
+  transition: color var(--transition-fast);
 }
 
 .csf-socio-chip-remove:hover {
-  color: #c0392b;
+  color: var(--color-danger);
 }

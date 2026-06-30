@@ -1,7 +1,7 @@
 .socios-card {
   border: 1px solid;
-  border-radius: 12px;
-  padding: 24px 28px;
+  border-radius: var(--radius-md);
+  padding: var(--space-6) 28px;
   max-width: 520px;
   margin: 0 auto;
   display: flex;
@@ -27,25 +27,25 @@
 .socios-card-data {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-3);
   flex: 1;
 }
 
 .socios-card-row {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: var(--space-3);
 }
 
 .socios-card-label {
   font-weight: 500;
-  color: #4a4a4a;
+  color: var(--color-text-secondary);
   min-width: 90px;
   font-size: 15px;
 }
 
 .socios-card-row span:last-child {
-  color: #111111;
+  color: var(--color-text-primary);
   font-size: 14px;
 }
 
@@ -54,7 +54,7 @@
   position: relative;
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: var(--space-3);
   max-width: 520px;
   width: 100%;
 }
@@ -65,8 +65,8 @@
   left: -10px;
   width: 28px;
   height: 28px;
-  background: #111111;
-  color: #ffffff;
+  background: var(--color-text-primary);
+  color: var(--color-surface);
   border: none;
   border-radius: 50%;
   font-size: 18px;
@@ -80,7 +80,7 @@
 .nro-socio-link {
   cursor: pointer;
   text-decoration: underline;
-  color: #111111;
+  color: var(--color-text-primary);
   background: none;
   border: none;
   padding: 0;

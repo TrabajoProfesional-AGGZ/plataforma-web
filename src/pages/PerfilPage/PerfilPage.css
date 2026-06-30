@@ -6,43 +6,45 @@
 .perfil-title {
   font-size: 32px;
   font-weight: 700;
-  color: #111111;
+  color: var(--color-text-primary);
   margin: 0 0 28px 0;
   text-align: center;
 }
 
 .perfil-card {
-  background-color: #ffffff;
-  border: 1px solid #4a4a4a;
-  border-radius: 8px;
-  padding: 24px;
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
   display: flex;
   flex-direction: row;
   align-items: center;
   gap: 28px;
+  box-shadow: var(--shadow-sm);
 }
 
 .perfil-avatar {
-  width: 80px;
-  height: 80px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
-  background-color: #f5f5f5;
+  background-color: var(--color-bg);
+  border: 1px solid var(--color-border);
   flex-shrink: 0;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #4a4a4a;
+  color: var(--color-text-secondary);
 }
 
 .perfil-avatar svg {
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
 }
 
 .perfil-fields {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: var(--space-5);
   flex: 1;
 }
 
@@ -53,16 +55,16 @@
 }
 
 .perfil-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
-  color: #4a4a4a;
+  color: var(--color-text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 }
 
 .perfil-value {
   font-size: 16px;
-  color: #111111;
+  color: var(--color-text-primary);
 }
 
 .perfil-rol-badge {
@@ -75,20 +77,21 @@
 }
 
 .perfil-rol-admin {
-  background-color: #e8f0fe;
-  color: #1a56db;
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border-strong);
 }
 
 .perfil-rol-superAdmin {
-  background-color: #fef3cd;
-  color: #92400e;
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
 }
 
 .perfil-actions {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 16px;
+  margin-top: var(--space-4);
 }
 
 .perfil-actions > button:only-child {
@@ -98,7 +101,7 @@
 .perfil-ver-permisos-button {
   background: none;
   border: none;
-  color: #4a4a4a;
+  color: var(--color-text-secondary);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -108,23 +111,13 @@
 }
 
 .perfil-ver-permisos-button:hover {
-  color: #111111;
+  color: var(--color-text-primary);
 }
 
-.perfil-cambiar-button {
-  padding: 10px 20px;
-  background-color: #111111;
-  color: #ffffff;
-  border: none;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
+/* .perfil-cambiar-button base → src/styles/shared.css */
 
 .perfil-cambiar-button:hover {
-  background-color: #4a4a4a;
+  background-color: var(--color-text-secondary);
 }
 
 .perfil-password-wrapper {
@@ -138,4 +131,3 @@
   padding-right: 80px;
   box-sizing: border-box;
 }
-

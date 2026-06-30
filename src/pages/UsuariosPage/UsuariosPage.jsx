@@ -9,6 +9,7 @@ import { CambiarRolForm } from '../../components/cambiarRolForm/CambiarRolForm';
 import { PermisosModal } from '../../components/permisosModal/PermisosModal';
 import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
+import { useListState } from '../../hooks/useListState';
 import { useModalEscape } from '../../hooks/useModalEscape';
 import { useAuthContext } from '../../context/AuthContext';
 import logo from '../../assets/logo_socio.png';
@@ -46,9 +47,7 @@ function UsuariosPage() {
 
   const [busqueda, setBusqueda] = useState('');
   const [modo, setModo] = useState('lista');
-  const [resultado, setResultado] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const { resultado, setResultado, loading, setLoading, error, setError } = useListState();
   const { setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
 
   const [filtroRol, setFiltroRol] = useState('');
