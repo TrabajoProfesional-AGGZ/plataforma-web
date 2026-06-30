@@ -109,11 +109,6 @@ describe('InstalacionesPage', () => {
     expect(screen.getByText('Reservas e Instalaciones')).toBeInTheDocument();
   });
 
-  test('muestra la sección Instalaciones en la vista de lista', async () => {
-    await renderPage();
-    expect(screen.getByRole('heading', { name: 'Instalaciones' })).toBeInTheDocument();
-  });
-
   test('no muestra el botón "Nueva reserva" en la vista de lista', async () => {
     await renderPage();
     expect(screen.queryByRole('button', { name: /nueva reserva/i })).not.toBeInTheDocument();

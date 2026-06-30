@@ -1,0 +1,244 @@
+.noticias-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.noticias-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-5) 0;
+  text-align: center;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/* ── Toolbar ──────────────────────────────────────────────────── */
+.noticias-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.noticias-btn-crear {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
+  transition: background-color var(--transition-fast);
+}
+
+.noticias-btn-crear:hover {
+  background-color: var(--color-text-secondary);
+}
+
+.noticias-btn-historicas {
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  transition: background-color var(--transition-fast);
+}
+
+.noticias-btn-historicas:hover {
+  background-color: var(--color-bg);
+}
+
+/* Table styles → src/styles/ListPage.css (.disciplinas-table-wrapper, .disciplinas-tabla, .disciplinas-tr-clickable)
+   Table header styles → src/styles/PageTableHeader.css
+   Empty state → .disciplinas-empty in src/styles/ListPage.css */
+
+/* ── Badge color variants ─────────────────────────────────────── */
+.badge-activa {
+  background-color: #d4edda;
+  color: #155724;
+  border-color: #28a745;
+}
+
+.badge-vencida {
+  background-color: #f5e9b2;
+  color: #6D4500;
+  border-color: #9A6200;
+}
+
+/* ── Nav / back ───────────────────────────────────────────────── */
+.noticias-nav {
+  display: flex;
+  align-items: center;
+  margin-bottom: var(--space-5);
+}
+
+.noticias-btn-volver {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.noticias-btn-volver:hover {
+  background-color: var(--color-bg);
+}
+
+/* ── Loading & error ──────────────────────────────────────────── */
+.noticias-loading {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-12) 0;
+}
+
+.noticias-error {
+  text-align: center;
+  color: var(--color-danger);
+  font-size: 14px;
+  background-color: #fdecea;
+  border: 1px solid #f5c6cb;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+
+/* ── Vista diario (newspaper article) ─────────────────────────── */
+.noticias-diario {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.noticias-diario-masthead {
+  border-top: 3px solid var(--color-text-primary);
+  padding-top: var(--space-3);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-5);
+}
+
+.noticias-diario-seccion {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+}
+
+.noticias-diario-masthead-right {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.noticias-diario-fecha {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.noticias-diario-titulo {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 44px;
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--color-text-primary);
+  text-align: left;
+  margin: 0 0 var(--space-3) 0;
+}
+
+
+.noticias-diario-rule {
+  border: none;
+  border-top: 1px solid var(--color-text-primary);
+  margin: var(--space-4) 0;
+}
+
+.noticias-diario-figura {
+  margin: 0 0 var(--space-6) 0;
+}
+
+.noticias-diario-imagen {
+  width: 100%;
+  max-height: 440px;
+  object-fit: cover;
+  border-radius: 0;
+  display: block;
+}
+
+.noticias-diario-cuerpo {
+  margin: 0 0 var(--space-8) 0;
+}
+
+.noticias-diario-cuerpo p {
+  font-size: 17px;
+  line-height: 1.78;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-4) 0;
+}
+
+.noticias-diario-cuerpo p:first-child::first-letter {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 4.8em;
+  font-weight: 700;
+  line-height: 0.8;
+  float: left;
+  margin: 6px 8px 0 0;
+  color: var(--color-text-primary);
+}
+
+/* ── Detail action buttons ────────────────────────────────────── */
+.noticias-detalle-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+}
+
+.noticias-btn-editar {
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: 1px solid var(--color-border-medium);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  transition: background-color var(--transition-fast);
+}
+
+.noticias-btn-editar:hover {
+  background-color: var(--color-bg);
+}
+
+.noticias-btn-eliminar {
+  padding: var(--space-2) var(--space-5);
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background-color: var(--color-danger);
+  color: var(--color-surface);
+  transition: background-color var(--transition-fast);
+}
+
+.noticias-btn-eliminar:hover {
+  background-color: var(--color-danger-hover);
+}

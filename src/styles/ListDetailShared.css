@@ -48,7 +48,7 @@
   align-items: center;
   gap: 4px;
   padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border-strong);
+  border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
   font-size: 14px;
@@ -130,6 +130,13 @@
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
+}
+
+/* Filled/borderless variants */
+.disciplinas-btn-eliminar,
+.instalaciones-btn-eliminar-inst,
+.socios-btn-editar,
+.usuarios-btn-editar {
   border: none;
 }
 
@@ -151,4 +158,60 @@
   font-size: 0.85rem;
   margin-top: -20px;
   margin-bottom: 0;
+}
+
+/* ── Shared detail card components (socios + usuarios) ──────── */
+.detalle-logo-circle {
+  width: 84px;
+  height: 84px;
+  min-width: 84px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  border: 2px solid var(--estado-color, var(--color-border-medium));
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.detalle-logo-img {
+  width: 84px;
+  height: 84px;
+  object-fit: fill;
+}
+
+.detalle-card-data-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  margin-bottom: var(--space-1);
+}
+
+.detalle-full-name {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.01em;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.detalle-estado-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  border: 1.5px solid;
+  white-space: nowrap;
+  flex-shrink: 0;
 }

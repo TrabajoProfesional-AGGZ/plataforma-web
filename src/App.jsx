@@ -7,6 +7,7 @@ import PerfilPage from './pages/PerfilPage/PerfilPage';
 import UsuariosPage from './pages/UsuariosPage/UsuariosPage';
 import InstalacionesPage from './pages/InstalacionesPage/InstalacionesPage';
 import DisciplinasPage from './pages/DisciplinasPage/DisciplinasPage';
+import NoticiasPage from './pages/NoticiasPage/NoticiasPage';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import AppLayout from './components/AppLayout/AppLayout';
 
@@ -35,6 +36,12 @@ function App() {
         <Route element={<PrivateRoute requiredPermiso="ver_usuarios" />}>
           <Route element={<AppLayout />}>
             <Route path="/usuarios" element={<UsuariosPage />} />
+          </Route>
+        </Route>
+
+        <Route element={<PrivateRoute requiredPermiso="ver_noticias" />}>
+          <Route element={<AppLayout />}>
+            <Route path="/noticias" element={<NoticiasPage />} />
           </Route>
         </Route>
       </Routes>

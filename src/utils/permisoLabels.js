@@ -15,5 +15,9 @@ export const PERMISO_LABELS = {
   'borrar_instalacion':'Dar de baja instalación',
   'crear_disciplina': 'Crear disciplina',
   'ver_disciplinas': 'Ver disciplinas',
-  'borrar_disciplina': 'Dar de baja disciplina'
+  'borrar_disciplina': 'Dar de baja disciplina',
+  'crear_noticia': 'Crear noticia',
+  'ver_noticias': 'Ver noticias',
+  'editar_noticia': 'Editar noticia',
+  'borrar_noticia': 'Dar de baja noticia'
 };

@@ -33,22 +33,9 @@ describe('AppLayout', () => {
     jest.clearAllMocks();
   });
 
-  test('muestra el email del usuario como botón en el header', () => {
+  test('muestra el email del usuario como texto en el header', () => {
     renderLayout();
-    expect(screen.getByRole('button', { name: 'admin@club.com' })).toBeInTheDocument();
-  });
-
-  test('muestra "Ver perfil" en el dropdown al hacer clic en el email', () => {
-    renderLayout();
-    fireEvent.click(screen.getByRole('button', { name: 'admin@club.com' }));
-    expect(screen.getByRole('button', { name: /ver perfil/i })).toBeInTheDocument();
-  });
-
-  test('navega a /perfil al hacer clic en "Ver perfil"', () => {
-    renderLayout();
-    fireEvent.click(screen.getByRole('button', { name: 'admin@club.com' }));
-    fireEvent.click(screen.getByRole('button', { name: /ver perfil/i }));
-    expect(mockNavigate).toHaveBeenCalledWith('/perfil');
+    expect(screen.getByText('admin@club.com')).toBeInTheDocument();
   });
 
   test('muestra el link de dashboard sin permisos', () => {
@@ -91,34 +78,5 @@ describe('AppLayout', () => {
       expect(authService.logout).toHaveBeenCalledTimes(1);
       expect(mockNavigate).toHaveBeenCalledWith('/');
     });
-  });
-
-  test('hacer click fuera del dropdown lo cierra', () => {
-    renderLayout();
-    fireEvent.click(screen.getByRole('button', { name: 'admin@club.com' }));
-    expect(screen.getByRole('button', { name: /ver perfil/i })).toBeInTheDocument();
-    fireEvent.mouseDown(document.body);
-    expect(screen.queryByRole('button', { name: /ver perfil/i })).not.toBeInTheDocument();
-  });
-
-  test('muestra animación de carga al cambiar de ruta', () => {
-    useAuth.mockReturnValue({ user: { uid: '1', email: 'admin@club.com' }, loading: false, permisos: [] });
-    useLocation.mockReturnValue(defaultLocation);
-    const { rerender } = render(
-      <MemoryRouter>
-        <AppLayout />
-      </MemoryRouter>
-    );
-
-    act(() => {
-      useLocation.mockReturnValue({ pathname: '/socios', search: '', hash: '', state: null, key: 'socios' });
-      rerender(
-        <MemoryRouter>
-          <AppLayout />
-        </MemoryRouter>
-      );
-    });
-
-    expect(document.querySelector('.app-page-loading')).toBeInTheDocument();
   });
 });

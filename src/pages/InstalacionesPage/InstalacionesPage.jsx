@@ -333,7 +333,6 @@ function InstalacionesPage() {
 
           <div className="instalaciones-seccion-separator">
             <div className="instalaciones-seccion-header">
-              <h2 className="instalaciones-seccion-title">Instalaciones</h2>
               <div className="instalaciones-seccion-toolbar">
                 <div>
                   {tiposDisponibles.length > 0 && (
