@@ -1,3 +1,9 @@
+/* Breakpoints de referencia (no usables dentro de @media — las custom
+   properties de CSS no funcionan en condiciones de media query, así que
+   quedan documentadas acá y se repiten como literales en cada archivo):
+   768px = tablet / activa el drawer del sidebar
+   480px = celular angosto
+   Excepción: .modal-grid-2 usa 600px (ver UsuariosPage.css). */
 :root {
   /* Colors */
   --color-text-primary: #111111;

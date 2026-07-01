@@ -4,12 +4,14 @@
   border-radius: var(--radius-md);
   padding: var(--space-6) 28px;
   max-width: 560px;
+  max-height: 90dvh;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
   text-align: left;
   width: 100%;
   box-sizing: border-box;
+  overflow-y: auto;
   box-shadow: var(--shadow-md);
 }
 
@@ -84,4 +86,15 @@
   border: none;
   padding: 0;
   font: inherit;
+}
+
+/* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
+@media (max-width: 480px) {
+  .socios-card-inner {
+    flex-direction: column;
+  }
+
+  .socios-card-row {
+    flex-wrap: wrap;
+  }
 }

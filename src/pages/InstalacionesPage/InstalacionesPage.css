@@ -228,3 +228,20 @@
   flex-direction: column;
   gap: 4px;
 }
+
+/* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
+@media (max-width: 768px) {
+  .instalaciones-reserva-form-fields {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .instalaciones-reserva-form-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .instalaciones-reserva-horas {
+    grid-template-columns: 1fr;
+  }
+}

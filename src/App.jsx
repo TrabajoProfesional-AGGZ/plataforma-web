@@ -8,6 +8,7 @@ import UsuariosPage from './pages/UsuariosPage/UsuariosPage';
 import InstalacionesPage from './pages/InstalacionesPage/InstalacionesPage';
 import DisciplinasPage from './pages/DisciplinasPage/DisciplinasPage';
 import NoticiasPage from './pages/NoticiasPage/NoticiasPage';
+import AlertasPage from './pages/AlertasPage/AlertasPage';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import AppLayout from './components/AppLayout/AppLayout';
 
@@ -42,6 +43,12 @@ function App() {
         <Route element={<PrivateRoute requiredPermiso="ver_noticias" />}>
           <Route element={<AppLayout />}>
             <Route path="/noticias" element={<NoticiasPage />} />
+          </Route>
+        </Route>
+
+        <Route element={<PrivateRoute requiredPermiso="ver_alertas" />}>
+          <Route element={<AppLayout />}>
+            <Route path="/alertas" element={<AlertasPage />} />
           </Route>
         </Route>
       </Routes>
