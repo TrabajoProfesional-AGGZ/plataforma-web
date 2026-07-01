@@ -65,6 +65,16 @@ describe('CreateAlertaForm', () => {
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
+  test('no rompe el formulario si falla la carga del catálogo', async () => {
+    fetchCategoriasSocio.mockRejectedValue(new Error('error de red'));
+    renderForm();
+    await waitFor(() => {
+      expect(fetchCategoriasSocio).toHaveBeenCalledTimes(1);
+    });
+    expect(screen.getByText('Nueva alerta')).toBeInTheDocument();
+    expect(screen.getByText('Todas')).toBeInTheDocument();
+  });
+
   test('carga las opciones de categoría y estado desde el catálogo', async () => {
     renderForm();
     await waitFor(() => {
