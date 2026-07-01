@@ -60,3 +60,10 @@
 .alertas-btn-eliminar-fila:hover {
   background-color: #fdecea;
 }
+
+/* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
+@media (max-width: 480px) {
+  .alertas-title {
+    font-size: 24px;
+  }
+}
