@@ -19,5 +19,8 @@ export const PERMISO_LABELS = {
   'crear_noticia': 'Crear noticia',
   'ver_noticias': 'Ver noticias',
   'editar_noticia': 'Editar noticia',
-  'borrar_noticia': 'Dar de baja noticia'
+  'borrar_noticia': 'Dar de baja noticia',
+  'crear_alerta': 'Crear alerta',
+  'ver_alertas': 'Ver alertas',
+  'borrar_alerta': 'Dar de baja alerta'
 };

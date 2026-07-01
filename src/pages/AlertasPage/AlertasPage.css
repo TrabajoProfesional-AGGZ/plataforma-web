@@ -1,0 +1,62 @@
+.alertas-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.alertas-title {
+  font-size: 32px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-5) 0;
+  text-align: center;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+.alertas-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: var(--space-4);
+}
+
+.alertas-btn-crear {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
+  transition: background-color var(--transition-fast);
+}
+
+.alertas-btn-crear:hover {
+  background-color: var(--color-text-secondary);
+}
+
+.alertas-loading {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-12) 0;
+}
+
+.alertas-btn-eliminar-fila {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--color-danger);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.alertas-btn-eliminar-fila:hover {
+  background-color: #fdecea;
+}
