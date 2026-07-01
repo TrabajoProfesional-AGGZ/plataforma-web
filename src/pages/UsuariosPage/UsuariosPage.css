@@ -181,6 +181,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow-y: auto;
+  padding: var(--space-6) var(--space-4);
+  box-sizing: border-box;
   z-index: var(--z-modal);
 }
 
@@ -190,6 +193,8 @@
   padding: var(--space-8);
   width: 100%;
   max-width: 420px;
+  max-height: 90dvh;
+  overflow-y: auto;
   box-shadow: var(--shadow-lg);
 }
 
@@ -337,4 +342,26 @@
   color: var(--color-text-primary);
   text-align: center;
   margin: 0 0 var(--space-6) 0;
+}
+
+/* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
+/* 600px: excepción documentada en CLAUDE.md para modal-grid-2 */
+@media (max-width: 600px) {
+  .modal-grid-2 {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal {
+    padding: var(--space-5);
+  }
+
+  .usuarios-card-inner {
+    flex-direction: column;
+  }
+
+  .usuarios-card-row {
+    flex-wrap: wrap;
+  }
 }
