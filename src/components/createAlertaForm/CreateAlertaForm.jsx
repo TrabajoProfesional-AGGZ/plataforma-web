@@ -50,8 +50,6 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
       successMessage="La alerta fue registrada correctamente."
       submitLabel="Enviar alerta"
       onCancel={onCancel}
-      goBack={() => {}}
-      goNext={() => {}}
       direction={direction}
       onFormSubmit={handleSubmit(onSubmit)}
     >
