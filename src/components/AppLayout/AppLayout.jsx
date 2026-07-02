@@ -1,6 +1,6 @@
 import { useRef, useEffect, useLayoutEffect } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, ShieldCheck, Building2, Trophy, Newspaper, Settings } from 'lucide-react';
+import { LayoutDashboard, Users, ShieldCheck, Building2, Trophy, Newspaper, Settings, BarChart3 } from 'lucide-react';
 import { logout } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
 import texto from '../../assets/texto.png';
@@ -15,6 +15,7 @@ const NAV_ITEMS_BASE = [
   { to: '/instalaciones', label: 'Reservas e Instalaciones', Icon: Building2, permiso: 'ver_instalaciones' },
   { to: '/disciplinas', label: 'Disciplinas', Icon: Trophy, permiso: 'ver_disciplinas' },
   { to: '/noticias', label: 'Noticias', Icon: Newspaper, permiso: 'ver_noticias' },
+  { to: '/metricas', label: 'Métricas', Icon: BarChart3, permiso: null },
   { to: '/perfil', label: 'Perfil', Icon: Settings, permiso: ''}
 ];
 

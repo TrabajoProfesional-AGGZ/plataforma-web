@@ -10,6 +10,7 @@ import DisciplinasPage from './pages/DisciplinasPage/DisciplinasPage';
 import NoticiasPage from './pages/NoticiasPage/NoticiasPage';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import AppLayout from './components/AppLayout/AppLayout';
+import MetricasPage from './pages/MetricasPage/MetricasPage';
 
 function App() {
   return (
@@ -42,6 +43,11 @@ function App() {
         <Route element={<PrivateRoute requiredPermiso="ver_noticias" />}>
           <Route element={<AppLayout />}>
             <Route path="/noticias" element={<NoticiasPage />} />
+          </Route>
+        </Route>
+        <Route element={<PrivateRoute />}>
+          <Route element={<AppLayout />}>
+            <Route path="/metricas" element={<MetricasPage />} />
           </Route>
         </Route>
       </Routes>
