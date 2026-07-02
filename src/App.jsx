@@ -8,6 +8,7 @@ import UsuariosPage from './pages/UsuariosPage/UsuariosPage';
 import InstalacionesPage from './pages/InstalacionesPage/InstalacionesPage';
 import DisciplinasPage from './pages/DisciplinasPage/DisciplinasPage';
 import NoticiasPage from './pages/NoticiasPage/NoticiasPage';
+import AlertasPage from './pages/AlertasPage/AlertasPage';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import AppLayout from './components/AppLayout/AppLayout';
 import MetricasPage from './pages/MetricasPage/MetricasPage';
@@ -48,6 +49,11 @@ function App() {
         <Route element={<PrivateRoute />}>
           <Route element={<AppLayout />}>
             <Route path="/metricas" element={<MetricasPage />} />
+          </Route>
+        </Route>
+        <Route element={<PrivateRoute requiredPermiso="ver_alertas" />}>
+          <Route element={<AppLayout />}>
+            <Route path="/alertas" element={<AlertasPage />} />
           </Route>
         </Route>
       </Routes>

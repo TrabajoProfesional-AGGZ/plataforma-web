@@ -186,3 +186,9 @@
     display: none;
   }
 }
+
+@media (max-width: 480px) {
+  .login-panel-right {
+    padding: var(--space-6) var(--space-4);
+  }
+}

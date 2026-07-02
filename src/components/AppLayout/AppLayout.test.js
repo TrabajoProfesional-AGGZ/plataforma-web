@@ -22,7 +22,7 @@ function renderLayout(permisos = []) {
   useAuth.mockReturnValue({ user: { uid: '1', email: 'admin@club.com' }, loading: false, permisos });
   useLocation.mockReturnValue(defaultLocation);
   return render(
-    <MemoryRouter>
+    <MemoryRouter initialEntries={[defaultLocation.pathname]}>
       <AppLayout />
     </MemoryRouter>
   );
@@ -78,5 +78,80 @@ describe('AppLayout', () => {
       expect(authService.logout).toHaveBeenCalledTimes(1);
       expect(mockNavigate).toHaveBeenCalledWith('/');
     });
+  });
+
+  test('el botón hamburguesa abre el drawer del sidebar', () => {
+    const { container } = renderLayout();
+
+    expect(container.querySelector('.app-sidebar')).not.toHaveClass('open');
+
+    fireEvent.click(screen.getByRole('button', { name: /abrir menú/i }));
+
+    expect(container.querySelector('.app-sidebar')).toHaveClass('open');
+  });
+
+  test('el backdrop cierra el drawer al hacer click', () => {
+    const { container } = renderLayout();
+
+    fireEvent.click(screen.getByRole('button', { name: /abrir menú/i }));
+    expect(container.querySelector('.app-sidebar')).toHaveClass('open');
+
+    fireEvent.click(screen.getByRole('button', { name: /cerrar menú/i }));
+
+    expect(container.querySelector('.app-sidebar')).not.toHaveClass('open');
+    expect(container.querySelector('.app-sidebar-backdrop')).not.toBeInTheDocument();
+  });
+
+  test('la tecla Escape cierra el drawer', () => {
+    const { container } = renderLayout();
+
+    fireEvent.click(screen.getByRole('button', { name: /abrir menú/i }));
+    expect(container.querySelector('.app-sidebar')).toHaveClass('open');
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(container.querySelector('.app-sidebar')).not.toHaveClass('open');
+  });
+
+  test('el drawer se cierra al hacer click en un link de navegación', () => {
+    const { container } = renderLayout(['ver_socios']);
+
+    fireEvent.click(screen.getByRole('button', { name: /abrir menú/i }));
+    expect(container.querySelector('.app-sidebar')).toHaveClass('open');
+
+    fireEvent.click(screen.getByRole('link', { name: /socios/i }));
+
+    expect(container.querySelector('.app-sidebar')).not.toHaveClass('open');
+  });
+
+  test('el indicador de sección activa se reposiciona al redimensionar/hacer zoom', () => {
+    const { container } = renderLayout();
+
+    const indicator = container.querySelector('.sidebar-active-bg');
+    indicator.style.opacity = '0';
+    indicator.style.transition = 'transform 1s ease-out';
+
+    act(() => {
+      window.dispatchEvent(new Event('resize'));
+    });
+
+    expect(indicator.style.opacity).toBe('1');
+    expect(indicator.style.transition).toBe('none');
+  });
+
+  test('el drawer se cierra automáticamente al cambiar de ruta', () => {
+    const { container, rerender } = renderLayout();
+
+    fireEvent.click(screen.getByRole('button', { name: /abrir menú/i }));
+    expect(container.querySelector('.app-sidebar')).toHaveClass('open');
+
+    useLocation.mockReturnValue({ ...defaultLocation, pathname: '/perfil' });
+    rerender(
+      <MemoryRouter>
+        <AppLayout />
+      </MemoryRouter>
+    );
+
+    expect(container.querySelector('.app-sidebar')).not.toHaveClass('open');
   });
 });

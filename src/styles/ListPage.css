@@ -45,7 +45,8 @@
 
 .socios-filtros-grupo,
 .usuarios-filtros-grupo {
-  width: 180px;
+  width: 100%;
+  max-width: 180px;
 }
 
 /* ── Table sort ───────────────────────────────────────────────── */
@@ -208,7 +209,8 @@
   background-color: var(--color-surface);
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-md);
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
   box-shadow: var(--shadow-sm);
 }
 
@@ -306,4 +308,12 @@
 .socios-btn-eliminar, .socios-btn-editar,
 .usuarios-btn-eliminar, .usuarios-btn-editar, .usuarios-btn-cambiar-rol {
   transition: background-color var(--transition-fast), color var(--transition-fast);
+}
+
+/* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
+@media (max-width: 480px) {
+  .socios-title,
+  .usuarios-title {
+    font-size: 24px;
+  }
 }

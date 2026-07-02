@@ -122,7 +122,6 @@
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 0 var(--space-8);
   background: var(--color-surface);
   border-bottom: 1px solid var(--color-border-medium);
@@ -132,6 +131,9 @@
   z-index: var(--z-sticky);
 }
 
+/* Centrado absoluto (true center), independiente del ancho de las acciones:
+   así el logo queda siempre perfectamente centrado, y es .app-header-actions
+   quien se limita con max-width para no llegar a tocarlo (ver más abajo). */
 .app-header-logo-btn {
   background: none;
   border: none;
@@ -144,17 +146,42 @@
   transform: translateX(-50%);
 }
 
+.app-header-menu-btn {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  align-items: center;
+  color: var(--color-text-primary);
+}
+
+.app-sidebar-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  border: none;
+  padding: 0;
+  cursor: default;
+  z-index: calc(var(--z-modal) - 1);
+}
+
 
 .app-header-logo {
   height: 70px;
   width: auto;
 }
 
+/* max-width: calcula el espacio disponible entre el borde derecho y el punto
+   donde empieza el logo (centrado en 50%, ancho real ~210px a 70px de alto)
+   más el padding del header y un margen de seguridad — así nunca lo toca,
+   sin importar cuán largo sea el mail. */
 .app-header-actions {
   display: flex;
   align-items: center;
   gap: var(--space-2);
   margin-left: auto;
+  max-width: calc(50% - 150px);
 }
 
 .app-email-text {
@@ -162,6 +189,9 @@
   font-size: 13px;
   font-weight: 500;
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 .app-logout-button {
@@ -174,6 +204,7 @@
   padding: 6px 14px;
   cursor: pointer;
   white-space: nowrap;
+  flex-shrink: 0;
   transition: opacity var(--transition-fast);
 }
 
@@ -195,4 +226,50 @@
   align-items: center;
   height: 100%;
   min-height: 300px;
+}
+
+/* ── Responsive (breakpoints: 768px tablet/drawer, 480px celular — ver tokens.css) ── */
+@media (max-width: 768px) {
+  .app-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    min-height: 100dvh;
+    transform: translateX(-100%);
+    transition: transform var(--transition-slow);
+    z-index: var(--z-modal);
+  }
+
+  .app-sidebar.open {
+    transform: translateX(0);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .app-header-menu-btn {
+    display: flex;
+  }
+
+  .app-header-logo-btn {
+    display: none;
+  }
+
+  /* sin logo centrado que evitar, las acciones pueden usar todo el ancho */
+  .app-header-actions {
+    max-width: none;
+  }
+
+  .app-header {
+    padding: 0 var(--space-4);
+  }
+
+  .app-content {
+    padding: var(--space-4);
+  }
+}
+
+@media (max-width: 480px) {
+  .app-email-text {
+    max-width: 90px;
+  }
 }
