@@ -1,4 +1,3 @@
-@ -0,0 +1,116 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import FinanzasPage from './FinanzasPage';
 import { getDashboardFinanzas } from '../../services/metricasService';
