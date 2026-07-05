@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { Users, ShieldCheck, ArrowUpRight, Building2, Trophy, Newspaper, Bell } from 'lucide-react';
+import { Users, ShieldCheck, ArrowUpRight, Building2, Trophy, Newspaper, Bell, Receipt } from 'lucide-react';
 import './DashboardPage.css';
 
 const SECCIONES = [
@@ -17,6 +17,13 @@ const SECCIONES = [
     descripcion: 'Crear nuevos usuarios administrativos y gestionar roles/permisos.',
     Icon: ShieldCheck,
     permiso: 'ver_usuarios',
+  },
+  {
+    path: '/finanzas',
+    titulo: 'Finanzas',
+    descripcion: 'Consultar métricas financieras y generar reportes.',
+    Icon: Receipt,
+    permiso: 'ver_finanzas',
   },
   {
     path: '/instalaciones',
