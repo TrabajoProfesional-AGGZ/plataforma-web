@@ -1,3 +1,4 @@
+@ -0,0 +1,116 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import FinanzasPage from './FinanzasPage';
 import { getDashboardFinanzas } from '../../services/metricasService';
@@ -90,3 +91,27 @@ describe('FinanzasPage', () => {
     });
   });
 });
+
+test('muestra un mensaje de error si no está autorizado (ej: error 403)', async () => {
+    usePermiso.mockReturnValue(true);
+    // Simulamos que el servicio devuelve el string exacto del bloque else if
+    getDashboardFinanzas.mockRejectedValueOnce(new Error('no-autorizado'));
+
+    render(<FinanzasPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('No tenés los permisos necesarios para ver esta información.')).toBeInTheDocument();
+    });
+  });
+
+  test('muestra un error genérico si el servicio falla por un motivo desconocido', async () => {
+    usePermiso.mockReturnValue(true);
+    // Simulamos un error cualquiera que caiga en el bloque else final
+    getDashboardFinanzas.mockRejectedValueOnce(new Error('error-raro-de-red'));
+
+    render(<FinanzasPage />);
+
+    await waitFor(() => {
+      expect(screen.getByText('No se pudieron cargar las métricas financieras.')).toBeInTheDocument();
+    });
+  });
