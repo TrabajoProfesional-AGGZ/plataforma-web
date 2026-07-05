@@ -4,6 +4,7 @@ import { getDashboardFinanzas } from '../../services/metricasService';
 import { usePermiso } from '../../hooks/usePermiso';
 
 // Mock de dependencias
+jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../services/metricasService');
 jest.mock('../../hooks/usePermiso');
 jest.mock('../../assets/logo_socio.png', () => 'logo.png');
