@@ -11,6 +11,7 @@ import NoticiasPage from './pages/NoticiasPage/NoticiasPage';
 import AlertasPage from './pages/AlertasPage/AlertasPage';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import AppLayout from './components/AppLayout/AppLayout';
+import MetricasPage from './pages/MetricasPage/MetricasPage';
 import FinanzasPage from './pages/FinanzasPage/FinanzasPage';
 
 function App() {
@@ -41,7 +42,7 @@ function App() {
           </Route>
         </Route>
 
-        <Route element={<PrivateRoute requiredPermiso="ver_finanzas" />}>
+        <Route element={<PrivateRoute requiredPermiso="ver_metricas" />}>
           <Route element={<AppLayout />}>
             <Route path="/finanzas" element={<FinanzasPage />} />
           </Route>
@@ -52,7 +53,11 @@ function App() {
             <Route path="/noticias" element={<NoticiasPage />} />
           </Route>
         </Route>
-
+        <Route element={<PrivateRoute requiredPermiso="ver_metricas" />}>
+          <Route element={<AppLayout />}>
+            <Route path="/metricas" element={<MetricasPage />} />
+          </Route>
+        </Route>
         <Route element={<PrivateRoute requiredPermiso="ver_alertas" />}>
           <Route element={<AppLayout />}>
             <Route path="/alertas" element={<AlertasPage />} />

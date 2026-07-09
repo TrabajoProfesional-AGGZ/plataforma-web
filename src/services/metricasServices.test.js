@@ -1,4 +1,4 @@
-import { getDashboardFinanzas } from './metricasService';
+import { getDashboardFinanzas, getTopDisciplinas, getOcupacionInstalaciones } from './metricasService';
 
 // Mockeamos la utilidad de fetch exactamente como en el resto de los servicios
 jest.mock('../utils/utils', () => ({ fetchTo: jest.fn() }));
@@ -13,9 +13,71 @@ const FINANZAS_MOCK = {
   ]
 };
 
+const DISCIPLINAS_MOCK = {
+  ranking: [
+    { id: '1', nombre: 'Natación', cupo_maximo: 30, total_inscriptos: 25, porcentaje_cupo: 83.3 },
+  ],
+  total: 1,
+};
+
+const OCUPACION_MOCK = {
+  instalaciones: [
+    { id: '1', nombre: 'Cancha', tipo: 'deportiva', horas_reservadas: 100, horas_disponibles: 420, porcentaje_ocupacion: 23.8 },
+  ],
+  total: 1,
+  promedio_ocupacion: 23.8,
+  periodo_dias: 30,
+};
+
 describe('metricasService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+  });
+
+  describe('getTopDisciplinas', () => {
+    test('llama al endpoint correcto con el límite indicado', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => DISCIPLINAS_MOCK });
+
+      const result = await getTopDisciplinas(5);
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/metricas/disciplinas/top?limite=5', 'GET');
+      expect(result.ranking).toHaveLength(1);
+    });
+
+    test('lanza "servicio-no-disponible" en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+
+      await expect(getTopDisciplinas(5)).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza error genérico cuando la respuesta no es ok (ej: 404)', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
+
+      await expect(getTopDisciplinas(5)).rejects.toThrow('Error al obtener ranking de disciplinas');
+    });
+  });
+
+  describe('getOcupacionInstalaciones', () => {
+    test('llama al endpoint correcto con los días indicados', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => OCUPACION_MOCK });
+
+      const result = await getOcupacionInstalaciones(30);
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/metricas/instalaciones/ocupacion?dias=30', 'GET');
+      expect(result.instalaciones).toHaveLength(1);
+    });
+
+    test('lanza "servicio-no-disponible" en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+
+      await expect(getOcupacionInstalaciones(30)).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza error genérico cuando la respuesta no es ok (ej: 404)', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
+
+      await expect(getOcupacionInstalaciones(30)).rejects.toThrow('Error al obtener ocupación de instalaciones');
+    });
   });
 
   describe('getDashboardFinanzas', () => {
