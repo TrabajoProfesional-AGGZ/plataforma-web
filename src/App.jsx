@@ -42,7 +42,7 @@ function App() {
           </Route>
         </Route>
 
-        <Route element={<PrivateRoute requiredPermiso="ver_finanzas" />}>
+        <Route element={<PrivateRoute requiredPermiso="ver_metricas" />}>
           <Route element={<AppLayout />}>
             <Route path="/finanzas" element={<FinanzasPage />} />
           </Route>
@@ -53,7 +53,7 @@ function App() {
             <Route path="/noticias" element={<NoticiasPage />} />
           </Route>
         </Route>
-        <Route element={<PrivateRoute />}>
+        <Route element={<PrivateRoute requiredPermiso="ver_metricas" />}>
           <Route element={<AppLayout />}>
             <Route path="/metricas" element={<MetricasPage />} />
           </Route>
