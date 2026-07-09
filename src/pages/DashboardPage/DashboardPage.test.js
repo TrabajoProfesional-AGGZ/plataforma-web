@@ -24,6 +24,7 @@ describe('DashboardPage', () => {
     expect(screen.getByRole('heading', { name: /panel principal/i })).toBeInTheDocument();
     expect(screen.queryByText('Socios')).not.toBeInTheDocument();
     expect(screen.queryByText('Usuarios Administrativos')).not.toBeInTheDocument();
+    expect(screen.queryByText('Finanzas')).not.toBeInTheDocument();
   });
 
   test('muestra la tarjeta de Socios con el permiso ver_socios', () => {
@@ -58,3 +59,19 @@ describe('DashboardPage', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/usuarios');
   });
 });
+
+test('muestra la tarjeta de Finanzas con el permiso ver_finanzas', () => {
+    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, permisos: ['ver_finanzas'] });
+    render(<MemoryRouter><DashboardPage /></MemoryRouter>);
+
+    expect(screen.getByText('Finanzas')).toBeInTheDocument();
+    expect(screen.queryByText('Socios')).not.toBeInTheDocument();
+  });
+
+  test('navega a /finanzas al hacer click en la tarjeta de Finanzas', () => {
+    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, permisos: ['ver_finanzas'] });
+    render(<MemoryRouter><DashboardPage /></MemoryRouter>);
+
+    fireEvent.click(screen.getByText('Finanzas').closest('button'));
+    expect(mockNavigate).toHaveBeenCalledWith('/finanzas');
+  });

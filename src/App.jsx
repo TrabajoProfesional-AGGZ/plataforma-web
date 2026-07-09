@@ -12,6 +12,7 @@ import AlertasPage from './pages/AlertasPage/AlertasPage';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import AppLayout from './components/AppLayout/AppLayout';
 import MetricasPage from './pages/MetricasPage/MetricasPage';
+import FinanzasPage from './pages/FinanzasPage/FinanzasPage';
 
 function App() {
   return (
@@ -38,6 +39,12 @@ function App() {
         <Route element={<PrivateRoute requiredPermiso="ver_usuarios" />}>
           <Route element={<AppLayout />}>
             <Route path="/usuarios" element={<UsuariosPage />} />
+          </Route>
+        </Route>
+
+        <Route element={<PrivateRoute requiredPermiso="ver_finanzas" />}>
+          <Route element={<AppLayout />}>
+            <Route path="/finanzas" element={<FinanzasPage />} />
           </Route>
         </Route>
 

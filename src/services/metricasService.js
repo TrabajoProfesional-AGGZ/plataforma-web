@@ -12,4 +12,20 @@ export async function getOcupacionInstalaciones(dias = 30) {
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al obtener ocupación de instalaciones');
   return res.json();
+// src/services/metricasService.js
+import { fetchTo } from '../utils/utils';
+
+
+export async function getDashboardFinanzas(periodo=null) {
+    let url = ''
+    if (periodo) {
+        url = `/api/v1/metricas/finanzas?periodo=${periodo}`
+    } else {
+        url = '/api/v1/metricas/finanzas'
+    }
+    const res = await fetchTo(url, 'GET');
+    if (res.status === 401 || res.status === 403) throw new Error('no-autorizado');
+    if (res.status >= 500) throw new Error('servicio-no-disponible');
+    if (!res.ok) throw new Error('Error al obtener métricas de finanzas');
+    return res.json();
 }
