@@ -12,6 +12,7 @@ export async function getOcupacionInstalaciones(dias = 30) {
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al obtener ocupación de instalaciones');
   return res.json();
+}
 
 export async function getDashboardFinanzas(periodo=null) {
     let url = ''
