@@ -22,5 +22,6 @@ export const PERMISO_LABELS = {
   'borrar_noticia': 'Dar de baja noticia',
   'crear_alerta': 'Crear alerta',
   'ver_alertas': 'Ver alertas',
-  'borrar_alerta': 'Dar de baja alerta'
+  'borrar_alerta': 'Dar de baja alerta',
+  'ver_metricas': 'Ver las metricas del club'
 };
