@@ -8,7 +8,7 @@ import './FinanzasPage.css';
 import '../../styles/ListPage.css';
 
 function FinanzasPage() {
-  const puedeVerFinanzas = usePermiso('ver_finanzas'); // Asegurate de tener este permiso configurado
+  const puedeVerFinanzas = usePermiso('ver_metricas'); // Asegurate de tener este permiso configurado
   
   const [datosFinanzas, setDatosFinanzas] = useState(null);
   const [loading, setLoading] = useState(false);
