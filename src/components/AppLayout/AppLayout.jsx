@@ -1,7 +1,6 @@
 import { useRef, useEffect, useLayoutEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, ShieldCheck, Building2, Trophy, Newspaper, Settings, BarChart3, Bell, Menu} from 'lucide-react';
-import { LayoutDashboard, Users, ShieldCheck, Building2, Trophy, Newspaper, Bell, Settings, Menu, Receipt } from 'lucide-react';
+import { LayoutDashboard, Users, ShieldCheck, Building2, Trophy, Newspaper, Settings, BarChart3, Bell, Menu, Receipt} from 'lucide-react';
 import { logout } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
 import texto from '../../assets/texto.png';
