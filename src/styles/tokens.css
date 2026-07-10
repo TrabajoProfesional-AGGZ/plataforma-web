@@ -72,6 +72,8 @@
   --sidebar-width-collapsed: 80px;
 
   /* Typography */
-  --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  --font-numeric: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: 'Archivo Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  /* Misma familia que --font-sans; los contextos numéricos (montos, tablas)
+     además agregan font-variant-numeric: tabular-nums en su propio selector. */
+  --font-numeric: 'Archivo Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }

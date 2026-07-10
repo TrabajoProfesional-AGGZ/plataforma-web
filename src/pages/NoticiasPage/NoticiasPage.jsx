@@ -5,6 +5,7 @@ import { usePermiso } from '../../hooks/usePermiso';
 import { CreateNoticiaForm } from '../../components/createNoticiaForm/CreateNoticiaForm';
 import { EditNoticiaForm } from '../../components/editNoticiaForm/EditNoticiaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
+import EstadoBadge from '../../components/badge/EstadoBadge';
 import { urlImagenSegura } from '../../utils/utils';
 import logo from '../../assets/logo_socio.png';
 import './NoticiasPage.css';
@@ -107,11 +108,11 @@ function NoticiasPage() {
     setEditarOpen(false);
   }
 
-  function estadoBadgeClass(estado) {
-    if (!estado) return 'badge-vencida';
+  function estadoBadgeVariant(estado) {
+    if (!estado) return 'warning';
     const e = estado.toLowerCase();
-    if (e === 'publicada') return 'badge-activa';
-    return 'badge-vencida';
+    if (e === 'publicada') return 'success';
+    return 'warning';
   }
 
   function renderLista() {
@@ -147,9 +148,9 @@ function NoticiasPage() {
                 <td>{n.fecha_publicacion}</td>
                 <td>{n.fecha_expiracion}</td>
                 <td>
-                  <span className={`disciplinas-badge ${estadoBadgeClass(n.estado)}`}>
+                  <EstadoBadge variant={estadoBadgeVariant(n.estado)}>
                     {n.estado ?? '—'}
-                  </span>
+                  </EstadoBadge>
                 </td>
               </tr>
             ))}

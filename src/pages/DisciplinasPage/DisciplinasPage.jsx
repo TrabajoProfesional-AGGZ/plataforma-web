@@ -7,6 +7,7 @@ import { getDisciplinas, createDisciplina, pausarDisciplina, getSociosByDiscipli
 import { getSocioByNroSocio } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
 import { VerSocioModal } from '../../components/verSocioModal/VerSocioModal';
+import EstadoBadge from '../../components/badge/EstadoBadge';
 import logo from '../../assets/logo_socio.png';
 import './DisciplinasPage.css';
 import '../../styles/ListPage.css';
@@ -194,14 +195,14 @@ function DisciplinasPage() {
                 <td>{d.nombre}</td>
                 <td>{d.cupo_maximo} personas</td>
                 <td>
-                  <span className={`disciplinas-badge ${d.arancelada ? 'badge-arancelada' : 'badge-no-arancelada'}`}>
+                  <EstadoBadge variant={d.arancelada ? 'success' : 'neutral'}>
                     {d.arancelada ? 'Sí' : 'No'}
-                  </span>
+                  </EstadoBadge>
                 </td>
                 <td>
-                  <span className={`disciplinas-badge ${d.estado === 'Pausada' ? 'badge-pausada' : 'badge-activa'}`}>
+                  <EstadoBadge variant={d.estado === 'Pausada' ? 'warning' : 'success'}>
                     {d.estado ?? 'Activa'}
-                  </span>
+                  </EstadoBadge>
                 </td>
               </tr>
             ))}
@@ -254,18 +255,18 @@ function DisciplinasPage() {
                 {
                   label: 'Estado',
                   value: disciplinaActual.estado ?? 'Activa',
-                  color: disciplinaActual.estado === 'Pausada' ? '#9A6200' : '#155724',
+                  color: disciplinaActual.estado === 'Pausada' ? 'var(--status-warning-border)' : 'var(--status-success-border)',
                 },
               ].map((field, i, arr) => (
                 <div
                   key={field.label}
                   className="disciplinas-detalle-row"
-                  style={{ borderBottom: i < arr.length - 1 ? '1px solid #f5f5f5' : 'none' }}
+                  style={{ borderBottom: i < arr.length - 1 ? '1px solid var(--color-bg)' : 'none' }}
                 >
                   <span className="disciplinas-detalle-row-label">{field.label}</span>
                   <span
                     className="disciplinas-detalle-row-value"
-                    style={{ color: field.color ?? '#111111' }}
+                    style={{ color: field.color ?? 'var(--color-text-primary)' }}
                   >
                     {field.value}
                   </span>
@@ -347,9 +348,7 @@ function DisciplinasPage() {
                             </td>
                             <td>{s.apellido} {s.nombre}</td>
                             <td>
-                              <span className={`disciplinas-badge ${s.estado?.nombre === 'Activo' || s.estado === 'Activo' ? 'badge-activa' : 'badge-pausada'}`}>
-                                {s.estado?.nombre ?? s.estado ?? '—'}
-                              </span>
+                              <EstadoBadge estado={s.estado?.nombre ?? s.estado} />
                             </td>
                             {puedeCrearDisciplina && (
                               <td>

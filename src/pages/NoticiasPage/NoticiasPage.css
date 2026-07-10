@@ -58,20 +58,8 @@
 
 /* Table styles → src/styles/ListPage.css (.disciplinas-table-wrapper, .disciplinas-tabla, .disciplinas-tr-clickable)
    Table header styles → src/styles/PageTableHeader.css
-   Empty state → .disciplinas-empty in src/styles/ListPage.css */
-
-/* ── Badge color variants ─────────────────────────────────────── */
-.badge-activa {
-  background-color: #d4edda;
-  color: #155724;
-  border-color: #28a745;
-}
-
-.badge-vencida {
-  background-color: #f5e9b2;
-  color: #6D4500;
-  border-color: #9A6200;
-}
+   Empty state → .disciplinas-empty in src/styles/ListPage.css
+   Badges de estado → src/components/badge/EstadoBadge.css (EstadoBadge) */
 
 /* ── Nav / back ───────────────────────────────────────────────── */
 .noticias-nav {

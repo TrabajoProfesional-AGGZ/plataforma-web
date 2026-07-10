@@ -9,6 +9,7 @@ import { getReservasPorInstalacion, getReservasPorSocio, deleteReserva, getReser
 import { getSocios } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
 import { VerSocioModal } from '../../components/verSocioModal/VerSocioModal';
+import EstadoBadge from '../../components/badge/EstadoBadge';
 import logo from '../../assets/logo_socio.png';
 import './InstalacionesPage.css';
 import '../../styles/ListPage.css';
@@ -233,9 +234,9 @@ function InstalacionesPage() {
                 <td>{inst.capacidad_maxima} personas</td>
                 <td>${inst.valor_hora}/h</td>
                 <td>
-                  <span className={`instalaciones-badge ${inst.activa ? 'badge-activa' : 'badge-inactiva'}`}>
+                  <EstadoBadge variant={inst.activa ? 'success' : 'neutral'}>
                     {inst.activa ? 'Activa' : 'Inactiva'}
-                  </span>
+                  </EstadoBadge>
                 </td>
               </tr>
             ))}

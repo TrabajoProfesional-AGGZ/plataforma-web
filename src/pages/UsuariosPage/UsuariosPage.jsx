@@ -12,23 +12,12 @@ import { useSortedList } from '../../hooks/useSortedList';
 import { useListState } from '../../hooks/useListState';
 import { useModalEscape } from '../../hooks/useModalEscape';
 import { useAuthContext } from '../../context/AuthContext';
+import { estadoConfig } from '../../utils/estadoConfig';
 import logo from '../../assets/logo_socio.png';
-import logoVerde from '../../assets/logo-verde.png';
-import logoAmarillo from '../../assets/logo-amarillo.png';
 import './UsuariosPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/ListDetailShared.css';
 import '../../styles/PageTableHeader.css';
-
-const ESTADO_CONFIG = {
-  'Activo':   { logo: logoVerde,    bg: '#8ac98ab0', border: '#0D6E0D' },
-  'Inactivo': { logo: logoAmarillo, bg: '#f4ecb5ee', border: '#9A6200' },
-};
-const ESTADO_DEFAULT = { logo: logoAmarillo, bg: '#f4ecb5ee', border: '#9A6200' };
-
-function estadoConfig(nombre) {
-  return ESTADO_CONFIG[nombre] ?? ESTADO_DEFAULT;
-}
 
 function getValorOrden(usuario, campo) {
   if (campo === 'rol') return String(usuario.rol?.nombre ?? '').toLowerCase();
