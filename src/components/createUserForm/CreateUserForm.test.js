@@ -42,7 +42,7 @@ async function fillStep2() {
 
 async function fillStep3() {
   fireEvent.change(screen.getByPlaceholderText('maria@ejemplo.com'), { target: { value: 'ana@ejemplo.com' } });
-  fireEvent.change(screen.getByPlaceholderText(/mínimo 6/i), { target: { value: 'secreta123' } });
+  fireEvent.change(screen.getByPlaceholderText(/mínimo 10/i), { target: { value: 'Secreta123' } });
 }
 
 async function navigateToStep4(onSuccess, onCancel) {
@@ -104,6 +104,26 @@ describe('CreateUserForm', () => {
     await waitFor(() => {
       expect(screen.getByText(/paso 2 de/i)).toBeInTheDocument();
       expect(screen.getByText(/tipo de documento/i)).toBeInTheDocument();
+    });
+  });
+
+  test('no avanza al paso 4 si la contraseña es débil (sin mayúscula)', async () => {
+    await renderForm();
+    await fillStep1();
+    userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+    await waitFor(() => expect(screen.getByText(/paso 2 de/i)).toBeInTheDocument());
+
+    fillStep2();
+    userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+    await waitFor(() => expect(screen.getByText(/paso 3 de/i)).toBeInTheDocument());
+
+    fireEvent.change(screen.getByPlaceholderText('maria@ejemplo.com'), { target: { value: 'ana@ejemplo.com' } });
+    fireEvent.change(screen.getByPlaceholderText(/mínimo 10/i), { target: { value: 'secreta123' } });
+    userEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/debe incluir al menos una mayúscula/i)).toBeInTheDocument();
+      expect(screen.getByText(/paso 3 de/i)).toBeInTheDocument();
     });
   });
 

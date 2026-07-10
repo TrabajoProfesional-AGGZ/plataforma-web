@@ -24,14 +24,24 @@ function App() {
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/perfil" element={<PerfilPage />} />
             <Route path="/cambiar-contrasena" element={<CambiarContrasenaPage />} />
-            <Route path="/instalaciones" element={<InstalacionesPage />} />
-            <Route path="/disciplinas" element={<DisciplinasPage />} />
           </Route>
         </Route>
 
         <Route element={<PrivateRoute requiredPermiso="ver_socios" />}>
           <Route element={<AppLayout />}>
             <Route path="/socios" element={<SociosPage />} />
+          </Route>
+        </Route>
+
+        <Route element={<PrivateRoute requiredPermiso="ver_instalaciones" />}>
+          <Route element={<AppLayout />}>
+            <Route path="/instalaciones" element={<InstalacionesPage />} />
+          </Route>
+        </Route>
+
+        <Route element={<PrivateRoute requiredPermiso="ver_disciplinas" />}>
+          <Route element={<AppLayout />}>
+            <Route path="/disciplinas" element={<DisciplinasPage />} />
           </Route>
         </Route>
 

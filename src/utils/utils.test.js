@@ -1,4 +1,4 @@
-import { fetchTo } from './utils';
+import { fetchTo, urlImagenSegura } from './utils';
 
 jest.mock('../firebase', () => ({
   auth: {
@@ -62,5 +62,33 @@ describe('fetchTo', () => {
     const result = await fetchTo('/api/v1/socios', 'GET');
 
     expect(result).toBe(mockResponse);
+  });
+});
+
+describe('urlImagenSegura', () => {
+  test('devuelve null si no hay url', () => {
+    expect(urlImagenSegura('')).toBeNull();
+    expect(urlImagenSegura(null)).toBeNull();
+    expect(urlImagenSegura(undefined)).toBeNull();
+  });
+
+  test('devuelve la url si es https', () => {
+    expect(urlImagenSegura('https://cdn.club.com/foto.jpg')).toBe('https://cdn.club.com/foto.jpg');
+  });
+
+  test('devuelve null si es http', () => {
+    expect(urlImagenSegura('http://cdn.club.com/foto.jpg')).toBeNull();
+  });
+
+  test('devuelve null si es data:', () => {
+    expect(urlImagenSegura('data:image/png;base64,abc123')).toBeNull();
+  });
+
+  test('devuelve null si es javascript:', () => {
+    expect(urlImagenSegura('javascript:alert(1)')).toBeNull();
+  });
+
+  test('devuelve null si la url es inválida', () => {
+    expect(urlImagenSegura('no-es-una-url')).toBeNull();
   });
 });

@@ -135,6 +135,15 @@ describe('NoticiasPage', () => {
     expect(screen.getByText(/2026-06-01/)).toBeInTheDocument();
   });
 
+  test('no renderiza el img si la imagen tiene un esquema inseguro', async () => {
+    getNoticias.mockResolvedValue([NOTICIA_LISTA]);
+    getNoticia.mockResolvedValue({ ...NOTICIA_DETALLE, imagen: 'javascript:alert(1)' });
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Noticia de prueba')).toBeInTheDocument());
+    await irAlDetalle();
+    expect(screen.queryByAltText('Imagen de la noticia')).not.toBeInTheDocument();
+  });
+
   test('"Volver" regresa a la vista lista', async () => {
     getNoticias.mockResolvedValue([NOTICIA_LISTA]);
     await renderPage();

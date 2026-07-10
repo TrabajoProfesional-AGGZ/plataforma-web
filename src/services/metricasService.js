@@ -17,7 +17,7 @@ export async function getOcupacionInstalaciones(dias = 30) {
 export async function getDashboardFinanzas(periodo=null) {
     let url = ''
     if (periodo) {
-        url = `/api/v1/metricas/finanzas?periodo=${periodo}`
+        url = `/api/v1/metricas/finanzas?periodo=${encodeURIComponent(periodo)}`
     } else {
         url = '/api/v1/metricas/finanzas'
     }

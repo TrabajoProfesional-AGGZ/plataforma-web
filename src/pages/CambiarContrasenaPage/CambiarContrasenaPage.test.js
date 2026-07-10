@@ -37,11 +37,23 @@ describe('CambiarContrasenaPage', () => {
     renderPage();
 
     fireEvent.change(screen.getByLabelText('Contraseña actual'), { target: { value: 'actual123' } });
-    fireEvent.change(screen.getByLabelText('Nueva contraseña'), { target: { value: 'nueva123' } });
-    fireEvent.change(screen.getByLabelText('Confirmar nueva contraseña'), { target: { value: 'diferente456' } });
+    fireEvent.change(screen.getByLabelText('Nueva contraseña'), { target: { value: 'Nueva12345' } });
+    fireEvent.change(screen.getByLabelText('Confirmar nueva contraseña'), { target: { value: 'Diferente6' } });
     fireEvent.click(screen.getByRole('button', { name: /cambiar contraseña/i }));
 
     expect(screen.getByRole('alert')).toHaveTextContent(/no coinciden/i);
+    expect(authService.changePassword).not.toHaveBeenCalled();
+  });
+
+  test('muestra error si la nueva contraseña es débil sin llamar al servicio', async () => {
+    renderPage();
+
+    fireEvent.change(screen.getByLabelText('Contraseña actual'), { target: { value: 'actual123' } });
+    fireEvent.change(screen.getByLabelText('Nueva contraseña'), { target: { value: 'nuevapass123' } });
+    fireEvent.change(screen.getByLabelText('Confirmar nueva contraseña'), { target: { value: 'nuevapass123' } });
+    fireEvent.click(screen.getByRole('button', { name: /cambiar contraseña/i }));
+
+    expect(screen.getByRole('alert')).toHaveTextContent(/mayúscula/i);
     expect(authService.changePassword).not.toHaveBeenCalled();
   });
 
@@ -51,12 +63,12 @@ describe('CambiarContrasenaPage', () => {
     renderPage();
 
     fireEvent.change(screen.getByLabelText('Contraseña actual'), { target: { value: 'actual123' } });
-    fireEvent.change(screen.getByLabelText('Nueva contraseña'), { target: { value: 'nueva456' } });
-    fireEvent.change(screen.getByLabelText('Confirmar nueva contraseña'), { target: { value: 'nueva456' } });
+    fireEvent.change(screen.getByLabelText('Nueva contraseña'), { target: { value: 'Nueva456789' } });
+    fireEvent.change(screen.getByLabelText('Confirmar nueva contraseña'), { target: { value: 'Nueva456789' } });
     fireEvent.click(screen.getByRole('button', { name: /cambiar contraseña/i }));
 
     await waitFor(() => {
-      expect(authService.changePassword).toHaveBeenCalledWith('actual123', 'nueva456');
+      expect(authService.changePassword).toHaveBeenCalledWith('actual123', 'Nueva456789');
       expect(authService.logout).toHaveBeenCalledTimes(1);
       expect(mockNavigate).toHaveBeenCalledWith('/', { state: { passwordChanged: true } });
     });
@@ -67,8 +79,8 @@ describe('CambiarContrasenaPage', () => {
     renderPage();
 
     fireEvent.change(screen.getByLabelText('Contraseña actual'), { target: { value: 'incorrecta' } });
-    fireEvent.change(screen.getByLabelText('Nueva contraseña'), { target: { value: 'nueva456' } });
-    fireEvent.change(screen.getByLabelText('Confirmar nueva contraseña'), { target: { value: 'nueva456' } });
+    fireEvent.change(screen.getByLabelText('Nueva contraseña'), { target: { value: 'Nueva456789' } });
+    fireEvent.change(screen.getByLabelText('Confirmar nueva contraseña'), { target: { value: 'Nueva456789' } });
     fireEvent.click(screen.getByRole('button', { name: /cambiar contraseña/i }));
 
     await waitFor(() => {

@@ -17,20 +17,20 @@ export async function createSocio(data) {
 }
 
 export async function updateSocio(id, data) {
-  const res = await fetchTo(`/api/v1/socios/${id}`, 'PATCH', data);
+  const res = await fetchTo(`/api/v1/socios/${encodeURIComponent(id)}`, 'PATCH', data);
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al modificar socio');
   return res.json();
 }
 
 export async function deleteSocio(id) {
-  const res = await fetchTo(`/api/v1/socios/${id}`, 'DELETE');
+  const res = await fetchTo(`/api/v1/socios/${encodeURIComponent(id)}`, 'DELETE');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al eliminar socio');
 }
 
 export async function getSocioByNroSocio(nroSocio) {
-  const res = await fetchTo(`/api/v1/socios/por-nro-socio/${nroSocio}`, 'GET');
+  const res = await fetchTo(`/api/v1/socios/por-nro-socio/${encodeURIComponent(nroSocio)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (res.status === 404) throw new Error('socio-no-encontrado');
   if (!res.ok) throw new Error('Error al buscar socio');
