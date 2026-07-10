@@ -37,6 +37,7 @@ CLAUDE.md
 TODO.md
 HANDOFF.md
 skills/
+.claude
 
 # Firebase Admin SDK key (NUNCA commitear)
 serviceAccountKey.json

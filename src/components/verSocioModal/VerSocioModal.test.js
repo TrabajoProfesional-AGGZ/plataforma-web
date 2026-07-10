@@ -31,13 +31,13 @@ describe('VerSocioModal', () => {
 
   test('llama a onClose al hacer clic en el botón ×', () => {
     render(<VerSocioModal socio={socioBase} onClose={onClose} />);
-    fireEvent.click(screen.getByRole('button', { name: '×' }));
+    fireEvent.click(screen.getByRole('button', { name: /cerrar/i }));
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 
   test('llama a onClose al hacer clic en el overlay', () => {
     const { container } = render(<VerSocioModal socio={socioBase} onClose={onClose} />);
-    const overlay = container.querySelector('.modal-overlay');
+    const overlay = container.querySelector('.csf-overlay');
     fireEvent.click(overlay);
     expect(onClose).toHaveBeenCalledTimes(1);
   });
@@ -48,10 +48,9 @@ describe('VerSocioModal', () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  test('llama a onClose al presionar ESC en el overlay', () => {
-    const { container } = render(<VerSocioModal socio={socioBase} onClose={onClose} />);
-    const overlay = container.querySelector('.modal-overlay');
-    fireEvent.keyDown(overlay, { key: 'Escape' });
+  test('llama a onClose al presionar ESC', () => {
+    render(<VerSocioModal socio={socioBase} onClose={onClose} />);
+    fireEvent.keyDown(document, { key: 'Escape' });
     expect(onClose).toHaveBeenCalledTimes(1);
   });
 

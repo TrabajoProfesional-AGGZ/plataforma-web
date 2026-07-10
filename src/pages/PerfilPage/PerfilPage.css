@@ -9,6 +9,7 @@
   color: var(--color-text-primary);
   margin: 0 0 28px 0;
   text-align: center;
+  letter-spacing: -0.02em;
 }
 
 .perfil-card {

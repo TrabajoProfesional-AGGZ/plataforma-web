@@ -7,8 +7,10 @@ import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDelet
 import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
 import { useListState } from '../../hooks/useListState';
-import { useModalEscape } from '../../hooks/useModalEscape';
 import { estadoConfig } from '../../utils/estadoConfig';
+import { MAX_LEN } from '../../utils/formValidators';
+import { handleActivateKey } from '../../utils/a11y';
+import EmptyState from '../../components/feedback/EmptyState';
 import { SocioAccionesExtra } from '../../components/socioAccionesExtra/SocioAccionesExtra';
 import logo from '../../assets/logo_socio.png';
 import './SociosPage.css';
@@ -23,6 +25,11 @@ function getValorOrden(socio, campo) {
   return String(val ?? '').toLowerCase();
 }
 
+function ariaSortDe(orden, campo) {
+  if (orden.campo !== campo) return 'none';
+  return orden.dir === 'asc' ? 'ascending' : 'descending';
+}
+
 
 
 function SociosPage() {
@@ -35,7 +42,7 @@ function SociosPage() {
   const [nroSocio, setNroSocio] = useState('');
   const [modo, setModo] = useState('idle'); // idle | socio | lista | no-encontrado
   const { resultado, setResultado, loading, setLoading, error, setError } = useListState();
-  const { setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
+  const { orden, setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
 
   const [filtroEstado, setFiltroEstado] = useState('');
   const [filtroAbierto, setFiltroAbierto] = useState(false);
@@ -76,12 +83,6 @@ function SociosPage() {
     inicializarSocios();
     return () => { cancelled = true; };
   }, [setError, setLoading, setResultado]);
-
-  useModalEscape([
-    [crearModalOpen, setCrearModalOpen],
-    [editarModalOpen, setEditarModalOpen],
-    [eliminarModalOpen, setEliminarModalOpen],
-  ]);
 
   async function cargarSocios() {
     setLoading(true);
@@ -201,6 +202,7 @@ function SociosPage() {
                 placeholder="Buscar por N° de socio"
                 value={nroSocio}
                 onChange={(e) => setNroSocio(e.target.value)}
+                maxLength={MAX_LEN.NRO_SOCIO}
               />
             </div>
             <button
@@ -226,7 +228,7 @@ function SociosPage() {
       </div>
 
       {loading && (
-        <div className="socios-search-loading">
+        <div className="list-loading">
           <img src={logo} alt="" className="loading-logo" />
         </div>
       )}
@@ -300,7 +302,7 @@ function SociosPage() {
         if (resultado.length === 0) {
           return (
             <div className="socios-table-wrapper">
-              <p className="socios-table-empty">No hay socios registrados.</p>
+              <EmptyState mensaje="No hay socios registrados." />
             </div>
           );
         }
@@ -353,36 +355,51 @@ function SociosPage() {
             </div>
             <div className="socios-table-wrapper">
               {listaFiltrada.length === 0 ? (
-                <p className="socios-table-empty">No hay socios con los filtros seleccionados.</p>
+                <EmptyState mensaje="No hay socios con los filtros seleccionados." />
               ) : (
                 <table className="socios-table">
                   <thead>
                     <tr>
-                      <th className="socios-th-sort" onClick={() => toggleOrden('nro_socio')}>
-                        N° Socio{iconoOrden('nro_socio')}
+                      <th className="socios-th-sort" aria-sort={ariaSortDe(orden, 'nro_socio')}>
+                        <button type="button" className="th-sort-btn" onClick={() => toggleOrden('nro_socio')}>
+                          N° Socio{iconoOrden('nro_socio')}
+                        </button>
                       </th>
-                      <th className="socios-th-sort" onClick={() => toggleOrden('apellido')}>
-                        Apellido{iconoOrden('apellido')}
+                      <th className="socios-th-sort" aria-sort={ariaSortDe(orden, 'apellido')}>
+                        <button type="button" className="th-sort-btn" onClick={() => toggleOrden('apellido')}>
+                          Apellido{iconoOrden('apellido')}
+                        </button>
                       </th>
-                      <th className="socios-th-sort" onClick={() => toggleOrden('nombre')}>
-                        Nombre{iconoOrden('nombre')}
+                      <th className="socios-th-sort" aria-sort={ariaSortDe(orden, 'nombre')}>
+                        <button type="button" className="th-sort-btn" onClick={() => toggleOrden('nombre')}>
+                          Nombre{iconoOrden('nombre')}
+                        </button>
                       </th>
-                      <th className="socios-th-sort" onClick={() => toggleOrden('categoria')}>
-                        Categoría{iconoOrden('categoria')}
+                      <th className="socios-th-sort" aria-sort={ariaSortDe(orden, 'categoria')}>
+                        <button type="button" className="th-sort-btn" onClick={() => toggleOrden('categoria')}>
+                          Categoría{iconoOrden('categoria')}
+                        </button>
                       </th>
-                      <th className="socios-th-sort" onClick={() => toggleOrden('estado')}>
-                        Estado{iconoOrden('estado')}
+                      <th className="socios-th-sort" aria-sort={ariaSortDe(orden, 'estado')}>
+                        <button type="button" className="th-sort-btn" onClick={() => toggleOrden('estado')}>
+                          Estado{iconoOrden('estado')}
+                        </button>
                       </th>
                     </tr>
                   </thead>
                   <tbody>
                     {aplicarOrden(listaFiltrada).map((s) => {
                       const cfg = estadoConfig(s.estado.nombre);
+                      const verDetalle = () => { setResultado(s); setModo('socio'); };
                       return (
                         <tr
                           key={s.id}
                           className="socios-tr-clickable"
-                          onClick={() => { setResultado(s); setModo('socio'); }}
+                          tabIndex={0}
+                          role="button"
+                          aria-label={`Ver detalle de ${s.apellido} ${s.nombre}`}
+                          onClick={verDetalle}
+                          onKeyDown={handleActivateKey(verDetalle)}
                         >
                           <td>{s.nro_socio}</td>
                           <td>{s.apellido}</td>

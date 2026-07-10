@@ -1,0 +1,182 @@
+.resumen-loading {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-12) 0;
+}
+
+.resumen-error {
+  text-align: center;
+  color: var(--color-danger);
+  font-size: 14px;
+  background-color: var(--status-error-surface-bg);
+  border: 1px solid var(--status-error-surface-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+
+.resumen-empty {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  text-align: center;
+}
+
+.resumen-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-6);
+}
+
+@media (max-width: 768px) {
+  .resumen-grid { grid-template-columns: 1fr; }
+}
+
+.resumen-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.resumen-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  color: var(--color-text-primary);
+}
+
+.resumen-card-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.resumen-badge {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  background: var(--color-bg);
+  padding: 2px 8px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Ranking ── */
+.ranking-list { display: flex; flex-direction: column; gap: var(--space-3); }
+
+.ranking-item {
+  display: grid;
+  grid-template-columns: 28px 1fr 1fr;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.ranking-position {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-text-primary);
+  color: var(--color-surface);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.ranking-info { display: flex; flex-direction: column; }
+.ranking-nombre { font-weight: 600; font-size: 14px; color: var(--color-text-primary); }
+.ranking-detalle { font-size: 12px; color: var(--color-text-secondary); }
+
+.ranking-bar-container {
+  position: relative;
+  height: 20px;
+  background: var(--color-bg);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.ranking-bar {
+  height: 100%;
+  background: var(--color-text-primary);
+  border-radius: var(--radius-full);
+  transition: width 0.6s ease;
+}
+
+.ranking-porcentaje {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+/* ── Ocupación ── */
+.ocupacion-promedio {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: var(--space-5);
+}
+
+.ocupacion-promedio-valor {
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  letter-spacing: -0.02em;
+}
+
+.ocupacion-promedio-label {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+}
+
+.ocupacion-list { display: flex; flex-direction: column; gap: var(--space-3); }
+
+.ocupacion-item {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.ocupacion-info { display: flex; flex-direction: column; }
+.ocupacion-nombre { font-weight: 600; font-size: 14px; color: var(--color-text-primary); }
+.ocupacion-tipo { font-size: 12px; color: var(--color-text-secondary); }
+
+.ocupacion-bar-container {
+  position: relative;
+  height: 20px;
+  background: var(--color-bg);
+  border-radius: var(--radius-full);
+  overflow: hidden;
+}
+
+.ocupacion-bar {
+  height: 100%;
+  background: var(--color-text-primary);
+  border-radius: var(--radius-full);
+  transition: width 0.6s ease;
+}
+
+.ocupacion-porcentaje {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.ocupacion-horas {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+@media (max-width: 480px) {
+  .ocupacion-item { grid-template-columns: 1fr; }
+}

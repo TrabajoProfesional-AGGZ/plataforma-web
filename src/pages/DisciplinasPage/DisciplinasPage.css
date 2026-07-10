@@ -8,31 +8,7 @@
 }
 
 /* .disciplinas-title, .disciplinas-toolbar → src/styles/ListDetailShared.css */
-
-/* ── Badge color variants ─────────────────────────────────────── */
-.badge-activa {
-  background-color: #d4edda;
-  color: #155724;
-  border-color: #28a745;
-}
-
-.badge-pausada {
-  background-color: #f5e9b2;
-  color: #6D4500;
-  border-color: #9A6200;
-}
-
-.badge-arancelada {
-  background-color: #d4edda;
-  color: #155724;
-  border-color: #28a745;
-}
-
-.badge-no-arancelada {
-  background-color: var(--color-bg);
-  color: var(--color-text-secondary);
-  border-color: var(--color-text-secondary);
-}
+/* Badges de estado → src/components/badge/EstadoBadge.css (EstadoBadge) */
 
 /* ── Detail view ─────────────────────────────────────────────── */
 .disciplinas-nav {
@@ -60,6 +36,70 @@
   margin: 0 0 var(--space-3) 0;
 }
 
+/* ── Toolbar: filtro (izquierda) + inscribir socio (derecha), misma fila ── */
+.disciplinas-socios-toolbar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-3);
+}
+
+.disciplinas-socios-toolbar .disciplinas-filtro-socio {
+  width: 200px;
+  flex: 0 0 auto;
+  margin-bottom: 0;
+}
+
+.disciplinas-inscribir-form {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+  flex-wrap: nowrap;
+  margin-left: auto;
+}
+
+.disciplinas-btn-inscribir {
+  background: var(--color-text-primary);
+  color: var(--color-surface);
+  border: none;
+  border-radius: var(--radius-md);
+  padding: var(--space-2) var(--space-3);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.disciplinas-btn-inscribir:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.disciplinas-inscribir-error {
+  color: #A01414;
+  font-size: 13px;
+  margin: 0 0 var(--space-3) 0;
+}
+
+/* ── Extender suscripción (por socio inscripto) ─────────────────── */
+.disciplinas-btn-extender {
+  background: var(--color-surface);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-text-primary);
+  border-radius: var(--radius-sm);
+  padding: 5px var(--space-3);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.disciplinas-btn-extender:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 /* ── Filtro socios inscriptos ────────────────────────────────── */
 .disciplinas-filtro-socio {
   width: 100%;
@@ -79,10 +119,5 @@
   border-color: var(--color-border-strong);
 }
 
-/* ── Loading state ────────────────────────────────────────────── */
-.disciplinas-loading {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-12) 0;
-}
+/* Loading wrapper → .list-loading en src/styles/ListPage.css */
 

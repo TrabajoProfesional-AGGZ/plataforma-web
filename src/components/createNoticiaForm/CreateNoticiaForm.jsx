@@ -5,7 +5,7 @@ import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
-import { useEscapeKey } from '../../hooks/useEscapeKey';
+import { getImagenUrlRules, MAX_LEN } from '../../utils/formValidators';
 
 const STEPS = [{ id: 1, label: 'Datos', icon: FileText }];
 
@@ -15,19 +15,18 @@ export function CreateNoticiaForm({ onSuccess, onCancel }) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({ mode: 'onTouched' });
 
-  useEscapeKey(onCancel);
-
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setSubmitted(true);
-    setTimeout(() => onSuccess({
+    await new Promise((resolve) => setTimeout(resolve, 1800));
+    onSuccess({
       titulo: data.titulo.trim(),
       cuerpo: data.cuerpo.trim(),
       fecha_expiracion: data.fecha_expiracion,
       imagen: data.imagen?.trim() || null,
-    }), 1800);
+    });
   };
 
   return (
@@ -36,10 +35,12 @@ export function CreateNoticiaForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      isSubmitting={isSubmitting}
       title="Nueva noticia"
       successTitle="¡Noticia creada!"
       successMessage="La noticia fue publicada correctamente."
       submitLabel="Publicar noticia"
+      submitLoadingLabel="Creando..."
       onCancel={onCancel}
       goBack={() => {}}
       goNext={() => {}}
@@ -49,23 +50,29 @@ export function CreateNoticiaForm({ onSuccess, onCancel }) {
       <FormStep key="step1" direction={direction}>
         <Field label="Título" icon={FileText} error={errors.titulo?.message}>
           <StyledInput
-            {...register('titulo', { required: 'El título es requerido' })}
+            {...register('titulo', {
+              required: 'El título es requerido',
+              maxLength: { value: MAX_LEN.TITULO_NOTICIA, message: `Máximo ${MAX_LEN.TITULO_NOTICIA} caracteres` },
+            })}
             placeholder="Ej. Inauguración de nuevas instalaciones"
             error={!!errors.titulo}
           />
         </Field>
         <Field label="Cuerpo" icon={FileText} error={errors.cuerpo?.message}>
           <textarea
-            {...register('cuerpo', { required: 'El cuerpo es requerido' })}
+            {...register('cuerpo', {
+              required: 'El cuerpo es requerido',
+              maxLength: { value: MAX_LEN.CUERPO_NOTICIA, message: `Máximo ${MAX_LEN.CUERPO_NOTICIA} caracteres` },
+            })}
             placeholder="Redactá el contenido de la noticia..."
             rows={5}
-            className={`csf-input${errors.cuerpo ? ' csf-input-error' : ''}`}
+            className={`csf-input${errors.cuerpo ? ' csf-input--error' : ''}`}
             style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: 14 }}
           />
         </Field>
         <Field label="URL de imagen (opcional)" icon={Image} error={errors.imagen?.message}>
           <StyledInput
-            {...register('imagen')}
+            {...register('imagen', getImagenUrlRules())}
             placeholder="https://..."
             error={!!errors.imagen}
           />

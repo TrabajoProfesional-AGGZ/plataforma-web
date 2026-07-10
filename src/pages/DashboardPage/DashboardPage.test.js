@@ -24,7 +24,7 @@ describe('DashboardPage', () => {
     expect(screen.getByRole('heading', { name: /panel principal/i })).toBeInTheDocument();
     expect(screen.queryByText('Socios')).not.toBeInTheDocument();
     expect(screen.queryByText('Usuarios Administrativos')).not.toBeInTheDocument();
-    expect(screen.queryByText('Finanzas')).not.toBeInTheDocument();
+    expect(screen.queryByText('Métricas')).not.toBeInTheDocument();
   });
 
   test('muestra la tarjeta de Socios con el permiso ver_socios', () => {
@@ -60,18 +60,18 @@ describe('DashboardPage', () => {
   });
 });
 
-test('muestra la tarjeta de Finanzas con el permiso ver_finanzas', () => {
-    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, permisos: ['ver_finanzas'] });
+test('muestra la tarjeta de Métricas con el permiso ver_metricas', () => {
+    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, permisos: ['ver_metricas'] });
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
-    expect(screen.getByText('Finanzas')).toBeInTheDocument();
+    expect(screen.getByText('Métricas')).toBeInTheDocument();
     expect(screen.queryByText('Socios')).not.toBeInTheDocument();
   });
 
-  test('navega a /finanzas al hacer click en la tarjeta de Finanzas', () => {
-    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, permisos: ['ver_finanzas'] });
+  test('navega a /metricas al hacer click en la tarjeta de Métricas', () => {
+    useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, permisos: ['ver_metricas'] });
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
-    fireEvent.click(screen.getByText('Finanzas').closest('button'));
-    expect(mockNavigate).toHaveBeenCalledWith('/finanzas');
+    fireEvent.click(screen.getByText('Métricas').closest('button'));
+    expect(mockNavigate).toHaveBeenCalledWith('/metricas');
   });

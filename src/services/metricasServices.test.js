@@ -91,6 +91,14 @@ describe('metricasService', () => {
       expect(result.recaudacion_total).toBe(150000);
     });
 
+    test('encodea caracteres especiales del periodo', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => FINANZAS_MOCK });
+
+      await getDashboardFinanzas('123/../x?a=1');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/metricas/finanzas?periodo=123%2F..%2Fx%3Fa%3D1', 'GET');
+    });
+
     test('llama al endpoint base si no se especifica un periodo', async () => {
       fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => FINANZAS_MOCK });
       

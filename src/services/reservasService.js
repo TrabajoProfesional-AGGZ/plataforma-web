@@ -18,11 +18,11 @@ export async function getReservas(instalacionId) {
 }
 
 export async function getReservasPorInstalacion(instalacionId) {
-  return fetchReservas(`/api/v1/reservas/por-instalacion/${instalacionId}`);
+  return fetchReservas(`/api/v1/reservas/por-instalacion/${encodeURIComponent(instalacionId)}`);
 }
 
 export async function getReservasPorSocio(nroSocio) {
-  return fetchReservas(`/api/v1/reservas/por-socio/${nroSocio}`);
+  return fetchReservas(`/api/v1/reservas/por-socio/${encodeURIComponent(nroSocio)}`);
 }
 
 export async function createReserva(data) {
@@ -34,7 +34,7 @@ export async function createReserva(data) {
 }
 
 export async function deleteReserva(instalacionId, reservaId) {
-  const res = await fetchTo(`/api/v1/reservas/${reservaId}`, 'DELETE');
+  const res = await fetchTo(`/api/v1/reservas/${encodeURIComponent(reservaId)}`, 'DELETE');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al eliminar reserva');
 }
@@ -44,5 +44,5 @@ export async function getReservasHistoricas() {
 }
 
 export async function getReservasHistoricasPorInstalacion(instalacionId) {
-  return fetchReservas(`/api/v1/reservas/historicas/por-instalacion/${instalacionId}`, 'Error al obtener reservas históricas');
+  return fetchReservas(`/api/v1/reservas/historicas/por-instalacion/${encodeURIComponent(instalacionId)}`, 'Error al obtener reservas históricas');
 }

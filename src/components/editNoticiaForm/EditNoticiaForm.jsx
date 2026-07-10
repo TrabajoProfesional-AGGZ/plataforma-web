@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FileText } from 'lucide-react';
 import { editarNoticia } from '../../services/noticiasService';
-import { useEscapeKey } from '../../hooks/useEscapeKey';
+import { MAX_LEN } from '../../utils/formValidators';
 import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
@@ -24,8 +24,6 @@ export function EditNoticiaForm({ noticia, onSuccess, onCancel }) {
       cuerpo: noticia.cuerpo ?? '',
     },
   });
-
-  useEscapeKey(onCancel);
 
   const onSubmit = async (data) => {
     setFormError('');
@@ -66,7 +64,10 @@ export function EditNoticiaForm({ noticia, onSuccess, onCancel }) {
         <Field id="edit-titulo" label="Título" icon={FileText} error={errors.titulo?.message}>
           <StyledInput
             id="edit-titulo"
-            {...register('titulo', { required: 'El título es obligatorio' })}
+            {...register('titulo', {
+              required: 'El título es obligatorio',
+              maxLength: { value: MAX_LEN.TITULO_NOTICIA, message: `Máximo ${MAX_LEN.TITULO_NOTICIA} caracteres` },
+            })}
             placeholder="Ej. Inauguración de nuevas instalaciones"
             error={!!errors.titulo}
           />
@@ -74,9 +75,12 @@ export function EditNoticiaForm({ noticia, onSuccess, onCancel }) {
         <Field id="edit-cuerpo" label="Cuerpo" icon={FileText} error={errors.cuerpo?.message}>
           <textarea
             id="edit-cuerpo"
-            {...register('cuerpo', { required: 'El cuerpo es obligatorio' })}
+            {...register('cuerpo', {
+              required: 'El cuerpo es obligatorio',
+              maxLength: { value: MAX_LEN.CUERPO_NOTICIA, message: `Máximo ${MAX_LEN.CUERPO_NOTICIA} caracteres` },
+            })}
             rows={5}
-            className={`csf-input${errors.cuerpo ? ' csf-input-error' : ''}`}
+            className={`csf-input${errors.cuerpo ? ' csf-input--error' : ''}`}
             style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: 14 }}
           />
         </Field>

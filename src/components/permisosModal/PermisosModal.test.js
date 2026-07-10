@@ -39,10 +39,10 @@ describe('PermisosModal', () => {
     expect(onClose).not.toHaveBeenCalled();
   });
 
-  test('llama a onClose al presionar Enter en el overlay', () => {
+  test('Enter en el overlay no cierra el modal', () => {
     const { container } = render(<PermisosModal permisos={['ver_socios']} onClose={onClose} />);
     const overlay = container.querySelector('.csf-overlay');
     fireEvent.keyDown(overlay, { key: 'Enter' });
-    expect(onClose).toHaveBeenCalledTimes(1);
+    expect(onClose).not.toHaveBeenCalled();
   });
 });

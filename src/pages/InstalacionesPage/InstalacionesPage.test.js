@@ -68,7 +68,7 @@ function mockUnaReserva() {
 async function renderPage() {
   render(<MemoryRouter><InstalacionesPage /></MemoryRouter>);
   await waitFor(() =>
-    expect(document.querySelector('.instalaciones-loading')).not.toBeInTheDocument()
+    expect(document.querySelector('.list-loading')).not.toBeInTheDocument()
   );
 }
 
@@ -117,6 +117,24 @@ describe('InstalacionesPage', () => {
   test('muestra mensaje cuando no hay instalaciones', async () => {
     await renderPage();
     expect(screen.getByText('No hay instalaciones registradas.')).toBeInTheDocument();
+  });
+
+  test('muestra un banner de error si falla la carga de instalaciones', async () => {
+    getInstalaciones.mockRejectedValue(new Error('error de red'));
+    await renderPage();
+    expect(screen.getByRole('alert')).toHaveTextContent('No se pudieron cargar las instalaciones.');
+  });
+
+  test('el botón Reintentar del banner de error vuelve a cargar las instalaciones', async () => {
+    getInstalaciones.mockRejectedValueOnce(new Error('error de red'));
+    await renderPage();
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+
+    getInstalaciones.mockResolvedValueOnce([
+      { id: 'i-1', nombre: 'Cancha', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 100, activa: true },
+    ]);
+    fireEvent.click(screen.getByRole('button', { name: /reintentar/i }));
+    await waitFor(() => expect(screen.getByText('Cancha')).toBeInTheDocument());
   });
 
   test('abre el formulario de crear instalación al hacer clic en "Nueva instalación"', async () => {
@@ -274,7 +292,7 @@ describe('InstalacionesPage', () => {
     fireEvent.click(screen.getByText('1234'));
 
     expect(screen.getByText('García Juan')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '×' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /cerrar/i })).toBeInTheDocument();
   });
 
   test('el card del socio se cierra al hacer clic en Cerrar', async () => {
@@ -286,7 +304,7 @@ describe('InstalacionesPage', () => {
     fireEvent.click(screen.getByText('1234'));
     expect(screen.getByText('García Juan')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: '×' }));
+    fireEvent.click(screen.getByRole('button', { name: /cerrar/i }));
     expect(screen.queryByText('García Juan')).not.toBeInTheDocument();
   });
 
@@ -338,6 +356,16 @@ describe('InstalacionesPage', () => {
     fireEvent.click(ultimoBoton('Eliminar'));
     expect(screen.getByText('Reservas e Instalaciones')).toBeInTheDocument();
     expect(screen.getByText('No hay instalaciones registradas.')).toBeInTheDocument();
+  });
+
+  test('muestra un banner de error en la lista si falla la eliminación de la instalación', async () => {
+    deleteInstalacion.mockRejectedValueOnce(new Error('error de red'));
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
+    fireEvent.click(ultimoBoton('Eliminar'));
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('No se pudo eliminar la instalación.'));
   });
 
   test('cancela la eliminación de una instalación', async () => {
@@ -479,12 +507,12 @@ describe('InstalacionesPage', () => {
     expect(screen.getByText('Test')).toBeInTheDocument();
   });
 
-  test('revierte la instalación optimista si falla createInstalacion', async () => {
+  test('revierte la instalación optimista y muestra un banner de error si falla createInstalacion', async () => {
     createInstalacion.mockRejectedValueOnce(new Error('error de red'));
     await renderPage();
     crearInstalacionHelper();
     await waitFor(() => {
-      expect(screen.getByText('No hay instalaciones registradas.')).toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent('No se pudo crear la instalación.');
     });
   });
 
@@ -497,7 +525,7 @@ describe('InstalacionesPage', () => {
     fireEvent.click(screen.getByText('1234'));
     expect(screen.getByText('García Juan')).toBeInTheDocument();
 
-    const overlay = document.querySelector('.ver-socio-modal-wrapper')?.closest('.modal-overlay');
+    const overlay = document.querySelector('.ver-socio-modal-wrapper')?.closest('.csf-overlay');
     fireEvent.click(overlay);
     expect(screen.queryByText('García Juan')).not.toBeInTheDocument();
   });

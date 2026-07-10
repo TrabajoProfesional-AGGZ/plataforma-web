@@ -13,8 +13,15 @@ jest.mock('../../services/disciplinasService', () => ({
   createDisciplina: jest.fn(),
   pausarDisciplina: jest.fn(),
   getSociosByDisciplina: jest.fn(),
+  inscribirSocioADisciplina: jest.fn(),
+  extenderSuscripcionDisciplina: jest.fn(),
 }));
-import { getDisciplinas, createDisciplina, pausarDisciplina, getSociosByDisciplina } from '../../services/disciplinasService';
+import { getDisciplinas, createDisciplina, pausarDisciplina, getSociosByDisciplina, inscribirSocioADisciplina, extenderSuscripcionDisciplina } from '../../services/disciplinasService';
+
+jest.mock('../../services/sociosService', () => ({
+  getSocioByNroSocio: jest.fn(),
+}));
+import { getSocioByNroSocio } from '../../services/sociosService';
 
 jest.mock('../../assets/logo_socio.png', () => 'logo_socio.png');
 jest.mock('../../assets/logo-verde.png', () => 'logo-verde.png');
@@ -45,7 +52,7 @@ jest.mock('../../components/verSocioModal/VerSocioModal', () => ({
 async function renderPage() {
   render(<MemoryRouter><DisciplinasPage /></MemoryRouter>);
   await waitFor(() =>
-    expect(document.querySelector('.disciplinas-loading')).not.toBeInTheDocument()
+    expect(document.querySelector('.list-loading')).not.toBeInTheDocument()
   );
 }
 
@@ -69,6 +76,8 @@ describe('DisciplinasPage', () => {
     createDisciplina.mockResolvedValue({ id: 'test-id' });
     pausarDisciplina.mockResolvedValue(undefined);
     getSociosByDisciplina.mockResolvedValue([]);
+    inscribirSocioADisciplina.mockResolvedValue({});
+    getSocioByNroSocio.mockResolvedValue({ id: 's-1', nro_socio: '2001' });
   });
 
   test('muestra el título "Disciplinas"', async () => {
@@ -182,12 +191,12 @@ describe('DisciplinasPage', () => {
     expect(screen.getByText('Pausada')).toBeInTheDocument();
   });
 
-  test('revierte la disciplina optimista si falla createDisciplina', async () => {
+  test('revierte la disciplina optimista y muestra un banner de error si falla createDisciplina', async () => {
     createDisciplina.mockRejectedValueOnce(new Error('error de red'));
     await renderPage();
     crearDisciplinaHelper();
     await waitFor(() => {
-      expect(screen.getByText('No hay disciplinas registradas.')).toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent('No se pudo crear la disciplina.');
     });
   });
 
@@ -491,7 +500,148 @@ describe('DisciplinasPage', () => {
     });
   });
 
-  test('revierte la disciplina optimista si pausarDisciplina falla', async () => {
+  // ── Tests de inscripción de socio a disciplina (Feature 1) ──
+
+  test('muestra el formulario de inscripción de socio en el detalle', async () => {
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByLabelText('Número de socio a inscribir')).toBeInTheDocument());
+  });
+
+  test('inscribe un socio y refresca la lista de inscriptos', async () => {
+    getDisciplinas.mockResolvedValue([
+      { id: 'disc-uuid-conocido', nombre: 'Natación', cupo_maximo: 30, arancelada: false, concepto_cobro: '', estado: 'Activa' },
+    ]);
+    getSociosByDisciplina
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([
+        { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
+      ]);
+
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Natación')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Natación'));
+    await waitFor(() => expect(screen.getByLabelText('Número de socio a inscribir')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Número de socio a inscribir'), { target: { value: '2001' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Inscribir socio' }));
+
+    await waitFor(() => {
+      expect(getSocioByNroSocio).toHaveBeenCalledWith('2001');
+      expect(inscribirSocioADisciplina).toHaveBeenCalledWith('disc-uuid-conocido', 's-1');
+      expect(screen.getByText('2001')).toBeInTheDocument();
+    });
+    expect(screen.getByLabelText('Número de socio a inscribir').value).toBe('');
+  });
+
+  test('muestra error si el número de socio no existe', async () => {
+    getSocioByNroSocio.mockRejectedValueOnce(new Error('socio-no-encontrado'));
+
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByLabelText('Número de socio a inscribir')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Número de socio a inscribir'), { target: { value: '9999' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Inscribir socio' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('No existe un socio con ese número.')).toBeInTheDocument();
+    });
+    expect(inscribirSocioADisciplina).not.toHaveBeenCalled();
+  });
+
+  test('muestra error si el socio ya está inscripto', async () => {
+    inscribirSocioADisciplina.mockRejectedValueOnce(new Error('ya-inscripto'));
+
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByLabelText('Número de socio a inscribir')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Número de socio a inscribir'), { target: { value: '2001' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Inscribir socio' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('El socio ya está inscripto en esta disciplina.')).toBeInTheDocument();
+    });
+  });
+
+  test('el botón "Inscribir socio" está deshabilitado sin número ingresado', async () => {
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Inscribir socio' })).toBeDisabled());
+  });
+
+  // ── Tests de extensión de suscripción por socio (Feature 1) ──
+
+  test('muestra un botón "Extender suscripcion" por cada socio inscripto', async () => {
+    getSociosByDisciplina.mockResolvedValue([
+      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
+      { id: 's-2', nro_socio: '2002', nombre: 'Carlos', apellido: 'Ruiz', estado: { nombre: 'Activo' } },
+    ]);
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getAllByText('Extender suscripcion')).toHaveLength(2));
+  });
+
+  test('extiende la suscripción de un socio y muestra confirmación', async () => {
+    getDisciplinas.mockResolvedValue([
+      { id: 'disc-uuid-conocido', nombre: 'Natación', cupo_maximo: 30, arancelada: false, concepto_cobro: '', estado: 'Activa' },
+    ]);
+    getSociosByDisciplina.mockResolvedValue([
+      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
+    ]);
+    extenderSuscripcionDisciplina.mockResolvedValueOnce({});
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Natación')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Natación'));
+    await waitFor(() => expect(screen.getByText('Extender suscripcion')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Extender suscripcion'));
+
+    await waitFor(() => expect(screen.getByText('Suscripción extendida')).toBeInTheDocument());
+    expect(extenderSuscripcionDisciplina).toHaveBeenCalledWith('disc-uuid-conocido', 's-1');
+  });
+
+  test('muestra error si falla la extensión de suscripción de un socio', async () => {
+    getSociosByDisciplina.mockResolvedValue([
+      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
+    ]);
+    extenderSuscripcionDisciplina.mockRejectedValueOnce(new Error('falla'));
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByText('Extender suscripcion')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Extender suscripcion'));
+
+    await waitFor(() => expect(screen.getByText('Error, reintentar')).toBeInTheDocument());
+  });
+
+  test('el estado de extensión se resetea al salir y volver al detalle', async () => {
+    getSociosByDisciplina.mockResolvedValue([
+      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
+    ]);
+    extenderSuscripcionDisciplina.mockResolvedValueOnce({});
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByText('Extender suscripcion')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Extender suscripcion'));
+    await waitFor(() => expect(screen.getByText('Suscripción extendida')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /volver/i }));
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('Extender suscripcion')).toBeInTheDocument());
+  });
+
+  test('revierte la disciplina optimista y muestra un banner de error si pausarDisciplina falla', async () => {
     pausarDisciplina.mockRejectedValueOnce(new Error('error de red'));
 
     await renderPage();
@@ -504,5 +654,22 @@ describe('DisciplinasPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Activa')).toBeInTheDocument();
     });
+    expect(screen.getByRole('alert')).toHaveTextContent('No se pudo pausar la disciplina.');
+  });
+
+  test('muestra un banner de error si falla la carga de disciplinas', async () => {
+    getDisciplinas.mockRejectedValue(new Error('error de red'));
+    await renderPage();
+    expect(screen.getByRole('alert')).toHaveTextContent('No se pudieron cargar las disciplinas.');
+  });
+
+  test('el botón Reintentar del banner de error vuelve a cargar las disciplinas', async () => {
+    getDisciplinas.mockRejectedValueOnce(new Error('error de red'));
+    await renderPage();
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+
+    getDisciplinas.mockResolvedValueOnce([{ id: 'd-1', nombre: 'Natación', cupo_maximo: 20, arancelada: false, estado: 'Activa' }]);
+    fireEvent.click(screen.getByRole('button', { name: /reintentar/i }));
+    await waitFor(() => expect(screen.getByText('Natación')).toBeInTheDocument());
   });
 });

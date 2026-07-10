@@ -1,19 +1,14 @@
-// src/pages/FinanzasPage/FinanzasPage.jsx
 import { useState, useEffect } from 'react';
 import { getDashboardFinanzas } from '../../services/metricasService';
-import { usePermiso } from '../../hooks/usePermiso';
 import { DesgloseFinanzasChart } from '../../components/charts/DesgloseFinanzasChart';
 import logo from '../../assets/logo_socio.png';
-import './FinanzasPage.css';
-import '../../styles/ListPage.css';
+import './FinanzasTab.css';
 
-function FinanzasPage() {
-  const puedeVerFinanzas = usePermiso('ver_metricas'); // Asegurate de tener este permiso configurado
-  
+function FinanzasTab() {
   const [datosFinanzas, setDatosFinanzas] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   // Estado para el selector de mes (Formato YYYY-MM)
   const [periodoSeleccionado, setPeriodoSeleccionado] = useState(() => {
     const hoy = new Date();
@@ -21,16 +16,18 @@ function FinanzasPage() {
   });
 
   useEffect(() => {
-    if (!puedeVerFinanzas) return;
-    
+    let cancelled = false;
+
     setLoading(true);
     setError('');
-    
+
     getDashboardFinanzas(periodoSeleccionado)
       .then((data) => {
+        if (cancelled) return;
         setDatosFinanzas(data);
       })
       .catch((err) => {
+        if (cancelled) return;
         if (err.message === 'servicio-no-disponible') {
           setError('El servicio de analíticas no está disponible. Intentá de nuevo más tarde.');
         } else if (err.message === 'no-autorizado') {
@@ -39,8 +36,12 @@ function FinanzasPage() {
           setError('No se pudieron cargar las métricas financieras.');
         }
       })
-      .finally(() => setLoading(false));
-  }, [periodoSeleccionado, puedeVerFinanzas]);
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [periodoSeleccionado]);
 
   function renderContenido() {
     if (loading) {
@@ -61,9 +62,9 @@ function FinanzasPage() {
 
     return (
       <div className="finanzas-dashboard">
-        
+
         <div className="finanzas-kpi-card">
-          <h2 className="finanzas-kpi-title">Recaudación Total Consolidada</h2>
+          <h2 className="finanzas-kpi-title">Recaudación total consolidada</h2>
           <p className="finanzas-kpi-value">
             ${datosFinanzas.recaudacion_total.toLocaleString('es-AR')}
           </p>
@@ -71,7 +72,7 @@ function FinanzasPage() {
         </div>
 
         <div className="finanzas-chart-container">
-          <h3 className="finanzas-chart-title">Desglose de Ingresos por Concepto</h3>
+          <h3 className="finanzas-chart-title">Desglose de ingresos por concepto</h3>
           <hr className="finanzas-rule" />
           <DesgloseFinanzasChart datos={datosFinanzas.desglose} />
         </div>
@@ -81,34 +82,23 @@ function FinanzasPage() {
   }
 
   return (
-    <div className="finanzas-page">
-      <h1 className="finanzas-title">Dashboard Financiero</h1>
-      
-      {/* Verificamos el permiso antes de renderizar el filtro y el contenido */}
-      {!puedeVerFinanzas ? (
-        <p className="finanzas-error" style={{ marginTop: 'var(--space-6)' }}>
-          No tenés los permisos necesarios para acceder a las métricas financieras del club.
-        </p>
-      ) : (
-        <>
-          <div className="finanzas-toolbar">
-            <div className="finanzas-filter-group">
-              <label htmlFor="periodo" className="finanzas-filter-label">Período a consultar:</label>
-              <input 
-                type="month" 
-                id="periodo"
-                className="finanzas-input-month"
-                value={periodoSeleccionado}
-                onChange={(e) => setPeriodoSeleccionado(e.target.value)}
-              />
-            </div>
-          </div>
+    <div className="finanzas-tab">
+      <div className="finanzas-toolbar">
+        <div className="finanzas-filter-group">
+          <label htmlFor="periodo" className="finanzas-filter-label">Período a consultar:</label>
+          <input
+            type="month"
+            id="periodo"
+            className="finanzas-input-month"
+            value={periodoSeleccionado}
+            onChange={(e) => setPeriodoSeleccionado(e.target.value)}
+          />
+        </div>
+      </div>
 
-          {renderContenido()}
-        </>
-      )}
+      {renderContenido()}
     </div>
   );
 }
 
-export default FinanzasPage;
+export default FinanzasTab;

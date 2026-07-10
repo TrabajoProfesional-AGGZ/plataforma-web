@@ -11,4 +11,9 @@ describe('LoadingScreen', () => {
     render(<LoadingScreen />);
     expect(screen.getByAltText('SocioUnido')).toHaveClass('loading-logo');
   });
+
+  test('expone role status con aria-label para lectores de pantalla', () => {
+    render(<LoadingScreen />);
+    expect(screen.getByRole('status')).toHaveAccessibleName('Cargando');
+  });
 });

@@ -95,10 +95,10 @@ describe('ConfirmDeleteModal', () => {
     expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
   });
 
-  test('llama a onCancel al presionar Enter en el overlay', () => {
+  test('Enter en el overlay no cierra el modal', () => {
     const { container } = render(<ConfirmDeleteModal {...defaultProps} />);
     const overlay = container.querySelector('.csf-overlay');
     fireEvent.keyDown(overlay, { key: 'Enter' });
-    expect(defaultProps.onCancel).toHaveBeenCalledTimes(1);
+    expect(defaultProps.onCancel).not.toHaveBeenCalled();
   });
 });

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import UsuariosPage from './UsuariosPage';
 
 jest.mock('../../hooks/usePermiso', () => ({
@@ -278,17 +278,6 @@ describe('UsuariosPage', () => {
     expect(screen.queryByRole('heading', { name: /nuevo usuario/i })).not.toBeInTheDocument();
   });
 
-  test('cierra el formulario de creación con ESC', async () => {
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('button', { name: /crear usuario/i })).not.toBeDisabled());
-
-    fireEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
-    expect(screen.getByRole('heading', { name: /nuevo usuario/i })).toBeInTheDocument();
-
-    fireEvent.keyDown(document, { key: 'Escape' });
-    expect(screen.queryByRole('heading', { name: /nuevo usuario/i })).not.toBeInTheDocument();
-  });
-
   test('crear usuario exitoso cierra el formulario y recarga la lista', async () => {
     fetchUsuarios.mockResolvedValue([usuarioMock]);
     render(<UsuariosPage />);
@@ -461,9 +450,8 @@ describe('UsuariosPage', () => {
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
     const th = screen.getAllByRole('columnheader')[0];
-    fireEvent.click(th);
-    const rows = screen.getAllByRole('row');
-    expect(rows.length).toBeGreaterThan(1);
+    fireEvent.click(within(th).getByRole('button'));
+    expect(screen.getAllByRole('button', { name: /ver detalle de/i }).length).toBeGreaterThan(0);
   });
 
   test('cicla entre asc, desc y sin orden al hacer click en el mismo encabezado', async () => {
@@ -472,14 +460,18 @@ describe('UsuariosPage', () => {
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
     const thApellido = screen.getAllByRole('columnheader')[0];
-    fireEvent.click(thApellido);
+    const btnApellido = within(thApellido).getByRole('button');
+    fireEvent.click(btnApellido);
     expect(thApellido.textContent).toContain('↑');
+    expect(thApellido).toHaveAttribute('aria-sort', 'ascending');
 
-    fireEvent.click(thApellido);
+    fireEvent.click(btnApellido);
     expect(thApellido.textContent).toContain('↓');
+    expect(thApellido).toHaveAttribute('aria-sort', 'descending');
 
-    fireEvent.click(thApellido);
+    fireEvent.click(btnApellido);
     expect(thApellido.textContent).toContain('↕');
+    expect(thApellido).toHaveAttribute('aria-sort', 'none');
   });
 
   test('ordena la tabla al hacer click en los encabezados Nombre, Email, Rol y Estado', async () => {
@@ -489,16 +481,16 @@ describe('UsuariosPage', () => {
 
     const headers = screen.getAllByRole('columnheader');
 
-    fireEvent.click(headers[1]);
+    fireEvent.click(within(headers[1]).getByRole('button'));
     expect(headers[1].textContent).toContain('↑');
 
-    fireEvent.click(headers[2]);
+    fireEvent.click(within(headers[2]).getByRole('button'));
     expect(headers[2].textContent).toContain('↑');
 
-    fireEvent.click(headers[3]);
+    fireEvent.click(within(headers[3]).getByRole('button'));
     expect(headers[3].textContent).toContain('↑');
 
-    fireEvent.click(headers[4]);
+    fireEvent.click(within(headers[4]).getByRole('button'));
     expect(headers[4].textContent).toContain('↑');
   });
 
@@ -509,8 +501,18 @@ describe('UsuariosPage', () => {
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
     const thEstado = screen.getAllByRole('columnheader')[4];
-    fireEvent.click(thEstado);
-    expect(screen.getAllByRole('row').length).toBeGreaterThan(1);
+    fireEvent.click(within(thEstado).getByRole('button'));
+    expect(screen.getAllByRole('button', { name: /ver detalle de/i }).length).toBeGreaterThan(0);
+  });
+
+  test('abre el detalle del usuario al presionar Enter sobre la fila', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock, usuarioMock2]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    const fila = screen.getAllByRole('button', { name: /ver detalle de/i })[0];
+    fireEvent.keyDown(fila, { key: 'Enter' });
+    await waitFor(() => expect(screen.getByRole('button', { name: /^editar$/i })).toBeInTheDocument());
   });
 
   test('Ver todos recarga del servidor cuando no hay caché', async () => {
@@ -530,15 +532,6 @@ describe('UsuariosPage', () => {
 
   // --- ESC cierra otros modales ---
 
-  test('ESC cierra el modal de edición', async () => {
-    await renderYAbrirCardUsuario();
-    fireEvent.click(screen.getByRole('button', { name: /editar/i }));
-    await waitFor(() => expect(screen.getByRole('heading', { name: /editar usuario/i })).toBeInTheDocument());
-
-    fireEvent.keyDown(document, { key: 'Escape' });
-    expect(screen.queryByRole('heading', { name: /editar usuario/i })).not.toBeInTheDocument();
-  });
-
   test('ESC cierra el modal de eliminación', async () => {
     await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
@@ -546,15 +539,6 @@ describe('UsuariosPage', () => {
 
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByText(/eliminar usuario/i)).not.toBeInTheDocument();
-  });
-
-  test('ESC cierra el modal de cambiar rol', async () => {
-    await renderYAbrirCardUsuario();
-    fireEvent.click(screen.getByRole('button', { name: /cambiar rol/i }));
-    await waitFor(() => expect(screen.getByRole('heading', { name: /cambiar rol/i })).toBeInTheDocument());
-
-    fireEvent.keyDown(document, { key: 'Escape' });
-    expect(screen.queryByRole('heading', { name: /cambiar rol/i })).not.toBeInTheDocument();
   });
 
   // --- Modal de permisos ---

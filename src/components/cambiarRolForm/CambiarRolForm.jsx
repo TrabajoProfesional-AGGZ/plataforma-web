@@ -4,6 +4,7 @@ import { Shield, AlertTriangle, ChevronRight } from 'lucide-react';
 import { cambiarRolUsuario } from '../../services/usuariosService';
 import '../createForm/CreateSocioForm.css';
 import { StyledSelect } from '../createForm/FormFields';
+import { ModalOverlay } from '../createForm/ModalOverlay';
 
 const STEP_SHARED_PROPS = {
   animate: { x: 0, opacity: 1 },
@@ -37,8 +38,7 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
   }
 
   return (
-    <div className="csf-overlay" onClick={onCancel}>
-      <div className="csf-wrapper" onClick={(e) => e.stopPropagation()}>
+    <ModalOverlay onClose={onCancel} ariaLabel={`Cambiar rol de ${usuario.nombre} ${usuario.apellido}`}>
         <motion.div
           key="form"
           initial={{ opacity: 0, y: 16 }}
@@ -107,16 +107,16 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
                   {...STEP_SHARED_PROPS}
                 >
                   <div style={{
-                    backgroundColor: '#fffbeb',
-                    border: '1px solid #f59e0b',
+                    backgroundColor: 'var(--status-warning-bg)',
+                    border: '1px solid var(--status-warning-border)',
                     borderRadius: '8px',
                     padding: '16px',
                     display: 'flex',
                     gap: '12px',
                     alignItems: 'flex-start',
                   }}>
-                    <AlertTriangle size={20} color="#b45309" strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }} />
-                    <p style={{ margin: 0, fontSize: 14, color: '#92400e', lineHeight: 1.5 }}>
+                    <AlertTriangle size={20} color="var(--status-warning-border)" strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }} />
+                    <p style={{ margin: 0, fontSize: 14, color: 'var(--status-warning-border)', lineHeight: 1.5 }}>
                       Advertencia: modificar el rol de un usuario modifica también sus permisos. ¿Confirmar?
                     </p>
                   </div>
@@ -156,7 +156,6 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
             </AnimatePresence>
           </div>
         </motion.div>
-      </div>
-    </div>
+    </ModalOverlay>
   );
 }

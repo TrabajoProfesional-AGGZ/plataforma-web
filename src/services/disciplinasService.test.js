@@ -1,4 +1,12 @@
-import { getDisciplinas, createDisciplina, pausarDisciplina, getSociosByDisciplina, getDisciplinasBySocio } from './disciplinasService';
+import {
+  getDisciplinas,
+  createDisciplina,
+  pausarDisciplina,
+  getSociosByDisciplina,
+  getDisciplinasBySocio,
+  inscribirSocioADisciplina,
+  extenderSuscripcionDisciplina,
+} from './disciplinasService';
 
 jest.mock('../utils/utils', () => ({ fetchTo: jest.fn() }));
 import { fetchTo } from '../utils/utils';
@@ -159,6 +167,59 @@ describe('disciplinasService', () => {
     test('lanza error genérico cuando la respuesta no es ok', async () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
       await expect(getDisciplinasBySocio('socio-uuid-1')).rejects.toThrow('Error al obtener disciplinas del socio');
+    });
+  });
+
+  describe('inscribirSocioADisciplina', () => {
+    test('hace POST al endpoint correcto con los IDs de disciplina y socio', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: true,
+        status: 201,
+        json: async () => ({ id_disciplina: 'disc-uuid-1', id_socio: 'socio-uuid-1' }),
+      });
+
+      await inscribirSocioADisciplina('disc-uuid-1', 'socio-uuid-1');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/disciplinas/disc-uuid-1/socios/socio-uuid-1', 'POST');
+    });
+
+    test('lanza servicio-no-disponible en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(inscribirSocioADisciplina('disc-uuid-1', 'socio-uuid-1')).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza ya-inscripto en 409', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 409 });
+      await expect(inscribirSocioADisciplina('disc-uuid-1', 'socio-uuid-1')).rejects.toThrow('ya-inscripto');
+    });
+
+    test('lanza error genérico cuando la respuesta no es ok', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
+      await expect(inscribirSocioADisciplina('disc-uuid-1', 'socio-uuid-1')).rejects.toThrow('Error al inscribir al socio en la disciplina');
+    });
+  });
+
+  describe('extenderSuscripcionDisciplina', () => {
+    test('hace PATCH al endpoint correcto con los IDs de disciplina y socio', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ id_disciplina: 'disc-uuid-1', id_socio: 'socio-uuid-1' }),
+      });
+
+      await extenderSuscripcionDisciplina('disc-uuid-1', 'socio-uuid-1');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/disciplinas/disc-uuid-1/socios/socio-uuid-1/extender', 'PATCH');
+    });
+
+    test('lanza servicio-no-disponible en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(extenderSuscripcionDisciplina('disc-uuid-1', 'socio-uuid-1')).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza error genérico cuando la respuesta no es ok', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
+      await expect(extenderSuscripcionDisciplina('disc-uuid-1', 'socio-uuid-1')).rejects.toThrow('Error al extender la suscripción');
     });
   });
 });
