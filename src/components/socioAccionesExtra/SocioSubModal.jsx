@@ -1,16 +1,7 @@
-import { useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { ModalOverlay } from '../createForm/ModalOverlay';
 
 function SocioSubModal({ titulo, wrapperClass, onClose, children }) {
-  useEffect(() => {
-    function handleKeyDown(e) {
-      if (e.key === 'Escape') onClose();
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [onClose]);
-
   return (
     <ModalOverlay onClose={onClose} wrapperClass={wrapperClass}>
       <div className="csf-outer-card">

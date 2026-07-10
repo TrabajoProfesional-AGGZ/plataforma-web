@@ -7,7 +7,6 @@ import '../createForm/CreateSocioForm.css';
 import { Field, StyledSelect, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
-import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { MAX_LEN } from '../../utils/formValidators';
 
 const STEPS = [{ id: 1, label: 'Datos', icon: MessageSquare }];
@@ -18,7 +17,7 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({ mode: 'onTouched' });
 
   const [catalogo, setCatalogo] = useState({ categorias: [], estados: [] });
@@ -29,15 +28,14 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
       .catch(() => {});
   }, []);
 
-  useEscapeKey(onCancel);
-
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setSubmitted(true);
-    setTimeout(() => onSuccess({
+    await new Promise((resolve) => setTimeout(resolve, 1800));
+    onSuccess({
       mensaje: data.mensaje.trim(),
       filtro_categoria: data.filtro_categoria || null,
       filtro_estado: data.filtro_estado || null,
-    }), 1800);
+    });
   };
 
   return (
@@ -46,10 +44,12 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      isSubmitting={isSubmitting}
       title="Nueva alerta"
       successTitle="¡Alerta enviada!"
       successMessage="La alerta fue registrada correctamente."
       submitLabel="Enviar alerta"
+      submitLoadingLabel="Enviando..."
       onCancel={onCancel}
       direction={direction}
       onFormSubmit={handleSubmit(onSubmit)}
@@ -63,7 +63,7 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
             })}
             placeholder="Redactá el mensaje de la alerta..."
             rows={5}
-            className={`csf-input${errors.mensaje ? ' csf-input-error' : ''}`}
+            className={`csf-input${errors.mensaje ? ' csf-input--error' : ''}`}
             style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: 14 }}
           />
         </Field>

@@ -4,20 +4,23 @@ import { getAlertas, createAlerta, borrarAlerta } from '../../services/alertasSe
 import { usePermiso } from '../../hooks/usePermiso';
 import { CreateAlertaForm } from '../../components/createAlertaForm/CreateAlertaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
+import EmptyState from '../../components/feedback/EmptyState';
 import logo from '../../assets/logo_socio.png';
 import './AlertasPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
 
-function truncar(texto, max = 80) {
-  if (!texto) return '';
-  return texto.length > max ? `${texto.slice(0, max)}…` : texto;
-}
-
 function formatearFecha(fecha) {
   if (!fecha) return '—';
   return new Date(fecha).toLocaleString();
+}
+
+function mensajeError(err, fallback) {
+  return err?.message === 'servicio-no-disponible'
+    ? 'El servicio no está disponible. Intentá de nuevo más tarde.'
+    : fallback;
 }
 
 function AlertasPage() {
@@ -27,16 +30,23 @@ function AlertasPage() {
 
   const [alertas, setAlertas] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [crearOpen, setCrearOpen] = useState(false);
   const [alertaAEliminar, setAlertaAEliminar] = useState(null);
+  const [guardando, setGuardando] = useState(false);
+
+  function cargarAlertas() {
+    setLoading(true);
+    setError('');
+    getAlertas()
+      .then((data) => setAlertas(data))
+      .catch((err) => setError(mensajeError(err, 'No se pudieron cargar las alertas.')))
+      .finally(() => setLoading(false));
+  }
 
   useEffect(() => {
     if (!puedeVerAlertas) return;
-    setLoading(true);
-    getAlertas()
-      .then((data) => setAlertas(data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    cargarAlertas();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleAlertaCreada(data) {
@@ -46,33 +56,42 @@ function AlertasPage() {
     try {
       const created = await createAlerta(data);
       setAlertas((prev) => prev.map((a) => (a.id === tempId ? created : a)));
-    } catch {
+    } catch (err) {
       setAlertas((prev) => prev.filter((a) => a.id !== tempId));
+      setError(mensajeError(err, 'No se pudo crear la alerta.'));
     }
   }
 
   async function handleEliminar() {
+    if (guardando) return;
+    setGuardando(true);
     const id = alertaAEliminar.id;
     const backup = alertaAEliminar;
     setAlertas((prev) => prev.filter((a) => a.id !== id));
     setAlertaAEliminar(null);
     try {
       await borrarAlerta(id);
-    } catch {
+    } catch (err) {
       setAlertas((prev) => [backup, ...prev]);
+      setError(mensajeError(err, 'No se pudo eliminar la alerta.'));
+    } finally {
+      setGuardando(false);
     }
   }
 
   function renderLista() {
     if (loading) {
       return (
-        <div className="alertas-loading">
+        <div className="list-loading">
           <img src={logo} alt="" className="loading-logo" />
         </div>
       );
     }
+    if (error && alertas.length === 0) {
+      return <ErrorBanner mensaje={error} onReintentar={cargarAlertas} />;
+    }
     if (alertas.length === 0) {
-      return <p className="disciplinas-empty">No hay alertas registradas.</p>;
+      return <EmptyState mensaje="No hay alertas registradas." />;
     }
     return (
       <div className="disciplinas-table-wrapper">
@@ -90,7 +109,7 @@ function AlertasPage() {
           <tbody>
             {alertas.map((a) => (
               <tr key={a.id}>
-                <td>{truncar(a.mensaje)}</td>
+                <td className="td-truncate" title={a.mensaje}>{a.mensaje}</td>
                 <td>{a.filtro_categoria ?? 'Todas'}</td>
                 <td>{a.filtro_estado ?? 'Todos'}</td>
                 <td>{a.cantidad_destinatarios}</td>
@@ -128,6 +147,8 @@ function AlertasPage() {
         )}
       </div>
 
+      {error && alertas.length > 0 && <ErrorBanner mensaje={error} />}
+
       {renderLista()}
 
       {crearOpen && (
@@ -142,6 +163,7 @@ function AlertasPage() {
         titulo="Eliminar alerta"
         mensaje="¿Estás seguro de que querés eliminar esta alerta? Esta acción no se puede deshacer."
         onConfirm={handleEliminar}
+        guardando={guardando}
         onCancel={() => setAlertaAEliminar(null)}
         labelConfirmar="Eliminar"
       />

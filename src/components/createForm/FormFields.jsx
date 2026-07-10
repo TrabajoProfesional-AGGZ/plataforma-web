@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { Children, cloneElement, isValidElement } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, User, CreditCard, Phone, Mail } from 'lucide-react';
 import PropTypes from 'prop-types';
@@ -9,11 +9,12 @@ export const slideVariants = {
   exit: (dir) => ({ x: dir > 0 ? -52 : 52, opacity: 0 }),
 };
 
-export function FieldError({ message }) {
+export function FieldError({ message, id }) {
   return (
     <AnimatePresence>
       {message && (
         <motion.p
+          id={id}
           role="alert"
           initial={{ opacity: 0, height: 0 }}
           animate={{ opacity: 1, height: 'auto' }}
@@ -31,17 +32,39 @@ export function FieldError({ message }) {
 
 FieldError.propTypes = {
   message: PropTypes.string,
+  id: PropTypes.string,
 };
 
+function slugify(text) {
+  return text
+    .toString()
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
 export function Field({ id, label, icon: Icon, error, children }) {
+  const fieldId = id ?? `field-${slugify(label)}`;
+  const errorId = `${fieldId}-error`;
+  const singleChild = Children.count(children) === 1 ? Children.only(children) : null;
+  const wiredChild = singleChild && isValidElement(singleChild)
+    ? cloneElement(singleChild, {
+      id: singleChild.props.id ?? fieldId,
+      'aria-invalid': error ? 'true' : undefined,
+      'aria-describedby': error ? errorId : undefined,
+    })
+    : children;
+
   return (
     <div className="csf-field">
-      <label className="csf-label" htmlFor={id}>
+      <label className="csf-label" htmlFor={fieldId}>
         <Icon size={13} strokeWidth={2} />
         {label}
       </label>
-      {children}
-      <FieldError message={error} />
+      {wiredChild}
+      <FieldError message={error} id={errorId} />
     </div>
   );
 }
@@ -54,31 +77,17 @@ Field.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-function getBorderColor(error, focused) {
-  if (error) return '#c0392b';
-  if (focused) return '#111111';
-  return 'transparent';
-}
-
 export function StyledInput({ error, ...props }) {
-  const [focused, setFocused] = useState(false);
-  const bgColor = focused || error ? '#ffffff' : '#f5f5f5';
-  const borderColor = getBorderColor(error, focused);
   return (
     <input
       {...props}
-      onFocus={(e) => { setFocused(true); props.onFocus?.(e); }}
-      onBlur={(e) => { setFocused(false); props.onBlur?.(e); }}
       className={`csf-input${error ? ' csf-input--error' : ''}`}
-      style={{ background: bgColor, borderColor }}
     />
   );
 }
 
 StyledInput.propTypes = {
   error: PropTypes.bool,
-  onFocus: PropTypes.func,
-  onBlur: PropTypes.func,
 };
 
 export function FormStep({ direction, children }) {
@@ -127,9 +136,9 @@ export function DocHint() {
   );
 }
 
-const EMAIL_PATTERN = { 
-  value: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/, 
-  message: 'Ingresá un correo válido' 
+const EMAIL_PATTERN = {
+  value: /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/,
+  message: 'Ingresá un correo válido'
 };
 
 export function DocNumberField({ docNumberRegister, errors, fieldKey, label = 'Número de documento', placeholder = 'Ej. 12345678' }) {
@@ -179,16 +188,10 @@ EmailField.propTypes = {
 };
 
 export function StyledSelect({ error, children, ...props }) {
-  const [focused, setFocused] = useState(false);
-  const bgColor = focused || error ? '#ffffff' : '#f5f5f5';
-  const borderColor = getBorderColor(error, focused);
   return (
     <select
       {...props}
-      onFocus={(e) => { setFocused(true); props.onFocus?.(e); }}
-      onBlur={(e) => { setFocused(false); props.onBlur?.(e); }}
       className={`csf-select${error ? ' csf-select--error' : ''}`}
-      style={{ background: bgColor, borderColor }}
     >
       {children}
     </select>
@@ -198,6 +201,4 @@ export function StyledSelect({ error, children, ...props }) {
 StyledSelect.propTypes = {
   error: PropTypes.bool,
   children: PropTypes.node.isRequired,
-  onFocus: PropTypes.func,
-  onBlur: PropTypes.func,
 };

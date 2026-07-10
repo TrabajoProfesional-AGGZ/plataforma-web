@@ -5,12 +5,22 @@ import { usePermiso } from '../../hooks/usePermiso';
 import { CreateNoticiaForm } from '../../components/createNoticiaForm/CreateNoticiaForm';
 import { EditNoticiaForm } from '../../components/editNoticiaForm/EditNoticiaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
+import EstadoBadge from '../../components/badge/EstadoBadge';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
+import EmptyState from '../../components/feedback/EmptyState';
 import { urlImagenSegura } from '../../utils/utils';
+import { handleActivateKey } from '../../utils/a11y';
 import logo from '../../assets/logo_socio.png';
 import './NoticiasPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
+
+function mensajeError(err, fallback) {
+  return err?.message === 'servicio-no-disponible'
+    ? 'El servicio no está disponible. Intentá de nuevo más tarde.'
+    : fallback;
+}
 
 function NoticiasPage() {
   const puedeVerNoticias = usePermiso('ver_noticias');
@@ -23,34 +33,38 @@ function NoticiasPage() {
   const [noticiaActual, setNoticiaActual] = useState(null);
   const [verHistoricas, setVerHistoricas] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [loadingDetalle, setLoadingDetalle] = useState(false);
   const [errorDetalle, setErrorDetalle] = useState('');
   const [crearOpen, setCrearOpen] = useState(false);
   const [editarOpen, setEditarOpen] = useState(false);
   const [eliminarOpen, setEliminarOpen] = useState(false);
+  const [guardando, setGuardando] = useState(false);
 
   const imagenSegura = urlImagenSegura(noticiaActual?.imagen);
 
+  async function cargarNoticias(historicas = verHistoricas) {
+    setLoading(true);
+    setError('');
+    try {
+      const data = historicas ? await getNoticiasHistoricas() : await getNoticias();
+      setNoticias(data);
+    } catch (err) {
+      setError(mensajeError(err, 'No se pudieron cargar las noticias.'));
+    } finally {
+      setLoading(false);
+    }
+  }
+
   useEffect(() => {
     if (!puedeVerNoticias) return;
-    setLoading(true);
-    getNoticias()
-      .then((data) => setNoticias(data))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    cargarNoticias(false);
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function handleToggleHistoricas() {
     const nuevaVista = !verHistoricas;
     setVerHistoricas(nuevaVista);
-    setLoading(true);
-    try {
-      const data = nuevaVista ? await getNoticiasHistoricas() : await getNoticias();
-      setNoticias(data);
-    } catch {
-    } finally {
-      setLoading(false);
-    }
+    await cargarNoticias(nuevaVista);
   }
 
   async function handleClickFila(n) {
@@ -80,12 +94,15 @@ function NoticiasPage() {
       setNoticias((prev) =>
         prev.map((n) => (n.id === tempId ? { ...data, ...created } : n))
       );
-    } catch {
+    } catch (err) {
       setNoticias((prev) => prev.filter((n) => n.id !== tempId));
+      setError(mensajeError(err, 'No se pudo crear la noticia.'));
     }
   }
 
   async function handleEliminar() {
+    if (guardando) return;
+    setGuardando(true);
     const id = noticiaActual.id;
     const backup = noticiaActual;
     setNoticias((prev) => prev.filter((n) => n.id !== id));
@@ -94,8 +111,11 @@ function NoticiasPage() {
     setEliminarOpen(false);
     try {
       await borrarNoticia(id);
-    } catch {
+    } catch (err) {
       setNoticias((prev) => [...prev, backup]);
+      setError(mensajeError(err, 'No se pudo eliminar la noticia.'));
+    } finally {
+      setGuardando(false);
     }
   }
 
@@ -107,23 +127,26 @@ function NoticiasPage() {
     setEditarOpen(false);
   }
 
-  function estadoBadgeClass(estado) {
-    if (!estado) return 'badge-vencida';
+  function estadoBadgeVariant(estado) {
+    if (!estado) return 'warning';
     const e = estado.toLowerCase();
-    if (e === 'publicada') return 'badge-activa';
-    return 'badge-vencida';
+    if (e === 'publicada') return 'success';
+    return 'warning';
   }
 
   function renderLista() {
     if (loading) {
       return (
-        <div className="noticias-loading">
+        <div className="list-loading">
           <img src={logo} alt="" className="loading-logo" />
         </div>
       );
     }
+    if (error && noticias.length === 0) {
+      return <ErrorBanner mensaje={error} onReintentar={() => cargarNoticias()} />;
+    }
     if (noticias.length === 0) {
-      return <p className="disciplinas-empty">No hay noticias registradas.</p>;
+      return <EmptyState mensaje="No hay noticias registradas." />;
     }
     return (
       <div className="disciplinas-table-wrapper">
@@ -141,15 +164,19 @@ function NoticiasPage() {
               <tr
                 key={n.id}
                 className="disciplinas-tr-clickable"
+                tabIndex={0}
+                role="button"
+                aria-label={`Ver detalle de ${n.titulo}`}
                 onClick={() => handleClickFila(n)}
+                onKeyDown={handleActivateKey(() => handleClickFila(n))}
               >
                 <td>{n.titulo}</td>
                 <td>{n.fecha_publicacion}</td>
                 <td>{n.fecha_expiracion}</td>
                 <td>
-                  <span className={`disciplinas-badge ${estadoBadgeClass(n.estado)}`}>
+                  <EstadoBadge variant={estadoBadgeVariant(n.estado)}>
                     {n.estado ?? '—'}
-                  </span>
+                  </EstadoBadge>
                 </td>
               </tr>
             ))}
@@ -175,6 +202,7 @@ function NoticiasPage() {
               </button>
             )}
           </div>
+          {error && noticias.length > 0 && <ErrorBanner mensaje={error} />}
           {renderLista()}
         </>
       )}
@@ -192,7 +220,7 @@ function NoticiasPage() {
           </div>
 
           {loadingDetalle && (
-            <div className="noticias-loading">
+            <div className="list-loading">
               <img src={logo} alt="" className="loading-logo" />
             </div>
           )}
@@ -275,6 +303,7 @@ function NoticiasPage() {
         titulo="Eliminar noticia"
         mensaje={`¿Estás seguro de que querés eliminar "${noticiaActual?.titulo}"? Esta acción no se puede deshacer.`}
         onConfirm={handleEliminar}
+        guardando={guardando}
         onCancel={() => setEliminarOpen(false)}
         labelConfirmar="Eliminar"
       />

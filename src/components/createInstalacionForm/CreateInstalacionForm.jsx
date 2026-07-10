@@ -4,7 +4,6 @@ import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
-import { useEscapeKey } from '../../hooks/useEscapeKey';
 import PropTypes from 'prop-types';
 
 const STEPS = [
@@ -24,10 +23,8 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
     register,
     handleSubmit,
     trigger,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({ mode: 'onTouched' });
-
-  useEscapeKey(onCancel);
 
   const goNext = async () => {
     const valid = await trigger(stepFields[step]);
@@ -35,15 +32,16 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
     advance();
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setSubmitted(true);
-    setTimeout(() => onSuccess({
+    await new Promise((resolve) => setTimeout(resolve, 1800));
+    onSuccess({
       nombre: data.nombre.trim(),
       tipo: data.tipo.trim(),
       capacidad_maxima: Number(data.capacidad_maxima),
       valor_hora: Number(data.valor_hora),
       activa: Boolean(data.activa),
-    }), 1800);
+    });
   };
 
   return (
@@ -52,10 +50,12 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      isSubmitting={isSubmitting}
       title="Nueva instalación"
       successTitle="¡Instalación creada!"
       successMessage="Los datos fueron guardados correctamente."
       submitLabel="Crear instalación"
+      submitLoadingLabel="Creando..."
       onCancel={onCancel}
       goBack={goBack}
       goNext={goNext}

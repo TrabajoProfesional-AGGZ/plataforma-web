@@ -117,7 +117,7 @@ describe('CreateDisciplinaForm', () => {
     await waitFor(() => {
       expect(screen.getByText('¡Disciplina creada!')).toBeInTheDocument();
     });
-    act(() => jest.advanceTimersByTime(1800));
+    await act(async () => { jest.advanceTimersByTime(1800); });
     expect(onSuccess).toHaveBeenCalledWith({
       nombre: 'Natación',
       cupo_maximo: 20,
@@ -161,7 +161,7 @@ describe('CreateDisciplinaForm', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /crear disciplina/i }));
     });
-    act(() => jest.advanceTimersByTime(1800));
+    await act(async () => { jest.advanceTimersByTime(1800); });
     expect(onSuccess).toHaveBeenCalledWith({
       nombre: 'Natación',
       cupo_maximo: 10,

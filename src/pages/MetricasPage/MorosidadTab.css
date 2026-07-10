@@ -8,8 +8,8 @@
   text-align: center;
   color: var(--color-danger);
   font-size: 14px;
-  background-color: #fdecea;
-  border: 1px solid #f5c6cb;
+  background-color: var(--status-error-surface-bg);
+  border: 1px solid var(--status-error-surface-border);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
 }

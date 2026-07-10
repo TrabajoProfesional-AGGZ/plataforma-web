@@ -65,7 +65,7 @@ const NOTICIA_DETALLE = {
 async function renderPage() {
   render(<MemoryRouter><NoticiasPage /></MemoryRouter>);
   await waitFor(() =>
-    expect(document.querySelector('.noticias-loading')).not.toBeInTheDocument()
+    expect(document.querySelector('.list-loading')).not.toBeInTheDocument()
   );
 }
 
@@ -97,6 +97,22 @@ describe('NoticiasPage', () => {
   test('muestra mensaje cuando no hay noticias', async () => {
     await renderPage();
     expect(screen.getByText('No hay noticias registradas.')).toBeInTheDocument();
+  });
+
+  test('muestra un banner de error si falla la carga de noticias', async () => {
+    getNoticias.mockRejectedValue(new Error('error de red'));
+    await renderPage();
+    expect(screen.getByRole('alert')).toHaveTextContent('No se pudieron cargar las noticias.');
+  });
+
+  test('el botón Reintentar del banner de error vuelve a cargar las noticias', async () => {
+    getNoticias.mockRejectedValueOnce(new Error('error de red'));
+    await renderPage();
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+
+    getNoticias.mockResolvedValueOnce([NOTICIA_LISTA]);
+    fireEvent.click(screen.getByRole('button', { name: /reintentar/i }));
+    await waitFor(() => expect(screen.getByText('Noticia de prueba')).toBeInTheDocument());
   });
 
   test('muestra las noticias cargadas desde el servidor', async () => {
@@ -173,13 +189,13 @@ describe('NoticiasPage', () => {
     expect(screen.getAllByText('Nueva noticia').length).toBeGreaterThanOrEqual(1);
   });
 
-  test('revierte la noticia optimista si createNoticia falla', async () => {
+  test('revierte la noticia optimista y muestra un banner de error si createNoticia falla', async () => {
     createNoticia.mockRejectedValueOnce(new Error('error'));
     await renderPage();
     fireEvent.click(screen.getByRole('button', { name: /nueva noticia/i }));
     fireEvent.click(screen.getByRole('button', { name: 'Confirmar creación' }));
     await waitFor(() => {
-      expect(screen.getByText('No hay noticias registradas.')).toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent('No se pudo crear la noticia.');
     });
   });
 
@@ -239,5 +255,19 @@ describe('NoticiasPage', () => {
     fireEvent.click(btnsEliminar[btnsEliminar.length - 1]);
     await waitFor(() => expect(screen.getByText('Noticias')).toBeInTheDocument());
     expect(borrarNoticia).toHaveBeenCalledWith('n-1');
+  });
+
+  test('revierte la noticia y muestra un banner de error si borrarNoticia falla', async () => {
+    borrarNoticia.mockRejectedValueOnce(new Error('error de red'));
+    getNoticias.mockResolvedValue([NOTICIA_LISTA]);
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Noticia de prueba')).toBeInTheDocument());
+    await irAlDetalle();
+    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
+    const btnsEliminar = screen.getAllByRole('button', { name: 'Eliminar' });
+    fireEvent.click(btnsEliminar[btnsEliminar.length - 1]);
+    await waitFor(() => expect(screen.getByText('Noticia de prueba')).toBeInTheDocument());
+    expect(borrarNoticia).toHaveBeenCalledWith('n-1');
+    expect(screen.getByRole('alert')).toHaveTextContent('No se pudo eliminar la noticia.');
   });
 });

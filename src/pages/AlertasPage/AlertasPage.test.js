@@ -40,7 +40,7 @@ const ALERTA_MOCK = {
 async function renderPage() {
   render(<AlertasPage />);
   await waitFor(() =>
-    expect(document.querySelector('.alertas-loading')).not.toBeInTheDocument()
+    expect(document.querySelector('.list-loading')).not.toBeInTheDocument()
   );
 }
 
@@ -65,10 +65,20 @@ describe('AlertasPage', () => {
     expect(screen.getByText('No hay alertas registradas.')).toBeInTheDocument();
   });
 
-  test('muestra lista vacía si falla la carga de alertas', async () => {
+  test('muestra un banner de error si falla la carga de alertas', async () => {
     getAlertas.mockRejectedValue(new Error('error de red'));
     await renderPage();
-    expect(screen.getByText('No hay alertas registradas.')).toBeInTheDocument();
+    expect(screen.getByRole('alert')).toHaveTextContent('No se pudieron cargar las alertas.');
+  });
+
+  test('el botón Reintentar del banner de error vuelve a cargar las alertas', async () => {
+    getAlertas.mockRejectedValueOnce(new Error('error de red'));
+    await renderPage();
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+
+    getAlertas.mockResolvedValueOnce([ALERTA_MOCK]);
+    fireEvent.click(screen.getByRole('button', { name: /reintentar/i }));
+    await waitFor(() => expect(screen.getByText('Recordatorio de cuota pendiente')).toBeInTheDocument());
   });
 
   test('muestra las alertas cargadas desde el servidor', async () => {
@@ -117,14 +127,15 @@ describe('AlertasPage', () => {
     expect(screen.getByText('Recordatorio de cuota pendiente')).toBeInTheDocument();
   });
 
-  test('revierte la alerta optimista si createAlerta falla', async () => {
+  test('revierte la alerta optimista y muestra un banner de error si createAlerta falla', async () => {
     createAlerta.mockRejectedValueOnce(new Error('error'));
     await renderPage();
     fireEvent.click(screen.getByRole('button', { name: /nueva alerta/i }));
     fireEvent.click(screen.getByRole('button', { name: 'Confirmar creación' }));
     await waitFor(() => {
-      expect(screen.getByText('No hay alertas registradas.')).toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent('No se pudo crear la alerta.');
     });
+    expect(screen.queryByText('Alerta nueva')).not.toBeInTheDocument();
   });
 
   test('el botón de eliminar abre el modal de confirmación', async () => {
@@ -157,7 +168,7 @@ describe('AlertasPage', () => {
     expect(borrarAlerta).not.toHaveBeenCalled();
   });
 
-  test('revierte la alerta si borrarAlerta falla', async () => {
+  test('revierte la alerta y muestra un banner de error si borrarAlerta falla', async () => {
     borrarAlerta.mockRejectedValueOnce(new Error('error de red'));
     getAlertas.mockResolvedValue([ALERTA_MOCK]);
     await renderPage();
@@ -167,5 +178,6 @@ describe('AlertasPage', () => {
     fireEvent.click(btnsEliminar[btnsEliminar.length - 1]);
     await waitFor(() => expect(screen.getByText('Recordatorio de cuota pendiente')).toBeInTheDocument());
     expect(borrarAlerta).toHaveBeenCalledWith('a-1');
+    expect(screen.getByRole('alert')).toHaveTextContent('No se pudo eliminar la alerta.');
   });
 });

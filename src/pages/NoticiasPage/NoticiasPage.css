@@ -58,20 +58,8 @@
 
 /* Table styles → src/styles/ListPage.css (.disciplinas-table-wrapper, .disciplinas-tabla, .disciplinas-tr-clickable)
    Table header styles → src/styles/PageTableHeader.css
-   Empty state → .disciplinas-empty in src/styles/ListPage.css */
-
-/* ── Badge color variants ─────────────────────────────────────── */
-.badge-activa {
-  background-color: #d4edda;
-  color: #155724;
-  border-color: #28a745;
-}
-
-.badge-vencida {
-  background-color: #f5e9b2;
-  color: #6D4500;
-  border-color: #9A6200;
-}
+   Empty state → .disciplinas-empty in src/styles/ListPage.css
+   Badges de estado → src/components/badge/EstadoBadge.css (EstadoBadge) */
 
 /* ── Nav / back ───────────────────────────────────────────────── */
 .noticias-nav {
@@ -100,18 +88,14 @@
 }
 
 /* ── Loading & error ──────────────────────────────────────────── */
-.noticias-loading {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-12) 0;
-}
+/* Loading wrapper → .list-loading en src/styles/ListPage.css */
 
 .noticias-error {
   text-align: center;
   color: var(--color-danger);
   font-size: 14px;
-  background-color: #fdecea;
-  border: 1px solid #f5c6cb;
+  background-color: var(--status-error-surface-bg);
+  border: 1px solid var(--status-error-surface-border);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
 }

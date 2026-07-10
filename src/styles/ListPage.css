@@ -134,8 +134,8 @@
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-.socios-search-loading,
-.usuarios-search-loading {
+/* Wrapper del spinner de carga, compartido por todas las list pages */
+.list-loading {
   display: flex;
   justify-content: center;
   padding: var(--space-12) 0;
@@ -147,8 +147,8 @@
   color: var(--color-danger);
   font-size: 14px;
   text-align: center;
-  background-color: #fdecea;
-  border: 1px solid #f5c6cb;
+  background-color: var(--status-error-surface-bg);
+  border: 1px solid var(--status-error-surface-border);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
 }
@@ -204,33 +204,37 @@
 }
 
 /* ── Table wrapper ───────────────────────────────────────────── */
+/* .disciplinas-* (wrapper/tabla/tr-clickable) se reutiliza tal cual en
+   NoticiasPage y AlertasPage — no renombrar para evitar churn en 3 páginas. */
 .socios-table-wrapper, .usuarios-table-wrapper,
 .disciplinas-table-wrapper, .instalaciones-table-wrapper {
+  position: relative;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-md);
+  max-height: calc(100vh - 260px);
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
   box-shadow: var(--shadow-sm);
 }
 
-.socios-table-empty,
-.usuarios-table-empty {
-  padding: var(--space-8);
-  text-align: center;
-  color: var(--color-text-secondary);
-  font-size: 14px;
-  margin: 0;
+/* Fade indicador de scroll horizontal en mobile (se mantiene scroll
+   horizontal "honesto" en vez de card-ificar la tabla) */
+@media (max-width: 768px) {
+  .socios-table-wrapper::after, .usuarios-table-wrapper::after,
+  .disciplinas-table-wrapper::after, .instalaciones-table-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 24px;
+    background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.06));
+    pointer-events: none;
+  }
 }
 
-.disciplinas-empty,
-.instalaciones-empty {
-  text-align: center;
-  padding: var(--space-12) 0;
-  color: var(--color-text-secondary);
-  font-size: 15px;
-  margin: 0;
-}
+/* Empty states → src/components/feedback/EmptyState.jsx (.empty-state) */
 
 /* ── Table base ──────────────────────────────────────────────── */
 .socios-table,
@@ -251,11 +255,7 @@
   color: var(--color-text-primary);
   vertical-align: middle;
   font-variant-numeric: tabular-nums;
-}
-
-.socios-table td,
-.usuarios-tabla td {
-  text-align: left;
+  text-align: center;
 }
 
 .socios-table tr:last-child td,
@@ -265,6 +265,15 @@
   border-bottom: none;
 }
 
+/* Columnas largas conocidas (email, mensaje): ellipsis + title con el
+   texto completo para el tooltip nativo del navegador */
+.td-truncate {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .socios-tr-clickable,
 .usuarios-tr-clickable,
 .disciplinas-tr-clickable,
@@ -272,11 +281,21 @@
   cursor: pointer;
 }
 
+/* :focus-visible con outline se clipea en <tr> (border-collapse) — se usa
+   box-shadow inset como anillo de foco para filas navegables por teclado */
+.socios-tr-clickable:focus-visible,
+.usuarios-tr-clickable:focus-visible,
+.disciplinas-tr-clickable:focus-visible,
+.instalaciones-tr-clickable:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--color-text-primary);
+}
+
 .socios-tr-clickable:hover td,
 .usuarios-tr-clickable:hover td,
 .disciplinas-tr-clickable:hover td,
 .instalaciones-tr-clickable:hover td {
-  background-color: #f8f8f8;
+  background-color: var(--color-row-hover);
 }
 
 /* ── Badge base ──────────────────────────────────────────────── */

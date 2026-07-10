@@ -8,31 +8,7 @@
 }
 
 /* .instalaciones-title, .instalaciones-toolbar → src/styles/ListDetailShared.css */
-
-/* ── Badge color variants ─────────────────────────────────────── */
-.badge-si {
-  background-color: #fff3cd;
-  color: #856404;
-  border-color: #ffc107;
-}
-
-.badge-no {
-  background-color: var(--color-bg);
-  color: var(--color-text-secondary);
-  border-color: var(--color-text-secondary);
-}
-
-.badge-activa {
-  background-color: #d4edda;
-  color: #155724;
-  border-color: #28a745;
-}
-
-.badge-inactiva {
-  background-color: var(--color-bg);
-  color: var(--color-text-secondary);
-  border-color: var(--color-text-secondary);
-}
+/* Badges de estado → src/components/badge/EstadoBadge.css (EstadoBadge) */
 
 /* ── Toggle: flex layout on top of shared btn-toggle base ─────── */
 .instalaciones-btn-toggle {
@@ -215,12 +191,7 @@
   flex-shrink: 0;
 }
 
-/* ── Loading state ────────────────────────────────────────────── */
-.instalaciones-loading {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-12) 0;
-}
+/* Loading wrapper → .list-loading en src/styles/ListPage.css */
 
 /* ── Lista de socios en celda de reserva ──────────────────────── */
 .reserva-socios-list {

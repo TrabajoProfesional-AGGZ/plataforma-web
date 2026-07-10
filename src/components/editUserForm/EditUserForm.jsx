@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { User } from 'lucide-react';
 import { editarUsuario } from '../../services/usuariosService';
-import { useEscapeKey } from '../../hooks/useEscapeKey';
 import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
@@ -24,8 +23,6 @@ export function EditUserForm({ usuario, onSuccess, onCancel }) {
       apellido: usuario.apellido ?? '',
     },
   });
-
-  useEscapeKey(onCancel);
 
   const onSubmit = async (data) => {
     setFormError('');

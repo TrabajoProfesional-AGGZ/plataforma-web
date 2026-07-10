@@ -52,7 +52,7 @@ jest.mock('../../components/verSocioModal/VerSocioModal', () => ({
 async function renderPage() {
   render(<MemoryRouter><DisciplinasPage /></MemoryRouter>);
   await waitFor(() =>
-    expect(document.querySelector('.disciplinas-loading')).not.toBeInTheDocument()
+    expect(document.querySelector('.list-loading')).not.toBeInTheDocument()
   );
 }
 
@@ -191,12 +191,12 @@ describe('DisciplinasPage', () => {
     expect(screen.getByText('Pausada')).toBeInTheDocument();
   });
 
-  test('revierte la disciplina optimista si falla createDisciplina', async () => {
+  test('revierte la disciplina optimista y muestra un banner de error si falla createDisciplina', async () => {
     createDisciplina.mockRejectedValueOnce(new Error('error de red'));
     await renderPage();
     crearDisciplinaHelper();
     await waitFor(() => {
-      expect(screen.getByText('No hay disciplinas registradas.')).toBeInTheDocument();
+      expect(screen.getByRole('alert')).toHaveTextContent('No se pudo crear la disciplina.');
     });
   });
 
@@ -641,7 +641,7 @@ describe('DisciplinasPage', () => {
     await waitFor(() => expect(screen.getByText('Extender suscripcion')).toBeInTheDocument());
   });
 
-  test('revierte la disciplina optimista si pausarDisciplina falla', async () => {
+  test('revierte la disciplina optimista y muestra un banner de error si pausarDisciplina falla', async () => {
     pausarDisciplina.mockRejectedValueOnce(new Error('error de red'));
 
     await renderPage();
@@ -654,5 +654,22 @@ describe('DisciplinasPage', () => {
     await waitFor(() => {
       expect(screen.getByText('Activa')).toBeInTheDocument();
     });
+    expect(screen.getByRole('alert')).toHaveTextContent('No se pudo pausar la disciplina.');
+  });
+
+  test('muestra un banner de error si falla la carga de disciplinas', async () => {
+    getDisciplinas.mockRejectedValue(new Error('error de red'));
+    await renderPage();
+    expect(screen.getByRole('alert')).toHaveTextContent('No se pudieron cargar las disciplinas.');
+  });
+
+  test('el botón Reintentar del banner de error vuelve a cargar las disciplinas', async () => {
+    getDisciplinas.mockRejectedValueOnce(new Error('error de red'));
+    await renderPage();
+    expect(screen.getByRole('alert')).toBeInTheDocument();
+
+    getDisciplinas.mockResolvedValueOnce([{ id: 'd-1', nombre: 'Natación', cupo_maximo: 20, arancelada: false, estado: 'Activa' }]);
+    fireEvent.click(screen.getByRole('button', { name: /reintentar/i }));
+    await waitFor(() => expect(screen.getByText('Natación')).toBeInTheDocument());
   });
 });

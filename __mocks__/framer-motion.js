@@ -18,6 +18,7 @@ const motion = new Proxy({}, {
 module.exports = {
   motion,
   AnimatePresence: ({ children }) => children,
+  MotionConfig: ({ children }) => children,
   useReducedMotion: () => false,
   useAnimation: () => ({ start: () => Promise.resolve(), set: () => {} }),
 };

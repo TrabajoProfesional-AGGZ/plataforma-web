@@ -38,11 +38,7 @@
   background-color: var(--color-text-secondary);
 }
 
-.alertas-loading {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-12) 0;
-}
+/* Loading wrapper → .list-loading en src/styles/ListPage.css */
 
 .alertas-btn-eliminar-fila {
   display: inline-flex;
@@ -58,7 +54,7 @@
 }
 
 .alertas-btn-eliminar-fila:hover {
-  background-color: #fdecea;
+  background-color: var(--status-error-surface-bg);
 }
 
 /* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */

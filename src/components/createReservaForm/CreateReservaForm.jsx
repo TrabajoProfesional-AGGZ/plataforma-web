@@ -12,7 +12,6 @@ import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
-import { useEscapeKey } from '../../hooks/useEscapeKey';
 import PropTypes from 'prop-types';
 
 const STEPS = [
@@ -42,8 +41,6 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
     getValues,
     formState: { errors },
   } = useForm({ mode: 'onTouched', defaultValues: { id_instalacion: instalacionPreseleccionada } });
-
-  useEscapeKey(onCancel);
 
   const previewSocio = async (value) => {
     if (!value?.trim()) return;
