@@ -16,7 +16,7 @@ const NAV_ITEMS_BASE = [
   { to: '/instalaciones', label: 'Reservas e Instalaciones', Icon: Building2, permiso: 'ver_instalaciones' },
   { to: '/disciplinas', label: 'Disciplinas', Icon: Trophy, permiso: 'ver_disciplinas' },
   { to: '/noticias', label: 'Noticias', Icon: Newspaper, permiso: 'ver_noticias' },
-  { to: '/metricas', label: 'Métricas', Icon: BarChart3, permiso: null },
+  { to: '/metricas', label: 'Métricas', Icon: BarChart3, permiso: 'ver_metricas' },
   { to: '/alertas', label: 'Alertas', Icon: Bell, permiso: 'ver_alertas' },
   { to: '/perfil', label: 'Perfil', Icon: Settings, permiso: ''}
 ];
@@ -52,7 +52,7 @@ function AppLayout() {
     };
 
     const slide = (idx) => {
-      el.style.transition = 'transform 0.08s ease-out';
+      el.style.transition = 'transform 0.05s ease-out';
       el.style.transform = `translateY(${linkEls[idx].offsetTop}px)`;
       el.style.height = `${linkEls[idx].offsetHeight}px`;
     };

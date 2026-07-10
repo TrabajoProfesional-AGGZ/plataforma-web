@@ -36,3 +36,18 @@ export async function getDisciplinasBySocio(idSocio) {
   const data = await res.json();
   return data.disciplinas ?? data;
 }
+
+export async function inscribirSocioADisciplina(idDisciplina, idSocio) {
+  const res = await fetchTo(`/api/v1/disciplinas/${idDisciplina}/socios/${idSocio}`, 'POST');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (res.status === 409) throw new Error('ya-inscripto');
+  if (!res.ok) throw new Error('Error al inscribir al socio en la disciplina');
+  return res.json();
+}
+
+export async function extenderSuscripcionDisciplina(idDisciplina, idSocio) {
+  const res = await fetchTo(`/api/v1/disciplinas/${idDisciplina}/socios/${idSocio}/extender`, 'PATCH');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error('Error al extender la suscripción');
+  return res.json();
+}
