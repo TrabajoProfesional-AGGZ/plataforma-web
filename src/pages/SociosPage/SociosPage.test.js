@@ -511,8 +511,8 @@ describe('SociosPage', () => {
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
     const th = screen.getAllByRole('columnheader')[0];
-    fireEvent.click(th);
-    expect(screen.getAllByRole('row').length).toBeGreaterThan(1);
+    fireEvent.click(within(th).getByRole('button'));
+    expect(screen.getAllByRole('button', { name: /ver detalle de/i }).length).toBeGreaterThan(0);
   });
 
   test('cicla entre asc, desc y sin orden al hacer click en el mismo encabezado', async () => {
@@ -521,14 +521,18 @@ describe('SociosPage', () => {
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
     const thNroSocio = screen.getAllByRole('columnheader')[0];
-    fireEvent.click(thNroSocio);
+    const btnNroSocio = within(thNroSocio).getByRole('button');
+    fireEvent.click(btnNroSocio);
     expect(thNroSocio.textContent).toContain('↑');
+    expect(thNroSocio).toHaveAttribute('aria-sort', 'ascending');
 
-    fireEvent.click(thNroSocio);
+    fireEvent.click(btnNroSocio);
     expect(thNroSocio.textContent).toContain('↓');
+    expect(thNroSocio).toHaveAttribute('aria-sort', 'descending');
 
-    fireEvent.click(thNroSocio);
+    fireEvent.click(btnNroSocio);
     expect(thNroSocio.textContent).toContain('↕');
+    expect(thNroSocio).toHaveAttribute('aria-sort', 'none');
   });
 
   test('ordena por columna con objetos anidados (estado)', async () => {
@@ -537,8 +541,8 @@ describe('SociosPage', () => {
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
     const thEstado = screen.getAllByRole('columnheader')[4];
-    fireEvent.click(thEstado);
-    expect(screen.getAllByRole('row').length).toBeGreaterThan(1);
+    fireEvent.click(within(thEstado).getByRole('button'));
+    expect(screen.getAllByRole('button', { name: /ver detalle de/i }).length).toBeGreaterThan(0);
   });
 
   test('ordena la tabla al hacer click en los encabezados Apellido, Nombre y Categoría', async () => {
@@ -548,13 +552,13 @@ describe('SociosPage', () => {
 
     const headers = screen.getAllByRole('columnheader');
 
-    fireEvent.click(headers[1]);
+    fireEvent.click(within(headers[1]).getByRole('button'));
     expect(headers[1].textContent).toContain('↑');
 
-    fireEvent.click(headers[2]);
+    fireEvent.click(within(headers[2]).getByRole('button'));
     expect(headers[2].textContent).toContain('↑');
 
-    fireEvent.click(headers[3]);
+    fireEvent.click(within(headers[3]).getByRole('button'));
     expect(headers[3].textContent).toContain('↑');
   });
 
@@ -565,8 +569,18 @@ describe('SociosPage', () => {
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
     const thCategoria = screen.getAllByRole('columnheader')[3];
-    fireEvent.click(thCategoria);
-    expect(screen.getAllByRole('row').length).toBeGreaterThan(1);
+    fireEvent.click(within(thCategoria).getByRole('button'));
+    expect(screen.getAllByRole('button', { name: /ver detalle de/i }).length).toBeGreaterThan(0);
+  });
+
+  test('abre el detalle del socio al presionar Enter sobre la fila', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    const fila = screen.getByRole('button', { name: new RegExp(`ver detalle de ${socioMock.apellido} ${socioMock.nombre}`, 'i') });
+    fireEvent.keyDown(fila, { key: 'Enter' });
+    await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
   });
 
   // --- Búsqueda sin caché (ruta no-cache en handleBuscar) ---

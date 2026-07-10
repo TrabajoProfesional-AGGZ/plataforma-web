@@ -7,6 +7,7 @@ import { EditNoticiaForm } from '../../components/editNoticiaForm/EditNoticiaFor
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import { urlImagenSegura } from '../../utils/utils';
+import { handleActivateKey } from '../../utils/a11y';
 import logo from '../../assets/logo_socio.png';
 import './NoticiasPage.css';
 import '../../styles/ListPage.css';
@@ -142,7 +143,11 @@ function NoticiasPage() {
               <tr
                 key={n.id}
                 className="disciplinas-tr-clickable"
+                tabIndex={0}
+                role="button"
+                aria-label={`Ver detalle de ${n.titulo}`}
                 onClick={() => handleClickFila(n)}
+                onKeyDown={handleActivateKey(() => handleClickFila(n))}
               >
                 <td>{n.titulo}</td>
                 <td>{n.fecha_publicacion}</td>

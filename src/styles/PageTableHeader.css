@@ -2,7 +2,7 @@
 .usuarios-tabla th,
 .disciplinas-tabla th,
 .instalaciones-tabla th {
-  text-align: left;
+  text-align: center;
   padding: var(--space-3) var(--space-5);
   background: var(--color-bg);
   border-bottom: 1px solid var(--color-border-medium);
@@ -12,4 +12,24 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+/* Header ordenable: el <button> reemplaza el onClick del <th> para que sea
+   accesible por teclado; hereda el estilo visual del th (.socios-th-sort /
+   .usuarios-th-sort siguen controlando hover). */
+.th-sort-btn {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  font: inherit;
+  color: inherit;
+}
+
+.th-sort-btn:focus-visible {
+  outline: 2px solid var(--color-text-primary);
+  outline-offset: 2px;
 }

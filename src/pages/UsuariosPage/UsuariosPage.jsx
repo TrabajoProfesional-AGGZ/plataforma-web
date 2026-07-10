@@ -13,6 +13,7 @@ import { useListState } from '../../hooks/useListState';
 import { useModalEscape } from '../../hooks/useModalEscape';
 import { useAuthContext } from '../../context/AuthContext';
 import { estadoConfig } from '../../utils/estadoConfig';
+import { handleActivateKey } from '../../utils/a11y';
 import logo from '../../assets/logo_socio.png';
 import './UsuariosPage.css';
 import '../../styles/ListPage.css';
@@ -23,6 +24,11 @@ function getValorOrden(usuario, campo) {
   if (campo === 'rol') return String(usuario.rol?.nombre ?? '').toLowerCase();
   if (campo === 'estado') return String(usuario.estado?.nombre ?? '').toLowerCase();
   return String(usuario[campo] ?? '').toLowerCase();
+}
+
+function ariaSortDe(orden, campo) {
+  if (orden.campo !== campo) return 'none';
+  return orden.dir === 'asc' ? 'ascending' : 'descending';
 }
 
 function UsuariosPage() {
@@ -37,7 +43,7 @@ function UsuariosPage() {
   const [busqueda, setBusqueda] = useState('');
   const [modo, setModo] = useState('lista');
   const { resultado, setResultado, loading, setLoading, error, setError } = useListState();
-  const { setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
+  const { orden, setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
 
   const [filtroRol, setFiltroRol] = useState('');
   const [filtroAbierto, setFiltroAbierto] = useState(false);
@@ -285,43 +291,58 @@ function UsuariosPage() {
               <table className="usuarios-tabla">
                 <thead>
                   <tr>
-                    <th className="usuarios-th-sort" onClick={() => toggleOrden('apellido')}>
-                      Apellido{iconoOrden('apellido')}
+                    <th className="usuarios-th-sort" aria-sort={ariaSortDe(orden, 'apellido')}>
+                      <button type="button" className="th-sort-btn" onClick={() => toggleOrden('apellido')}>
+                        Apellido{iconoOrden('apellido')}
+                      </button>
                     </th>
-                    <th className="usuarios-th-sort" onClick={() => toggleOrden('nombre')}>
-                      Nombre{iconoOrden('nombre')}
+                    <th className="usuarios-th-sort" aria-sort={ariaSortDe(orden, 'nombre')}>
+                      <button type="button" className="th-sort-btn" onClick={() => toggleOrden('nombre')}>
+                        Nombre{iconoOrden('nombre')}
+                      </button>
                     </th>
-                    <th className="usuarios-th-sort" onClick={() => toggleOrden('email')}>
-                      Email{iconoOrden('email')}
+                    <th className="usuarios-th-sort" aria-sort={ariaSortDe(orden, 'email')}>
+                      <button type="button" className="th-sort-btn" onClick={() => toggleOrden('email')}>
+                        Email{iconoOrden('email')}
+                      </button>
                     </th>
-                    <th className="usuarios-th-sort" onClick={() => toggleOrden('rol')}>
-                      Rol{iconoOrden('rol')}
+                    <th className="usuarios-th-sort" aria-sort={ariaSortDe(orden, 'rol')}>
+                      <button type="button" className="th-sort-btn" onClick={() => toggleOrden('rol')}>
+                        Rol{iconoOrden('rol')}
+                      </button>
                     </th>
-                    <th className="usuarios-th-sort" onClick={() => toggleOrden('estado')}>
-                      Estado{iconoOrden('estado')}
+                    <th className="usuarios-th-sort" aria-sort={ariaSortDe(orden, 'estado')}>
+                      <button type="button" className="th-sort-btn" onClick={() => toggleOrden('estado')}>
+                        Estado{iconoOrden('estado')}
+                      </button>
                     </th>
                   </tr>
                 </thead>
                 <tbody>
                   {aplicarOrden(listaFiltrada).map((u) => {
                     const cfg = estadoConfig(u.estado?.nombre);
+                    const verDetalle = () => {
+                      if (buscarTimeoutRef.current) {
+                        clearTimeout(buscarTimeoutRef.current);
+                        buscarTimeoutRef.current = null;
+                        setLoading(false);
+                      }
+                      setResultado(u);
+                      setModo('usuario');
+                    };
                     return (
                       <tr
                         key={u.id}
                         className="usuarios-tr-clickable"
-                        onClick={() => {
-                          if (buscarTimeoutRef.current) {
-                            clearTimeout(buscarTimeoutRef.current);
-                            buscarTimeoutRef.current = null;
-                            setLoading(false);
-                          }
-                          setResultado(u);
-                          setModo('usuario');
-                        }}
+                        tabIndex={0}
+                        role="button"
+                        aria-label={`Ver detalle de ${u.apellido} ${u.nombre}`}
+                        onClick={verDetalle}
+                        onKeyDown={handleActivateKey(verDetalle)}
                       >
                         <td>{u.apellido}</td>
                         <td>{u.nombre}</td>
-                        <td>{u.email}</td>
+                        <td className="td-truncate" title={u.email}>{u.email}</td>
                         <td>
                           <span className="usuarios-rol-badge">{u.rol?.nombre}</span>
                         </td>

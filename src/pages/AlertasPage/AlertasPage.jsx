@@ -10,11 +10,6 @@ import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
 
-function truncar(texto, max = 80) {
-  if (!texto) return '';
-  return texto.length > max ? `${texto.slice(0, max)}…` : texto;
-}
-
 function formatearFecha(fecha) {
   if (!fecha) return '—';
   return new Date(fecha).toLocaleString();
@@ -90,7 +85,7 @@ function AlertasPage() {
           <tbody>
             {alertas.map((a) => (
               <tr key={a.id}>
-                <td>{truncar(a.mensaje)}</td>
+                <td className="td-truncate" title={a.mensaje}>{a.mensaje}</td>
                 <td>{a.filtro_categoria ?? 'Todas'}</td>
                 <td>{a.filtro_estado ?? 'Todos'}</td>
                 <td>{a.cantidad_destinatarios}</td>

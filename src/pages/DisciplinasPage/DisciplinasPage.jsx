@@ -8,6 +8,7 @@ import { getSocioByNroSocio } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
 import { VerSocioModal } from '../../components/verSocioModal/VerSocioModal';
 import EstadoBadge from '../../components/badge/EstadoBadge';
+import { handleActivateKey } from '../../utils/a11y';
 import logo from '../../assets/logo_socio.png';
 import './DisciplinasPage.css';
 import '../../styles/ListPage.css';
@@ -186,11 +187,17 @@ function DisciplinasPage() {
             </tr>
           </thead>
           <tbody>
-            {disciplinas.map((d) => (
+            {disciplinas.map((d) => {
+              const verDetalle = () => { setDisciplinaActual(d); setVista('detalle'); };
+              return (
               <tr
                 key={d.id}
                 className="disciplinas-tr-clickable"
-                onClick={() => { setDisciplinaActual(d); setVista('detalle'); }}
+                tabIndex={0}
+                role="button"
+                aria-label={`Ver detalle de ${d.nombre}`}
+                onClick={verDetalle}
+                onKeyDown={handleActivateKey(verDetalle)}
               >
                 <td>{d.nombre}</td>
                 <td>{d.cupo_maximo} personas</td>
@@ -205,7 +212,8 @@ function DisciplinasPage() {
                   </EstadoBadge>
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>

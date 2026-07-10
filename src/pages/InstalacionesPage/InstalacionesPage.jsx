@@ -10,6 +10,7 @@ import { getSocios } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
 import { VerSocioModal } from '../../components/verSocioModal/VerSocioModal';
 import EstadoBadge from '../../components/badge/EstadoBadge';
+import { handleActivateKey } from '../../utils/a11y';
 import logo from '../../assets/logo_socio.png';
 import './InstalacionesPage.css';
 import '../../styles/ListPage.css';
@@ -223,11 +224,17 @@ function InstalacionesPage() {
             </tr>
           </thead>
           <tbody>
-            {instalacionesFiltradas.map((inst) => (
+            {instalacionesFiltradas.map((inst) => {
+              const verDetalle = () => { setInstalacionActual(inst); setVista('detalle'); };
+              return (
               <tr
                 key={inst.id}
                 className="instalaciones-tr-clickable"
-                onClick={() => { setInstalacionActual(inst); setVista('detalle'); }}
+                tabIndex={0}
+                role="button"
+                aria-label={`Ver detalle de ${inst.nombre}`}
+                onClick={verDetalle}
+                onKeyDown={handleActivateKey(verDetalle)}
               >
                 <td>{inst.nombre}</td>
                 <td>{inst.tipo}</td>
@@ -239,7 +246,8 @@ function InstalacionesPage() {
                   </EstadoBadge>
                 </td>
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>

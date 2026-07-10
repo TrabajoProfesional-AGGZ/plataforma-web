@@ -204,14 +204,34 @@
 }
 
 /* ── Table wrapper ───────────────────────────────────────────── */
+/* .disciplinas-* (wrapper/tabla/tr-clickable) se reutiliza tal cual en
+   NoticiasPage y AlertasPage — no renombrar para evitar churn en 3 páginas. */
 .socios-table-wrapper, .usuarios-table-wrapper,
 .disciplinas-table-wrapper, .instalaciones-table-wrapper {
+  position: relative;
   background-color: var(--color-surface);
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-md);
+  max-height: calc(100vh - 260px);
   overflow-x: auto;
-  overflow-y: hidden;
+  overflow-y: auto;
   box-shadow: var(--shadow-sm);
+}
+
+/* Fade indicador de scroll horizontal en mobile (se mantiene scroll
+   horizontal "honesto" en vez de card-ificar la tabla) */
+@media (max-width: 768px) {
+  .socios-table-wrapper::after, .usuarios-table-wrapper::after,
+  .disciplinas-table-wrapper::after, .instalaciones-table-wrapper::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    width: 24px;
+    background: linear-gradient(to right, transparent, rgba(0, 0, 0, 0.06));
+    pointer-events: none;
+  }
 }
 
 .socios-table-empty,
@@ -251,11 +271,7 @@
   color: var(--color-text-primary);
   vertical-align: middle;
   font-variant-numeric: tabular-nums;
-}
-
-.socios-table td,
-.usuarios-tabla td {
-  text-align: left;
+  text-align: center;
 }
 
 .socios-table tr:last-child td,
@@ -265,11 +281,30 @@
   border-bottom: none;
 }
 
+/* Columnas largas conocidas (email, mensaje): ellipsis + title con el
+   texto completo para el tooltip nativo del navegador */
+.td-truncate {
+  max-width: 320px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .socios-tr-clickable,
 .usuarios-tr-clickable,
 .disciplinas-tr-clickable,
 .instalaciones-tr-clickable {
   cursor: pointer;
+}
+
+/* :focus-visible con outline se clipea en <tr> (border-collapse) — se usa
+   box-shadow inset como anillo de foco para filas navegables por teclado */
+.socios-tr-clickable:focus-visible,
+.usuarios-tr-clickable:focus-visible,
+.disciplinas-tr-clickable:focus-visible,
+.instalaciones-tr-clickable:focus-visible {
+  outline: none;
+  box-shadow: inset 0 0 0 2px var(--color-text-primary);
 }
 
 .socios-tr-clickable:hover td,
