@@ -1,6 +1,6 @@
 import { useRef, useEffect, useLayoutEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, ShieldCheck, Building2, Trophy, Newspaper, Settings, BarChart3, Bell, Menu, Receipt} from 'lucide-react';
+import { LayoutDashboard, Users, ShieldCheck, Building2, Trophy, Newspaper, Settings, BarChart3, Bell, Menu, Receipt, TrendingDown} from 'lucide-react';
 import { logout } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
 import texto from '../../assets/texto.png';
@@ -17,6 +17,7 @@ const NAV_ITEMS_BASE = [
   { to: '/disciplinas', label: 'Disciplinas', Icon: Trophy, permiso: 'ver_disciplinas' },
   { to: '/noticias', label: 'Noticias', Icon: Newspaper, permiso: 'ver_noticias' },
   { to: '/metricas', label: 'Métricas', Icon: BarChart3, permiso: 'ver_metricas' },
+  { to: '/morosidad', label: 'Morosidad', Icon: TrendingDown, permiso: 'ver_metricas' },
   { to: '/alertas', label: 'Alertas', Icon: Bell, permiso: 'ver_alertas' },
   { to: '/perfil', label: 'Perfil', Icon: Settings, permiso: ''}
 ];
