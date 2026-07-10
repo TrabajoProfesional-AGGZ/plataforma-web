@@ -15,17 +15,18 @@ export function CreateNoticiaForm({ onSuccess, onCancel }) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({ mode: 'onTouched' });
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setSubmitted(true);
-    setTimeout(() => onSuccess({
+    await new Promise((resolve) => setTimeout(resolve, 1800));
+    onSuccess({
       titulo: data.titulo.trim(),
       cuerpo: data.cuerpo.trim(),
       fecha_expiracion: data.fecha_expiracion,
       imagen: data.imagen?.trim() || null,
-    }), 1800);
+    });
   };
 
   return (
@@ -34,10 +35,12 @@ export function CreateNoticiaForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      isSubmitting={isSubmitting}
       title="Nueva noticia"
       successTitle="¡Noticia creada!"
       successMessage="La noticia fue publicada correctamente."
       submitLabel="Publicar noticia"
+      submitLoadingLabel="Creando..."
       onCancel={onCancel}
       goBack={() => {}}
       goNext={() => {}}

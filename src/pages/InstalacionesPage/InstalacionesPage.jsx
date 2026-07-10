@@ -10,6 +10,8 @@ import { getSocios } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
 import { VerSocioModal } from '../../components/verSocioModal/VerSocioModal';
 import EstadoBadge from '../../components/badge/EstadoBadge';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
+import EmptyState from '../../components/feedback/EmptyState';
 import { handleActivateKey } from '../../utils/a11y';
 import logo from '../../assets/logo_socio.png';
 import './InstalacionesPage.css';
@@ -17,6 +19,12 @@ import '../../styles/ListPage.css';
 import '../../styles/SocioCard.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
+
+function mensajeError(err, fallback) {
+  return err?.message === 'servicio-no-disponible'
+    ? 'El servicio no está disponible. Intentá de nuevo más tarde.'
+    : fallback;
+}
 
 function InstalacionesPage() {
   const location = useLocation();
@@ -32,6 +40,7 @@ function InstalacionesPage() {
   const [instalaciones, setInstalaciones] = useState([]);
   const [reservas, setReservas] = useState([]);
   const [loadingInstalaciones, setLoadingInstalaciones] = useState(false);
+  const [error, setError] = useState('');
 
   const [crearInstalacionFormOpen, setCrearInstalacionFormOpen] = useState(false);
   const [crearReservaFormOpen, setCrearReservaFormOpen] = useState(false);
@@ -39,6 +48,8 @@ function InstalacionesPage() {
   const [eliminarInstalacionOpen, setEliminarInstalacionOpen] = useState(false);
   const [eliminarReservaOpen, setEliminarReservaOpen] = useState(false);
   const [reservaActual, setReservaActual] = useState(null);
+  const [guardandoInstalacion, setGuardandoInstalacion] = useState(false);
+  const [guardandoReserva, setGuardandoReserva] = useState(false);
 
   const [filtroTipo, setFiltroTipo] = useState('');
   const [filtroFecha, setFiltroFecha] = useState('');
@@ -50,13 +61,18 @@ function InstalacionesPage() {
   const [vistaReservas, setVistaReservas] = useState('activas');
   const [reservasHistoricas, setReservasHistoricas] = useState([]);
 
-  useEffect(() => {
-    if (!puedeVerInstalaciones) return;
+  function cargarInstalaciones() {
     setLoadingInstalaciones(true);
+    setError('');
     getInstalaciones()
       .then((data) => setInstalaciones(data))
-      .catch(() => {})
+      .catch((err) => setError(mensajeError(err, 'No se pudieron cargar las instalaciones.')))
       .finally(() => setLoadingInstalaciones(false));
+  }
+
+  useEffect(() => {
+    if (!puedeVerInstalaciones) return;
+    cargarInstalaciones();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   async function cargarReservas(instalacionId) {
@@ -109,12 +125,15 @@ function InstalacionesPage() {
       setInstalaciones((prev) =>
         prev.map((i) => (i.id === tempId ? { ...data, ...created } : i))
       );
-    } catch {
+    } catch (err) {
       setInstalaciones((prev) => prev.filter((i) => i.id !== tempId));
+      setError(mensajeError(err, 'No se pudo crear la instalación.'));
     }
   }
 
   async function handleEliminarInstalacion() {
+    if (guardandoInstalacion) return;
+    setGuardandoInstalacion(true);
     const id = instalacionActual.id;
     setInstalaciones((prev) => prev.filter((i) => i.id !== id));
     setReservas((prev) => prev.filter((r) => r.instalacion_id !== id));
@@ -123,7 +142,11 @@ function InstalacionesPage() {
     setEliminarInstalacionOpen(false);
     try {
       await deleteInstalacion(id);
-    } catch { /* silently ignore */ }
+    } catch (err) {
+      setError(mensajeError(err, 'No se pudo eliminar la instalación.'));
+    } finally {
+      setGuardandoInstalacion(false);
+    }
   }
 
   // === Instalaciones filtradas ===
@@ -152,13 +175,21 @@ function InstalacionesPage() {
   }
 
   async function handleEliminarReserva() {
+    if (guardandoReserva) return;
+    setGuardandoReserva(true);
     const { id } = reservaActual;
+    const anterior = reservas;
     setReservas((prev) => prev.map((r) => r.id === id ? { ...r, estado: 'Cancelada' } : r));
     setEliminarReservaOpen(false);
     setReservaActual(null);
     try {
       await deleteReserva(instalacionActual.id, id);
-    } catch { /* silently ignore */ }
+    } catch (err) {
+      setReservas(anterior);
+      setError(mensajeError(err, 'No se pudo eliminar la reserva.'));
+    } finally {
+      setGuardandoReserva(false);
+    }
   }
 
   async function cargarReservasHistoricas(instalacionId) {
@@ -183,16 +214,19 @@ function InstalacionesPage() {
   const renderContenidoInstalaciones = () => {
     if (loadingInstalaciones) {
       return (
-        <div className="instalaciones-loading">
+        <div className="list-loading">
           <img src={logo} alt="" className="loading-logo" />
         </div>
       );
     }
+    if (error && instalaciones.length === 0) {
+      return <ErrorBanner mensaje={error} onReintentar={cargarInstalaciones} />;
+    }
     if (instalaciones.length === 0) {
-      return <p className="instalaciones-empty">No hay instalaciones registradas.</p>;
+      return <EmptyState mensaje="No hay instalaciones registradas." />;
     }
     if (instalacionesFiltradas.length === 0) {
-      return <p className="instalaciones-empty">No hay instalaciones del tipo seleccionado.</p>;
+      return <EmptyState mensaje="No hay instalaciones del tipo seleccionado." />;
     }
 
     return (
@@ -241,11 +275,11 @@ function InstalacionesPage() {
   const renderTablaReservas = (datos, { mostrarEstado = false, mostrarAcciones = false, mensajeVacio = null } = {}) => {
     if (datos.length === 0) {
       return (
-        <p className="instalaciones-empty">
-          {mensajeVacio ?? (filtroFecha && reservasDeInstalacion.length > 0
+        <EmptyState
+          mensaje={mensajeVacio ?? (filtroFecha && reservasDeInstalacion.length > 0
             ? 'No hay reservas para la fecha seleccionada.'
             : 'No hay reservas para esta instalación.')}
-        </p>
+        />
       );
     }
 
@@ -351,6 +385,7 @@ function InstalacionesPage() {
               </div>
             </div>
 
+            {error && instalaciones.length > 0 && <ErrorBanner mensaje={error} />}
             {renderContenidoInstalaciones()}
           </div>
         </>
@@ -521,6 +556,7 @@ function InstalacionesPage() {
         titulo="Eliminar instalación"
         mensaje={`¿Estás seguro de que querés eliminar "${instalacionActual?.nombre}"? También se eliminarán todas sus reservas.`}
         onConfirm={handleEliminarInstalacion}
+        guardando={guardandoInstalacion}
         onCancel={() => setEliminarInstalacionOpen(false)}
       />
 
@@ -529,6 +565,7 @@ function InstalacionesPage() {
         titulo="Eliminar reserva"
         mensaje="¿Estás seguro de que querés eliminar esta reserva?"
         onConfirm={handleEliminarReserva}
+        guardando={guardandoReserva}
         onCancel={() => setEliminarReservaOpen(false)}
       />
 

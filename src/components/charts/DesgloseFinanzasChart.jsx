@@ -1,10 +1,11 @@
 // src/components/charts/DesgloseFinanzasChart.jsx
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import EmptyState from '../feedback/EmptyState';
 
 export function DesgloseFinanzasChart({ datos }) {
   if (!datos || datos.length === 0) {
-    return <p style={{ color: 'var(--color-text-secondary)', textAlign: 'center', padding: 'var(--space-8) 0' }}>No hay datos financieros para este período.</p>;
+    return <EmptyState mensaje="No hay datos financieros para este período." />;
   }
 
   // Ordenamos los datos de mayor a menor recaudación

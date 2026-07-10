@@ -95,7 +95,7 @@ describe('CreateNoticiaForm', () => {
       expect(screen.getByText('¡Noticia creada!')).toBeInTheDocument();
     });
 
-    act(() => jest.advanceTimersByTime(1800));
+    await act(async () => { jest.advanceTimersByTime(1800); });
     expect(onSuccess).toHaveBeenCalledWith({
       titulo: 'Mi noticia',
       cuerpo: 'Contenido',
@@ -114,7 +114,7 @@ describe('CreateNoticiaForm', () => {
       fireEvent.click(screen.getByRole('button', { name: /publicar noticia/i }));
     });
 
-    act(() => jest.advanceTimersByTime(1800));
+    await act(async () => { jest.advanceTimersByTime(1800); });
     expect(onSuccess).toHaveBeenCalledWith(expect.objectContaining({ imagen: null }));
   });
 

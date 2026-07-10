@@ -17,7 +17,7 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
   const {
     register,
     handleSubmit,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({ mode: 'onTouched' });
 
   const [catalogo, setCatalogo] = useState({ categorias: [], estados: [] });
@@ -28,13 +28,14 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
       .catch(() => {});
   }, []);
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setSubmitted(true);
-    setTimeout(() => onSuccess({
+    await new Promise((resolve) => setTimeout(resolve, 1800));
+    onSuccess({
       mensaje: data.mensaje.trim(),
       filtro_categoria: data.filtro_categoria || null,
       filtro_estado: data.filtro_estado || null,
-    }), 1800);
+    });
   };
 
   return (
@@ -43,10 +44,12 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      isSubmitting={isSubmitting}
       title="Nueva alerta"
       successTitle="¡Alerta enviada!"
       successMessage="La alerta fue registrada correctamente."
       submitLabel="Enviar alerta"
+      submitLoadingLabel="Enviando..."
       onCancel={onCancel}
       direction={direction}
       onFormSubmit={handleSubmit(onSubmit)}

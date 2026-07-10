@@ -10,6 +10,7 @@ import { useListState } from '../../hooks/useListState';
 import { estadoConfig } from '../../utils/estadoConfig';
 import { MAX_LEN } from '../../utils/formValidators';
 import { handleActivateKey } from '../../utils/a11y';
+import EmptyState from '../../components/feedback/EmptyState';
 import { SocioAccionesExtra } from '../../components/socioAccionesExtra/SocioAccionesExtra';
 import logo from '../../assets/logo_socio.png';
 import './SociosPage.css';
@@ -227,7 +228,7 @@ function SociosPage() {
       </div>
 
       {loading && (
-        <div className="socios-search-loading">
+        <div className="list-loading">
           <img src={logo} alt="" className="loading-logo" />
         </div>
       )}
@@ -301,7 +302,7 @@ function SociosPage() {
         if (resultado.length === 0) {
           return (
             <div className="socios-table-wrapper">
-              <p className="socios-table-empty">No hay socios registrados.</p>
+              <EmptyState mensaje="No hay socios registrados." />
             </div>
           );
         }
@@ -354,7 +355,7 @@ function SociosPage() {
             </div>
             <div className="socios-table-wrapper">
               {listaFiltrada.length === 0 ? (
-                <p className="socios-table-empty">No hay socios con los filtros seleccionados.</p>
+                <EmptyState mensaje="No hay socios con los filtros seleccionados." />
               ) : (
                 <table className="socios-table">
                   <thead>

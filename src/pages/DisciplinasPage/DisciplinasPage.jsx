@@ -8,12 +8,20 @@ import { getSocioByNroSocio } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
 import { VerSocioModal } from '../../components/verSocioModal/VerSocioModal';
 import EstadoBadge from '../../components/badge/EstadoBadge';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
+import EmptyState from '../../components/feedback/EmptyState';
 import { handleActivateKey } from '../../utils/a11y';
 import logo from '../../assets/logo_socio.png';
 import './DisciplinasPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
+
+function mensajeError(err, fallback) {
+  return err?.message === 'servicio-no-disponible'
+    ? 'El servicio no está disponible. Intentá de nuevo más tarde.'
+    : fallback;
+}
 
 function DisciplinasPage() {
   const location = useLocation();
@@ -25,8 +33,10 @@ function DisciplinasPage() {
   const [disciplinas, setDisciplinas] = useState([]);
   const [disciplinaActual, setDisciplinaActual] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [crearOpen, setCrearOpen] = useState(false);
   const [pausarOpen, setPausarOpen] = useState(false);
+  const [guardando, setGuardando] = useState(false);
   const [sociosDisciplina, setSociosDisciplina] = useState([]);
   const [loadingSociosDisciplina, setLoadingSociosDisciplina] = useState(false);
   const [verSocioData, setVerSocioData] = useState(null);
@@ -37,13 +47,18 @@ function DisciplinasPage() {
   const [inscribiendoError, setInscribiendoError] = useState('');
   const [estadoExtension, setEstadoExtension] = useState({});
 
-  useEffect(() => {
-    if (!puedeVerDisciplinas) return;
+  function cargarDisciplinas() {
     setLoading(true);
+    setError('');
     getDisciplinas()
       .then((data) => setDisciplinas(data))
-      .catch(() => {})
+      .catch((err) => setError(mensajeError(err, 'No se pudieron cargar las disciplinas.')))
       .finally(() => setLoading(false));
+  }
+
+  useEffect(() => {
+    if (!puedeVerDisciplinas) return;
+    cargarDisciplinas();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -120,12 +135,15 @@ function DisciplinasPage() {
       setDisciplinas((prev) =>
         prev.map((d) => (d.id === tempId ? { ...data, ...created } : d))
       );
-    } catch {
+    } catch (err) {
       setDisciplinas((prev) => prev.filter((d) => d.id !== tempId));
+      setError(mensajeError(err, 'No se pudo crear la disciplina.'));
     }
   }
 
   async function handlePausar() {
+    if (guardando) return;
+    setGuardando(true);
     const id = disciplinaActual.id;
     const estadoAnterior = disciplinaActual.estado ?? 'Activa';
     setDisciplinas((prev) =>
@@ -136,10 +154,13 @@ function DisciplinasPage() {
     setPausarOpen(false);
     try {
       await pausarDisciplina(id);
-    } catch {
+    } catch (err) {
       setDisciplinas((prev) =>
         prev.map((d) => (d.id === id ? { ...d, estado: estadoAnterior } : d))
       );
+      setError(mensajeError(err, 'No se pudo pausar la disciplina.'));
+    } finally {
+      setGuardando(false);
     }
   }
 
@@ -155,13 +176,16 @@ function DisciplinasPage() {
   function renderListaContenido() {
     if (loading) {
       return (
-        <div className="disciplinas-loading">
+        <div className="list-loading">
           <img src={logo} alt="" className="loading-logo" />
         </div>
       );
     }
+    if (error && disciplinas.length === 0) {
+      return <ErrorBanner mensaje={error} onReintentar={cargarDisciplinas} />;
+    }
     if (disciplinas.length === 0) {
-      return <p className="disciplinas-empty">No hay disciplinas registradas.</p>;
+      return <EmptyState mensaje="No hay disciplinas registradas." />;
     }
     return (
       <div className="disciplinas-table-wrapper">
@@ -224,6 +248,7 @@ function DisciplinasPage() {
             )}
           </div>
 
+          {error && disciplinas.length > 0 && <ErrorBanner mensaje={error} />}
           {renderListaContenido()}
         </>
       )}
@@ -310,15 +335,15 @@ function DisciplinasPage() {
             {inscribiendoError && <p className="disciplinas-inscribir-error">{inscribiendoError}</p>}
 
             {loadingSociosDisciplina ? (
-              <div className="disciplinas-loading">
+              <div className="list-loading">
                 <img src={logo} alt="" className="loading-logo" />
               </div>
             ) : sociosDisciplina.length === 0 ? (
-              <p className="disciplinas-empty">No hay socios inscriptos en esta disciplina.</p>
+              <EmptyState mensaje="No hay socios inscriptos en esta disciplina." />
             ) : (
               <>
                 {sociosDisciplinaFiltrados.length === 0 ? (
-                  <p className="disciplinas-empty">No hay socios con ese número.</p>
+                  <EmptyState mensaje="No hay socios con ese número." />
                 ) : (
                   <div className="disciplinas-table-wrapper">
                     <table className="disciplinas-tabla">
@@ -391,6 +416,7 @@ function DisciplinasPage() {
         titulo="Pausar disciplina"
         mensaje={`¿Estás seguro de que querés pausar "${disciplinaActual?.nombre}"? La disciplina pasará al estado "Pausada" y no estará disponible para nuevas inscripciones.`}
         onConfirm={handlePausar}
+        guardando={guardando}
         onCancel={() => setPausarOpen(false)}
         labelConfirmar="Pausar"
       />

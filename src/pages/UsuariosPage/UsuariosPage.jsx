@@ -13,6 +13,7 @@ import { useListState } from '../../hooks/useListState';
 import { useAuthContext } from '../../context/AuthContext';
 import { estadoConfig } from '../../utils/estadoConfig';
 import { handleActivateKey } from '../../utils/a11y';
+import EmptyState from '../../components/feedback/EmptyState';
 import logo from '../../assets/logo_socio.png';
 import './UsuariosPage.css';
 import '../../styles/ListPage.css';
@@ -240,7 +241,7 @@ function UsuariosPage() {
       </div>
 
       {loading && (
-        <div className="usuarios-search-loading">
+        <div className="list-loading">
           <img src={logo} alt="" className="loading-logo" />
         </div>
       )}
@@ -276,9 +277,9 @@ function UsuariosPage() {
 
           <div className="usuarios-table-wrapper">
             {listaBase.length === 0 ? (
-              <p className="usuarios-table-empty">No hay usuarios registrados.</p>
+              <EmptyState mensaje="No hay usuarios registrados." />
             ) : listaFiltrada.length === 0 ? (
-              <p className="usuarios-table-empty">No hay usuarios con los filtros seleccionados.</p>
+              <EmptyState mensaje="No hay usuarios con los filtros seleccionados." />
             ) : (
               <table className="usuarios-tabla">
                 <thead>

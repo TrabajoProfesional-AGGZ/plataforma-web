@@ -134,8 +134,8 @@
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-.socios-search-loading,
-.usuarios-search-loading {
+/* Wrapper del spinner de carga, compartido por todas las list pages */
+.list-loading {
   display: flex;
   justify-content: center;
   padding: var(--space-12) 0;
@@ -234,23 +234,7 @@
   }
 }
 
-.socios-table-empty,
-.usuarios-table-empty {
-  padding: var(--space-8);
-  text-align: center;
-  color: var(--color-text-secondary);
-  font-size: 14px;
-  margin: 0;
-}
-
-.disciplinas-empty,
-.instalaciones-empty {
-  text-align: center;
-  padding: var(--space-12) 0;
-  color: var(--color-text-secondary);
-  font-size: 15px;
-  margin: 0;
-}
+/* Empty states → src/components/feedback/EmptyState.jsx (.empty-state) */
 
 /* ── Table base ──────────────────────────────────────────────── */
 .socios-table,

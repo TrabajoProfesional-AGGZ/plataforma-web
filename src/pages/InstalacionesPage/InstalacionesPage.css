@@ -191,12 +191,7 @@
   flex-shrink: 0;
 }
 
-/* ── Loading state ────────────────────────────────────────────── */
-.instalaciones-loading {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-12) 0;
-}
+/* Loading wrapper → .list-loading en src/styles/ListPage.css */
 
 /* ── Lista de socios en celda de reserva ──────────────────────── */
 .reserva-socios-list {

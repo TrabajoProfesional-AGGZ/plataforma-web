@@ -15,7 +15,7 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
   const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
 
   const {
-    register, handleSubmit, trigger, watch, getValues, formState: { errors },
+    register, handleSubmit, trigger, watch, getValues, formState: { errors, isSubmitting },
   } = useForm({ mode: 'onTouched' });
 
   const arancelada = watch('arancelada');
@@ -29,14 +29,15 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
     advance();
   };
 
-  const onSubmit = (data) => {
+  const onSubmit = async (data) => {
     setSubmitted(true);
-    setTimeout(() => onSuccess({
+    await new Promise((resolve) => setTimeout(resolve, 1800));
+    onSuccess({
       nombre: data.nombre.trim(),
       cupo_maximo: Number(data.cupo_maximo),
       arancelada: Boolean(data.arancelada),
       concepto_cobro: data.arancelada ? (data.concepto_cobro?.trim() ?? '') : '',
-    }), 1800);
+    });
   };
 
   return (
@@ -45,10 +46,12 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      isSubmitting={isSubmitting}
       title="Nueva disciplina"
       successTitle="¡Disciplina creada!"
       successMessage="Los datos fueron guardados correctamente."
       submitLabel="Crear disciplina"
+      submitLoadingLabel="Creando..."
       onCancel={onCancel}
       goBack={goBack}
       goNext={goNext}
