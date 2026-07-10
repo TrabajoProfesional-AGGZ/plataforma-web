@@ -35,6 +35,31 @@ export function esUrlHttpsValida(v) {
 export function getImagenUrlRules() {
   return {
     validate: esUrlHttpsValida,
-    maxLength: { value: 2048, message: 'Máximo 2048 caracteres' },
+    maxLength: { value: MAX_LEN.URL_IMAGEN, message: `Máximo ${MAX_LEN.URL_IMAGEN} caracteres` },
+  };
+}
+
+export const MAX_LEN = {
+  TITULO_NOTICIA: 150,
+  CUERPO_NOTICIA: 5000,
+  MENSAJE_ALERTA: 500,
+  NRO_SOCIO: 20,
+  URL_IMAGEN: 2048,
+  PASSWORD: 128,
+};
+
+export function validarFortalezaPassword(v) {
+  if (!v || v.length < 10) return 'Mínimo 10 caracteres';
+  if (v.length > MAX_LEN.PASSWORD) return `Máximo ${MAX_LEN.PASSWORD} caracteres`;
+  if (!/[a-z]/.test(v)) return 'Debe incluir al menos una minúscula';
+  if (!/[A-Z]/.test(v)) return 'Debe incluir al menos una mayúscula';
+  if (!/[0-9]/.test(v)) return 'Debe incluir al menos un número';
+  return undefined;
+}
+
+export function getPasswordRules() {
+  return {
+    required: 'La contraseña es requerida',
+    validate: validarFortalezaPassword,
   };
 }

@@ -8,6 +8,7 @@ import { Field, StyledSelect, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
+import { MAX_LEN } from '../../utils/formValidators';
 
 const STEPS = [{ id: 1, label: 'Datos', icon: MessageSquare }];
 
@@ -56,7 +57,10 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
       <FormStep key="step1" direction={direction}>
         <Field label="Mensaje" icon={MessageSquare} error={errors.mensaje?.message}>
           <textarea
-            {...register('mensaje', { required: 'El mensaje es requerido' })}
+            {...register('mensaje', {
+              required: 'El mensaje es requerido',
+              maxLength: { value: MAX_LEN.MENSAJE_ALERTA, message: `Máximo ${MAX_LEN.MENSAJE_ALERTA} caracteres` },
+            })}
             placeholder="Redactá el mensaje de la alerta..."
             rows={5}
             className={`csf-input${errors.mensaje ? ' csf-input-error' : ''}`}

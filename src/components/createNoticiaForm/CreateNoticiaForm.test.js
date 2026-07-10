@@ -133,6 +133,20 @@ describe('CreateNoticiaForm', () => {
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
+  test('muestra error y no submitea si el título excede el máximo de caracteres', async () => {
+    renderForm();
+    fireEvent.change(screen.getByPlaceholderText(/inauguración/i), { target: { value: 'a'.repeat(151) } });
+    fireEvent.change(screen.getByPlaceholderText(/redactá el contenido/i), { target: { value: 'Cuerpo' } });
+    fireEvent.change(document.querySelector('input[type="date"]'), { target: { value: '2026-12-31' } });
+
+    fireEvent.click(screen.getByRole('button', { name: /publicar noticia/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Máximo 150 caracteres')).toBeInTheDocument();
+    });
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
   test('muestra los campos título, cuerpo, url de imagen y fecha de vencimiento', () => {
     renderForm();
     expect(screen.getByPlaceholderText(/inauguración/i)).toBeInTheDocument();

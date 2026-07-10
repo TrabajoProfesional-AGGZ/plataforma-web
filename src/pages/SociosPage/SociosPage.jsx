@@ -9,6 +9,7 @@ import { useSortedList } from '../../hooks/useSortedList';
 import { useListState } from '../../hooks/useListState';
 import { useModalEscape } from '../../hooks/useModalEscape';
 import { estadoConfig } from '../../utils/estadoConfig';
+import { MAX_LEN } from '../../utils/formValidators';
 import { SocioAccionesExtra } from '../../components/socioAccionesExtra/SocioAccionesExtra';
 import logo from '../../assets/logo_socio.png';
 import './SociosPage.css';
@@ -201,6 +202,7 @@ function SociosPage() {
                 placeholder="Buscar por N° de socio"
                 value={nroSocio}
                 onChange={(e) => setNroSocio(e.target.value)}
+                maxLength={MAX_LEN.NRO_SOCIO}
               />
             </div>
             <button

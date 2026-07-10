@@ -1,4 +1,4 @@
-import { getDocNumberRules, validarFechaNacimiento, validarFechaNacimientoOpcional, esUrlHttpsValida, getImagenUrlRules } from './formValidators';
+import { getDocNumberRules, validarFechaNacimiento, validarFechaNacimientoOpcional, esUrlHttpsValida, getImagenUrlRules, validarFortalezaPassword, getPasswordRules, MAX_LEN } from './formValidators';
 
 describe('formValidators', () => {
   describe('validarFechaNacimiento', () => {
@@ -86,6 +86,53 @@ describe('formValidators', () => {
       const rules = getImagenUrlRules();
       expect(rules.validate).toBe(esUrlHttpsValida);
       expect(rules.maxLength.value).toBe(2048);
+    });
+  });
+
+  describe('validarFortalezaPassword', () => {
+    test('rechaza contraseñas vacías o menores a 10 caracteres', () => {
+      expect(validarFortalezaPassword('')).toBe('Mínimo 10 caracteres');
+      expect(validarFortalezaPassword('Abc123')).toBe('Mínimo 10 caracteres');
+    });
+
+    test('rechaza contraseñas mayores a 128 caracteres', () => {
+      const larga = `Ab1${'a'.repeat(127)}`;
+      expect(validarFortalezaPassword(larga)).toBe('Máximo 128 caracteres');
+    });
+
+    test('rechaza contraseñas sin minúscula', () => {
+      expect(validarFortalezaPassword('SECRETA123')).toBe('Debe incluir al menos una minúscula');
+    });
+
+    test('rechaza contraseñas sin mayúscula', () => {
+      expect(validarFortalezaPassword('secreta123')).toBe('Debe incluir al menos una mayúscula');
+    });
+
+    test('rechaza contraseñas sin número', () => {
+      expect(validarFortalezaPassword('SecretaAbc')).toBe('Debe incluir al menos un número');
+    });
+
+    test('acepta una contraseña fuerte', () => {
+      expect(validarFortalezaPassword('Secreta123')).toBeUndefined();
+    });
+  });
+
+  describe('getPasswordRules', () => {
+    test('incluye required y validate', () => {
+      const rules = getPasswordRules();
+      expect(rules.required).toBe('La contraseña es requerida');
+      expect(rules.validate).toBe(validarFortalezaPassword);
+    });
+  });
+
+  describe('MAX_LEN', () => {
+    test('define los límites usados por los forms', () => {
+      expect(MAX_LEN.TITULO_NOTICIA).toBe(150);
+      expect(MAX_LEN.CUERPO_NOTICIA).toBe(5000);
+      expect(MAX_LEN.MENSAJE_ALERTA).toBe(500);
+      expect(MAX_LEN.NRO_SOCIO).toBe(20);
+      expect(MAX_LEN.URL_IMAGEN).toBe(2048);
+      expect(MAX_LEN.PASSWORD).toBe(128);
     });
   });
 });

@@ -6,7 +6,7 @@ import { Field, StyledInput, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
-import { getImagenUrlRules } from '../../utils/formValidators';
+import { getImagenUrlRules, MAX_LEN } from '../../utils/formValidators';
 
 const STEPS = [{ id: 1, label: 'Datos', icon: FileText }];
 
@@ -50,14 +50,20 @@ export function CreateNoticiaForm({ onSuccess, onCancel }) {
       <FormStep key="step1" direction={direction}>
         <Field label="Título" icon={FileText} error={errors.titulo?.message}>
           <StyledInput
-            {...register('titulo', { required: 'El título es requerido' })}
+            {...register('titulo', {
+              required: 'El título es requerido',
+              maxLength: { value: MAX_LEN.TITULO_NOTICIA, message: `Máximo ${MAX_LEN.TITULO_NOTICIA} caracteres` },
+            })}
             placeholder="Ej. Inauguración de nuevas instalaciones"
             error={!!errors.titulo}
           />
         </Field>
         <Field label="Cuerpo" icon={FileText} error={errors.cuerpo?.message}>
           <textarea
-            {...register('cuerpo', { required: 'El cuerpo es requerido' })}
+            {...register('cuerpo', {
+              required: 'El cuerpo es requerido',
+              maxLength: { value: MAX_LEN.CUERPO_NOTICIA, message: `Máximo ${MAX_LEN.CUERPO_NOTICIA} caracteres` },
+            })}
             placeholder="Redactá el contenido de la noticia..."
             rows={5}
             className={`csf-input${errors.cuerpo ? ' csf-input-error' : ''}`}
