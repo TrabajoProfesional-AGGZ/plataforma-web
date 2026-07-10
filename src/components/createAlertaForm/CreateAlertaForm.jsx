@@ -63,7 +63,7 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
             })}
             placeholder="Redactá el mensaje de la alerta..."
             rows={5}
-            className={`csf-input${errors.mensaje ? ' csf-input-error' : ''}`}
+            className={`csf-input${errors.mensaje ? ' csf-input--error' : ''}`}
             style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: 14 }}
           />
         </Field>

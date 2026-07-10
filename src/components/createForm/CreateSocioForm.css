@@ -23,7 +23,7 @@ button.csf-overlay {
 }
 
 .csf-outer-card {
-  background-color: #f0f0f0;
+  background-color: var(--color-bg-subtle);
   border-radius: var(--radius-xl);
   padding: 28px 28px 24px;
   max-height: 90dvh;
@@ -186,7 +186,7 @@ button.csf-overlay {
 }
 
 .csf-input::placeholder {
-  color: #c0c0c0;
+  color: var(--color-border-medium);
 }
 
 .csf-select {
@@ -214,8 +214,8 @@ button.csf-overlay {
 
 /* Error global en el formulario */
 .csf-form-error {
-  background-color: #fdecea;
-  border: 1px solid #f5c6cb;
+  background-color: var(--status-error-surface-bg);
+  border: 1px solid var(--status-error-surface-border);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
   font-size: 13px;
@@ -362,7 +362,7 @@ button.csf-overlay {
 }
 
 .csf-checkbox-label:hover {
-  background-color: #ebebeb;
+  background-color: var(--color-border);
 }
 
 .csf-checkbox-input {
@@ -439,7 +439,7 @@ button.csf-overlay {
 }
 
 .csf-btn-agregar-socio:hover:not(:disabled) {
-  background-color: #333333;
+  background-color: var(--color-text-secondary);
 }
 
 .csf-btn-agregar-socio:disabled {

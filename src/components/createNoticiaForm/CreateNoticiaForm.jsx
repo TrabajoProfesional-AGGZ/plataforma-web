@@ -66,7 +66,7 @@ export function CreateNoticiaForm({ onSuccess, onCancel }) {
             })}
             placeholder="Redactá el contenido de la noticia..."
             rows={5}
-            className={`csf-input${errors.cuerpo ? ' csf-input-error' : ''}`}
+            className={`csf-input${errors.cuerpo ? ' csf-input--error' : ''}`}
             style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: 14 }}
           />
         </Field>

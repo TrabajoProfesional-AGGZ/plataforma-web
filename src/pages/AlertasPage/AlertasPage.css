@@ -58,7 +58,7 @@
 }
 
 .alertas-btn-eliminar-fila:hover {
-  background-color: #fdecea;
+  background-color: var(--status-error-surface-bg);
 }
 
 /* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */

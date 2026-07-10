@@ -13,8 +13,24 @@
   --color-border: #e8e8e8;
   --color-border-medium: #d0d0d0;
   --color-border-strong: #111111;
+  --color-border-light: #efefef;
   --color-danger: #c0392b;
   --color-danger-hover: #96281b;
+  --color-row-hover: #f8f8f8;
+  --color-bg-subtle: #f0f0f0;
+  --color-overlay: rgba(0, 0, 0, 0.4);
+
+  /* Status colors (bg/border pairs used by estado badges, banners) */
+  --status-success-bg: #a7daa7;
+  --status-success-border: #0D6E0D;
+  --status-danger-bg: #f4bebe;
+  --status-danger-border: #A01414;
+  --status-warning-bg: #f5e9b2;
+  --status-warning-border: #9A6200;
+  --status-suspended-bg: #ffbd98;
+  --status-suspended-border: #f14701;
+  --status-error-surface-bg: #fdecea;
+  --status-error-surface-border: #f5c6cb;
 
   /* Spacing (base-8) */
   --space-1: 4px;

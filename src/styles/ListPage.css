@@ -147,8 +147,8 @@
   color: var(--color-danger);
   font-size: 14px;
   text-align: center;
-  background-color: #fdecea;
-  border: 1px solid #f5c6cb;
+  background-color: var(--status-error-surface-bg);
+  border: 1px solid var(--status-error-surface-border);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
 }
@@ -276,7 +276,7 @@
 .usuarios-tr-clickable:hover td,
 .disciplinas-tr-clickable:hover td,
 .instalaciones-tr-clickable:hover td {
-  background-color: #f8f8f8;
+  background-color: var(--color-row-hover);
 }
 
 /* ── Badge base ──────────────────────────────────────────────── */

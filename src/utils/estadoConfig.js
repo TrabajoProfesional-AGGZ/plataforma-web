@@ -4,13 +4,13 @@ import logoAmarillo from '../assets/logo-amarillo.png';
 import logoNaranja from '../assets/logo-naranja.png';
 
 export const ESTADO_CONFIG = {
-  'Activo':     { logo: logoVerde,    bg: '#a7daa7', border: '#0D6E0D' },
-  'Moroso':     { logo: logoRojo,     bg: '#f4bebe', border: '#A01414' },
-  'Inactivo':   { logo: logoAmarillo, bg: '#f5e9b2', border: '#9A6200' },
-  'Suspendido': { logo: logoNaranja,  bg: '#ffbd98', border: '#f14701' },
+  'Activo':     { logo: logoVerde,    bg: 'var(--status-success-bg)',   border: 'var(--status-success-border)' },
+  'Moroso':     { logo: logoRojo,     bg: 'var(--status-danger-bg)',    border: 'var(--status-danger-border)' },
+  'Inactivo':   { logo: logoAmarillo, bg: 'var(--status-warning-bg)',   border: 'var(--status-warning-border)' },
+  'Suspendido': { logo: logoNaranja,  bg: 'var(--status-suspended-bg)', border: 'var(--status-suspended-border)' },
 };
 
-export const ESTADO_DEFAULT = { logo: logoAmarillo, bg: '#f5e9b2', border: '#9A6200' };
+export const ESTADO_DEFAULT = { logo: logoAmarillo, bg: 'var(--status-warning-bg)', border: 'var(--status-warning-border)' };
 
 export function estadoConfig(estado) {
   const nombre = typeof estado === 'object' ? (estado?.nombre ?? '') : (estado ?? '');
