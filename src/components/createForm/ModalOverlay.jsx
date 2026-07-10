@@ -52,7 +52,7 @@ export function ModalOverlay({ onClose, wrapperClass, children, ariaLabel, ariaL
     >
       <div
         ref={wrapperRef}
-        className={`csf-wrapper${wrapperClass ? ` ${wrapperClass}` : ''}`}
+        className={['csf-wrapper', wrapperClass].filter(Boolean).join(' ')}
         role="dialog"
         aria-modal="true"
         aria-label={ariaLabel}
