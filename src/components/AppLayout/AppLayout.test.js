@@ -156,12 +156,12 @@ describe('AppLayout', () => {
   });
 });
 
-  test('no muestra el link de finanzas sin el permiso ver_metricas', () => {
+  test('no muestra el link de métricas sin el permiso ver_metricas', () => {
     renderLayout([]);
-    expect(screen.queryByRole('link', { name: /finanzas/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /métricas/i })).not.toBeInTheDocument();
   });
 
-  test('muestra el link de finanzas con el permiso ver_metricas', () => {
+  test('muestra el link de métricas con el permiso ver_metricas', () => {
     renderLayout(['ver_metricas']);
-    expect(screen.getByRole('link', { name: /finanzas/i })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /métricas/i })).toBeInTheDocument();
   });

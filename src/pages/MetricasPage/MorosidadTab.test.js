@@ -1,11 +1,9 @@
 import { render, screen, waitFor, fireEvent } from '@testing-library/react';
-import MorosidadPage from './MorosidadPage';
+import MorosidadTab from './MorosidadTab';
 import { getDashboardFidelizacion } from '../../services/fidelizacionService';
-import { usePermiso } from '../../hooks/usePermiso';
 
 jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../services/fidelizacionService');
-jest.mock('../../hooks/usePermiso');
 jest.mock('../../assets/logo_socio.png', () => 'logo.png');
 
 jest.mock('../../components/charts/TendenciasPagoChart', () => ({
@@ -25,28 +23,15 @@ const mockDatos = {
   ],
 };
 
-describe('MorosidadPage', () => {
+describe('MorosidadTab', () => {
   beforeEach(() => {
     jest.clearAllMocks();
   });
 
-  test('muestra mensaje de error de permisos si no tiene el permiso correspondiente', () => {
-    usePermiso.mockReturnValue(false);
-
-    render(<MorosidadPage />);
-
-    expect(screen.getByText('Predicción de Morosidad')).toBeInTheDocument();
-    expect(
-      screen.getByText('No tenés los permisos necesarios para acceder a las métricas de morosidad del club.')
-    ).toBeInTheDocument();
-    expect(getDashboardFidelizacion).not.toHaveBeenCalled();
-  });
-
   test('renderiza la predicción de morosidad ordenada por probabilidad de atraso descendente', async () => {
-    usePermiso.mockReturnValue(true);
     getDashboardFidelizacion.mockResolvedValueOnce(mockDatos);
 
-    render(<MorosidadPage />);
+    render(<MorosidadTab />);
 
     await waitFor(() => {
       expect(screen.getByText('Juan Pérez')).toBeInTheDocument();
@@ -64,7 +49,6 @@ describe('MorosidadPage', () => {
   });
 
   test('muestra un guion cuando la probabilidad de atraso viene nula', async () => {
-    usePermiso.mockReturnValue(true);
     getDashboardFidelizacion.mockResolvedValueOnce({
       ...mockDatos,
       prediccion_morosidad: [
@@ -72,7 +56,7 @@ describe('MorosidadPage', () => {
       ],
     });
 
-    render(<MorosidadPage />);
+    render(<MorosidadTab />);
 
     await waitFor(() => {
       expect(screen.getByText('Sin dato')).toBeInTheDocument();
@@ -81,10 +65,9 @@ describe('MorosidadPage', () => {
   });
 
   test('muestra estado vacío cuando no hay predicciones de morosidad', async () => {
-    usePermiso.mockReturnValue(true);
     getDashboardFidelizacion.mockResolvedValueOnce({ ...mockDatos, prediccion_morosidad: [] });
 
-    render(<MorosidadPage />);
+    render(<MorosidadTab />);
 
     await waitFor(() => {
       expect(screen.getByText('No hay predicciones de morosidad disponibles.')).toBeInTheDocument();
@@ -92,10 +75,9 @@ describe('MorosidadPage', () => {
   });
 
   test('filtra las tendencias de pago según el rango de meses seleccionado', async () => {
-    usePermiso.mockReturnValue(true);
     getDashboardFidelizacion.mockResolvedValueOnce(mockDatos);
 
-    render(<MorosidadPage />);
+    render(<MorosidadTab />);
 
     await waitFor(() => {
       expect(screen.getByTestId('mock-chart')).toHaveTextContent('3');
@@ -115,10 +97,9 @@ describe('MorosidadPage', () => {
   });
 
   test('muestra un mensaje de error si el servicio no está disponible', async () => {
-    usePermiso.mockReturnValue(true);
     getDashboardFidelizacion.mockRejectedValueOnce(new Error('servicio-no-disponible'));
 
-    render(<MorosidadPage />);
+    render(<MorosidadTab />);
 
     await waitFor(() => {
       expect(screen.getByText('El servicio de analíticas no está disponible. Intentá de nuevo más tarde.')).toBeInTheDocument();
@@ -126,10 +107,9 @@ describe('MorosidadPage', () => {
   });
 
   test('muestra un mensaje de error si no está autorizado', async () => {
-    usePermiso.mockReturnValue(true);
     getDashboardFidelizacion.mockRejectedValueOnce(new Error('no-autorizado'));
 
-    render(<MorosidadPage />);
+    render(<MorosidadTab />);
 
     await waitFor(() => {
       expect(screen.getByText('No tenés los permisos necesarios para ver esta información.')).toBeInTheDocument();
@@ -137,10 +117,9 @@ describe('MorosidadPage', () => {
   });
 
   test('muestra un error genérico ante un fallo desconocido', async () => {
-    usePermiso.mockReturnValue(true);
     getDashboardFidelizacion.mockRejectedValueOnce(new Error('error-raro-de-red'));
 
-    render(<MorosidadPage />);
+    render(<MorosidadTab />);
 
     await waitFor(() => {
       expect(screen.getByText('No se pudieron cargar las métricas de morosidad.')).toBeInTheDocument();
