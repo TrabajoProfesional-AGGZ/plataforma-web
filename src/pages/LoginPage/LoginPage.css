@@ -73,7 +73,6 @@
 
 .login-field input:focus {
   border-color: var(--color-border-strong);
-  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.08);
 }
 
 .login-password-wrapper {
