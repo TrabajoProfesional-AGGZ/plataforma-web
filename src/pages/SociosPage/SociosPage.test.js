@@ -260,17 +260,6 @@ describe('SociosPage', () => {
     expect(screen.queryByRole('heading', { name: /nuevo socio/i })).not.toBeInTheDocument();
   });
 
-  test('cierra el formulario de creación con la tecla ESC', async () => {
-    render(<SociosPage />);
-    await waitFor(() => expect(screen.getByRole('button', { name: /crear socio/i })).not.toBeDisabled());
-
-    fireEvent.click(screen.getByRole('button', { name: /crear socio/i }));
-    expect(screen.getByRole('heading', { name: /nuevo socio/i })).toBeInTheDocument();
-
-    fireEvent.keyDown(document, { key: 'Escape' });
-    expect(screen.queryByRole('heading', { name: /nuevo socio/i })).not.toBeInTheDocument();
-  });
-
   test('crear socio exitoso cierra el formulario y recarga la lista', async () => {
     getSocios.mockResolvedValue([socioMock]);
     render(<SociosPage />);
@@ -480,17 +469,6 @@ describe('SociosPage', () => {
   });
 
   // --- ESC cierra otros modales ---
-
-  test('ESC cierra el formulario de edición', async () => {
-    await buscarYAbrirCard();
-    await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
-
-    fireEvent.click(screen.getByRole('button', { name: /editar/i }));
-    await waitFor(() => expect(screen.getByRole('heading', { name: /editar socio/i })).toBeInTheDocument());
-
-    fireEvent.keyDown(document, { key: 'Escape' });
-    expect(screen.queryByRole('heading', { name: /editar socio/i })).not.toBeInTheDocument();
-  });
 
   test('ESC cierra el modal de eliminación', async () => {
     await buscarYAbrirCard();

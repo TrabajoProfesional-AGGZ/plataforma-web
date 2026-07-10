@@ -98,22 +98,6 @@ function InstalacionesPage() {
     if (found) { setInstalacionActual(found); setVista('detalle'); }
   }, [instalaciones]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  const anyModalOpen = eliminarInstalacionOpen || eliminarReservaOpen || verSocioOpen;
-
-  useEffect(() => {
-    if (!anyModalOpen) return;
-    function handleKeyDown(e) {
-      if (e.key === 'Escape') {
-        // Al setear todos en false nos ahorramos los if/else anidados
-        setEliminarInstalacionOpen(false);
-        setEliminarReservaOpen(false);
-        setVerSocioOpen(false);
-      }
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [anyModalOpen]);
-
   // === Instalaciones ===
 
   async function handleInstalacionCreada(data) {

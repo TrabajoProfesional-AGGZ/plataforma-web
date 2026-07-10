@@ -7,7 +7,6 @@ import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDelet
 import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
 import { useListState } from '../../hooks/useListState';
-import { useModalEscape } from '../../hooks/useModalEscape';
 import { estadoConfig } from '../../utils/estadoConfig';
 import { MAX_LEN } from '../../utils/formValidators';
 import { handleActivateKey } from '../../utils/a11y';
@@ -83,12 +82,6 @@ function SociosPage() {
     inicializarSocios();
     return () => { cancelled = true; };
   }, [setError, setLoading, setResultado]);
-
-  useModalEscape([
-    [crearModalOpen, setCrearModalOpen],
-    [editarModalOpen, setEditarModalOpen],
-    [eliminarModalOpen, setEliminarModalOpen],
-  ]);
 
   async function cargarSocios() {
     setLoading(true);

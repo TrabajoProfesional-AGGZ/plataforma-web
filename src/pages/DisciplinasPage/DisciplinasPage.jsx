@@ -47,18 +47,6 @@ function DisciplinasPage() {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!pausarOpen && !verSocioOpen) return;
-    function handleKeyDown(e) {
-      if (e.key === 'Escape') {
-        setPausarOpen(false);
-        setVerSocioOpen(false);
-      }
-    }
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [pausarOpen, verSocioOpen]);
-
-  useEffect(() => {
     if (!location.state?.disciplinaId || disciplinas.length === 0) return;
     const found = disciplinas.find((d) => d.id === location.state.disciplinaId);
     if (found) { setDisciplinaActual(found); setVista('detalle'); }

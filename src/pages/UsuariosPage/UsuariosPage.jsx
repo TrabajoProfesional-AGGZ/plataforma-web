@@ -10,7 +10,6 @@ import { PermisosModal } from '../../components/permisosModal/PermisosModal';
 import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
 import { useListState } from '../../hooks/useListState';
-import { useModalEscape } from '../../hooks/useModalEscape';
 import { useAuthContext } from '../../context/AuthContext';
 import { estadoConfig } from '../../utils/estadoConfig';
 import { handleActivateKey } from '../../utils/a11y';
@@ -95,13 +94,6 @@ function UsuariosPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  useModalEscape([
-    [crearModalOpen, setCrearModalOpen],
-    [editarModalOpen, setEditarModalOpen],
-    [eliminarModalOpen, setEliminarModalOpen],
-    [cambiarRolModalOpen, setCambiarRolModalOpen],
-  ]);
 
   async function fetchYActualizarUsuarios() {
     setLoading(true);

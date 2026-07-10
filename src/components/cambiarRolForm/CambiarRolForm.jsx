@@ -4,6 +4,7 @@ import { Shield, AlertTriangle, ChevronRight } from 'lucide-react';
 import { cambiarRolUsuario } from '../../services/usuariosService';
 import '../createForm/CreateSocioForm.css';
 import { StyledSelect } from '../createForm/FormFields';
+import { ModalOverlay } from '../createForm/ModalOverlay';
 
 const STEP_SHARED_PROPS = {
   animate: { x: 0, opacity: 1 },
@@ -37,8 +38,7 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
   }
 
   return (
-    <div className="csf-overlay" onClick={onCancel}>
-      <div className="csf-wrapper" onClick={(e) => e.stopPropagation()}>
+    <ModalOverlay onClose={onCancel} ariaLabel={`Cambiar rol de ${usuario.nombre} ${usuario.apellido}`}>
         <motion.div
           key="form"
           initial={{ opacity: 0, y: 16 }}
@@ -156,7 +156,6 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
             </AnimatePresence>
           </div>
         </motion.div>
-      </div>
-    </div>
+    </ModalOverlay>
   );
 }

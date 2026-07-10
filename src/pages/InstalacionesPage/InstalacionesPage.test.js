@@ -274,7 +274,7 @@ describe('InstalacionesPage', () => {
     fireEvent.click(screen.getByText('1234'));
 
     expect(screen.getByText('García Juan')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: '×' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /cerrar/i })).toBeInTheDocument();
   });
 
   test('el card del socio se cierra al hacer clic en Cerrar', async () => {
@@ -286,7 +286,7 @@ describe('InstalacionesPage', () => {
     fireEvent.click(screen.getByText('1234'));
     expect(screen.getByText('García Juan')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: '×' }));
+    fireEvent.click(screen.getByRole('button', { name: /cerrar/i }));
     expect(screen.queryByText('García Juan')).not.toBeInTheDocument();
   });
 
@@ -497,7 +497,7 @@ describe('InstalacionesPage', () => {
     fireEvent.click(screen.getByText('1234'));
     expect(screen.getByText('García Juan')).toBeInTheDocument();
 
-    const overlay = document.querySelector('.ver-socio-modal-wrapper')?.closest('.modal-overlay');
+    const overlay = document.querySelector('.ver-socio-modal-wrapper')?.closest('.csf-overlay');
     fireEvent.click(overlay);
     expect(screen.queryByText('García Juan')).not.toBeInTheDocument();
   });

@@ -1,7 +1,47 @@
+import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import './CreateSocioForm.css';
 
-export function ModalOverlay({ onClose, wrapperClass, children }) {
+const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+export function ModalOverlay({ onClose, wrapperClass, children, ariaLabel, ariaLabelledBy }) {
+  const wrapperRef = useRef(null);
+
+  useEffect(() => {
+    const previouslyFocused = document.activeElement;
+    const { body } = document;
+    const previousOverflow = body.style.overflow;
+    body.style.overflow = 'hidden';
+    wrapperRef.current?.focus();
+
+    function handleKeyDown(e) {
+      if (e.key === 'Escape') {
+        onClose();
+        return;
+      }
+      if (e.key !== 'Tab' || !wrapperRef.current) return;
+      const focusables = wrapperRef.current.querySelectorAll(FOCUSABLE_SELECTOR);
+      if (focusables.length === 0) return;
+      const first = focusables[0];
+      const last = focusables[focusables.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      body.style.overflow = previousOverflow;
+      previouslyFocused?.focus?.();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <div
       className="csf-overlay"
@@ -9,11 +49,16 @@ export function ModalOverlay({ onClose, wrapperClass, children }) {
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
-      onKeyDown={(e) => {
-        if (e.target === e.currentTarget && (e.key === 'Escape' || e.key === 'Enter')) onClose();
-      }}
     >
-      <div className={`csf-wrapper${wrapperClass ? ` ${wrapperClass}` : ''}`}>
+      <div
+        ref={wrapperRef}
+        className={`csf-wrapper${wrapperClass ? ` ${wrapperClass}` : ''}`}
+        role="dialog"
+        aria-modal="true"
+        aria-label={ariaLabel}
+        aria-labelledby={ariaLabelledBy}
+        tabIndex={-1}
+      >
         {children}
       </div>
     </div>
@@ -24,4 +69,6 @@ ModalOverlay.propTypes = {
   onClose: PropTypes.func.isRequired,
   wrapperClass: PropTypes.string,
   children: PropTypes.node.isRequired,
+  ariaLabel: PropTypes.string,
+  ariaLabelledBy: PropTypes.string,
 };

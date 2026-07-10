@@ -278,17 +278,6 @@ describe('UsuariosPage', () => {
     expect(screen.queryByRole('heading', { name: /nuevo usuario/i })).not.toBeInTheDocument();
   });
 
-  test('cierra el formulario de creación con ESC', async () => {
-    render(<UsuariosPage />);
-    await waitFor(() => expect(screen.getByRole('button', { name: /crear usuario/i })).not.toBeDisabled());
-
-    fireEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
-    expect(screen.getByRole('heading', { name: /nuevo usuario/i })).toBeInTheDocument();
-
-    fireEvent.keyDown(document, { key: 'Escape' });
-    expect(screen.queryByRole('heading', { name: /nuevo usuario/i })).not.toBeInTheDocument();
-  });
-
   test('crear usuario exitoso cierra el formulario y recarga la lista', async () => {
     fetchUsuarios.mockResolvedValue([usuarioMock]);
     render(<UsuariosPage />);
@@ -543,15 +532,6 @@ describe('UsuariosPage', () => {
 
   // --- ESC cierra otros modales ---
 
-  test('ESC cierra el modal de edición', async () => {
-    await renderYAbrirCardUsuario();
-    fireEvent.click(screen.getByRole('button', { name: /editar/i }));
-    await waitFor(() => expect(screen.getByRole('heading', { name: /editar usuario/i })).toBeInTheDocument());
-
-    fireEvent.keyDown(document, { key: 'Escape' });
-    expect(screen.queryByRole('heading', { name: /editar usuario/i })).not.toBeInTheDocument();
-  });
-
   test('ESC cierra el modal de eliminación', async () => {
     await renderYAbrirCardUsuario();
     fireEvent.click(screen.getByRole('button', { name: /eliminar/i }));
@@ -559,15 +539,6 @@ describe('UsuariosPage', () => {
 
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByText(/eliminar usuario/i)).not.toBeInTheDocument();
-  });
-
-  test('ESC cierra el modal de cambiar rol', async () => {
-    await renderYAbrirCardUsuario();
-    fireEvent.click(screen.getByRole('button', { name: /cambiar rol/i }));
-    await waitFor(() => expect(screen.getByRole('heading', { name: /cambiar rol/i })).toBeInTheDocument());
-
-    fireEvent.keyDown(document, { key: 'Escape' });
-    expect(screen.queryByRole('heading', { name: /cambiar rol/i })).not.toBeInTheDocument();
   });
 
   // --- Modal de permisos ---

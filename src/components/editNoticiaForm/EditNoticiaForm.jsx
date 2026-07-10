@@ -3,7 +3,6 @@ import { useForm } from 'react-hook-form';
 import { FileText } from 'lucide-react';
 import { editarNoticia } from '../../services/noticiasService';
 import { MAX_LEN } from '../../utils/formValidators';
-import { useEscapeKey } from '../../hooks/useEscapeKey';
 import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
@@ -25,8 +24,6 @@ export function EditNoticiaForm({ noticia, onSuccess, onCancel }) {
       cuerpo: noticia.cuerpo ?? '',
     },
   });
-
-  useEscapeKey(onCancel);
 
   const onSubmit = async (data) => {
     setFormError('');

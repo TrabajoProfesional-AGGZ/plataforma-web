@@ -5,7 +5,6 @@ import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
-import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { getImagenUrlRules, MAX_LEN } from '../../utils/formValidators';
 
 const STEPS = [{ id: 1, label: 'Datos', icon: FileText }];
@@ -18,8 +17,6 @@ export function CreateNoticiaForm({ onSuccess, onCancel }) {
     handleSubmit,
     formState: { errors },
   } = useForm({ mode: 'onTouched' });
-
-  useEscapeKey(onCancel);
 
   const onSubmit = (data) => {
     setSubmitted(true);

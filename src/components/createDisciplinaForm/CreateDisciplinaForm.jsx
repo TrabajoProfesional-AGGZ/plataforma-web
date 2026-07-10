@@ -5,7 +5,6 @@ import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
-import { useEscapeKey } from '../../hooks/useEscapeKey';
 
 const STEPS = [
   { id: 1, label: 'Datos', icon: Tag },
@@ -20,8 +19,6 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
   } = useForm({ mode: 'onTouched' });
 
   const arancelada = watch('arancelada');
-
-  useEscapeKey(onCancel);
 
   const goNext = async () => {
     const fieldsToValidate = step === 1

@@ -7,7 +7,6 @@ import '../createForm/CreateSocioForm.css';
 import { Field, StyledSelect, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
-import { useEscapeKey } from '../../hooks/useEscapeKey';
 import { MAX_LEN } from '../../utils/formValidators';
 
 const STEPS = [{ id: 1, label: 'Datos', icon: MessageSquare }];
@@ -28,8 +27,6 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
       .then(([categorias, estados]) => setCatalogo({ categorias, estados }))
       .catch(() => {});
   }, []);
-
-  useEscapeKey(onCancel);
 
   const onSubmit = (data) => {
     setSubmitted(true);

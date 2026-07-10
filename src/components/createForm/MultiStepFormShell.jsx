@@ -25,6 +25,7 @@ export function MultiStepFormShell({
   children,
 }) {
   const progress = (step / steps.length) * 100;
+  const isSingleStep = steps.length === 1;
 
   return (
     <ModalOverlay onClose={onCancel}>
@@ -67,64 +68,70 @@ export function MultiStepFormShell({
             >
               <div className="csf-header">
                 <h1>{title}</h1>
-                <p>Paso {step} de {steps.length} — {steps[step - 1].label}</p>
+                {!isSingleStep && (
+                  <p>Paso {step} de {steps.length} — {steps[step - 1].label}</p>
+                )}
               </div>
 
-              <div className="csf-steps">
-                {steps.map((s, i) => {
-                  const done = step > s.id;
-                  const active = step === s.id;
-                  const Icon = s.icon;
-                  return (
-                    <div key={s.id} className="csf-step-item">
-                      <div className="csf-step-meta">
-                        <motion.div
-                          className="csf-step-bubble"
-                          animate={{ background: done || active ? '#111111' : '#e0e0e0' }}
-                          transition={{ duration: 0.3 }}
-                        >
-                          <AnimatePresence mode="wait">
-                            {done ? (
-                              <motion.span
-                                key="check"
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                transition={{ type: 'spring', stiffness: 300 }}
-                              >
-                                <CheckCircle2 size={16} color="#ffffff" strokeWidth={2.5} />
-                              </motion.span>
-                            ) : (
-                              <motion.span key="icon" initial={{ scale: 0.8 }} animate={{ scale: 1 }}>
-                                <Icon size={16} color={active ? '#ffffff' : '#4a4a4a'} strokeWidth={2} />
-                              </motion.span>
-                            )}
-                          </AnimatePresence>
-                        </motion.div>
-                        <span className={`csf-step-label${active ? ' csf-step-label--active' : ''}`}>
-                          {s.label}
-                        </span>
-                      </div>
-                      {i < steps.length - 1 && (
-                        <div className="csf-connector">
-                          <motion.div
-                            className="csf-connector-fill"
-                            animate={{ width: step > s.id ? '100%' : '0%' }}
-                            transition={{ duration: 0.4, ease: 'easeInOut' }}
-                          />
+              {!isSingleStep && (
+                <>
+                  <div className="csf-steps">
+                    {steps.map((s, i) => {
+                      const done = step > s.id;
+                      const active = step === s.id;
+                      const Icon = s.icon;
+                      return (
+                        <div key={s.id} className="csf-step-item">
+                          <div className="csf-step-meta">
+                            <motion.div
+                              className="csf-step-bubble"
+                              animate={{ background: done || active ? '#111111' : '#e0e0e0' }}
+                              transition={{ duration: 0.3 }}
+                            >
+                              <AnimatePresence mode="wait">
+                                {done ? (
+                                  <motion.span
+                                    key="check"
+                                    initial={{ scale: 0 }}
+                                    animate={{ scale: 1 }}
+                                    transition={{ type: 'spring', stiffness: 300 }}
+                                  >
+                                    <CheckCircle2 size={16} color="#ffffff" strokeWidth={2.5} />
+                                  </motion.span>
+                                ) : (
+                                  <motion.span key="icon" initial={{ scale: 0.8 }} animate={{ scale: 1 }}>
+                                    <Icon size={16} color={active ? '#ffffff' : '#4a4a4a'} strokeWidth={2} />
+                                  </motion.span>
+                                )}
+                              </AnimatePresence>
+                            </motion.div>
+                            <span className={`csf-step-label${active ? ' csf-step-label--active' : ''}`}>
+                              {s.label}
+                            </span>
+                          </div>
+                          {i < steps.length - 1 && (
+                            <div className="csf-connector">
+                              <motion.div
+                                className="csf-connector-fill"
+                                animate={{ width: step > s.id ? '100%' : '0%' }}
+                                transition={{ duration: 0.4, ease: 'easeInOut' }}
+                              />
+                            </div>
+                          )}
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
+                      );
+                    })}
+                  </div>
 
-              <div className="csf-progress">
-                <motion.div
-                  className="csf-progress-fill"
-                  animate={{ width: `${progress}%` }}
-                  transition={{ duration: 0.4, ease: 'easeInOut' }}
-                />
-              </div>
+                  <div className="csf-progress">
+                    <motion.div
+                      className="csf-progress-fill"
+                      animate={{ width: `${progress}%` }}
+                      transition={{ duration: 0.4, ease: 'easeInOut' }}
+                    />
+                  </div>
+                </>
+              )}
 
               <div className="csf-card">
                 <form

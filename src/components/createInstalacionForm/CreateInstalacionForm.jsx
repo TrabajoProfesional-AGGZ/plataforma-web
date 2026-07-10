@@ -4,7 +4,6 @@ import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
-import { useEscapeKey } from '../../hooks/useEscapeKey';
 import PropTypes from 'prop-types';
 
 const STEPS = [
@@ -26,8 +25,6 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
     trigger,
     formState: { errors },
   } = useForm({ mode: 'onTouched' });
-
-  useEscapeKey(onCancel);
 
   const goNext = async () => {
     const valid = await trigger(stepFields[step]);
