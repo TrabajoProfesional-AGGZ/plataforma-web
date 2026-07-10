@@ -58,6 +58,14 @@ describe('reservasService', () => {
       expect(result).toHaveLength(1);
     });
 
+    test('encodea caracteres especiales del id de instalación', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => [] });
+
+      await getReservasPorInstalacion('123/../x?a=1');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/reservas/por-instalacion/123%2F..%2Fx%3Fa%3D1', 'GET');
+    });
+
     test('devuelve array desde clave reservas si está presente', async () => {
       fetchTo.mockResolvedValueOnce({
         ok: true,
@@ -92,6 +100,14 @@ describe('reservasService', () => {
 
       expect(fetchTo).toHaveBeenCalledWith('/api/v1/reservas/por-socio/1234', 'GET');
       expect(result).toHaveLength(1);
+    });
+
+    test('encodea caracteres especiales del nro de socio', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => [] });
+
+      await getReservasPorSocio('123/../x?a=1');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/reservas/por-socio/123%2F..%2Fx%3Fa%3D1', 'GET');
     });
 
     test('lanza servicio-no-disponible en 500', async () => {
@@ -149,6 +165,14 @@ describe('reservasService', () => {
       await deleteReserva('inst-1', 'reserva-1');
 
       expect(fetchTo).toHaveBeenCalledWith('/api/v1/reservas/reserva-1', 'DELETE');
+    });
+
+    test('encodea caracteres especiales del id de reserva', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200 });
+
+      await deleteReserva('inst-1', '123/../x?a=1');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/reservas/123%2F..%2Fx%3Fa%3D1', 'DELETE');
     });
 
     test('lanza servicio-no-disponible en 500', async () => {
@@ -210,6 +234,14 @@ describe('reservasService', () => {
 
       expect(fetchTo).toHaveBeenCalledWith('/api/v1/reservas/historicas/por-instalacion/inst-1', 'GET');
       expect(result).toHaveLength(2);
+    });
+
+    test('encodea caracteres especiales del id de instalación', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => [] });
+
+      await getReservasHistoricasPorInstalacion('123/../x?a=1');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/reservas/historicas/por-instalacion/123%2F..%2Fx%3Fa%3D1', 'GET');
     });
 
     test('lanza servicio-no-disponible en 500', async () => {

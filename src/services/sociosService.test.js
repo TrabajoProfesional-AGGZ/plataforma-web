@@ -88,6 +88,14 @@ describe('sociosService', () => {
       expect(fetchTo).toHaveBeenCalledWith('/api/v1/socios/uuid-1', 'PATCH', { nombre: 'Juan' });
     });
 
+    test('encodea caracteres especiales del id', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({}) });
+
+      await updateSocio('123/../x?a=1', {});
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/socios/123%2F..%2Fx%3Fa%3D1', 'PATCH', {});
+    });
+
     test('lanza servicio-no-disponible en 500', async () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
       await expect(updateSocio('uuid-1', {})).rejects.toThrow('servicio-no-disponible');
@@ -106,6 +114,14 @@ describe('sociosService', () => {
       await deleteSocio('uuid-1');
 
       expect(fetchTo).toHaveBeenCalledWith('/api/v1/socios/uuid-1', 'DELETE');
+    });
+
+    test('encodea caracteres especiales del id', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200 });
+
+      await deleteSocio('123/../x?a=1');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/socios/123%2F..%2Fx%3Fa%3D1', 'DELETE');
     });
 
     test('lanza servicio-no-disponible en 500', async () => {
@@ -130,6 +146,14 @@ describe('sociosService', () => {
       await getSocioByNroSocio(1000);
 
       expect(fetchTo).toHaveBeenCalledWith('/api/v1/socios/por-nro-socio/1000', 'GET');
+    });
+
+    test('encodea caracteres especiales del nro de socio', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({}) });
+
+      await getSocioByNroSocio('123/../x?a=1');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/socios/por-nro-socio/123%2F..%2Fx%3Fa%3D1', 'GET');
     });
 
     test('lanza socio-no-encontrado en 404', async () => {
