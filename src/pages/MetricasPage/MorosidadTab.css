@@ -1,0 +1,84 @@
+.morosidad-loading {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-12) 0;
+}
+
+.morosidad-error {
+  text-align: center;
+  color: var(--color-danger);
+  font-size: 14px;
+  background-color: #fdecea;
+  border: 1px solid #f5c6cb;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+
+.morosidad-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+.morosidad-periodo {
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  margin: 0;
+}
+
+.morosidad-section {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.morosidad-section-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-4) 0;
+}
+
+.morosidad-toolbar {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.morosidad-filter-group {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: var(--color-bg);
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-sm);
+}
+
+.morosidad-filter-label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.morosidad-select {
+  border: none;
+  font-family: inherit;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  background: transparent;
+  outline: none;
+  cursor: pointer;
+}
+
+/* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
+@media (max-width: 480px) {
+  .morosidad-toolbar {
+    justify-content: center;
+  }
+}

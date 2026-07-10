@@ -1,118 +1,83 @@
-import { useState, useEffect } from 'react';
-import { BarChart3, TrendingUp } from 'lucide-react';
-import { getTopDisciplinas, getOcupacionInstalaciones } from '../../services/metricasService';
+import { useRef, useState } from 'react';
+import { usePermiso } from '../../hooks/usePermiso';
+import ResumenTab from './ResumenTab';
+import FinanzasTab from './FinanzasTab';
+import MorosidadTab from './MorosidadTab';
 import './MetricasPage.css';
 
+const TABS = [
+  { id: 'resumen', label: 'Instalaciones', Component: ResumenTab },
+  { id: 'finanzas', label: 'Finanzas', Component: FinanzasTab },
+  { id: 'morosidad', label: 'Morosidad', Component: MorosidadTab },
+];
+
 function MetricasPage() {
-  const [disciplinas, setDisciplinas] = useState(null);
-  const [ocupacion, setOcupacion] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const puedeVerMetricas = usePermiso('ver_metricas');
+  const [activeTab, setActiveTab] = useState(TABS[0].id);
+  const tabRefs = useRef({});
 
-  useEffect(() => {
-    async function cargarDatos() {
-      try {
-        setLoading(true);
-        const [disc, ocup] = await Promise.all([
-          getTopDisciplinas(5),
-          getOcupacionInstalaciones(30),
-        ]);
-        setDisciplinas(disc);
-        setOcupacion(ocup);
-      } catch (err) {
-        setError('No se pudieron cargar las métricas. Intentá más tarde.');
-      } finally {
-        setLoading(false);
-      }
-    }
-    cargarDatos();
-  }, []);
+  function handleKeyDown(e) {
+    const idx = TABS.findIndex((t) => t.id === activeTab);
+    let nextIdx = null;
+    if (e.key === 'ArrowRight') nextIdx = (idx + 1) % TABS.length;
+    else if (e.key === 'ArrowLeft') nextIdx = (idx - 1 + TABS.length) % TABS.length;
+    else if (e.key === 'Home') nextIdx = 0;
+    else if (e.key === 'End') nextIdx = TABS.length - 1;
 
-  if (loading) return <div className="metricas-loading">Cargando métricas...</div>;
-  if (error) return <div className="metricas-error">{error}</div>;
+    if (nextIdx === null) return;
+    e.preventDefault();
+    const nextId = TABS[nextIdx].id;
+    setActiveTab(nextId);
+    tabRefs.current[nextId]?.focus();
+  }
+
+  const ActiveComponent = TABS.find((t) => t.id === activeTab).Component;
 
   return (
-    <div className="metricas-main">
-      <h1 className="metricas-title">Métricas del Club</h1>
-      <p className="metricas-subtitle">Estadísticas de uso de espacios y disciplinas</p>
+    <div className="metricas-page">
+      <h1 className="metricas-title">Métricas</h1>
+      <p className="metricas-subtitle">Panel financiero, de uso y de riesgo del club</p>
 
-      <div className="metricas-grid">
-
-        {/* ── Top Disciplinas ── */}
-        <section className="metricas-card">
-          <div className="metricas-card-header">
-            <TrendingUp size={20} />
-            <h2>Top 5 Disciplinas por Inscriptos</h2>
+      {!puedeVerMetricas ? (
+        <p className="metricas-error" style={{ marginTop: 'var(--space-6)' }}>
+          No tenés los permisos necesarios para acceder a las métricas del club.
+        </p>
+      ) : (
+        <>
+          <div
+            className="metricas-tablist"
+            role="tablist"
+            aria-label="Secciones de métricas"
+            onKeyDown={handleKeyDown}
+          >
+            {TABS.map(({ id, label }) => (
+              <button
+                key={id}
+                ref={(el) => { tabRefs.current[id] = el; }}
+                type="button"
+                role="tab"
+                id={`metricas-tab-${id}`}
+                aria-selected={activeTab === id}
+                aria-controls={`metricas-panel-${id}`}
+                tabIndex={activeTab === id ? 0 : -1}
+                className="metricas-tab"
+                onClick={() => setActiveTab(id)}
+              >
+                {label}
+              </button>
+            ))}
           </div>
 
-          {disciplinas?.ranking?.length > 0 ? (
-            <div className="ranking-list">
-              {disciplinas.ranking.map((d, i) => (
-                <div key={d.id} className="ranking-item">
-                  <div className="ranking-position">{i + 1}</div>
-                  <div className="ranking-info">
-                    <span className="ranking-nombre">{d.nombre}</span>
-                    <span className="ranking-detalle">
-                      {d.total_inscriptos} / {d.cupo_maximo} inscriptos
-                    </span>
-                  </div>
-                  <div className="ranking-bar-container">
-                    <div
-                      className="ranking-bar"
-                      style={{ width: `${Math.min(d.porcentaje_cupo, 100)}%` }}
-                    />
-                    <span className="ranking-porcentaje">{d.porcentaje_cupo}%</span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="metricas-empty">No hay disciplinas con inscriptos activos.</p>
-          )}
-        </section>
-
-        {/* ── Ocupación de Instalaciones ── */}
-        <section className="metricas-card">
-          <div className="metricas-card-header">
-            <BarChart3 size={20} />
-            <h2>Ocupación de Instalaciones</h2>
-            <span className="metricas-badge">Últimos {ocupacion?.periodo_dias} días</span>
+          <div
+            className="metricas-panel"
+            role="tabpanel"
+            id={`metricas-panel-${activeTab}`}
+            aria-labelledby={`metricas-tab-${activeTab}`}
+          >
+            <ActiveComponent />
           </div>
-
-          {ocupacion?.promedio_ocupacion != null && (
-            <div className="ocupacion-promedio">
-              <span className="ocupacion-promedio-valor">{ocupacion.promedio_ocupacion}%</span>
-              <span className="ocupacion-promedio-label">Promedio general</span>
-            </div>
-          )}
-
-          {ocupacion?.instalaciones?.length > 0 ? (
-            <div className="ocupacion-list">
-              {ocupacion.instalaciones.map((inst) => (
-                <div key={inst.id} className="ocupacion-item">
-                  <div className="ocupacion-info">
-                    <span className="ocupacion-nombre">{inst.nombre}</span>
-                    <span className="ocupacion-tipo">{inst.tipo}</span>
-                  </div>
-                  <div className="ocupacion-bar-container">
-                    <div
-                      className="ocupacion-bar"
-                      style={{ width: `${Math.min(inst.porcentaje_ocupacion, 100)}%` }}
-                    />
-                    <span className="ocupacion-porcentaje">{inst.porcentaje_ocupacion}%</span>
-                  </div>
-                  <span className="ocupacion-horas">
-                    {inst.horas_reservadas}h / {inst.horas_disponibles}h
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p className="metricas-empty">No hay instalaciones activas.</p>
-          )}
-        </section>
-
-      </div>
+        </>
+      )}
     </div>
   );
 }

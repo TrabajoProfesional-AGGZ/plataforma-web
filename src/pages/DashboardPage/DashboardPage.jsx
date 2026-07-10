@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
-import { Users, ShieldCheck, ArrowUpRight, Building2, Trophy, Newspaper, Bell, Receipt } from 'lucide-react';
+import { Users, ShieldCheck, ArrowUpRight, Building2, Trophy, Newspaper, Bell, BarChart3 } from 'lucide-react';
 import './DashboardPage.css';
 
 const SECCIONES = [
@@ -19,11 +19,11 @@ const SECCIONES = [
     permiso: 'ver_usuarios',
   },
   {
-    path: '/finanzas',
-    titulo: 'Finanzas',
-    descripcion: 'Consultar métricas financieras y generar reportes.',
-    Icon: Receipt,
-    permiso: 'ver_finanzas',
+    path: '/metricas',
+    titulo: 'Métricas',
+    descripcion: 'Consultar métricas financieras, de uso y predicción de morosidad.',
+    Icon: BarChart3,
+    permiso: 'ver_metricas',
   },
   {
     path: '/instalaciones',

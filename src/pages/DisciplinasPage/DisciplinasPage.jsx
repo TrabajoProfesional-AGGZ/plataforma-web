@@ -3,7 +3,8 @@ import { useLocation } from 'react-router-dom';
 import { Plus, ChevronLeft } from 'lucide-react';
 import { CreateDisciplinaForm } from '../../components/createDisciplinaForm/CreateDisciplinaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
-import { getDisciplinas, createDisciplina, pausarDisciplina, getSociosByDisciplina } from '../../services/disciplinasService';
+import { getDisciplinas, createDisciplina, pausarDisciplina, getSociosByDisciplina, inscribirSocioADisciplina, extenderSuscripcionDisciplina } from '../../services/disciplinasService';
+import { getSocioByNroSocio } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
 import { VerSocioModal } from '../../components/verSocioModal/VerSocioModal';
 import logo from '../../assets/logo_socio.png';
@@ -29,6 +30,10 @@ function DisciplinasPage() {
   const [verSocioData, setVerSocioData] = useState(null);
   const [verSocioOpen, setVerSocioOpen] = useState(false);
   const [filtroDisciplinaSocio, setFiltroDisciplinaSocio] = useState('');
+  const [nroSocioInscribir, setNroSocioInscribir] = useState('');
+  const [inscribiendoLoading, setInscribiendoLoading] = useState(false);
+  const [inscribiendoError, setInscribiendoError] = useState('');
+  const [estadoExtension, setEstadoExtension] = useState({});
 
   useEffect(() => {
     if (!puedeVerDisciplinas) return;
@@ -64,12 +69,57 @@ function DisciplinasPage() {
       return;
     }
     setFiltroDisciplinaSocio('');
+    setNroSocioInscribir('');
+    setInscribiendoError('');
+    setEstadoExtension({});
     setLoadingSociosDisciplina(true);
     getSociosByDisciplina(disciplinaActual.id)
       .then((data) => setSociosDisciplina(data))
       .catch(() => setSociosDisciplina([]))
       .finally(() => setLoadingSociosDisciplina(false));
   }, [disciplinaActual]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  async function handleInscribirSocio(e) {
+    e.preventDefault();
+    const nro = nroSocioInscribir.trim();
+    if (!nro) return;
+    setInscribiendoLoading(true);
+    setInscribiendoError('');
+    try {
+      const socio = await getSocioByNroSocio(nro);
+      await inscribirSocioADisciplina(disciplinaActual.id, socio.id);
+      const actualizados = await getSociosByDisciplina(disciplinaActual.id);
+      setSociosDisciplina(actualizados);
+      setNroSocioInscribir('');
+    } catch (err) {
+      const mensajes = {
+        'socio-no-encontrado': 'No existe un socio con ese número.',
+        'ya-inscripto': 'El socio ya está inscripto en esta disciplina.',
+      };
+      setInscribiendoError(mensajes[err.message] ?? 'No se pudo inscribir al socio.');
+    } finally {
+      setInscribiendoLoading(false);
+    }
+  }
+
+  async function handleExtenderSuscripcion(idSocio) {
+    setEstadoExtension((prev) => ({ ...prev, [idSocio]: 'loading' }));
+    try {
+      await extenderSuscripcionDisciplina(disciplinaActual.id, idSocio);
+      setEstadoExtension((prev) => ({ ...prev, [idSocio]: 'exito' }));
+    } catch {
+      setEstadoExtension((prev) => ({ ...prev, [idSocio]: 'error' }));
+    }
+  }
+
+  function labelExtenderSuscripcion(idSocio) {
+    switch (estadoExtension[idSocio]) {
+      case 'loading': return 'Extendiendo…';
+      case 'exito': return 'Suscripción extendida';
+      case 'error': return 'Error, reintentar';
+      default: return 'Extender suscripcion';
+    }
+  }
 
   async function handleDisciplinaCreada(data) {
     setCrearOpen(false);
@@ -227,14 +277,9 @@ function DisciplinasPage() {
 
           <div className="disciplinas-socios-section">
             <h3 className="disciplinas-socios-title">Socios inscriptos</h3>
-            {loadingSociosDisciplina ? (
-              <div className="disciplinas-loading">
-                <img src={logo} alt="" className="loading-logo" />
-              </div>
-            ) : sociosDisciplina.length === 0 ? (
-              <p className="disciplinas-empty">No hay socios inscriptos en esta disciplina.</p>
-            ) : (
-              <>
+
+            <div className="disciplinas-socios-toolbar">
+              {!loadingSociosDisciplina && sociosDisciplina.length > 0 && (
                 <input
                   type="text"
                   className="disciplinas-filtro-socio"
@@ -243,6 +288,38 @@ function DisciplinasPage() {
                   onChange={(e) => setFiltroDisciplinaSocio(e.target.value)}
                   aria-label="Filtrar por número de socio"
                 />
+              )}
+              {puedeCrearDisciplina && (
+                <form className="disciplinas-inscribir-form" onSubmit={handleInscribirSocio}>
+                  <input
+                    type="text"
+                    className="disciplinas-filtro-socio"
+                    placeholder="N° de socio a inscribir"
+                    value={nroSocioInscribir}
+                    onChange={(e) => setNroSocioInscribir(e.target.value)}
+                    aria-label="Número de socio a inscribir"
+                    disabled={inscribiendoLoading}
+                  />
+                  <button
+                    type="submit"
+                    className="disciplinas-btn-inscribir"
+                    disabled={inscribiendoLoading || !nroSocioInscribir.trim()}
+                  >
+                    {inscribiendoLoading ? 'Inscribiendo…' : 'Inscribir socio'}
+                  </button>
+                </form>
+              )}
+            </div>
+            {inscribiendoError && <p className="disciplinas-inscribir-error">{inscribiendoError}</p>}
+
+            {loadingSociosDisciplina ? (
+              <div className="disciplinas-loading">
+                <img src={logo} alt="" className="loading-logo" />
+              </div>
+            ) : sociosDisciplina.length === 0 ? (
+              <p className="disciplinas-empty">No hay socios inscriptos en esta disciplina.</p>
+            ) : (
+              <>
                 {sociosDisciplinaFiltrados.length === 0 ? (
                   <p className="disciplinas-empty">No hay socios con ese número.</p>
                 ) : (
@@ -253,6 +330,7 @@ function DisciplinasPage() {
                           <th>N° Socio</th>
                           <th>Apellido y nombre</th>
                           <th>Estado</th>
+                          {puedeCrearDisciplina && <th>Suscripción</th>}
                         </tr>
                       </thead>
                       <tbody>
@@ -273,6 +351,18 @@ function DisciplinasPage() {
                                 {s.estado?.nombre ?? s.estado ?? '—'}
                               </span>
                             </td>
+                            {puedeCrearDisciplina && (
+                              <td>
+                                <button
+                                  type="button"
+                                  className="disciplinas-btn-extender"
+                                  disabled={estadoExtension[s.id] === 'loading'}
+                                  onClick={() => handleExtenderSuscripcion(s.id)}
+                                >
+                                  {labelExtenderSuscripcion(s.id)}
+                                </button>
+                              </td>
+                            )}
                           </tr>
                         ))}
                       </tbody>

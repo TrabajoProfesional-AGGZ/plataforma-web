@@ -1,65 +1,84 @@
-import { render, screen } from '@testing-library/react';
-
-jest.mock('../../services/metricasService', () => ({
-  getTopDisciplinas: jest.fn(),
-  getOcupacionInstalaciones: jest.fn(),
-}));
-
+import { render, screen, fireEvent } from '@testing-library/react';
 import MetricasPage from './MetricasPage';
-import { getTopDisciplinas, getOcupacionInstalaciones } from '../../services/metricasService';
+import { usePermiso } from '../../hooks/usePermiso';
 
-beforeEach(() => {
-  getTopDisciplinas.mockResolvedValue({
-    ranking: [
-      { id: '1', nombre: 'Natación', cupo_maximo: 30, total_inscriptos: 25, porcentaje_cupo: 83.3 },
-    ],
-    total: 1,
+jest.mock('../../firebase', () => ({ auth: {} }));
+jest.mock('../../hooks/usePermiso');
+
+jest.mock('./ResumenTab', () => () => <div data-testid="panel-resumen">Panel Resumen</div>);
+jest.mock('./FinanzasTab', () => () => <div data-testid="panel-finanzas">Panel Finanzas</div>);
+jest.mock('./MorosidadTab', () => () => <div data-testid="panel-morosidad">Panel Morosidad</div>);
+
+describe('MetricasPage', () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
-  getOcupacionInstalaciones.mockResolvedValue({
-    instalaciones: [
-      { id: '1', nombre: 'Cancha', tipo: 'deportiva', horas_reservadas: 100, horas_disponibles: 420, porcentaje_ocupacion: 23.8 },
-    ],
-    total: 1,
-    promedio_ocupacion: 23.8,
-    periodo_dias: 30,
+
+  test('muestra mensaje de error de permisos si no tiene ver_metricas', () => {
+    usePermiso.mockReturnValue(false);
+
+    render(<MetricasPage />);
+
+    expect(screen.getByText('Métricas')).toBeInTheDocument();
+    expect(
+      screen.getByText('No tenés los permisos necesarios para acceder a las métricas del club.')
+    ).toBeInTheDocument();
+    expect(screen.queryByRole('tablist')).not.toBeInTheDocument();
   });
-});
 
-test('renderiza el título de métricas', async () => {
-  render(<MetricasPage />);
-  expect(await screen.findByText('Métricas del Club')).toBeInTheDocument();
-});
+  test('muestra la pestaña Instalaciones activa por defecto', () => {
+    usePermiso.mockReturnValue(true);
 
-test('muestra el ranking de disciplinas', async () => {
-  render(<MetricasPage />);
-  expect(await screen.findByText('Natación', {}, { timeout: 3000 })).toBeInTheDocument();
-});
+    render(<MetricasPage />);
 
-test('muestra la ocupación de instalaciones', async () => {
-  render(<MetricasPage />);
-  expect(await screen.findByText('Cancha', {}, { timeout: 3000 })).toBeInTheDocument();
-});
+    expect(screen.getByRole('tab', { name: 'Instalaciones' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByTestId('panel-resumen')).toBeInTheDocument();
+    expect(screen.queryByTestId('panel-finanzas')).not.toBeInTheDocument();
+  });
 
-test('muestra un mensaje de error si falla la carga de métricas', async () => {
-  getTopDisciplinas.mockRejectedValueOnce(new Error('servicio-no-disponible'));
+  test('click en la pestaña Finanzas muestra su panel', () => {
+    usePermiso.mockReturnValue(true);
 
-  render(<MetricasPage />);
+    render(<MetricasPage />);
 
-  expect(await screen.findByText('No se pudieron cargar las métricas. Intentá más tarde.')).toBeInTheDocument();
-});
+    fireEvent.click(screen.getByRole('tab', { name: 'Finanzas' }));
 
-test('muestra mensaje vacío cuando no hay disciplinas con inscriptos', async () => {
-  getTopDisciplinas.mockResolvedValue({ ranking: [], total: 0 });
+    expect(screen.getByRole('tab', { name: 'Finanzas' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByTestId('panel-finanzas')).toBeInTheDocument();
+    expect(screen.queryByTestId('panel-resumen')).not.toBeInTheDocument();
+  });
 
-  render(<MetricasPage />);
+  test('click en la pestaña Morosidad muestra su panel', () => {
+    usePermiso.mockReturnValue(true);
 
-  expect(await screen.findByText('No hay disciplinas con inscriptos activos.')).toBeInTheDocument();
-});
+    render(<MetricasPage />);
 
-test('muestra mensaje vacío cuando no hay instalaciones activas', async () => {
-  getOcupacionInstalaciones.mockResolvedValue({ instalaciones: [], total: 0, promedio_ocupacion: null, periodo_dias: 30 });
+    fireEvent.click(screen.getByRole('tab', { name: 'Morosidad' }));
 
-  render(<MetricasPage />);
+    expect(screen.getByTestId('panel-morosidad')).toBeInTheDocument();
+  });
 
-  expect(await screen.findByText('No hay instalaciones activas.')).toBeInTheDocument();
+  test('la flecha derecha mueve la selección a la siguiente pestaña', () => {
+    usePermiso.mockReturnValue(true);
+
+    render(<MetricasPage />);
+
+    const tablist = screen.getByRole('tablist');
+    fireEvent.keyDown(tablist, { key: 'ArrowRight' });
+
+    expect(screen.getByRole('tab', { name: 'Finanzas' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByTestId('panel-finanzas')).toBeInTheDocument();
+  });
+
+  test('la flecha izquierda desde la primera pestaña vuelve a la última', () => {
+    usePermiso.mockReturnValue(true);
+
+    render(<MetricasPage />);
+
+    const tablist = screen.getByRole('tablist');
+    fireEvent.keyDown(tablist, { key: 'ArrowLeft' });
+
+    expect(screen.getByRole('tab', { name: 'Morosidad' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByTestId('panel-morosidad')).toBeInTheDocument();
+  });
 });
