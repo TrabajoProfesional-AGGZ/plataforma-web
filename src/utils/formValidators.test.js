@@ -1,4 +1,4 @@
-import { getDocNumberRules, validarFechaNacimiento, validarFechaNacimientoOpcional } from './formValidators';
+import { getDocNumberRules, validarFechaNacimiento, validarFechaNacimientoOpcional, esUrlHttpsValida, getImagenUrlRules } from './formValidators';
 
 describe('formValidators', () => {
   describe('validarFechaNacimiento', () => {
@@ -51,6 +51,41 @@ describe('formValidators', () => {
     test('setValueAs convierte a mayúsculas', () => {
       const rules = getDocNumberRules();
       expect(rules.setValueAs('abc123')).toBe('ABC123');
+    });
+  });
+
+  describe('esUrlHttpsValida', () => {
+    test('acepta vacío por ser opcional', () => {
+      expect(esUrlHttpsValida('')).toBe(true);
+      expect(esUrlHttpsValida(undefined)).toBe(true);
+    });
+
+    test('acepta una url https', () => {
+      expect(esUrlHttpsValida('https://cdn.club.com/foto.jpg')).toBe(true);
+    });
+
+    test('rechaza una url http', () => {
+      expect(esUrlHttpsValida('http://cdn.club.com/foto.jpg')).toBe('La URL debe usar https://');
+    });
+
+    test('rechaza data:', () => {
+      expect(esUrlHttpsValida('data:image/png;base64,abc123')).toBe('La URL debe usar https://');
+    });
+
+    test('rechaza javascript:', () => {
+      expect(esUrlHttpsValida('javascript:alert(1)')).toBe('La URL debe usar https://');
+    });
+
+    test('rechaza una url inválida', () => {
+      expect(esUrlHttpsValida('basura')).toBe('URL inválida');
+    });
+  });
+
+  describe('getImagenUrlRules', () => {
+    test('incluye validate y maxLength de 2048', () => {
+      const rules = getImagenUrlRules();
+      expect(rules.validate).toBe(esUrlHttpsValida);
+      expect(rules.maxLength.value).toBe(2048);
     });
   });
 });

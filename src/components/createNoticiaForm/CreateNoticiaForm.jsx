@@ -6,6 +6,7 @@ import { Field, StyledInput, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
 import { useEscapeKey } from '../../hooks/useEscapeKey';
+import { getImagenUrlRules } from '../../utils/formValidators';
 
 const STEPS = [{ id: 1, label: 'Datos', icon: FileText }];
 
@@ -65,7 +66,7 @@ export function CreateNoticiaForm({ onSuccess, onCancel }) {
         </Field>
         <Field label="URL de imagen (opcional)" icon={Image} error={errors.imagen?.message}>
           <StyledInput
-            {...register('imagen')}
+            {...register('imagen', getImagenUrlRules())}
             placeholder="https://..."
             error={!!errors.imagen}
           />

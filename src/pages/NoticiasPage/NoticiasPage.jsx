@@ -5,6 +5,7 @@ import { usePermiso } from '../../hooks/usePermiso';
 import { CreateNoticiaForm } from '../../components/createNoticiaForm/CreateNoticiaForm';
 import { EditNoticiaForm } from '../../components/editNoticiaForm/EditNoticiaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
+import { urlImagenSegura } from '../../utils/utils';
 import logo from '../../assets/logo_socio.png';
 import './NoticiasPage.css';
 import '../../styles/ListPage.css';
@@ -27,6 +28,8 @@ function NoticiasPage() {
   const [crearOpen, setCrearOpen] = useState(false);
   const [editarOpen, setEditarOpen] = useState(false);
   const [eliminarOpen, setEliminarOpen] = useState(false);
+
+  const imagenSegura = urlImagenSegura(noticiaActual?.imagen);
 
   useEffect(() => {
     if (!puedeVerNoticias) return;
@@ -214,12 +217,13 @@ function NoticiasPage() {
 
               <hr className="noticias-diario-rule" />
 
-              {noticiaActual.imagen && (
+              {imagenSegura && (
                 <figure className="noticias-diario-figura">
                   <img
-                    src={noticiaActual.imagen}
+                    src={imagenSegura}
                     alt="Imagen de la noticia"
                     className="noticias-diario-imagen"
+                    referrerPolicy="no-referrer"
                   />
                 </figure>
               )}

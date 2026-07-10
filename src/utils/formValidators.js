@@ -22,3 +22,19 @@ export function validarFechaNacimientoOpcional(v) {
   if (!v) return undefined;
   return validarFechaNacimiento(v);
 }
+
+export function esUrlHttpsValida(v) {
+  if (!v) return true;
+  try {
+    return new URL(v).protocol === 'https:' || 'La URL debe usar https://';
+  } catch {
+    return 'URL inválida';
+  }
+}
+
+export function getImagenUrlRules() {
+  return {
+    validate: esUrlHttpsValida,
+    maxLength: { value: 2048, message: 'Máximo 2048 caracteres' },
+  };
+}
