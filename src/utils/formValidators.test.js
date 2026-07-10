@@ -56,12 +56,12 @@ describe('formValidators', () => {
 
   describe('esUrlHttpsValida', () => {
     test('acepta vacío por ser opcional', () => {
-      expect(esUrlHttpsValida('')).toBe(true);
-      expect(esUrlHttpsValida(undefined)).toBe(true);
+      expect(esUrlHttpsValida('')).toBeUndefined();
+      expect(esUrlHttpsValida(undefined)).toBeUndefined();
     });
 
     test('acepta una url https', () => {
-      expect(esUrlHttpsValida('https://cdn.club.com/foto.jpg')).toBe(true);
+      expect(esUrlHttpsValida('https://cdn.club.com/foto.jpg')).toBeUndefined();
     });
 
     test('rechaza una url http', () => {

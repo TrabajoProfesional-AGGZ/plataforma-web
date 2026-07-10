@@ -24,9 +24,9 @@ export function validarFechaNacimientoOpcional(v) {
 }
 
 export function esUrlHttpsValida(v) {
-  if (!v) return true;
+  if (!v) return undefined;
   try {
-    return new URL(v).protocol === 'https:' || 'La URL debe usar https://';
+    return new URL(v).protocol === 'https:' ? undefined : 'La URL debe usar https://';
   } catch {
     return 'URL inválida';
   }
@@ -53,7 +53,7 @@ export function validarFortalezaPassword(v) {
   if (v.length > MAX_LEN.PASSWORD) return `Máximo ${MAX_LEN.PASSWORD} caracteres`;
   if (!/[a-z]/.test(v)) return 'Debe incluir al menos una minúscula';
   if (!/[A-Z]/.test(v)) return 'Debe incluir al menos una mayúscula';
-  if (!/[0-9]/.test(v)) return 'Debe incluir al menos un número';
+  if (!/\d/.test(v)) return 'Debe incluir al menos un número';
   return undefined;
 }
 
