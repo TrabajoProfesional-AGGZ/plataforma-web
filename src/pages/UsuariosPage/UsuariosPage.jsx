@@ -14,7 +14,7 @@ import { useAuthContext } from '../../context/AuthContext';
 import { estadoConfig } from '../../utils/estadoConfig';
 import { handleActivateKey } from '../../utils/a11y';
 import EmptyState from '../../components/feedback/EmptyState';
-import logo from '../../assets/logo_socio.png';
+import { useTheme } from '../../hooks/useTheme';
 import './UsuariosPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/ListDetailShared.css';
@@ -32,6 +32,7 @@ function ariaSortDe(orden, campo) {
 }
 
 function UsuariosPage() {
+  const { logoSocio: logo } = useTheme();
   const puedeCrear = usePermiso('crear_usuario');
   const puedeEditar = usePermiso('editar_usuario');
   const puedeBorrar = usePermiso('borrar_usuario');

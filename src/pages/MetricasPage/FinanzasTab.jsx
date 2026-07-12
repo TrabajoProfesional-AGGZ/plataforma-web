@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { getDashboardFinanzas } from '../../services/metricasService';
 import { DesgloseFinanzasChart } from '../../components/charts/DesgloseFinanzasChart';
-import logo from '../../assets/logo_socio.png';
+import { useTheme } from '../../hooks/useTheme';
 import './FinanzasTab.css';
 
 function FinanzasTab() {
+  const { logoSocio: logo } = useTheme();
   const [datosFinanzas, setDatosFinanzas] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');

@@ -33,16 +33,16 @@ function ConfirmDeleteModal({
         <div className="csf-card">
           <div className="csf-fields">
             <div style={{
-              backgroundColor: '#fdecea',
-              border: '1px solid #f5c6cb',
+              backgroundColor: 'var(--status-error-surface-bg)',
+              border: '1px solid var(--status-error-surface-border)',
               borderRadius: '8px',
               padding: '16px',
               display: 'flex',
               gap: '12px',
               alignItems: 'flex-start',
             }}>
-              <AlertTriangle size={20} color="#c0392b" strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }} />
-              <p style={{ margin: 0, fontSize: 14, color: '#7b1c1c', lineHeight: 1.5 }}>
+              <AlertTriangle size={20} color="var(--color-danger)" strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }} />
+              <p style={{ margin: 0, fontSize: 14, color: 'var(--color-danger)', lineHeight: 1.5 }}>
                 {mensaje}
               </p>
             </div>

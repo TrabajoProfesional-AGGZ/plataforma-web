@@ -1,10 +1,9 @@
 import { useRef, useEffect, useLayoutEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, ShieldCheck, Building2, Trophy, Newspaper, Settings, BarChart3, Bell, Menu} from 'lucide-react';
+import { LayoutDashboard, Users, ShieldCheck, Building2, Trophy, Newspaper, Settings, BarChart3, Bell, Menu, Moon, Sun } from 'lucide-react';
 import { logout } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
-import texto from '../../assets/texto.png';
-import logoSocio from '../../assets/logo_socio.png';
+import { useTheme } from '../../hooks/useTheme';
 import './AppLayout.css';
 
 
@@ -22,6 +21,7 @@ const NAV_ITEMS_BASE = [
 
 function AppLayout() {
   const { user, permisos } = useAuth();
+  const { theme, toggleTheme, logoSocio, logoTexto } = useTheme();
   const navigate = useNavigate();
   const location = useLocation();
   const navRef = useRef(null);
@@ -135,6 +135,14 @@ function AppLayout() {
       <aside className={`app-sidebar${drawerOpen ? ' open' : ''}`}>
         <div className="sidebar-header">
           <img src={logoSocio} alt="SocioUnido" className="sidebar-logo-icon" />
+          <button
+            type="button"
+            className="sidebar-theme-toggle"
+            aria-label={theme === 'dark' ? 'Activar modo claro' : 'Activar modo oscuro'}
+            onClick={toggleTheme}
+          >
+            {theme === 'dark' ? <Sun size={18} aria-hidden="true" /> : <Moon size={18} aria-hidden="true" />}
+          </button>
         </div>
 
         <nav className="sidebar-nav" ref={navRef}>
@@ -167,7 +175,7 @@ function AppLayout() {
             <Menu size={24} aria-hidden="true" />
           </button>
           <button className="app-header-logo-btn" onClick={() => navigate('/dashboard')}>
-            <img src={texto} alt="SocioUnido" className="app-header-logo" />
+            <img src={logoTexto} alt="SocioUnido" className="app-header-logo" />
           </button>
           <div className="app-header-actions">
             <span className="app-email-text">{user?.email}</span>

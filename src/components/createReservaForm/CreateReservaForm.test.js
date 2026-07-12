@@ -2,7 +2,9 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { CreateReservaForm } from './CreateReservaForm';
 
 jest.mock('../../assets/logo-verde.png', () => 'logo-verde.png');
-jest.mock('../../assets/logo_socio.png', () => 'logo_socio.png');
+jest.mock('../../hooks/useTheme', () => ({
+  useTheme: () => ({ theme: 'light', toggleTheme: jest.fn(), logoSocio: 'logo.png', logoTexto: 'texto.png' }),
+}));
 
 jest.mock('../../services/reservasService', () => ({
   createReserva: jest.fn(),

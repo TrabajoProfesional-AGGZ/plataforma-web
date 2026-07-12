@@ -3,6 +3,10 @@ import { SocioReservasModal } from './SocioReservasModal';
 import { getReservasPorSocio } from '../../services/reservasService';
 import { getInstalaciones } from '../../services/instalacionesService';
 
+jest.mock('../../hooks/useTheme', () => ({
+  useTheme: () => ({ theme: 'light', toggleTheme: jest.fn(), logoSocio: 'logo.png', logoTexto: 'texto.png' }),
+}));
+
 jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../services/reservasService');
 jest.mock('../../services/instalacionesService');

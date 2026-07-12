@@ -67,13 +67,13 @@
 }
 
 .socio-modal-badge.badge-activa {
-  background: #d4edda;
-  color: #155724;
+  background: var(--status-success-bg);
+  color: var(--status-success-border);
 }
 
 .socio-modal-badge.badge-pausada {
-  background: #fff3cd;
-  color: #9a6200;
+  background: var(--status-warning-bg);
+  color: var(--status-warning-border);
 }
 
 .socio-modal-btn-ver {

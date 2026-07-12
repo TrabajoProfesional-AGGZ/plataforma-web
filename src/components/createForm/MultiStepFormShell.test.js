@@ -2,6 +2,10 @@ import { render, screen } from '@testing-library/react';
 import { User, FileText } from 'lucide-react';
 import { MultiStepFormShell } from './MultiStepFormShell';
 
+jest.mock('../../hooks/useTheme', () => ({
+  useTheme: () => ({ theme: 'light', toggleTheme: jest.fn(), logoSocio: 'logo.png', logoTexto: 'texto.png' }),
+}));
+
 const MULTI_STEPS = [
   { id: 1, label: 'Personal', icon: User },
   { id: 2, label: 'Documento', icon: FileText },

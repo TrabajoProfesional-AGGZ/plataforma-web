@@ -7,7 +7,7 @@ import {
 } from 'lucide-react';
 import { createReserva } from '../../services/reservasService';
 import { getSocioByNroSocio } from '../../services/sociosService';
-import logo from '../../assets/logo_socio.png';
+import { useTheme } from '../../hooks/useTheme';
 import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
@@ -25,6 +25,7 @@ const stepFields = {
 };
 
 export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], instalacionPreseleccionada = '' }) {
+  const { logoSocio: logo } = useTheme();
   const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
   const [nroSocioInput, setNroSocioInput] = useState('');
   const [busquedaSocio, setBusquedaSocio] = useState(false);
@@ -177,7 +178,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
               </div>
               {socioPreview && socioPreview.nro_socio === nroSocioInput.trim() && (
                 <span className="csf-socio-nombre-inline">
-                  <CheckCircle2 size={13} color="#0D6E0D" />
+                  <CheckCircle2 size={13} color="var(--status-success-border)" />
                   {socioPreview.apellido} {socioPreview.nombre}
                 </span>
               )}

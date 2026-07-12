@@ -4,6 +4,10 @@ import { EditUserForm } from './EditUserForm';
 
 jest.mock('../../firebase', () => ({ auth: { currentUser: { getIdToken: jest.fn().mockResolvedValue('token') } } }));
 
+jest.mock('../../hooks/useTheme', () => ({
+  useTheme: () => ({ theme: 'light', toggleTheme: jest.fn(), logoSocio: 'logo.png', logoTexto: 'texto.png' }),
+}));
+
 jest.mock('../../services/usuariosService', () => ({
   editarUsuario: jest.fn(),
 }));

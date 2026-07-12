@@ -4,6 +4,10 @@ import { EditNoticiaForm } from './EditNoticiaForm';
 
 jest.mock('../../firebase', () => ({ auth: { currentUser: { getIdToken: jest.fn().mockResolvedValue('token') } } }));
 
+jest.mock('../../hooks/useTheme', () => ({
+  useTheme: () => ({ theme: 'light', toggleTheme: jest.fn(), logoSocio: 'logo.png', logoTexto: 'texto.png' }),
+}));
+
 jest.mock('../../services/noticiasService', () => ({
   editarNoticia: jest.fn(),
 }));

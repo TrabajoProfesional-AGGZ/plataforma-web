@@ -4,6 +4,8 @@
    768px = tablet / activa el drawer del sidebar
    480px = celular angosto */
 :root {
+  color-scheme: light;
+
   /* Colors */
   --color-text-primary: #111111;
   --color-text-secondary: #4a4a4a;
@@ -19,6 +21,11 @@
   --color-bg-subtle: #f0f0f0;
   --color-overlay: rgba(0, 0, 0, 0.4);
 
+  /* Texto fijo sobre botones de color sólido (ej. danger) — a diferencia de
+     --color-surface, nunca invierte en modo oscuro (el botón sigue siendo
+     rojo, no se puede dejar el texto oscuro encima). */
+  --color-on-accent: #ffffff;
+
   /* Status colors (bg/border pairs used by estado badges, banners) */
   --status-success-bg: #a7daa7;
   --status-success-border: #0D6E0D;
@@ -30,6 +37,10 @@
   --status-suspended-border: #f14701;
   --status-error-surface-bg: #fdecea;
   --status-error-surface-border: #f5c6cb;
+
+  /* Variante suave para banners de éxito (LoginPage, CambiarContrasenaPage) */
+  --surface-success-bg: #f0faf5;
+  --surface-success-border: #b7dfc8;
 
   /* Spacing (base-8) */
   --space-1: 4px;
@@ -75,4 +86,44 @@
   /* Misma familia que --font-sans; los contextos numéricos (montos, tablas)
      además agregan font-variant-numeric: tabular-nums en su propio selector. */
   --font-numeric: 'Archivo Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+/* Modo oscuro — activado por ThemeContext seteando data-theme en <html>.
+   Solo se sobreescriben los tokens de color; spacing/radius/shadow/z-index/font
+   quedan iguales en ambos temas. --status-*-bg/border se invierten juntos (bg
+   más oscuro + border/texto más claro) porque se usan tanto como chip
+   autocontenido (EstadoBadge, riesgoConfig) como texto plano sobre el fondo de
+   la página (ej. CreateSocioForm .csf-upload-box) — en ambos casos necesitan
+   seguir siendo legibles. --color-on-accent NO se sobreescribe acá a propósito:
+   los botones de color sólido (danger) no cambian de tono con el tema. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+
+  --color-text-primary: #f5f5f5;
+  --color-text-secondary: #b0b0b0;
+  --color-bg: #121212;
+  --color-surface: #1e1e1e;
+  --color-border: #2e2e2e;
+  --color-border-medium: #3a3a3a;
+  --color-border-strong: #f5f5f5;
+  --color-border-light: #262626;
+  --color-danger: #f87171;
+  --color-danger-hover: #ef4444;
+  --color-row-hover: #232323;
+  --color-bg-subtle: #1a1a1a;
+  --color-overlay: rgba(0, 0, 0, 0.6);
+
+  --status-success-bg: #1c3a26;
+  --status-success-border: #4ade80;
+  --status-danger-bg: #3a1f1f;
+  --status-danger-border: #f87171;
+  --status-warning-bg: #3a2f14;
+  --status-warning-border: #facc15;
+  --status-suspended-bg: #3a2415;
+  --status-suspended-border: #fb923c;
+  --status-error-surface-bg: #3a1f1f;
+  --status-error-surface-border: #f87171;
+
+  --surface-success-bg: #16241c;
+  --surface-success-border: #2f5d43;
 }

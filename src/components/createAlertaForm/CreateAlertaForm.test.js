@@ -2,6 +2,9 @@ import { render, screen, fireEvent, waitFor, act } from '@testing-library/react'
 import { CreateAlertaForm } from './CreateAlertaForm';
 
 jest.mock('../../assets/logo-verde.png', () => 'logo-verde.png');
+jest.mock('../../hooks/useTheme', () => ({
+  useTheme: () => ({ theme: 'light', toggleTheme: jest.fn(), logoSocio: 'logo.png', logoTexto: 'texto.png' }),
+}));
 
 jest.mock('../../services/catalogosService', () => ({
   fetchCategoriasSocio: jest.fn(),

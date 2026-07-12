@@ -12,7 +12,7 @@ import { MAX_LEN } from '../../utils/formValidators';
 import { handleActivateKey } from '../../utils/a11y';
 import EmptyState from '../../components/feedback/EmptyState';
 import { SocioAccionesExtra } from '../../components/socioAccionesExtra/SocioAccionesExtra';
-import logo from '../../assets/logo_socio.png';
+import { useTheme } from '../../hooks/useTheme';
 import './SociosPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/ListDetailShared.css';
@@ -33,6 +33,7 @@ function ariaSortDe(orden, campo) {
 
 
 function SociosPage() {
+  const { logoSocio: logo } = useTheme();
   const puedeCrear = usePermiso('crear_socio');
   const puedeEditar = usePermiso('editar_socio');
   const puedeBorrar = usePermiso('borrar_socio');
