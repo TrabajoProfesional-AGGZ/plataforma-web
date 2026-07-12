@@ -492,6 +492,117 @@ button.csf-overlay {
   color: var(--color-danger);
 }
 
+/* ── Subida de imagen (CreateNoticiaForm) ──────────────────────── */
+.csf-upload-box {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  min-height: 136px;
+  border: 2px dashed var(--color-border-medium);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg);
+  padding: var(--space-6) var(--space-4);
+  font-family: inherit;
+  font-size: 14px;
+  color: var(--color-text-primary);
+  cursor: pointer;
+  text-align: center;
+  transition: border-color var(--transition-normal), color var(--transition-normal);
+  box-sizing: border-box;
+  position: relative;
+}
+
+.csf-upload-box:hover:not(:disabled) {
+  cursor: pointer;
+  border-color: var(--color-border-strong);
+}
+
+.csf-upload-box:disabled {
+  cursor: not-allowed;
+  opacity: 0.75;
+}
+
+.csf-upload-box--lista {
+  border-style: solid;
+  border-color: var(--color-border-strong);
+}
+
+.csf-upload-box--exito {
+  border-style: solid;
+  border-color: var(--status-success-border);
+}
+
+.csf-upload-box--error {
+  border-style: solid;
+  border-color: var(--status-danger-border);
+}
+
+.csf-upload-preview {
+  width: 64px;
+  height: 64px;
+  border-radius: var(--radius-sm);
+  object-fit: cover;
+}
+
+.csf-upload-icon {
+  color: var(--color-text-secondary);
+}
+
+.csf-upload-texto {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  max-width: 100%;
+}
+
+.csf-upload-texto > span:first-child {
+  font-weight: 500;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.csf-upload-hint {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.csf-upload-box--exito .csf-upload-texto > span:first-child,
+.csf-upload-box--exito .csf-upload-hint {
+  color: var(--status-success-border);
+}
+
+.csf-upload-box--error .csf-upload-texto > span:first-child,
+.csf-upload-box--error .csf-upload-hint {
+  color: var(--status-danger-border);
+}
+
+.csf-upload-status-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.csf-upload-status-icon--exito {
+  color: var(--status-success-border);
+}
+
+.csf-upload-status-icon--error {
+  color: var(--status-danger-border);
+}
+
+.csf-spinner--dark {
+  border-color: var(--color-border-medium);
+  border-top-color: var(--color-text-secondary);
+  flex-shrink: 0;
+  animation: spin 0.8s linear infinite;
+}
+
 /* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
 @media (max-width: 480px) {
   .csf-grid-2 {

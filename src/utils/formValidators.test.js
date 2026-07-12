@@ -1,4 +1,10 @@
-import { getDocNumberRules, validarFechaNacimiento, validarFechaNacimientoOpcional, esUrlHttpsValida, getImagenUrlRules, validarFortalezaPassword, getPasswordRules, MAX_LEN } from './formValidators';
+import { getDocNumberRules, validarFechaNacimiento, validarFechaNacimientoOpcional, esUrlHttpsValida, getImagenUrlRules, validarFortalezaPassword, getPasswordRules, validarArchivoImagen, MAX_LEN } from './formValidators';
+
+function crearArchivo({ name = 'foto.jpg', type = 'image/jpeg', size = 1024 } = {}) {
+  const file = new File(['x'], name, { type });
+  Object.defineProperty(file, 'size', { value: size });
+  return file;
+}
 
 describe('formValidators', () => {
   describe('validarFechaNacimiento', () => {
@@ -133,6 +139,50 @@ describe('formValidators', () => {
       expect(MAX_LEN.NRO_SOCIO).toBe(20);
       expect(MAX_LEN.URL_IMAGEN).toBe(2048);
       expect(MAX_LEN.PASSWORD).toBe(128);
+      expect(MAX_LEN.TITULO_IMAGEN).toBe(150);
+    });
+  });
+
+  describe('validarArchivoImagen', () => {
+    test('acepta ausencia de archivo por ser opcional', () => {
+      expect(validarArchivoImagen(null)).toBeUndefined();
+      expect(validarArchivoImagen(undefined)).toBeUndefined();
+    });
+
+    test('acepta un jpg válido', () => {
+      expect(validarArchivoImagen(crearArchivo({ name: 'foto.jpg', type: 'image/jpeg' }))).toBeUndefined();
+    });
+
+    test('acepta un png válido', () => {
+      expect(validarArchivoImagen(crearArchivo({ name: 'foto.png', type: 'image/png' }))).toBeUndefined();
+    });
+
+    test('acepta un webp válido', () => {
+      expect(validarArchivoImagen(crearArchivo({ name: 'foto.webp', type: 'image/webp' }))).toBeUndefined();
+    });
+
+    test('rechaza un tipo MIME no permitido', () => {
+      expect(validarArchivoImagen(crearArchivo({ name: 'foto.gif', type: 'image/gif' })))
+        .toBe('Solo se permiten imágenes JPG, PNG o WEBP');
+    });
+
+    test('rechaza un archivo sin extensión', () => {
+      expect(validarArchivoImagen(crearArchivo({ name: 'foto', type: 'image/jpeg' })))
+        .toBe('Solo se permiten imágenes JPG, PNG o WEBP');
+    });
+
+    test('rechaza doble extensión peligrosa', () => {
+      expect(validarArchivoImagen(crearArchivo({ name: 'foto.exe.jpg', type: 'image/jpeg' })))
+        .toBe('Nombre de archivo no permitido');
+    });
+
+    test('acepta nombres con puntos legítimos que no son peligrosos', () => {
+      expect(validarArchivoImagen(crearArchivo({ name: 'IMG_001.2024.jpg', type: 'image/jpeg' }))).toBeUndefined();
+    });
+
+    test('rechaza un archivo que supera los 5MB', () => {
+      expect(validarArchivoImagen(crearArchivo({ size: 5 * 1024 * 1024 + 1 })))
+        .toBe('La imagen no puede superar los 5MB');
     });
   });
 });
