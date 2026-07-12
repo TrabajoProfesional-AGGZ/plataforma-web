@@ -284,10 +284,12 @@ button.csf-overlay {
 .csf-btn-next,
 .csf-btn-submit {
   color: var(--color-surface);
+  background-color: var(--color-text-primary);
 }
 
 .csf-btn-danger {
   color: var(--color-on-accent);
+  background-color: var(--color-danger);
 }
 
 .csf-btn-submit:disabled,
@@ -296,18 +298,9 @@ button.csf-overlay {
   cursor: not-allowed;
 }
 
-.csf-btn-next,
-.csf-btn-submit {
-  background-color: var(--color-text-primary);
-}
-
 .csf-btn-next:hover,
 .csf-btn-submit:hover:not(:disabled) {
   background-color: var(--color-text-secondary);
-}
-
-.csf-btn-danger {
-  background-color: var(--color-danger);
 }
 
 .csf-btn-danger:hover:not(:disabled) {
