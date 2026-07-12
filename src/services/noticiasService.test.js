@@ -1,4 +1,4 @@
-import { getNoticias, getNoticiasHistoricas, getNoticia, createNoticia, editarNoticia, borrarNoticia } from './noticiasService';
+import { getNoticias, getNoticiasHistoricas, getNoticia, createNoticia, editarNoticia, borrarNoticia, subirImagenNoticia } from './noticiasService';
 
 jest.mock('../utils/utils', () => ({ fetchTo: jest.fn() }));
 import { fetchTo } from '../utils/utils';
@@ -111,6 +111,37 @@ describe('noticiasService', () => {
     test('lanza error genérico cuando la respuesta no es ok', async () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
       await expect(editarNoticia('n-1', {})).rejects.toThrow('Error al editar noticia');
+    });
+  });
+
+  describe('subirImagenNoticia', () => {
+    test('llama al endpoint con POST y el body correcto', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 201, json: async () => ({ url: 'https://res.cloudinary.com/x/foto.jpg' }) });
+      const result = await subirImagenNoticia('data:image/jpeg;base64,abc', 'Mi título');
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/noticias/imagen', 'POST', {
+        imagen_base64: 'data:image/jpeg;base64,abc',
+        titulo_foto: 'Mi título',
+      });
+      expect(result.url).toBe('https://res.cloudinary.com/x/foto.jpg');
+    });
+
+    test('envía titulo_foto null cuando no se pasa título', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 201, json: async () => ({ url: 'https://res.cloudinary.com/x/foto.jpg' }) });
+      await subirImagenNoticia('data:image/jpeg;base64,abc');
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/noticias/imagen', 'POST', {
+        imagen_base64: 'data:image/jpeg;base64,abc',
+        titulo_foto: null,
+      });
+    });
+
+    test('lanza servicio-no-disponible en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(subirImagenNoticia('data:image/jpeg;base64,abc')).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza error genérico cuando la respuesta no es ok', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 400 });
+      await expect(subirImagenNoticia('data:image/jpeg;base64,abc')).rejects.toThrow('Error al subir la imagen');
     });
   });
 

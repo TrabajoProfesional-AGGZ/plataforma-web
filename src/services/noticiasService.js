@@ -21,6 +21,16 @@ export async function getNoticia(id) {
   return res.json();
 }
 
+export async function subirImagenNoticia(imagenBase64, tituloFoto) {
+  const res = await fetchTo('/api/v1/noticias/imagen', 'POST', {
+    imagen_base64: imagenBase64,
+    titulo_foto: tituloFoto || null,
+  });
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error('Error al subir la imagen');
+  return res.json();
+}
+
 export async function createNoticia(data) {
   const res = await fetchTo('/api/v1/noticias', 'POST', data);
   if (res.status >= 500) throw new Error('servicio-no-disponible');
