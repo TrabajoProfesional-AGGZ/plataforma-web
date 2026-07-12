@@ -1,6 +1,10 @@
 import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
 import SociosPage from './SociosPage';
 
+jest.mock('../../hooks/useTheme', () => ({
+  useTheme: () => ({ theme: 'light', toggleTheme: jest.fn(), logoSocio: 'logo.png', logoTexto: 'texto.png' }),
+}));
+
 jest.mock('../../firebase', () => ({ auth: {} }));
 
 jest.mock('../../hooks/usePermiso', () => ({

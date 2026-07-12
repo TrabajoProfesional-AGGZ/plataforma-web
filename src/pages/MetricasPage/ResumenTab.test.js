@@ -4,7 +4,9 @@ import { getTopDisciplinas, getOcupacionInstalaciones } from '../../services/met
 
 jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../services/metricasService');
-jest.mock('../../assets/logo_socio.png', () => 'logo.png');
+jest.mock('../../hooks/useTheme', () => ({
+  useTheme: () => ({ theme: 'light', toggleTheme: jest.fn(), logoSocio: 'logo.png', logoTexto: 'texto.png' }),
+}));
 
 beforeEach(() => {
   jest.clearAllMocks();

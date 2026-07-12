@@ -278,8 +278,16 @@ button.csf-overlay {
 .csf-btn-submit,
 .csf-btn-danger {
   border: none;
-  color: var(--color-surface);
   transition: background-color var(--transition-fast);
+}
+
+.csf-btn-next,
+.csf-btn-submit {
+  color: var(--color-surface);
+}
+
+.csf-btn-danger {
+  color: var(--color-on-accent);
 }
 
 .csf-btn-submit:disabled,
@@ -398,7 +406,7 @@ button.csf-overlay {
   align-items: center;
   gap: 5px;
   font-size: 13px;
-  color: #0D6E0D;
+  color: var(--status-success-border);
   font-weight: 500;
   white-space: nowrap;
 }
@@ -408,7 +416,7 @@ button.csf-overlay {
   align-items: center;
   gap: 5px;
   font-size: 13px;
-  color: #0D6E0D;
+  color: var(--status-success-border);
   font-weight: 500;
   margin-top: 6px;
 }
@@ -469,7 +477,7 @@ button.csf-overlay {
   align-items: center;
   justify-content: space-between;
   background-color: var(--color-bg);
-  border: 1px solid #d0d0d0;
+  border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
   padding: 6px 10px;
   font-size: 13px;

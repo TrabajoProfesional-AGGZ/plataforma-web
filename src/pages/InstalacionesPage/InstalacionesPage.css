@@ -111,7 +111,7 @@
 
 .instalaciones-btn-reserva-eliminar {
   background-color: var(--color-danger);
-  color: var(--color-surface);
+  color: var(--color-on-accent);
   border: none;
 }
 

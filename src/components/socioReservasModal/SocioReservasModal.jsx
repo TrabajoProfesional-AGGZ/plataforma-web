@@ -4,10 +4,11 @@ import PropTypes from 'prop-types';
 import { getReservasPorSocio } from '../../services/reservasService';
 import { getInstalaciones } from '../../services/instalacionesService';
 import { SocioSubModal } from '../socioAccionesExtra/SocioSubModal';
-import logo from '../../assets/logo_socio.png';
+import { useTheme } from '../../hooks/useTheme';
 import './SocioReservasModal.css';
 
 function SocioReservasModal({ nroSocio, onClose }) {
+  const { logoSocio: logo } = useTheme();
   const navigate = useNavigate();
   const [reservas, setReservas] = useState([]);
   const [instalacionMap, setInstalacionMap] = useState({});

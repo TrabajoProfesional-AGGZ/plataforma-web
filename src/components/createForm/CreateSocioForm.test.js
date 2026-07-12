@@ -3,6 +3,10 @@ import { render, screen, waitFor, fireEvent } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { CreateSocioForm } from './CreateSocioForm';
 
+jest.mock('../../hooks/useTheme', () => ({
+  useTheme: () => ({ theme: 'light', toggleTheme: jest.fn(), logoSocio: 'logo.png', logoTexto: 'texto.png' }),
+}));
+
 jest.mock('../../services/sociosService', () => ({
   createSocio: jest.fn(),
 }));

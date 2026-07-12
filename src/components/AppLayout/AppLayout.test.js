@@ -6,7 +6,9 @@ import * as authService from '../../services/authService';
 jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../services/authService');
 jest.mock('../../hooks/useAuth');
+jest.mock('../../hooks/useTheme');
 import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../hooks/useTheme';
 import { useLocation } from 'react-router-dom';
 
 const mockNavigate = jest.fn();
@@ -17,9 +19,16 @@ jest.mock('react-router-dom', () => ({
 }));
 
 const defaultLocation = { pathname: '/dashboard', search: '', hash: '', state: null, key: 'default' };
+const mockToggleTheme = jest.fn();
 
-function renderLayout(permisos = []) {
+function renderLayout(permisos = [], theme = 'light') {
   useAuth.mockReturnValue({ user: { uid: '1', email: 'admin@club.com' }, loading: false, permisos });
+  useTheme.mockReturnValue({
+    theme,
+    toggleTheme: mockToggleTheme,
+    logoSocio: 'logo-socio.png',
+    logoTexto: 'logo-texto.png',
+  });
   useLocation.mockReturnValue(defaultLocation);
   return render(
     <MemoryRouter initialEntries={[defaultLocation.pathname]}>
@@ -153,6 +162,22 @@ describe('AppLayout', () => {
     );
 
     expect(container.querySelector('.app-sidebar')).not.toHaveClass('open');
+  });
+
+  test('en modo claro muestra el botón para activar modo oscuro', () => {
+    renderLayout([], 'light');
+    expect(screen.getByRole('button', { name: /activar modo oscuro/i })).toBeInTheDocument();
+  });
+
+  test('en modo oscuro muestra el botón para activar modo claro', () => {
+    renderLayout([], 'dark');
+    expect(screen.getByRole('button', { name: /activar modo claro/i })).toBeInTheDocument();
+  });
+
+  test('el botón de tema llama a toggleTheme al hacer click', () => {
+    renderLayout([], 'light');
+    fireEvent.click(screen.getByRole('button', { name: /activar modo oscuro/i }));
+    expect(mockToggleTheme).toHaveBeenCalledTimes(1);
   });
 });
 

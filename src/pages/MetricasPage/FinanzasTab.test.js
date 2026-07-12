@@ -4,7 +4,9 @@ import { getDashboardFinanzas } from '../../services/metricasService';
 
 jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../services/metricasService');
-jest.mock('../../assets/logo_socio.png', () => 'logo.png');
+jest.mock('../../hooks/useTheme', () => ({
+  useTheme: () => ({ theme: 'light', toggleTheme: jest.fn(), logoSocio: 'logo.png', logoTexto: 'texto.png' }),
+}));
 
 jest.mock('../../components/charts/DesgloseFinanzasChart', () => ({
   DesgloseFinanzasChart: () => <div data-testid="mock-chart">Mock Chart</div>

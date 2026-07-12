@@ -54,18 +54,18 @@
   color: var(--color-danger);
   font-size: 13px;
   margin: 0;
-  background-color: #fdf2f2;
-  border: 1px solid #f5c6cb;
+  background-color: var(--status-error-surface-bg);
+  border: 1px solid var(--status-error-surface-border);
   border-radius: var(--radius-sm);
   padding: var(--space-2) var(--space-3);
 }
 
 .cambiar-contrasena-exito {
-  color: #1a7a4a;
+  color: var(--status-success-border);
   font-size: 13px;
   margin: 0;
-  background-color: #f0faf5;
-  border: 1px solid #b7dfc8;
+  background-color: var(--surface-success-bg);
+  border: 1px solid var(--surface-success-border);
   border-radius: var(--radius-sm);
   padding: var(--space-2) var(--space-3);
   align-items: center;

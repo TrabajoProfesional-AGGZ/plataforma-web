@@ -5,14 +5,22 @@ import AppLayout from './AppLayout';
 jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../services/authService', () => ({ logout: jest.fn().mockResolvedValue() }));
 jest.mock('../../hooks/useAuth');
+jest.mock('../../hooks/useTheme');
 
 import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../hooks/useTheme';
 
 function buildRouter(initialPath, permisos = []) {
   useAuth.mockReturnValue({
     user: { uid: '1', email: 'admin@test.com' },
     loading: false,
     permisos,
+  });
+  useTheme.mockReturnValue({
+    theme: 'light',
+    toggleTheme: jest.fn(),
+    logoSocio: 'logo-socio.png',
+    logoTexto: 'logo-texto.png',
   });
   return createMemoryRouter(
     [{ path: '*', element: <AppLayout /> }],

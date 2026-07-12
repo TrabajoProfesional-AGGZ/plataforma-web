@@ -219,7 +219,7 @@
   cursor: pointer;
   border: none;
   background-color: var(--color-danger);
-  color: var(--color-surface);
+  color: var(--color-on-accent);
   transition: background-color var(--transition-fast);
 }
 

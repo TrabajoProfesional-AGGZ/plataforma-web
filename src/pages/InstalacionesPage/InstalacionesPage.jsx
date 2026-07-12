@@ -13,7 +13,7 @@ import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
 import { handleActivateKey } from '../../utils/a11y';
-import logo from '../../assets/logo_socio.png';
+import { useTheme } from '../../hooks/useTheme';
 import './InstalacionesPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/SocioCard.css';
@@ -27,6 +27,7 @@ function mensajeError(err, fallback) {
 }
 
 function InstalacionesPage() {
+  const { logoSocio: logo } = useTheme();
   const location = useLocation();
   const puedeVerInstalaciones = usePermiso('ver_instalaciones');
   const puedeCrearInstalacion = usePermiso('crear_instalacion');
@@ -412,18 +413,18 @@ function InstalacionesPage() {
                 {
                   label: 'Estado',
                   value: instalacionActual.activa ? 'Activa' : 'Inactiva',
-                  color: instalacionActual.activa ? '#155724' : '#4a4a4a',
+                  color: instalacionActual.activa ? 'var(--status-success-border)' : 'var(--color-text-secondary)',
                 },
               ].map((field, i, arr) => (
                 <div
                   key={field.label}
                   className="instalaciones-detalle-row"
-                  style={{ borderBottom: i < arr.length - 1 ? '1px solid #f5f5f5' : 'none' }}
+                  style={{ borderBottom: i < arr.length - 1 ? '1px solid var(--color-bg)' : 'none' }}
                 >
                   <span className="instalaciones-detalle-row-label">{field.label}</span>
                   <span
                     className="instalaciones-detalle-row-value"
-                    style={{ color: field.color ?? '#111111' }}
+                    style={{ color: field.color ?? 'var(--color-text-primary)' }}
                   >
                     {field.value}
                   </span>

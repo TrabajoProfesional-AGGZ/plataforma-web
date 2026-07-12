@@ -24,7 +24,7 @@
 .sidebar-header {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: space-between;
   padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-border-medium);
   height: 56px;
@@ -107,6 +107,26 @@
   color: var(--color-text-secondary);
   font-size: 12px;
   margin: 0;
+}
+
+.sidebar-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 45px;
+  height: 45px;
+  padding: 0;
+  background: none;
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-sm);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+.sidebar-theme-toggle:hover {
+  background-color: var(--color-bg);
 }
 
 /* ── Main area ──────────────────────────────────────────── */
