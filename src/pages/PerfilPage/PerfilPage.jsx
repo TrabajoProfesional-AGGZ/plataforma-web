@@ -25,8 +25,8 @@ function PasswordInput({ id, value, onChange, autoComplete, required }) {
         className="csf-input"
         style={{
           paddingRight: 48,
-          background: focused ? '#ffffff' : '#f5f5f5',
-          borderColor: focused ? '#111111' : 'transparent',
+          background: focused ? 'var(--color-surface)' : 'var(--color-bg)',
+          borderColor: focused ? 'var(--color-text-primary)' : 'transparent',
         }}
       />
       <button
@@ -41,7 +41,7 @@ function PasswordInput({ id, value, onChange, autoComplete, required }) {
           background: 'none',
           border: 'none',
           cursor: 'pointer',
-          color: '#4a4a4a',
+          color: 'var(--color-text-secondary)',
           padding: 0,
           display: 'flex',
           alignItems: 'center',

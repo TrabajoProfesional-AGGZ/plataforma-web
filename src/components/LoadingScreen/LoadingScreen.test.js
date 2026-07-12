@@ -1,6 +1,10 @@
 import { render, screen } from '@testing-library/react';
 import LoadingScreen from './LoadingScreen';
 
+jest.mock('../../hooks/useTheme', () => ({
+  useTheme: () => ({ theme: 'light', toggleTheme: jest.fn(), logoSocio: 'logo.png', logoTexto: 'texto.png' }),
+}));
+
 describe('LoadingScreen', () => {
   test('renderiza la imagen del logo', () => {
     render(<LoadingScreen />);

@@ -3,10 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import PropTypes from 'prop-types';
 import { getDisciplinasBySocio } from '../../services/disciplinasService';
 import { SocioSubModal } from '../socioAccionesExtra/SocioSubModal';
-import logo from '../../assets/logo_socio.png';
+import { useTheme } from '../../hooks/useTheme';
 import './SocioDisciplinasModal.css';
 
 function SocioDisciplinasModal({ idSocio, onClose }) {
+  const { logoSocio: logo } = useTheme();
   const navigate = useNavigate();
   const [disciplinas, setDisciplinas] = useState([]);
   const [loading, setLoading] = useState(true);

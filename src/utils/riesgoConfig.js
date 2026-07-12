@@ -1,10 +1,10 @@
 export const RIESGO_CONFIG = {
-  Alto: { bg: '#f4bebe', border: '#A01414' },
-  Medio: { bg: '#f5e9b2', border: '#9A6200' },
-  Bajo: { bg: '#a7daa7', border: '#0D6E0D' },
+  Alto: { bg: 'var(--status-danger-bg)', border: 'var(--status-danger-border)' },
+  Medio: { bg: 'var(--status-warning-bg)', border: 'var(--status-warning-border)' },
+  Bajo: { bg: 'var(--status-success-bg)', border: 'var(--status-success-border)' },
 };
 
-export const RIESGO_DEFAULT = { bg: '#f5e9b2', border: '#9A6200' };
+export const RIESGO_DEFAULT = { bg: 'var(--status-warning-bg)', border: 'var(--status-warning-border)' };
 
 function normalizar(valor) {
   if (!valor) return '';

@@ -4,7 +4,9 @@ import { getDashboardFidelizacion } from '../../services/fidelizacionService';
 
 jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../services/fidelizacionService');
-jest.mock('../../assets/logo_socio.png', () => 'logo.png');
+jest.mock('../../hooks/useTheme', () => ({
+  useTheme: () => ({ theme: 'light', toggleTheme: jest.fn(), logoSocio: 'logo.png', logoTexto: 'texto.png' }),
+}));
 
 jest.mock('../../components/charts/TendenciasPagoChart', () => ({
   TendenciasPagoChart: ({ datos }) => <div data-testid="mock-chart">{datos.length}</div>,

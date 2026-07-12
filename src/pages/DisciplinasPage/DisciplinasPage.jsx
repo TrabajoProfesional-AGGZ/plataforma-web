@@ -11,7 +11,7 @@ import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
 import { handleActivateKey } from '../../utils/a11y';
-import logo from '../../assets/logo_socio.png';
+import { useTheme } from '../../hooks/useTheme';
 import './DisciplinasPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
@@ -24,6 +24,7 @@ function mensajeError(err, fallback) {
 }
 
 function DisciplinasPage() {
+  const { logoSocio: logo } = useTheme();
   const location = useLocation();
   const puedeVerDisciplinas = usePermiso('ver_disciplinas');
   const puedeCrearDisciplina = usePermiso('crear_disciplina');

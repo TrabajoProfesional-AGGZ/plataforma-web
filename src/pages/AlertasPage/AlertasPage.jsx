@@ -6,7 +6,7 @@ import { CreateAlertaForm } from '../../components/createAlertaForm/CreateAlerta
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
-import logo from '../../assets/logo_socio.png';
+import { useTheme } from '../../hooks/useTheme';
 import './AlertasPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
@@ -24,6 +24,7 @@ function mensajeError(err, fallback) {
 }
 
 function AlertasPage() {
+  const { logoSocio: logo } = useTheme();
   const puedeVerAlertas = usePermiso('ver_alertas');
   const puedeCrearAlerta = usePermiso('crear_alerta');
   const puedeBorrarAlerta = usePermiso('borrar_alerta');

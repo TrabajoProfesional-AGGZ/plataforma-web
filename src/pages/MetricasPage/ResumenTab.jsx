@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { TrendingUp, BarChart3 } from 'lucide-react';
 import { getTopDisciplinas, getOcupacionInstalaciones } from '../../services/metricasService';
-import logo from '../../assets/logo_socio.png';
+import { useTheme } from '../../hooks/useTheme';
 import './ResumenTab.css';
 
 function ResumenTab() {
+  const { logoSocio: logo } = useTheme();
   const [disciplinas, setDisciplinas] = useState(null);
   const [ocupacion, setOcupacion] = useState(null);
   const [loading, setLoading] = useState(true);

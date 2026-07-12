@@ -3,7 +3,7 @@ import { getDashboardFidelizacion } from '../../services/fidelizacionService';
 import { useListState } from '../../hooks/useListState';
 import { TendenciasPagoChart } from '../../components/charts/TendenciasPagoChart';
 import { riesgoConfig } from '../../utils/riesgoConfig';
-import logo from '../../assets/logo_socio.png';
+import { useTheme } from '../../hooks/useTheme';
 import './MorosidadTab.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
@@ -27,6 +27,7 @@ function SelectorMes({ id, label, value, onChange, opciones }) {
 }
 
 function MorosidadTab() {
+  const { logoSocio: logo } = useTheme();
   const { resultado: datos, setResultado: setDatos, loading, setLoading, error, setError } = useListState();
   const [mesDesde, setMesDesde] = useState('');
   const [mesHasta, setMesHasta] = useState('');

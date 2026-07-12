@@ -168,7 +168,7 @@
 
 .usuarios-btn-eliminar:hover {
   background-color: var(--color-danger);
-  color: var(--color-surface);
+  color: var(--color-on-accent);
 }
 
 /* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */

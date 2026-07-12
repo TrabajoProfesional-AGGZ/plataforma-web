@@ -10,7 +10,7 @@ import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
 import { urlImagenSegura } from '../../utils/utils';
 import { handleActivateKey } from '../../utils/a11y';
-import logo from '../../assets/logo_socio.png';
+import { useTheme } from '../../hooks/useTheme';
 import './NoticiasPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
@@ -23,6 +23,7 @@ function mensajeError(err, fallback) {
 }
 
 function NoticiasPage() {
+  const { logoSocio: logo } = useTheme();
   const puedeVerNoticias = usePermiso('ver_noticias');
   const puedeCrearNoticia = usePermiso('crear_noticia');
   const puedeEditarNoticia = usePermiso('editar_noticia');
