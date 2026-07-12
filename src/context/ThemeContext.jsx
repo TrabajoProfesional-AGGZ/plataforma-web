@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import logoSocioLight from '../assets/logo_socio.png';
 import logoSocioDark from '../assets/logo_socio_oscuro.jpeg';
 import logoTextoLight from '../assets/texto.png';
@@ -16,20 +16,23 @@ export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(getInitialTheme);
 
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme);
+    document.documentElement.dataset.theme = theme;
     localStorage.setItem(THEME_STORAGE_KEY, theme);
   }, [theme]);
 
-  function toggleTheme() {
+  const toggleTheme = useCallback(() => {
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
-  }
+  }, []);
 
-  const value = {
-    theme,
-    toggleTheme,
-    logoSocio: theme === 'dark' ? logoSocioDark : logoSocioLight,
-    logoTexto: theme === 'dark' ? logoTextoDark : logoTextoLight,
-  };
+  const value = useMemo(
+    () => ({
+      theme,
+      toggleTheme,
+      logoSocio: theme === 'dark' ? logoSocioDark : logoSocioLight,
+      logoTexto: theme === 'dark' ? logoTextoDark : logoTextoLight,
+    }),
+    [theme, toggleTheme]
+  );
 
   return (
     <ThemeContext.Provider value={value}>
