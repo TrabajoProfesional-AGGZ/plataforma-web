@@ -47,7 +47,21 @@ export const MAX_LEN = {
   URL_IMAGEN: 2048,
   PASSWORD: 128,
   TITULO_IMAGEN: 150,
+  EMAIL: 254,
 };
+
+// eslint-disable-next-line no-control-regex
+const CARACTERES_DE_CONTROL = /[\x00-\x1F\x7F]/;
+
+export function validarCredencialSegura(value, maxLength) {
+  if (CARACTERES_DE_CONTROL.test(value)) {
+    return 'El valor contiene caracteres no permitidos';
+  }
+  if (value.length > maxLength) {
+    return `Máximo ${maxLength} caracteres`;
+  }
+  return '';
+}
 
 const TIPOS_IMAGEN_PERMITIDOS = new Set(['image/jpeg', 'image/png', 'image/webp']);
 const EXTENSIONES_IMAGEN_PERMITIDAS = new Set(['jpg', 'jpeg', 'png', 'webp']);

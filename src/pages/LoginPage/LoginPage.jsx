@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { login } from '../../services/authService';
+import { RecuperarContraseniaModal } from './RecuperarContraseniaModal';
 import logoSocioAlt from '../../assets/logo_socio_alt.png';
 import logoConTexto from '../../assets/logo_con_texto.png';
 import './LoginPage.css';
@@ -26,6 +27,7 @@ function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [exiting, setExiting] = useState(false);
+  const [mostrarRecuperar, setMostrarRecuperar] = useState(false);
   const [logoFadingOut, setLogoFadingOut] = useState(false);
   const shouldReduceMotion = useReducedMotion();
   const [animStarted, setAnimStarted] = useState(false);
@@ -149,6 +151,15 @@ function LoginPage() {
                 </button>
               </div>
             </div>
+            <div className="login-forgot-wrapper">
+              <button
+                type="button"
+                className="login-forgot-btn"
+                onClick={() => setMostrarRecuperar(true)}
+              >
+                ¿Olvidaste tu contraseña?
+              </button>
+            </div>
             {passwordChanged && (
               <p className="login-success" role="status">
                 Contraseña actualizada correctamente
@@ -165,6 +176,10 @@ function LoginPage() {
           </motion.form>
         </motion.div>
       </div>
+
+      {mostrarRecuperar && (
+        <RecuperarContraseniaModal onClose={() => setMostrarRecuperar(false)} />
+      )}
     </div>
   );
 }
