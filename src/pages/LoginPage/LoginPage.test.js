@@ -100,6 +100,26 @@ describe('LoginPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /ocultar contraseña/i }));
     expect(passwordInput).toHaveAttribute('type', 'password');
   });
+
+  test('abre el modal de recuperar contraseña al hacer click en "¿Olvidaste tu contraseña?"', () => {
+    renderLoginPage();
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: '¿Olvidaste tu contraseña?' }));
+
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Recuperar contraseña' })).toBeInTheDocument();
+  });
+
+  test('cierra el modal de recuperar contraseña al presionar Escape', () => {
+    renderLoginPage();
+    fireEvent.click(screen.getByRole('button', { name: '¿Olvidaste tu contraseña?' }));
+    expect(screen.getByRole('dialog')).toBeInTheDocument();
+
+    fireEvent.keyDown(document, { key: 'Escape' });
+
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+  });
 });
 
 describe('LoginPage - con movimiento reducido preferido', () => {
