@@ -25,6 +25,9 @@ function FinanzasTab() {
     getDashboardFinanzas(periodoSeleccionado)
       .then((data) => {
         if (cancelled) return;
+        if (!data || typeof data.recaudacion_total !== 'number' || !Array.isArray(data.desglose)) {
+          throw new Error('servicio-no-disponible');
+        }
         setDatosFinanzas(data);
       })
       .catch((err) => {
@@ -67,7 +70,7 @@ function FinanzasTab() {
         <div className="finanzas-kpi-card">
           <h2 className="finanzas-kpi-title">Recaudación total consolidada</h2>
           <p className="finanzas-kpi-value">
-            ${datosFinanzas.recaudacion_total.toLocaleString('es-AR')}
+            ${(datosFinanzas.recaudacion_total ?? 0).toLocaleString('es-AR')}
           </p>
           <span className="finanzas-kpi-subtitle">Periodo: {datosFinanzas.periodo}</span>
         </div>

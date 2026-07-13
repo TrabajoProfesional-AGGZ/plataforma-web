@@ -66,6 +66,16 @@ describe('FinanzasTab', () => {
     });
   });
 
+  test('muestra un mensaje de error si el backend responde con un body malformado (sin recaudacion_total)', async () => {
+    getDashboardFinanzas.mockResolvedValueOnce({});
+
+    render(<FinanzasTab />);
+
+    await waitFor(() => {
+      expect(screen.getByText('El servicio de analíticas no está disponible. Intentá de nuevo más tarde.')).toBeInTheDocument();
+    });
+  });
+
   test('hace una nueva petición cuando el usuario cambia el periodo en el input', async () => {
     getDashboardFinanzas.mockResolvedValue(mockDataFinanzas);
 
