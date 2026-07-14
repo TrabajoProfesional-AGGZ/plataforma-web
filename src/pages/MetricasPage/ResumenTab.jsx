@@ -67,15 +67,23 @@ function ResumenTab() {
                 <div className="ranking-info">
                   <span className="ranking-nombre">{d.nombre}</span>
                   <span className="ranking-detalle">
-                    {d.total_inscriptos} / {d.cupo_maximo} inscriptos
+                    {d.cupo_maximo != null
+                      ? `${d.total_inscriptos} / ${d.cupo_maximo} inscriptos`
+                      : `${d.total_inscriptos} inscriptos (sin límite)`}
                   </span>
                 </div>
                 <div className="ranking-bar-container">
-                  <div
-                    className="ranking-bar"
-                    style={{ width: `${Math.min(d.porcentaje_cupo, 100)}%` }}
-                  />
-                  <span className="ranking-porcentaje">{d.porcentaje_cupo}%</span>
+                  {d.porcentaje_cupo != null ? (
+                    <>
+                      <div
+                        className="ranking-bar"
+                        style={{ width: `${Math.min(d.porcentaje_cupo, 100)}%` }}
+                      />
+                      <span className="ranking-porcentaje">{d.porcentaje_cupo}%</span>
+                    </>
+                  ) : (
+                    <span className="ranking-porcentaje">Sin límite</span>
+                  )}
                 </div>
               </div>
             ))}
