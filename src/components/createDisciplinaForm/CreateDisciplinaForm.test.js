@@ -132,14 +132,14 @@ describe('CreateDisciplinaForm', () => {
   test('el checkbox arancelada no aparece marcado por defecto', async () => {
     renderForm();
     await avanzarAlPaso2();
-    const checkbox = screen.getByRole('checkbox');
+    const checkbox = screen.getByRole('checkbox', { name: /la disciplina tiene un arancel asociado/i });
     expect(checkbox).not.toBeChecked();
   });
 
   test('al marcar arancelada aparece el campo concepto de cobro', async () => {
     renderForm();
     await avanzarAlPaso2();
-    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(screen.getByRole('checkbox', { name: /la disciplina tiene un arancel asociado/i }));
     expect(screen.getByPlaceholderText(/cuota mensual/i)).toBeInTheDocument();
   });
 
@@ -147,7 +147,7 @@ describe('CreateDisciplinaForm', () => {
     renderForm();
     await avanzarAlPaso2();
     fireEvent.change(screen.getByPlaceholderText(/ej\. 30/i), { target: { value: '15' } });
-    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(screen.getByRole('checkbox', { name: /la disciplina tiene un arancel asociado/i }));
     fireEvent.click(screen.getByRole('button', { name: /crear disciplina/i }));
     await waitFor(() => {
       expect(screen.getByText(/el concepto de cobro es requerido/i)).toBeInTheDocument();
@@ -159,7 +159,7 @@ describe('CreateDisciplinaForm', () => {
     renderForm();
     await avanzarAlPaso2();
     fireEvent.change(screen.getByPlaceholderText(/ej\. 30/i), { target: { value: '10' } });
-    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(screen.getByRole('checkbox', { name: /la disciplina tiene un arancel asociado/i }));
     fireEvent.change(screen.getByPlaceholderText(/cuota mensual/i), { target: { value: 'Cuota mensual de natación' } });
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /crear disciplina/i }));
@@ -171,6 +171,45 @@ describe('CreateDisciplinaForm', () => {
       arancelada: true,
       concepto_cobro: 'Cuota mensual de natación',
     });
+  });
+
+  test('permite crear una disciplina sin límite de cupo', async () => {
+    renderForm();
+    await avanzarAlPaso2();
+    fireEvent.click(screen.getByRole('checkbox', { name: /la disciplina no tiene límite de capacidad/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /crear disciplina/i }));
+    });
+    await waitFor(() => {
+      expect(screen.getByText('¡Disciplina creada!')).toBeInTheDocument();
+    });
+    await act(async () => { jest.advanceTimersByTime(1800); });
+    expect(onSuccess).toHaveBeenCalledWith({
+      nombre: 'Natación',
+      cupo_maximo: null,
+      arancelada: false,
+      concepto_cobro: '',
+    });
+  });
+
+  test('deshabilita el input de cupo máximo al marcar sin límite', async () => {
+    renderForm();
+    await avanzarAlPaso2();
+    fireEvent.click(screen.getByRole('checkbox', { name: /la disciplina no tiene límite de capacidad/i }));
+    expect(screen.getByPlaceholderText(/ej\. 30/i)).toBeDisabled();
+  });
+
+  test('no exige cupo máximo si sin límite está marcado, aunque el campo esté vacío', async () => {
+    renderForm();
+    await avanzarAlPaso2();
+    fireEvent.click(screen.getByRole('checkbox', { name: /la disciplina no tiene límite de capacidad/i }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /crear disciplina/i }));
+    });
+    await waitFor(() => {
+      expect(screen.getByText('¡Disciplina creada!')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('El cupo máximo es requerido')).not.toBeInTheDocument();
   });
 
   test('muestra indicadores de pasos Datos y Configuración', () => {

@@ -251,6 +251,25 @@ describe('DisciplinasPage', () => {
     expect(screen.getByText('ID: disc-known-id')).toBeInTheDocument();
   });
 
+  test('muestra "Sin límite" en la lista si la disciplina no tiene cupo_maximo', async () => {
+    getDisciplinas.mockResolvedValue([
+      { id: 'disc-1', nombre: 'Yoga', cupo_maximo: null, arancelada: false, concepto_cobro: '', estado: 'Activa' },
+    ]);
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Yoga')).toBeInTheDocument());
+    expect(screen.getByText('Sin límite')).toBeInTheDocument();
+  });
+
+  test('muestra "Sin límite" en el detalle si la disciplina no tiene cupo_maximo', async () => {
+    getDisciplinas.mockResolvedValue([
+      { id: 'disc-1', nombre: 'Yoga', cupo_maximo: null, arancelada: false, concepto_cobro: '', estado: 'Activa' },
+    ]);
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Yoga')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Yoga'));
+    expect(screen.getByText('Sin límite')).toBeInTheDocument();
+  });
+
   test('muestra badge "Pausada" para disciplinas con estado Pausada', async () => {
     getDisciplinas.mockResolvedValue([
       { id: 'disc-1', nombre: 'Yoga', cupo_maximo: 10, arancelada: false, concepto_cobro: '', estado: 'Pausada' },

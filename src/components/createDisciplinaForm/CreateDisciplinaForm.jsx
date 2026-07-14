@@ -19,6 +19,7 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
   } = useForm({ mode: 'onTouched' });
 
   const arancelada = watch('arancelada');
+  const sinLimiteCupo = watch('sin_limite_cupo');
 
   const goNext = async () => {
     const fieldsToValidate = step === 1
@@ -34,7 +35,7 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
     await new Promise((resolve) => setTimeout(resolve, 1800));
     onSuccess({
       nombre: data.nombre.trim(),
-      cupo_maximo: Number(data.cupo_maximo),
+      cupo_maximo: data.sin_limite_cupo ? null : Number(data.cupo_maximo),
       arancelada: Boolean(data.arancelada),
       concepto_cobro: data.arancelada ? (data.concepto_cobro?.trim() ?? '') : '',
     });
@@ -75,16 +76,29 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
             <Field label="Cupo máximo (personas)" icon={Users} error={errors.cupo_maximo?.message}>
               <StyledInput
                 {...register('cupo_maximo', {
-                  required: 'El cupo máximo es requerido',
-                  min: { value: 1, message: 'Debe ser mayor a 0' },
-                  validate: (v) => Number(v) > 0 || 'Debe ser mayor a 0',
+                  validate: (v) => {
+                    if (getValues('sin_limite_cupo')) return true;
+                    if (!v) return 'El cupo máximo es requerido';
+                    return Number(v) > 0 || 'Debe ser mayor a 0';
+                  },
                 })}
                 type="number"
                 min="1"
                 placeholder="Ej. 30"
+                disabled={sinLimiteCupo}
                 error={!!errors.cupo_maximo}
               />
             </Field>
+            <div className="csf-field">
+              <span className="csf-label">
+                <Users size={13} strokeWidth={2} />
+                Sin límite de cupo
+              </span>
+              <label className="csf-checkbox-label">
+                <input type="checkbox" className="csf-checkbox-input" {...register('sin_limite_cupo')} />
+                <span>La disciplina no tiene límite de capacidad</span>
+              </label>
+            </div>
             <div className="csf-field">
               <span className="csf-label">
                 <DollarSign size={13} strokeWidth={2} />
