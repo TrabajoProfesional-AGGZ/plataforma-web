@@ -18,7 +18,9 @@ function VerSocioModal({ socio, onClose }) {
         <button type="button" className="ver-socio-btn-x" aria-label="Cerrar" onClick={onClose}>×</button>
         <div className="socios-card-inner">
           <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
-            <img src={cfg.logo} alt="" className="detalle-logo-img" />
+            {socio.foto_url
+              ? <img src={socio.foto_url} alt="" className="detalle-logo-img" referrerPolicy="no-referrer" />
+              : <img src={cfg.logo} alt="" className="detalle-logo-img" />}
           </div>
           <div className="socios-card-data">
             <div className="detalle-card-data-header">
@@ -81,6 +83,7 @@ VerSocioModal.propTypes = {
     fecha_nacimiento: PropTypes.string,
     email: PropTypes.string,
     telefono: PropTypes.string,
+    foto_url: PropTypes.string,
     categoria: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     estado: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
   }).isRequired,

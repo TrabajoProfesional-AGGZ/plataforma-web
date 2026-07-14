@@ -245,7 +245,9 @@ function SociosPage() {
           <div className="socios-card">
             <div className="socios-card-inner">
               <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
-                <img src={cfg.logo} alt="" className="detalle-logo-img" />
+                {resultado.foto_url
+                  ? <img src={resultado.foto_url} alt="" className="detalle-logo-img" referrerPolicy="no-referrer" />
+                  : <img src={cfg.logo} alt="" className="detalle-logo-img" />}
               </div>
               <div className="socios-card-data">
                 <div className="detalle-card-data-header">
