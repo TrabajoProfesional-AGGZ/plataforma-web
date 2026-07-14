@@ -141,6 +141,22 @@ describe('SociosPage', () => {
     });
   });
 
+  test('muestra la foto de perfil del socio en la card cuando foto_url está presente', async () => {
+    const socioConFoto = { ...socioMock, foto_url: 'https://res.cloudinary.com/foto.jpg' };
+    getSocios.mockResolvedValue([socioConFoto]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    const fila = screen.getByRole('button', { name: new RegExp(`ver detalle de ${socioConFoto.apellido} ${socioConFoto.nombre}`, 'i') });
+    fireEvent.click(fila);
+
+    await waitFor(() => {
+      const img = document.querySelector('.detalle-logo-img');
+      expect(img).toHaveAttribute('src', 'https://res.cloudinary.com/foto.jpg');
+      expect(img).toHaveAttribute('referrerPolicy', 'no-referrer');
+    });
+  });
+
   test('muestra mensaje de no encontrado cuando el N° de socio no existe en la lista', async () => {
     getSocios.mockResolvedValue([socioMock]);
     render(<SociosPage />);

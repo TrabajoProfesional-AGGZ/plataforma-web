@@ -84,4 +84,12 @@ describe('VerSocioModal', () => {
     expect(screen.getByText('Adulto')).toBeInTheDocument();
     expect(screen.getByText('Moroso')).toBeInTheDocument();
   });
+
+  test('muestra la foto de perfil del socio cuando foto_url está presente', () => {
+    const conFoto = { ...socioBase, foto_url: 'https://res.cloudinary.com/foto.jpg' };
+    const { container } = render(<VerSocioModal socio={conFoto} onClose={onClose} />);
+    const img = container.querySelector('.detalle-logo-img');
+    expect(img).toHaveAttribute('src', 'https://res.cloudinary.com/foto.jpg');
+    expect(img).toHaveAttribute('referrerPolicy', 'no-referrer');
+  });
 });
