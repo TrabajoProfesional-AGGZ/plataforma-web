@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { AnimatePresence } from 'framer-motion';
 import {
   User, Clock, CheckCircle2, AlertCircle,
   Calendar, Building2, Hash, X,
 } from 'lucide-react';
-import { createReserva } from '../../services/reservasService';
+import { createReserva, getTurnosDisponibles } from '../../services/reservasService';
 import { getSocioByNroSocio } from '../../services/sociosService';
 import { useTheme } from '../../hooks/useTheme';
 import '../createForm/CreateSocioForm.css';
@@ -21,7 +21,18 @@ const STEPS = [
 
 const stepFields = {
   1: ['id_instalacion'],
-  2: ['fecha_reserva', 'hora_inicio', 'hora_fin'],
+  2: ['fecha_reserva', 'hora_inicio'],
+};
+
+const AVISOS_ESTADO_SOCIO = {
+  Moroso: 'No se puede realizar una reserva para este socio hasta que no regularice su situación financiera con el club',
+  Suspendido: 'No se puede realizar una reserva para este socio hasta que no termine su suspensión.',
+};
+
+const MENSAJES_ERROR_SUBMIT = {
+  superposicion: 'Ya existe una reserva en ese horario para esta instalación.',
+  'socio-moroso': AVISOS_ESTADO_SOCIO.Moroso,
+  'socio-suspendido': AVISOS_ESTADO_SOCIO.Suspendido,
 };
 
 export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], instalacionPreseleccionada = '' }) {
@@ -34,14 +45,45 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
   const [sociosAgregados, setSociosAgregados] = useState([]);
   const [errorListaSocios, setErrorListaSocios] = useState('');
   const [submitError, setSubmitError] = useState('');
+  const [turnosDisponibles, setTurnosDisponibles] = useState([]);
+  const [cargandoTurnos, setCargandoTurnos] = useState(false);
+  const [errorTurnos, setErrorTurnos] = useState('');
 
   const {
     register,
     handleSubmit,
     trigger,
-    getValues,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm({ mode: 'onTouched', defaultValues: { id_instalacion: instalacionPreseleccionada } });
+
+  const idInstalacionSeleccionada = watch('id_instalacion');
+  const fechaSeleccionada = watch('fecha_reserva');
+
+  useEffect(() => {
+    if (!idInstalacionSeleccionada || !fechaSeleccionada) {
+      setTurnosDisponibles([]);
+      return;
+    }
+    let cancelled = false;
+    setCargandoTurnos(true);
+    setErrorTurnos('');
+    getTurnosDisponibles(idInstalacionSeleccionada, fechaSeleccionada)
+      .then((turnos) => {
+        if (cancelled) return;
+        setTurnosDisponibles(turnos);
+        setValue('hora_inicio', '');
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setTurnosDisponibles([]);
+          setErrorTurnos('No se pudieron cargar los turnos disponibles.');
+        }
+      })
+      .finally(() => { if (!cancelled) setCargandoTurnos(false); });
+    return () => { cancelled = true; };
+  }, [idInstalacionSeleccionada, fechaSeleccionada, setValue]);
 
   const previewSocio = async (value) => {
     if (!value?.trim()) return;
@@ -51,6 +93,19 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
     } catch {
       // preview silently fails
     }
+  };
+
+  const agregarSocioSiValido = (socio) => {
+    const avisoEstado = AVISOS_ESTADO_SOCIO[socio.estado?.nombre];
+    if (avisoEstado) {
+      setErrorSocio(avisoEstado);
+      return;
+    }
+    setSociosAgregados((prev) => [...prev, socio]);
+    setNroSocioInput('');
+    setSocioPreview(null);
+    setErrorSocio('');
+    setErrorListaSocios('');
   };
 
   const agregarSocio = async () => {
@@ -64,11 +119,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
 
     const socioYaResuelto = socioPreview?.nro_socio === nro ? socioPreview : null;
     if (socioYaResuelto) {
-      setSociosAgregados((prev) => [...prev, socioYaResuelto]);
-      setNroSocioInput('');
-      setSocioPreview(null);
-      setErrorSocio('');
-      setErrorListaSocios('');
+      agregarSocioSiValido(socioYaResuelto);
       return;
     }
 
@@ -80,10 +131,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
         setErrorSocio('Este socio ya fue agregado.');
         return;
       }
-      setSociosAgregados((prev) => [...prev, socio]);
-      setNroSocioInput('');
-      setSocioPreview(null);
-      setErrorListaSocios('');
+      agregarSocioSiValido(socio);
     } catch {
       setErrorSocio('No se encontró ningún socio con ese número.');
     } finally {
@@ -119,16 +167,11 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
         id_instalacion: data.id_instalacion,
         fecha_reserva: data.fecha_reserva,
         hora_inicio: data.hora_inicio,
-        hora_fin: data.hora_fin,
       });
       setSubmitted(true);
       setTimeout(() => onSuccess(), 1800);
     } catch (e) {
-      setSubmitError(
-        e.message === 'superposicion'
-          ? 'Ya existe una reserva en ese horario para esta instalación.'
-          : 'No se pudo registrar la reserva. Intentá de nuevo.'
-      );
+      setSubmitError(MENSAJES_ERROR_SUBMIT[e.message] || 'No se pudo registrar la reserva. Intentá de nuevo.');
     }
   };
 
@@ -238,29 +281,32 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
                 error={!!errors.fecha_reserva}
               />
             </Field>
-            <div className="csf-grid-2">
-              <Field label="Hora inicio" icon={Clock} error={errors.hora_inicio?.message}>
-                <StyledInput
-                  {...register('hora_inicio', { required: 'La hora de inicio es requerida' })}
-                  type="time"
-                  error={!!errors.hora_inicio}
-                />
-              </Field>
-              <Field label="Hora fin" icon={Clock} error={errors.hora_fin?.message}>
-                <StyledInput
-                  {...register('hora_fin', {
-                    required: 'La hora de fin es requerida',
-                    validate: (v) => {
-                      const inicio = getValues('hora_inicio');
-                      if (!inicio) return true;
-                      return v > inicio || 'La hora de fin debe ser posterior a la de inicio';
-                    },
-                  })}
-                  type="time"
-                  error={!!errors.hora_fin}
-                />
-              </Field>
-            </div>
+            <Field label="Turno" icon={Clock} error={errors.hora_inicio?.message}>
+              <StyledSelect
+                {...register('hora_inicio', { required: 'Debe seleccionar un turno' })}
+                error={!!errors.hora_inicio}
+                disabled={cargandoTurnos || turnosDisponibles.length === 0}
+              >
+                <option value="">
+                  {cargandoTurnos ? 'Cargando turnos...' : 'Seleccionar turno...'}
+                </option>
+                {turnosDisponibles.map((turno) => (
+                  <option key={turno} value={turno}>{turno.slice(0, 5)}</option>
+                ))}
+              </StyledSelect>
+            </Field>
+            {!cargandoTurnos && fechaSeleccionada && !errorTurnos && turnosDisponibles.length === 0 && (
+              <p className="csf-error">
+                <AlertCircle size={12} />
+                No hay turnos disponibles para esta instalación en la fecha elegida.
+              </p>
+            )}
+            {errorTurnos && (
+              <p className="csf-error">
+                <AlertCircle size={12} />
+                {errorTurnos}
+              </p>
+            )}
             {submitError && (
               <p className="csf-error">
                 <AlertCircle size={12} />

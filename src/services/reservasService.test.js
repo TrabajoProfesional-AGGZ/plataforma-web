@@ -1,4 +1,4 @@
-import { getReservas, getReservasPorInstalacion, getReservasPorSocio, createReserva, deleteReserva, getReservasHistoricas, getReservasHistoricasPorInstalacion } from './reservasService';
+import { getReservas, getReservasPorInstalacion, getReservasPorSocio, createReserva, deleteReserva, getReservasHistoricas, getReservasHistoricasPorInstalacion, getTurnosDisponibles } from './reservasService';
 
 jest.mock('../utils/utils', () => ({ fetchTo: jest.fn() }));
 import { fetchTo } from '../utils/utils';
@@ -123,11 +123,10 @@ describe('reservasService', () => {
 
   describe('createReserva', () => {
     const datos = {
-      id_socio: 'socio-uuid-1',
+      ids_socios: ['socio-uuid-1'],
       id_instalacion: 'inst-uuid-1',
       fecha_reserva: '2026-07-01',
       hora_inicio: '10:00',
-      hora_fin: '12:00',
     };
 
     test('hace POST al endpoint correcto con los datos de la reserva', async () => {
@@ -152,9 +151,52 @@ describe('reservasService', () => {
       await expect(createReserva(datos)).rejects.toThrow('superposicion');
     });
 
+    test('lanza "socio-moroso" cuando la respuesta es 403 con tipo moroso', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        json: async () => ({ detail: { tipo: 'moroso', socios_moroso: ['1000'] } }),
+      });
+      await expect(createReserva(datos)).rejects.toThrow('socio-moroso');
+    });
+
+    test('lanza "socio-suspendido" cuando la respuesta es 403 con tipo suspendido', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        json: async () => ({ detail: { tipo: 'suspendido', socios_suspendido: ['1000'] } }),
+      });
+      await expect(createReserva(datos)).rejects.toThrow('socio-suspendido');
+    });
+
     test('lanza error genérico en 400', async () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 400 });
       await expect(createReserva(datos)).rejects.toThrow('Error al crear reserva');
+    });
+  });
+
+  describe('getTurnosDisponibles', () => {
+    test('llama al endpoint correcto con instalacion y fecha', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ['08:00:00', '09:00:00'],
+      });
+
+      const result = await getTurnosDisponibles('inst-1', '2026-10-10');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/reservas/turnos-disponibles/inst-1?fecha=2026-10-10', 'GET');
+      expect(result).toEqual(['08:00:00', '09:00:00']);
+    });
+
+    test('lanza servicio-no-disponible en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(getTurnosDisponibles('inst-1', '2026-10-10')).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza error genérico cuando la respuesta no es ok', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
+      await expect(getTurnosDisponibles('inst-1', '2026-10-10')).rejects.toThrow('Error al obtener turnos disponibles');
     });
   });
 

@@ -45,7 +45,7 @@ describe('instalacionesService', () => {
   });
 
   describe('createInstalacion', () => {
-    const datos = { nombre: 'Cancha', tipo: 'Deportiva', capacidad_maxima: 50, valor_hora: 1500, activa: true };
+    const datos = { nombre: 'Cancha', tipo: 'Deportiva', capacidad_maxima: 50, valor_turno: 1500, duracion_turno: 60, activa: true };
 
     test('hace POST al endpoint correcto con los datos de la instalación', async () => {
       fetchTo.mockResolvedValueOnce({
