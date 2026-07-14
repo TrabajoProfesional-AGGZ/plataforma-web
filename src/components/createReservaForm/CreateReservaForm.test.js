@@ -8,8 +8,9 @@ jest.mock('../../hooks/useTheme', () => ({
 
 jest.mock('../../services/reservasService', () => ({
   createReserva: jest.fn(),
+  getTurnosDisponibles: jest.fn(),
 }));
-import { createReserva } from '../../services/reservasService';
+import { createReserva, getTurnosDisponibles } from '../../services/reservasService';
 
 jest.mock('../../services/sociosService', () => ({
   getSocioByNroSocio: jest.fn(),
@@ -52,14 +53,15 @@ async function avanzarAlPaso2() {
   act(() => jest.advanceTimersByTime(300));
 }
 
-async function llenarYEnviarPaso2(horaFin = '10:00') {
+async function llenarYEnviarPaso2(turno = '09:00:00') {
   renderForm();
   await avanzarAlPaso2();
   const fechaInput = document.querySelector('input[type="date"]');
-  const timeInputs = document.querySelectorAll('input[type="time"]');
-  fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
-  fireEvent.change(timeInputs[0], { target: { value: '09:00' } });
-  fireEvent.change(timeInputs[1], { target: { value: horaFin } });
+  await act(async () => {
+    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+  });
+  await waitFor(() => expect(screen.getByRole('option', { name: turno.slice(0, 5) })).toBeInTheDocument());
+  fireEvent.change(screen.getByRole('combobox'), { target: { value: turno } });
   await act(async () => {
     fireEvent.click(screen.getByRole('button', { name: /registrar reserva/i }));
   });
@@ -70,6 +72,7 @@ beforeEach(() => {
   jest.useFakeTimers();
   createReserva.mockResolvedValue({ id: 'reserva-nueva' });
   getSocioByNroSocio.mockResolvedValue(SOCIO_TEST);
+  getTurnosDisponibles.mockResolvedValue(['09:00:00', '10:00:00', '11:00:00']);
 });
 
 afterEach(() => {
@@ -180,23 +183,6 @@ describe('CreateReservaForm', () => {
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
-  test('no envía si hora fin es anterior a hora inicio', async () => {
-    renderForm();
-    await avanzarAlPaso2();
-
-    const fechaInput = document.querySelector('input[type="date"]');
-    const [horaIniInput, horaFinInput] = document.querySelectorAll('input[type="time"]');
-    fireEvent.change(fechaInput, { target: { value: '2026-07-01' } });
-    fireEvent.change(horaIniInput, { target: { value: '10:00' } });
-    fireEvent.change(horaFinInput, { target: { value: '08:00' } });
-    fireEvent.blur(horaFinInput);
-
-    await waitFor(() => {
-      expect(screen.getByText(/hora de fin debe ser posterior/i)).toBeInTheDocument();
-    });
-    expect(onSuccess).not.toHaveBeenCalled();
-  });
-
   test('muestra pantalla de éxito y llama onSuccess al confirmar con datos válidos', async () => {
     await llenarYEnviarPaso2();
     await waitFor(() => {
@@ -207,14 +193,13 @@ describe('CreateReservaForm', () => {
   });
 
   test('llama a createReserva con la lista de IDs de socios', async () => {
-    await llenarYEnviarPaso2('11:00');
+    await llenarYEnviarPaso2('11:00:00');
 
     expect(createReserva).toHaveBeenCalledWith({
       ids_socios: ['socio-uuid-1'],
       id_instalacion: 'inst-uuid-1',
       fecha_reserva: '2026-08-10',
-      hora_inicio: '09:00',
-      hora_fin: '11:00',
+      hora_inicio: '11:00:00',
     });
   });
 
@@ -278,17 +263,6 @@ describe('CreateReservaForm', () => {
     fireEvent.focus(select);
     fireEvent.blur(select);
     expect(select).toBeInTheDocument();
-  });
-
-  test('hora_fin es válida si hora_inicio está vacía', async () => {
-    renderForm();
-    await avanzarAlPaso2();
-    const [, horaFinInput] = document.querySelectorAll('input[type="time"]');
-    fireEvent.change(horaFinInput, { target: { value: '10:00' } });
-    fireEvent.blur(horaFinInput);
-    await waitFor(() => {
-      expect(screen.queryByText(/hora de fin debe ser posterior/i)).not.toBeInTheDocument();
-    });
   });
 
   // ── Tests del preview inline al perder el foco ──
@@ -417,10 +391,11 @@ describe('CreateReservaForm', () => {
     act(() => jest.advanceTimersByTime(300));
 
     const fechaInput = document.querySelector('input[type="date"]');
-    const timeInputs = document.querySelectorAll('input[type="time"]');
-    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
-    fireEvent.change(timeInputs[0], { target: { value: '09:00' } });
-    fireEvent.change(timeInputs[1], { target: { value: '11:00' } });
+    await act(async () => {
+      fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+    });
+    await waitFor(() => expect(screen.getByRole('option', { name: '11:00' })).toBeInTheDocument());
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: '11:00:00' } });
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /registrar reserva/i }));
     });
@@ -429,8 +404,7 @@ describe('CreateReservaForm', () => {
       ids_socios: ['socio-uuid-1', 'socio-uuid-2'],
       id_instalacion: 'inst-uuid-1',
       fecha_reserva: '2026-08-10',
-      hora_inicio: '09:00',
-      hora_fin: '11:00',
+      hora_inicio: '11:00:00',
     }));
   });
 
@@ -442,5 +416,112 @@ describe('CreateReservaForm', () => {
       fireEvent.keyDown(input, { key: 'Enter' });
     });
     await waitFor(() => expect(screen.getByText('1234 — García Juan')).toBeInTheDocument());
+  });
+
+  // ── Tests de bloqueo por estado financiero del socio ──
+
+  test('no permite agregar un socio moroso y muestra el aviso correspondiente', async () => {
+    getSocioByNroSocio.mockResolvedValue({ ...SOCIO_TEST, estado: { nombre: 'Moroso' } });
+    renderForm();
+    fireEvent.change(screen.getByPlaceholderText(/ej\. 1234/i), { target: { value: '1234' } });
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /agregar/i }));
+    });
+    await waitFor(() => {
+      expect(screen.getByText(/regularice su situación financiera/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByText('1234 — García Juan')).not.toBeInTheDocument();
+  });
+
+  test('no permite agregar un socio suspendido y muestra el aviso correspondiente', async () => {
+    getSocioByNroSocio.mockResolvedValue({ ...SOCIO_TEST, estado: { nombre: 'Suspendido' } });
+    renderForm();
+    fireEvent.change(screen.getByPlaceholderText(/ej\. 1234/i), { target: { value: '1234' } });
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /agregar/i }));
+    });
+    await waitFor(() => {
+      expect(screen.getByText(/termine su suspensión/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByText('1234 — García Juan')).not.toBeInTheDocument();
+  });
+
+  test('bloquea también al agregar por preview (blur) si el socio está moroso', async () => {
+    getSocioByNroSocio.mockResolvedValue({ ...SOCIO_TEST, estado: { nombre: 'Moroso' } });
+    renderForm();
+    const input = screen.getByPlaceholderText(/ej\. 1234/i);
+    fireEvent.change(input, { target: { value: '1234' } });
+    await act(async () => { fireEvent.blur(input); });
+    await waitFor(() => expect(screen.getByText('García Juan')).toBeInTheDocument());
+
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /agregar/i }));
+    });
+    await waitFor(() => {
+      expect(screen.getByText(/regularice su situación financiera/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByText('1234 — García Juan')).not.toBeInTheDocument();
+  });
+
+  // ── Tests del selector de turnos disponibles ──
+
+  test('muestra "Cargando turnos..." mientras se obtienen los turnos disponibles', async () => {
+    let resolveTurnos;
+    getTurnosDisponibles.mockReturnValue(new Promise((resolve) => { resolveTurnos = resolve; }));
+    renderForm();
+    await avanzarAlPaso2();
+
+    const fechaInput = document.querySelector('input[type="date"]');
+    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+
+    await waitFor(() => expect(screen.getByText('Cargando turnos...')).toBeInTheDocument());
+    await act(async () => { resolveTurnos(['09:00:00']); });
+    expect(screen.queryByText('Cargando turnos...')).not.toBeInTheDocument();
+  });
+
+  test('muestra los turnos disponibles como opciones del select', async () => {
+    renderForm();
+    await avanzarAlPaso2();
+
+    const fechaInput = document.querySelector('input[type="date"]');
+    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+
+    await waitFor(() => {
+      expect(screen.getByRole('option', { name: '09:00' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: '10:00' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: '11:00' })).toBeInTheDocument();
+    });
+  });
+
+  test('muestra un aviso cuando no hay turnos disponibles para la fecha elegida', async () => {
+    getTurnosDisponibles.mockResolvedValue([]);
+    renderForm();
+    await avanzarAlPaso2();
+
+    const fechaInput = document.querySelector('input[type="date"]');
+    await act(async () => {
+      fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+    });
+
+    await waitFor(() => {
+      expect(screen.getByText(/no hay turnos disponibles/i)).toBeInTheDocument();
+    });
+  });
+
+  test('no envía si no se seleccionó ningún turno', async () => {
+    renderForm();
+    await avanzarAlPaso2();
+    const fechaInput = document.querySelector('input[type="date"]');
+    await act(async () => {
+      fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+    });
+    await waitFor(() => expect(screen.getByRole('option', { name: '09:00' })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /registrar reserva/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Debe seleccionar un turno')).toBeInTheDocument();
+    });
+    expect(onSuccess).not.toHaveBeenCalled();
   });
 });
