@@ -29,7 +29,22 @@ export async function createReserva(data) {
   const res = await fetchTo('/api/v1/reservas', 'POST', data);
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (res.status === 409) throw new Error('superposicion');
+  if (res.status === 403) {
+    const body = await res.json().catch(() => null);
+    const tipo = body?.detail?.tipo;
+    throw new Error(tipo === 'suspendido' ? 'socio-suspendido' : 'socio-moroso');
+  }
   if (!res.ok) throw new Error('Error al crear reserva');
+  return res.json();
+}
+
+export async function getTurnosDisponibles(idInstalacion, fecha) {
+  const res = await fetchTo(
+    `/api/v1/reservas/turnos-disponibles/${encodeURIComponent(idInstalacion)}?fecha=${encodeURIComponent(fecha)}`,
+    'GET'
+  );
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error('Error al obtener turnos disponibles');
   return res.json();
 }
 

@@ -45,7 +45,7 @@ jest.mock('../../assets/logo-naranja.png', () => 'logo-naranja.png');
 jest.mock('../../components/createInstalacionForm/CreateInstalacionForm', () => ({
   CreateInstalacionForm: ({ onSuccess, onCancel }) => (
     <div>
-      <button onClick={() => onSuccess({ nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true })}>
+      <button onClick={() => onSuccess({ nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1500, duracion_turno: 60, activa: true })}>
         Confirmar creación
       </button>
       <button onClick={onCancel}>Cancelar creación</button>
@@ -135,7 +135,7 @@ describe('InstalacionesPage', () => {
     expect(screen.getByRole('alert')).toBeInTheDocument();
 
     getInstalaciones.mockResolvedValueOnce([
-      { id: 'i-1', nombre: 'Cancha', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 100, activa: true },
+      { id: 'i-1', nombre: 'Cancha', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 100, activa: true },
     ]);
     fireEvent.click(screen.getByRole('button', { name: /reintentar/i }));
     await waitFor(() => expect(screen.getByText('Cancha')).toBeInTheDocument());
@@ -160,7 +160,7 @@ describe('InstalacionesPage', () => {
     expect(screen.getByText('Test')).toBeInTheDocument();
     expect(screen.getAllByText('Deportiva').length).toBeGreaterThan(0);
     expect(screen.getByText('10 personas')).toBeInTheDocument();
-    expect(screen.getByText('$1500/h')).toBeInTheDocument();
+    expect(screen.getByText('$1500/turno')).toBeInTheDocument();
     expect(screen.getByText('Activa')).toBeInTheDocument();
   });
 
@@ -485,7 +485,7 @@ describe('InstalacionesPage', () => {
     irAlDetalle();
     expect(screen.getByText('Deportiva')).toBeInTheDocument();
     expect(screen.getByText('10 personas')).toBeInTheDocument();
-    expect(screen.getByText('$1500/h')).toBeInTheDocument();
+    expect(screen.getByText('$1500/turno')).toBeInTheDocument();
     expect(screen.getByText('Activa')).toBeInTheDocument();
   });
 
@@ -538,7 +538,7 @@ describe('InstalacionesPage', () => {
 
   test('muestra el badge "Inactiva" para instalaciones con activa=false', async () => {
     getInstalaciones.mockResolvedValue([
-      { id: 'inst-inactiva', nombre: 'Cancha Vieja', tipo: 'Deportiva', capacidad_maxima: 5, valor_hora: 0, activa: false },
+      { id: 'inst-inactiva', nombre: 'Cancha Vieja', tipo: 'Deportiva', capacidad_maxima: 5, valor_turno: 0, activa: false },
     ]);
     await renderPage();
     await waitFor(() => expect(screen.getByText('Inactiva')).toBeInTheDocument());
@@ -546,7 +546,7 @@ describe('InstalacionesPage', () => {
 
   test('muestra "Inactiva" en el detalle de una instalación con activa=false', async () => {
     getInstalaciones.mockResolvedValue([
-      { id: 'inst-inactiva', nombre: 'Cancha Vieja', tipo: 'Deportiva', capacidad_maxima: 5, valor_hora: 0, activa: false },
+      { id: 'inst-inactiva', nombre: 'Cancha Vieja', tipo: 'Deportiva', capacidad_maxima: 5, valor_turno: 0, activa: false },
     ]);
     await renderPage();
     await waitFor(() => expect(screen.getByText('Cancha Vieja')).toBeInTheDocument());
@@ -558,8 +558,8 @@ describe('InstalacionesPage', () => {
 
   test('muestra "No hay instalaciones del tipo seleccionado" cuando el filtro no tiene coincidencias', async () => {
     getInstalaciones.mockResolvedValue([
-      { id: 'inst-dep', nombre: 'Cancha', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1000, activa: true },
-      { id: 'inst-soc', nombre: 'Salon', tipo: 'Social', capacidad_maxima: 50, valor_hora: 500, activa: true },
+      { id: 'inst-dep', nombre: 'Cancha', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1000, activa: true },
+      { id: 'inst-soc', nombre: 'Salon', tipo: 'Social', capacidad_maxima: 50, valor_turno: 500, activa: true },
     ]);
     await renderPage();
     await waitFor(() => expect(screen.getByText('Cancha')).toBeInTheDocument());
@@ -633,7 +633,7 @@ describe('InstalacionesPage', () => {
 
   test('muestra el ID de la instalación bajo el detalle del card', async () => {
     getInstalaciones.mockResolvedValue([
-      { id: 'inst-known-id', nombre: 'Pileta', tipo: 'Deportiva', capacidad_maxima: 20, valor_hora: 2000, activa: true },
+      { id: 'inst-known-id', nombre: 'Pileta', tipo: 'Deportiva', capacidad_maxima: 20, valor_turno: 2000, activa: true },
     ]);
     await renderPage();
     await waitFor(() => expect(screen.getByText('Pileta')).toBeInTheDocument());
@@ -697,7 +697,7 @@ describe('InstalacionesPage', () => {
 
   test('usa getReservasPorInstalacion para cargar reservas del detalle', async () => {
     getInstalaciones.mockResolvedValue([
-      { id: 'inst-known', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+      { id: 'inst-known', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1500, activa: true },
     ]);
     await renderPage();
     await waitFor(() => expect(screen.getByText('Test')).toBeInTheDocument());
@@ -717,7 +717,7 @@ describe('InstalacionesPage', () => {
 
   test('buscar por N° de socio llama a getReservasPorSocio y muestra resultados filtrados', async () => {
     getInstalaciones.mockResolvedValue([
-      { id: 'inst-busqueda', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+      { id: 'inst-busqueda', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1500, activa: true },
     ]);
     getReservasPorSocio.mockResolvedValue([
       { id: 'r-socio', id_instalacion: 'inst-busqueda', socios: [SOCIO_MOCK],fecha_reserva: '2026-09-20', hora_inicio: '09:00', hora_fin: '10:00' },
@@ -741,7 +741,7 @@ describe('InstalacionesPage', () => {
 
   test('limpiar el filtro por N° de socio vuelve a mostrar todas las reservas', async () => {
     getInstalaciones.mockResolvedValue([
-      { id: 'inst-limpiar', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+      { id: 'inst-limpiar', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1500, activa: true },
     ]);
     getReservasPorInstalacion.mockResolvedValue([
       { id: 'r-inst', id_instalacion: 'inst-limpiar', socios: [SOCIO_MOCK],fecha_reserva: '2026-10-01', hora_inicio: '08:00', hora_fin: '09:00' },
@@ -783,7 +783,7 @@ describe('InstalacionesPage', () => {
 
   test('navega al detalle de instalación cuando hay instalacionId en location.state', async () => {
     getInstalaciones.mockResolvedValue([
-      { id: 'inst-state-test', nombre: 'Cancha de tenis', tipo: 'Deportiva', capacidad_maxima: 4, valor_hora: 1000, activa: true },
+      { id: 'inst-state-test', nombre: 'Cancha de tenis', tipo: 'Deportiva', capacidad_maxima: 4, valor_turno: 1000, activa: true },
     ]);
 
     render(
@@ -800,7 +800,7 @@ describe('InstalacionesPage', () => {
 
   test('muestra reservas históricas al hacer clic en "Ver reservas históricas"', async () => {
     getInstalaciones.mockResolvedValue([
-      { id: 'inst-hist', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+      { id: 'inst-hist', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1500, activa: true },
     ]);
     getReservasPorInstalacion.mockResolvedValue([]);
     getReservasHistoricasPorInstalacion.mockResolvedValue([
@@ -822,7 +822,7 @@ describe('InstalacionesPage', () => {
 
   test('vuelve a las reservas activas al hacer clic en "Ver reservas activas"', async () => {
     getInstalaciones.mockResolvedValue([
-      { id: 'inst-toggle', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+      { id: 'inst-toggle', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1500, activa: true },
     ]);
     getReservasPorInstalacion.mockResolvedValue([
       { id: 'r-act', id_instalacion: 'inst-toggle', socios: [SOCIO_MOCK],fecha_reserva: '2026-08-01', hora_inicio: '10:00', hora_fin: '11:00' },
@@ -851,7 +851,7 @@ describe('InstalacionesPage', () => {
 
   test('al volver a reservas activas después de buscar, las reservas activas son visibles', async () => {
     getInstalaciones.mockResolvedValue([
-      { id: 'inst-bugfix', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+      { id: 'inst-bugfix', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1500, activa: true },
     ]);
     getReservasPorInstalacion.mockResolvedValue([
       { id: 'r-act', id_instalacion: 'inst-bugfix', socios: [SOCIO_MOCK],fecha_reserva: '2026-11-01', hora_inicio: '10:00', hora_fin: '11:00' },
@@ -882,7 +882,7 @@ describe('InstalacionesPage', () => {
   test('en la vista histórica el filtro por N° de socio filtra client-side sin llamar a la API', async () => {
     const SOCIO2 = { id: 'socio-2', nro_socio: '9999', nombre: 'Maria', apellido: 'Perez' };
     getInstalaciones.mockResolvedValue([
-      { id: 'inst-cs', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+      { id: 'inst-cs', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1500, activa: true },
     ]);
     getSocios.mockResolvedValue([SOCIO_MOCK, SOCIO2]);
     getReservasPorInstalacion.mockResolvedValue([]);
@@ -909,7 +909,7 @@ describe('InstalacionesPage', () => {
 
   test('presionar Enter en la vista histórica no llama a getReservasPorSocio', async () => {
     getInstalaciones.mockResolvedValue([
-      { id: 'inst-ent', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+      { id: 'inst-ent', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1500, activa: true },
     ]);
     getReservasPorInstalacion.mockResolvedValue([]);
     getReservasHistoricasPorInstalacion.mockResolvedValue([]);
@@ -934,7 +934,7 @@ describe('InstalacionesPage', () => {
 
   test('al cambiar a la vista histórica, el filtro de N° de socio se limpia', async () => {
     getInstalaciones.mockResolvedValue([
-      { id: 'inst-rst', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+      { id: 'inst-rst', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1500, activa: true },
     ]);
     getReservasPorInstalacion.mockResolvedValue([]);
     getReservasHistoricasPorInstalacion.mockResolvedValue([]);
@@ -957,7 +957,7 @@ describe('InstalacionesPage', () => {
 
   test('al volver a la vista activa, el filtro de N° de socio se limpia', async () => {
     getInstalaciones.mockResolvedValue([
-      { id: 'inst-rst2', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+      { id: 'inst-rst2', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1500, activa: true },
     ]);
     getReservasPorInstalacion.mockResolvedValue([]);
     getReservasHistoricasPorInstalacion.mockResolvedValue([]);
@@ -983,7 +983,7 @@ describe('InstalacionesPage', () => {
 
   test('presionar Enter con el filtro de socio vacío limpia los resultados de búsqueda', async () => {
     getInstalaciones.mockResolvedValue([
-      { id: 'inst-busq-vacia', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_hora: 1500, activa: true },
+      { id: 'inst-busq-vacia', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1500, activa: true },
     ]);
     getReservasPorInstalacion.mockResolvedValue([
       { id: 'r-base', id_instalacion: 'inst-busq-vacia', socios: [SOCIO_MOCK],fecha_reserva: '2026-09-01', hora_inicio: '10:00', hora_fin: '11:00' },

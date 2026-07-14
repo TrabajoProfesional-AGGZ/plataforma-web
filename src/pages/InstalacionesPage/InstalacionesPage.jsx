@@ -238,7 +238,7 @@ function InstalacionesPage() {
               <th>Nombre</th>
               <th>Tipo</th>
               <th>Capacidad máxima</th>
-              <th>Valor/hora</th>
+              <th>Valor/Turno</th>
               <th>Estado</th>
             </tr>
           </thead>
@@ -258,7 +258,7 @@ function InstalacionesPage() {
                 <td>{inst.nombre}</td>
                 <td>{inst.tipo}</td>
                 <td>{inst.capacidad_maxima} personas</td>
-                <td>${inst.valor_hora}/h</td>
+                <td>${inst.valor_turno}/turno</td>
                 <td>
                   <EstadoBadge variant={inst.activa ? 'success' : 'neutral'}>
                     {inst.activa ? 'Activa' : 'Inactiva'}
@@ -409,7 +409,8 @@ function InstalacionesPage() {
               {[
                 { label: 'Tipo', value: instalacionActual.tipo },
                 { label: 'Capacidad máxima', value: `${instalacionActual.capacidad_maxima} personas` },
-                { label: 'Valor por hora', value: `$${instalacionActual.valor_hora}/h` },
+                { label: 'Valor por turno', value: `$${instalacionActual.valor_turno}/turno` },
+                { label: 'Duración del turno', value: `${instalacionActual.duracion_turno} minutos` },
                 {
                   label: 'Estado',
                   value: instalacionActual.activa ? 'Activa' : 'Inactiva',

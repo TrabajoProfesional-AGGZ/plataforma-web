@@ -123,7 +123,7 @@ describe('CreateInstalacionForm', () => {
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
-  test('no envía si el valor por hora es negativo', async () => {
+  test('no envía si el valor por turno es negativo', async () => {
     renderForm();
     await avanzarAlPaso2();
     fireEvent.change(screen.getByPlaceholderText(/ej\. 50/i), { target: { value: '20' } });
@@ -151,7 +151,8 @@ describe('CreateInstalacionForm', () => {
       nombre: 'Pileta',
       tipo: 'Acuática',
       capacidad_maxima: 30,
-      valor_hora: 2000,
+      valor_turno: 2000,
+      duracion_turno: 60,
       activa: true,
     });
   });

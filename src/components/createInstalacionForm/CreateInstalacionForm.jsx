@@ -1,7 +1,7 @@
 import { useForm } from 'react-hook-form';
-import { Building2, Settings, CheckCircle2, Users, DollarSign, Tag } from 'lucide-react';
+import { Building2, Settings, CheckCircle2, Users, DollarSign, Tag, Clock } from 'lucide-react';
 import '../createForm/CreateSocioForm.css';
-import { Field, StyledInput, FormStep } from '../createForm/FormFields';
+import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
 import PropTypes from 'prop-types';
@@ -13,8 +13,11 @@ const STEPS = [
 
 const stepFields = {
   1: ['nombre', 'tipo'],
-  2: ['capacidad_maxima', 'valor_hora'],
+  2: ['capacidad_maxima', 'valor_turno', 'duracion_turno'],
 };
+
+// Duraciones de turno (minutos) que dividen exactamente las 12hs disponibles (08:00-20:00)
+const DURACIONES_TURNO = [30, 45, 60, 90, 120];
 
 export function CreateInstalacionForm({ onSuccess, onCancel }) {
   const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
@@ -39,7 +42,8 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
       nombre: data.nombre.trim(),
       tipo: data.tipo.trim(),
       capacidad_maxima: Number(data.capacidad_maxima),
-      valor_hora: Number(data.valor_hora),
+      valor_turno: Number(data.valor_turno),
+      duracion_turno: Number(data.duracion_turno),
       activa: Boolean(data.activa),
     });
   };
@@ -96,10 +100,10 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
                 error={!!errors.capacidad_maxima}
               />
             </Field>
-            <Field label="Valor por hora ($)" icon={DollarSign} error={errors.valor_hora?.message}>
+            <Field label="Valor por turno ($)" icon={DollarSign} error={errors.valor_turno?.message}>
               <StyledInput
-                {...register('valor_hora', {
-                  required: 'El valor por hora es requerido',
+                {...register('valor_turno', {
+                  required: 'El valor por turno es requerido',
                   min: { value: 0, message: 'No puede ser negativo' },
                   validate: (v) => Number(v) >= 0 || 'No puede ser negativo',
                 })}
@@ -107,8 +111,21 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
                 min="0"
                 step="0.01"
                 placeholder="Ej. 1500"
-                error={!!errors.valor_hora}
+                error={!!errors.valor_turno}
               />
+            </Field>
+            <Field label="Duración del turno" icon={Clock} error={errors.duracion_turno?.message}>
+              <StyledSelect
+                {...register('duracion_turno', { required: 'La duración del turno es requerida' })}
+                defaultValue={60}
+                error={!!errors.duracion_turno}
+              >
+                {DURACIONES_TURNO.map((minutos) => (
+                  <option key={minutos} value={minutos}>
+                    {minutos} minutos
+                  </option>
+                ))}
+              </StyledSelect>
             </Field>
             <div className="csf-field">
               <span className="csf-label">
