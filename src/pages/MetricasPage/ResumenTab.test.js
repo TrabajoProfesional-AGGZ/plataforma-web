@@ -54,6 +54,20 @@ test('muestra un error genérico ante un fallo desconocido', async () => {
   expect(await screen.findByText('No se pudieron cargar las métricas. Intentá más tarde.')).toBeInTheDocument();
 });
 
+test('muestra "sin límite" para una disciplina sin cupo_maximo', async () => {
+  getTopDisciplinas.mockResolvedValue({
+    ranking: [
+      { id: '1', nombre: 'Yoga', cupo_maximo: null, total_inscriptos: 12, porcentaje_cupo: null },
+    ],
+    total: 1,
+  });
+
+  render(<ResumenTab />);
+
+  expect(await screen.findByText('12 inscriptos (sin límite)')).toBeInTheDocument();
+  expect(screen.getByText('Sin límite')).toBeInTheDocument();
+});
+
 test('muestra mensaje vacío cuando no hay disciplinas con inscriptos', async () => {
   getTopDisciplinas.mockResolvedValue({ ranking: [], total: 0 });
 

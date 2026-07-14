@@ -213,7 +213,7 @@ function DisciplinasPage() {
                 onKeyDown={handleActivateKey(verDetalle)}
               >
                 <td>{d.nombre}</td>
-                <td>{d.cupo_maximo} personas</td>
+                <td>{d.cupo_maximo != null ? `${d.cupo_maximo} personas` : 'Sin límite'}</td>
                 <td>
                   <EstadoBadge variant={d.arancelada ? 'success' : 'neutral'}>
                     {d.arancelada ? 'Sí' : 'No'}
@@ -269,7 +269,10 @@ function DisciplinasPage() {
 
             <div className="disciplinas-detalle-card">
               {[
-                { label: 'Cupo máximo', value: `${disciplinaActual.cupo_maximo} personas` },
+                {
+                  label: 'Cupo máximo',
+                  value: disciplinaActual.cupo_maximo != null ? `${disciplinaActual.cupo_maximo} personas` : 'Sin límite',
+                },
                 { label: 'Arancelada', value: disciplinaActual.arancelada ? 'Sí' : 'No' },
                 ...(disciplinaActual.arancelada
                   ? [{ label: 'Concepto de cobro', value: disciplinaActual.concepto_cobro }]
