@@ -17,6 +17,13 @@ jest.mock('../socioReservasModal/SocioReservasModal', () => ({
     </div>
   ),
 }));
+jest.mock('../socioTramitesModal/SocioTramitesModal', () => ({
+  SocioTramitesModal: ({ onClose }) => (
+    <div data-testid="tramites-modal">
+      <button onClick={onClose}>Cerrar trámites</button>
+    </div>
+  ),
+}));
 
 import { usePermiso } from '../../hooks/usePermiso';
 
@@ -25,11 +32,12 @@ describe('SocioAccionesExtra', () => {
     jest.clearAllMocks();
   });
 
-  test('muestra ambos botones cuando el usuario tiene ambos permisos', () => {
-    usePermiso.mockImplementation((p) => p === 'ver_disciplinas' || p === 'ver_reservas');
+  test('muestra los tres botones cuando el usuario tiene los tres permisos', () => {
+    usePermiso.mockImplementation((p) => p === 'ver_disciplinas' || p === 'ver_reservas' || p === 'ver_tramites');
     render(<SocioAccionesExtra idSocio="uuid-1" nroSocio="1001" />);
     expect(screen.getByText('Ver disciplinas inscriptas')).toBeInTheDocument();
     expect(screen.getByText('Ver reservas activas')).toBeInTheDocument();
+    expect(screen.getByText('Ver trámites')).toBeInTheDocument();
   });
 
   test('no renderiza nada si el usuario no tiene ningún permiso', () => {
@@ -43,6 +51,7 @@ describe('SocioAccionesExtra', () => {
     render(<SocioAccionesExtra idSocio="uuid-1" nroSocio="1001" />);
     expect(screen.getByText('Ver disciplinas inscriptas')).toBeInTheDocument();
     expect(screen.queryByText('Ver reservas activas')).not.toBeInTheDocument();
+    expect(screen.queryByText('Ver trámites')).not.toBeInTheDocument();
   });
 
   test('solo muestra "Ver reservas" si solo tiene ese permiso', () => {
@@ -50,6 +59,15 @@ describe('SocioAccionesExtra', () => {
     render(<SocioAccionesExtra idSocio="uuid-1" nroSocio="1001" />);
     expect(screen.queryByText('Ver disciplinas inscriptas')).not.toBeInTheDocument();
     expect(screen.getByText('Ver reservas activas')).toBeInTheDocument();
+    expect(screen.queryByText('Ver trámites')).not.toBeInTheDocument();
+  });
+
+  test('solo muestra "Ver trámites" si solo tiene ese permiso', () => {
+    usePermiso.mockImplementation((p) => p === 'ver_tramites');
+    render(<SocioAccionesExtra idSocio="uuid-1" nroSocio="1001" />);
+    expect(screen.queryByText('Ver disciplinas inscriptas')).not.toBeInTheDocument();
+    expect(screen.queryByText('Ver reservas activas')).not.toBeInTheDocument();
+    expect(screen.getByText('Ver trámites')).toBeInTheDocument();
   });
 
   test('abre el modal de disciplinas al hacer click en el botón', () => {
@@ -66,11 +84,26 @@ describe('SocioAccionesExtra', () => {
     expect(screen.getByTestId('reservas-modal')).toBeInTheDocument();
   });
 
+  test('abre el modal de trámites al hacer click en el botón', () => {
+    usePermiso.mockImplementation((p) => p === 'ver_tramites');
+    render(<SocioAccionesExtra idSocio="uuid-1" nroSocio="1001" />);
+    fireEvent.click(screen.getByText('Ver trámites'));
+    expect(screen.getByTestId('tramites-modal')).toBeInTheDocument();
+  });
+
   test('cierra el modal de disciplinas al hacer click en Cerrar dentro del modal', () => {
     usePermiso.mockImplementation((p) => p === 'ver_disciplinas' || p === 'ver_reservas');
     render(<SocioAccionesExtra idSocio="uuid-1" nroSocio="1001" />);
     fireEvent.click(screen.getByText('Ver disciplinas inscriptas'));
     fireEvent.click(screen.getByText('Cerrar disciplinas'));
     expect(screen.queryByTestId('disciplinas-modal')).not.toBeInTheDocument();
+  });
+
+  test('cierra el modal de trámites al hacer click en Cerrar dentro del modal', () => {
+    usePermiso.mockImplementation((p) => p === 'ver_tramites');
+    render(<SocioAccionesExtra idSocio="uuid-1" nroSocio="1001" />);
+    fireEvent.click(screen.getByText('Ver trámites'));
+    fireEvent.click(screen.getByText('Cerrar trámites'));
+    expect(screen.queryByTestId('tramites-modal')).not.toBeInTheDocument();
   });
 });

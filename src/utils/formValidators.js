@@ -48,6 +48,7 @@ export const MAX_LEN = {
   PASSWORD: 128,
   TITULO_IMAGEN: 150,
   EMAIL: 254,
+  OBSERVACIONES_TRAMITE: 500,
 };
 
 // eslint-disable-next-line no-control-regex
