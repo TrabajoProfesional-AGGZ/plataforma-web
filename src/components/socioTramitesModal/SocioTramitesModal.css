@@ -1,0 +1,64 @@
+.socio-tramites-wrapper {
+  max-width: 480px;
+}
+
+.socio-tramites-item {
+  cursor: pointer;
+}
+
+.socio-tramites-info {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.socio-tramites-fecha {
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.socio-tramites-btn-volver {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  padding: 0 0 var(--space-3) 0;
+}
+
+.socio-tramites-detalle-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+}
+
+.socio-tramites-detalle-titulo {
+  font-size: 16px;
+  color: var(--color-text-primary);
+  margin: 0;
+}
+
+.socio-tramites-dato {
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.socio-tramites-imagen {
+  max-width: 100%;
+  max-height: 320px;
+  border-radius: var(--radius-sm);
+  object-fit: contain;
+}
+
+.socio-tramites-link-archivo {
+  color: var(--color-text-primary);
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: underline;
+}
