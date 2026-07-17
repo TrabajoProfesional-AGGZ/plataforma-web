@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Search, Plus } from 'lucide-react';
 import { getSocios, deleteSocio } from '../../services/sociosService';
+import { getDisciplinas, getSociosByDisciplina, extenderSuscripcionDisciplina } from '../../services/disciplinasService';
 import { CreateSocioForm } from '../../components/createForm/CreateSocioForm';
 import { EditSocioForm } from '../../components/editForm/EditSocioForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
@@ -37,6 +38,8 @@ function SociosPage() {
   const puedeCrear = usePermiso('crear_socio');
   const puedeEditar = usePermiso('editar_socio');
   const puedeBorrar = usePermiso('borrar_socio');
+  const puedeVerDisciplinas = usePermiso('ver_disciplinas');
+  const puedeCrearDisciplina = usePermiso('crear_disciplina');
 
   const cacheSociosRef = useRef(null);
 
@@ -48,6 +51,11 @@ function SociosPage() {
   const [filtroEstado, setFiltroEstado] = useState('');
   const [filtroAbierto, setFiltroAbierto] = useState(false);
   const [filtroCategoria, setFiltroCategoria] = useState('');
+  const [filtroDisciplina, setFiltroDisciplina] = useState('');
+  const [disciplinas, setDisciplinas] = useState([]);
+  const [idsDisciplinaFiltro, setIdsDisciplinaFiltro] = useState(null);
+  const [errorDisciplinaFiltro, setErrorDisciplinaFiltro] = useState('');
+  const [estadoExtension, setEstadoExtension] = useState({});
 
   const [crearModalOpen, setCrearModalOpen] = useState(false);
   const [editarModalOpen, setEditarModalOpen] = useState(false);
@@ -85,6 +93,34 @@ function SociosPage() {
     return () => { cancelled = true; };
   }, [setError, setLoading, setResultado]);
 
+  useEffect(() => {
+    if (!puedeVerDisciplinas) return;
+    let cancelled = false;
+    getDisciplinas()
+      .then((data) => { if (!cancelled) setDisciplinas(data); })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, [puedeVerDisciplinas]);
+
+  useEffect(() => {
+    if (!filtroDisciplina) {
+      setIdsDisciplinaFiltro(null);
+      setErrorDisciplinaFiltro('');
+      return;
+    }
+    let cancelled = false;
+    setErrorDisciplinaFiltro('');
+    getSociosByDisciplina(filtroDisciplina)
+      .then((data) => { if (!cancelled) setIdsDisciplinaFiltro(new Set(data.map((s) => s.id))); })
+      .catch(() => {
+        if (!cancelled) {
+          setIdsDisciplinaFiltro(new Set());
+          setErrorDisciplinaFiltro('No se pudieron obtener los socios de la disciplina.');
+        }
+      });
+    return () => { cancelled = true; };
+  }, [filtroDisciplina]);
+
   async function cargarSocios() {
     setLoading(true);
     setError(null);
@@ -110,6 +146,8 @@ function SociosPage() {
     setFiltroEstado('');
     setFiltroAbierto(false);
     setFiltroCategoria('');
+    setFiltroDisciplina('');
+    setEstadoExtension({});
     cacheSociosRef.current = null;
     await cargarSocios();
   }
@@ -150,6 +188,8 @@ function SociosPage() {
     setFiltroEstado('');
     setFiltroAbierto(false);
     setFiltroCategoria('');
+    setFiltroDisciplina('');
+    setEstadoExtension({});
     setError(null);
     if (cacheSociosRef.current !== null) {
       setResultado(cacheSociosRef.current);
@@ -162,6 +202,26 @@ function SociosPage() {
   function abrirEditar() {
     setErrorModal('');
     setEditarModalOpen(true);
+  }
+
+  async function handleExtenderSuscripcion(e, idSocio) {
+    e.stopPropagation();
+    setEstadoExtension((prev) => ({ ...prev, [idSocio]: 'loading' }));
+    try {
+      await extenderSuscripcionDisciplina(filtroDisciplina, idSocio);
+      setEstadoExtension((prev) => ({ ...prev, [idSocio]: 'exito' }));
+    } catch {
+      setEstadoExtension((prev) => ({ ...prev, [idSocio]: 'error' }));
+    }
+  }
+
+  function labelExtenderSuscripcion(idSocio) {
+    switch (estadoExtension[idSocio]) {
+      case 'loading': return 'Extendiendo…';
+      case 'exito': return 'Suscripción extendida';
+      case 'error': return 'Error, reintentar';
+      default: return 'Extender suscripcion';
+    }
   }
 
   function abrirEliminar() {
@@ -311,10 +371,12 @@ function SociosPage() {
         }
         const estadosUnicos = [...new Set(resultado.map(s => s.estado.nombre))].sort();
         const categoriasUnicas = [...new Set(resultado.map(s => s.categoria.nombre))].sort();
+        const mostrarColumnaSuscripcion = !!filtroDisciplina && puedeCrearDisciplina;
         const listaFiltrada = resultado.filter(s => {
           const matchEstado = filtroEstado ? s.estado.nombre === filtroEstado : true;
           const matchCategoria = filtroCategoria ? s.categoria.nombre === filtroCategoria : true;
-          return matchEstado && matchCategoria;
+          const matchDisciplina = filtroDisciplina ? (idsDisciplinaFiltro?.has(s.id) ?? false) : true;
+          return matchEstado && matchCategoria && matchDisciplina;
         });
         return (
           <>
@@ -353,9 +415,25 @@ function SociosPage() {
                       ))}
                     </select>
                   </div>
+                  {puedeVerDisciplinas && disciplinas.length > 0 && (
+                    <div className="socios-filtros-grupo">
+                      <select
+                        id="filtro-disciplina"
+                        className="socios-filtro-select"
+                        value={filtroDisciplina}
+                        onChange={(e) => setFiltroDisciplina(e.target.value)}
+                      >
+                        <option value="">Disciplina: Todas</option>
+                        {disciplinas.map(d => (
+                          <option key={d.id} value={d.id}>{d.nombre}</option>
+                        ))}
+                      </select>
+                    </div>
+                  )}
                 </div>
               )}
             </div>
+            {errorDisciplinaFiltro && <p className="socios-error">{errorDisciplinaFiltro}</p>}
             <div className="socios-table-wrapper">
               {listaFiltrada.length === 0 ? (
                 <EmptyState mensaje="No hay socios con los filtros seleccionados." />
@@ -388,6 +466,7 @@ function SociosPage() {
                           Estado{iconoOrden('estado')}
                         </button>
                       </th>
+                      {mostrarColumnaSuscripcion && <th>Suscripción</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -417,6 +496,18 @@ function SociosPage() {
                               {s.estado.nombre}
                             </span>
                           </td>
+                          {mostrarColumnaSuscripcion && (
+                            <td>
+                              <button
+                                type="button"
+                                className="socios-btn-extender"
+                                disabled={estadoExtension[s.id] === 'loading'}
+                                onClick={(e) => handleExtenderSuscripcion(e, s.id)}
+                              >
+                                {labelExtenderSuscripcion(s.id)}
+                              </button>
+                            </td>
+                          )}
                         </tr>
                       );
                     })}
