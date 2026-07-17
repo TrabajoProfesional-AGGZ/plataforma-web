@@ -18,6 +18,13 @@ jest.mock('../../services/sociosService', () => ({
 }));
 import { getSocios, updateSocio, deleteSocio } from '../../services/sociosService';
 
+jest.mock('../../services/disciplinasService', () => ({
+  getDisciplinas: jest.fn(),
+  getSociosByDisciplina: jest.fn(),
+  extenderSuscripcionDisciplina: jest.fn(),
+}));
+import { getDisciplinas, getSociosByDisciplina, extenderSuscripcionDisciplina } from '../../services/disciplinasService';
+
 jest.mock('../../components/createForm/CreateSocioForm', () => ({
   CreateSocioForm: ({ onSuccess, onCancel }) => (
     <div>
@@ -81,6 +88,8 @@ describe('SociosPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     getSocios.mockResolvedValue([]);
+    getDisciplinas.mockResolvedValue([]);
+    getSociosByDisciplina.mockResolvedValue([]);
   });
 
   test('renderiza el título, el campo de búsqueda y los botones', async () => {
@@ -417,6 +426,131 @@ describe('SociosPage', () => {
     expect(screen.queryByText('Pérez')).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
+    await waitFor(() => {
+      expect(screen.getByText('Pérez')).toBeInTheDocument();
+      expect(screen.getByText('García')).toBeInTheDocument();
+    });
+  });
+
+  // --- Filtro por disciplina (Feedback: se quitó la vista de socios inscriptos de Disciplinas) ---
+
+  test('no muestra el selector de disciplina si no hay disciplinas cargadas', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    getDisciplinas.mockResolvedValue([]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+
+    expect(screen.queryByDisplayValue('Disciplina: Todas')).not.toBeInTheDocument();
+  });
+
+  test('muestra el selector de disciplina cuando hay disciplinas cargadas', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    getDisciplinas.mockResolvedValue([{ id: 'disc-1', nombre: 'Natación' }]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+
+    expect(screen.getByDisplayValue('Disciplina: Todas')).toBeInTheDocument();
+    expect(screen.getByRole('option', { name: 'Natación' })).toBeInTheDocument();
+  });
+
+  test('filtrar por disciplina muestra solo los socios inscriptos en esa disciplina', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    getDisciplinas.mockResolvedValue([{ id: 'disc-1', nombre: 'Natación' }]);
+    getSociosByDisciplina.mockResolvedValue([{ id: socioMock.id, nro_socio: socioMock.nro_socio }]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
+
+    await waitFor(() => expect(getSociosByDisciplina).toHaveBeenCalledWith('disc-1'));
+    await waitFor(() => {
+      expect(screen.getByText('Pérez')).toBeInTheDocument();
+      expect(screen.queryByText('García')).not.toBeInTheDocument();
+    });
+  });
+
+  test('muestra mensaje de error si falla la carga de socios de la disciplina', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    getDisciplinas.mockResolvedValue([{ id: 'disc-1', nombre: 'Natación' }]);
+    getSociosByDisciplina.mockRejectedValueOnce(new Error('falla'));
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
+
+    await waitFor(() => {
+      expect(screen.getByText(/no se pudieron obtener los socios de la disciplina/i)).toBeInTheDocument();
+    });
+  });
+
+  test('muestra columna Suscripción con botón para extender al filtrar por disciplina', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    getDisciplinas.mockResolvedValue([{ id: 'disc-1', nombre: 'Natación' }]);
+    getSociosByDisciplina.mockResolvedValue([{ id: socioMock.id, nro_socio: socioMock.nro_socio }]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
+
+    await waitFor(() => expect(screen.getByText('Extender suscripcion')).toBeInTheDocument());
+  });
+
+  test('extiende la suscripción de un socio filtrado por disciplina sin abrir su detalle', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    getDisciplinas.mockResolvedValue([{ id: 'disc-1', nombre: 'Natación' }]);
+    getSociosByDisciplina.mockResolvedValue([{ id: socioMock.id, nro_socio: socioMock.nro_socio }]);
+    extenderSuscripcionDisciplina.mockResolvedValueOnce({});
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
+    await waitFor(() => expect(screen.getByText('Extender suscripcion')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Extender suscripcion'));
+
+    await waitFor(() => expect(screen.getByText('Suscripción extendida')).toBeInTheDocument());
+    expect(extenderSuscripcionDisciplina).toHaveBeenCalledWith('disc-1', socioMock.id);
+    expect(screen.queryByRole('button', { name: /editar/i })).not.toBeInTheDocument();
+  });
+
+  test('muestra error al fallar la extensión de suscripción desde el filtro de disciplina', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    getDisciplinas.mockResolvedValue([{ id: 'disc-1', nombre: 'Natación' }]);
+    getSociosByDisciplina.mockResolvedValue([{ id: socioMock.id, nro_socio: socioMock.nro_socio }]);
+    extenderSuscripcionDisciplina.mockRejectedValueOnce(new Error('falla'));
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
+    await waitFor(() => expect(screen.getByText('Extender suscripcion')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('Extender suscripcion'));
+
+    await waitFor(() => expect(screen.getByText('Error, reintentar')).toBeInTheDocument());
+  });
+
+  test('el filtro de disciplina se limpia al hacer click en Ver todos', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    getDisciplinas.mockResolvedValue([{ id: 'disc-1', nombre: 'Natación' }]);
+    getSociosByDisciplina.mockResolvedValue([{ id: socioMock.id, nro_socio: socioMock.nro_socio }]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
+    await waitFor(() => expect(screen.queryByText('García')).not.toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
+
     await waitFor(() => {
       expect(screen.getByText('Pérez')).toBeInTheDocument();
       expect(screen.getByText('García')).toBeInTheDocument();

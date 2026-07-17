@@ -33,30 +33,20 @@
   font-size: 18px;
   font-weight: 600;
   color: var(--color-text-primary);
+  margin: 0 0 var(--space-2) 0;
+}
+
+.disciplinas-socios-hint {
+  font-size: 13px;
+  color: var(--color-text-secondary);
   margin: 0 0 var(--space-3) 0;
-}
-
-/* ── Toolbar: filtro (izquierda) + inscribir socio (derecha), misma fila ── */
-.disciplinas-socios-toolbar {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  flex-wrap: wrap;
-  margin-bottom: var(--space-3);
-}
-
-.disciplinas-socios-toolbar .disciplinas-filtro-socio {
-  width: 200px;
-  flex: 0 0 auto;
-  margin-bottom: 0;
 }
 
 .disciplinas-inscribir-form {
   display: flex;
   gap: var(--space-2);
   align-items: center;
-  flex-wrap: nowrap;
-  margin-left: auto;
+  flex-wrap: wrap;
 }
 
 .disciplinas-btn-inscribir {
@@ -79,28 +69,16 @@
 .disciplinas-inscribir-error {
   color: var(--status-danger-border);
   font-size: 13px;
-  margin: 0 0 var(--space-3) 0;
+  margin: var(--space-3) 0 0 0;
 }
 
-/* ── Extender suscripción (por socio inscripto) ─────────────────── */
-.disciplinas-btn-extender {
-  background: var(--color-surface);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-text-primary);
-  border-radius: var(--radius-sm);
-  padding: 5px var(--space-3);
-  font-size: 12px;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
+.disciplinas-inscribir-exito {
+  color: var(--status-success-border);
+  font-size: 13px;
+  margin: var(--space-3) 0 0 0;
 }
 
-.disciplinas-btn-extender:disabled {
-  cursor: not-allowed;
-  opacity: 0.6;
-}
-
-/* ── Filtro socios inscriptos ────────────────────────────────── */
+/* ── Input N° de socio a inscribir ───────────────────────────── */
 .disciplinas-filtro-socio {
   width: 100%;
   max-width: 220px;
@@ -112,7 +90,6 @@
   color: var(--color-text-primary);
   background-color: var(--color-surface);
   outline: none;
-  margin-bottom: var(--space-3);
 }
 
 .disciplinas-filtro-socio:focus {

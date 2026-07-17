@@ -3,10 +3,9 @@ import { useLocation } from 'react-router-dom';
 import { Plus, ChevronLeft } from 'lucide-react';
 import { CreateDisciplinaForm } from '../../components/createDisciplinaForm/CreateDisciplinaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
-import { getDisciplinas, createDisciplina, pausarDisciplina, getSociosByDisciplina, inscribirSocioADisciplina, extenderSuscripcionDisciplina } from '../../services/disciplinasService';
+import { getDisciplinas, createDisciplina, pausarDisciplina, inscribirSocioADisciplina } from '../../services/disciplinasService';
 import { getSocioByNroSocio } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
-import { VerSocioModal } from '../../components/verSocioModal/VerSocioModal';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
@@ -38,15 +37,10 @@ function DisciplinasPage() {
   const [crearOpen, setCrearOpen] = useState(false);
   const [pausarOpen, setPausarOpen] = useState(false);
   const [guardando, setGuardando] = useState(false);
-  const [sociosDisciplina, setSociosDisciplina] = useState([]);
-  const [loadingSociosDisciplina, setLoadingSociosDisciplina] = useState(false);
-  const [verSocioData, setVerSocioData] = useState(null);
-  const [verSocioOpen, setVerSocioOpen] = useState(false);
-  const [filtroDisciplinaSocio, setFiltroDisciplinaSocio] = useState('');
   const [nroSocioInscribir, setNroSocioInscribir] = useState('');
   const [inscribiendoLoading, setInscribiendoLoading] = useState(false);
   const [inscribiendoError, setInscribiendoError] = useState('');
-  const [estadoExtension, setEstadoExtension] = useState({});
+  const [inscribiendoExito, setInscribiendoExito] = useState(false);
 
   function cargarDisciplinas() {
     setLoading(true);
@@ -69,21 +63,11 @@ function DisciplinasPage() {
   }, [disciplinas]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
-    if (!disciplinaActual) {
-      setSociosDisciplina([]);
-      setFiltroDisciplinaSocio('');
-      return;
-    }
-    setFiltroDisciplinaSocio('');
+    if (!disciplinaActual) return;
     setNroSocioInscribir('');
     setInscribiendoError('');
-    setEstadoExtension({});
-    setLoadingSociosDisciplina(true);
-    getSociosByDisciplina(disciplinaActual.id)
-      .then((data) => setSociosDisciplina(data))
-      .catch(() => setSociosDisciplina([]))
-      .finally(() => setLoadingSociosDisciplina(false));
-  }, [disciplinaActual]); // eslint-disable-line react-hooks/exhaustive-deps
+    setInscribiendoExito(false);
+  }, [disciplinaActual]);
 
   async function handleInscribirSocio(e) {
     e.preventDefault();
@@ -91,12 +75,12 @@ function DisciplinasPage() {
     if (!nro) return;
     setInscribiendoLoading(true);
     setInscribiendoError('');
+    setInscribiendoExito(false);
     try {
       const socio = await getSocioByNroSocio(nro);
       await inscribirSocioADisciplina(disciplinaActual.id, socio.id);
-      const actualizados = await getSociosByDisciplina(disciplinaActual.id);
-      setSociosDisciplina(actualizados);
       setNroSocioInscribir('');
+      setInscribiendoExito(true);
     } catch (err) {
       const mensajes = {
         'socio-no-encontrado': 'No existe un socio con ese número.',
@@ -105,25 +89,6 @@ function DisciplinasPage() {
       setInscribiendoError(mensajes[err.message] ?? 'No se pudo inscribir al socio.');
     } finally {
       setInscribiendoLoading(false);
-    }
-  }
-
-  async function handleExtenderSuscripcion(idSocio) {
-    setEstadoExtension((prev) => ({ ...prev, [idSocio]: 'loading' }));
-    try {
-      await extenderSuscripcionDisciplina(disciplinaActual.id, idSocio);
-      setEstadoExtension((prev) => ({ ...prev, [idSocio]: 'exito' }));
-    } catch {
-      setEstadoExtension((prev) => ({ ...prev, [idSocio]: 'error' }));
-    }
-  }
-
-  function labelExtenderSuscripcion(idSocio) {
-    switch (estadoExtension[idSocio]) {
-      case 'loading': return 'Extendiendo…';
-      case 'exito': return 'Suscripción extendida';
-      case 'error': return 'Error, reintentar';
-      default: return 'Extender suscripcion';
     }
   }
 
@@ -163,15 +128,6 @@ function DisciplinasPage() {
     } finally {
       setGuardando(false);
     }
-  }
-
-  const sociosDisciplinaFiltrados = filtroDisciplinaSocio.trim()
-    ? sociosDisciplina.filter((s) => String(s.nro_socio).includes(filtroDisciplinaSocio.trim()))
-    : sociosDisciplina;
-
-  function abrirVerSocio(socio) {
-    setVerSocioData(socio);
-    setVerSocioOpen(true);
   }
 
   function renderListaContenido() {
@@ -301,101 +257,35 @@ function DisciplinasPage() {
             <p className="detalle-id">ID: {disciplinaActual.id}</p>
           </div>
 
-          <div className="disciplinas-socios-section">
-            <h3 className="disciplinas-socios-title">Socios inscriptos</h3>
+          {puedeCrearDisciplina && (
+            <div className="disciplinas-socios-section">
+              <h3 className="disciplinas-socios-title">Inscribir socio</h3>
+              <p className="disciplinas-socios-hint">
+                Para ver los socios inscriptos en esta disciplina, andá a la sección Socios y filtrá por disciplina.
+              </p>
 
-            <div className="disciplinas-socios-toolbar">
-              {!loadingSociosDisciplina && sociosDisciplina.length > 0 && (
+              <form className="disciplinas-inscribir-form" onSubmit={handleInscribirSocio}>
                 <input
                   type="text"
                   className="disciplinas-filtro-socio"
-                  placeholder="Filtrar por N° de socio"
-                  value={filtroDisciplinaSocio}
-                  onChange={(e) => setFiltroDisciplinaSocio(e.target.value)}
-                  aria-label="Filtrar por número de socio"
+                  placeholder="N° de socio a inscribir"
+                  value={nroSocioInscribir}
+                  onChange={(e) => setNroSocioInscribir(e.target.value)}
+                  aria-label="Número de socio a inscribir"
+                  disabled={inscribiendoLoading}
                 />
-              )}
-              {puedeCrearDisciplina && (
-                <form className="disciplinas-inscribir-form" onSubmit={handleInscribirSocio}>
-                  <input
-                    type="text"
-                    className="disciplinas-filtro-socio"
-                    placeholder="N° de socio a inscribir"
-                    value={nroSocioInscribir}
-                    onChange={(e) => setNroSocioInscribir(e.target.value)}
-                    aria-label="Número de socio a inscribir"
-                    disabled={inscribiendoLoading}
-                  />
-                  <button
-                    type="submit"
-                    className="disciplinas-btn-inscribir"
-                    disabled={inscribiendoLoading || !nroSocioInscribir.trim()}
-                  >
-                    {inscribiendoLoading ? 'Inscribiendo…' : 'Inscribir socio'}
-                  </button>
-                </form>
-              )}
+                <button
+                  type="submit"
+                  className="disciplinas-btn-inscribir"
+                  disabled={inscribiendoLoading || !nroSocioInscribir.trim()}
+                >
+                  {inscribiendoLoading ? 'Inscribiendo…' : 'Inscribir socio'}
+                </button>
+              </form>
+              {inscribiendoError && <p className="disciplinas-inscribir-error">{inscribiendoError}</p>}
+              {inscribiendoExito && <p className="disciplinas-inscribir-exito">Socio inscripto correctamente.</p>}
             </div>
-            {inscribiendoError && <p className="disciplinas-inscribir-error">{inscribiendoError}</p>}
-
-            {loadingSociosDisciplina ? (
-              <div className="list-loading">
-                <img src={logo} alt="" className="loading-logo" />
-              </div>
-            ) : sociosDisciplina.length === 0 ? (
-              <EmptyState mensaje="No hay socios inscriptos en esta disciplina." />
-            ) : (
-              <>
-                {sociosDisciplinaFiltrados.length === 0 ? (
-                  <EmptyState mensaje="No hay socios con ese número." />
-                ) : (
-                  <div className="disciplinas-table-wrapper">
-                    <table className="disciplinas-tabla">
-                      <thead>
-                        <tr>
-                          <th>N° Socio</th>
-                          <th>Apellido y nombre</th>
-                          <th>Estado</th>
-                          {puedeCrearDisciplina && <th>Suscripción</th>}
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {sociosDisciplinaFiltrados.map((s) => (
-                          <tr key={s.id}>
-                            <td>
-                              <button
-                                type="button"
-                                className="nro-socio-link"
-                                onClick={() => abrirVerSocio(s)}
-                              >
-                                {s.nro_socio}
-                              </button>
-                            </td>
-                            <td>{s.apellido} {s.nombre}</td>
-                            <td>
-                              <EstadoBadge estado={s.estado?.nombre ?? s.estado} />
-                            </td>
-                            {puedeCrearDisciplina && (
-                              <td>
-                                <button
-                                  type="button"
-                                  className="disciplinas-btn-extender"
-                                  disabled={estadoExtension[s.id] === 'loading'}
-                                  onClick={() => handleExtenderSuscripcion(s.id)}
-                                >
-                                  {labelExtenderSuscripcion(s.id)}
-                                </button>
-                              </td>
-                            )}
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                )}
-              </>
-            )}
-          </div>
+          )}
 
           {puedeBorrarDisciplina && (
             <div className="disciplinas-detalle-actions">
@@ -424,10 +314,6 @@ function DisciplinasPage() {
         onCancel={() => setPausarOpen(false)}
         labelConfirmar="Pausar"
       />
-
-      {verSocioOpen && verSocioData && (
-        <VerSocioModal socio={verSocioData} onClose={() => setVerSocioOpen(false)} />
-      )}
     </div>
   );
 }

@@ -9,18 +9,17 @@ jest.mock('../../hooks/useTheme', () => ({
 jest.mock('../../firebase', () => ({ auth: {} }));
 
 jest.mock('../../hooks/usePermiso', () => ({
-  usePermiso: () => true,
+  usePermiso: jest.fn(() => true),
 }));
+import { usePermiso } from '../../hooks/usePermiso';
 
 jest.mock('../../services/disciplinasService', () => ({
   getDisciplinas: jest.fn(),
   createDisciplina: jest.fn(),
   pausarDisciplina: jest.fn(),
-  getSociosByDisciplina: jest.fn(),
   inscribirSocioADisciplina: jest.fn(),
-  extenderSuscripcionDisciplina: jest.fn(),
 }));
-import { getDisciplinas, createDisciplina, pausarDisciplina, getSociosByDisciplina, inscribirSocioADisciplina, extenderSuscripcionDisciplina } from '../../services/disciplinasService';
+import { getDisciplinas, createDisciplina, pausarDisciplina, inscribirSocioADisciplina } from '../../services/disciplinasService';
 
 jest.mock('../../services/sociosService', () => ({
   getSocioByNroSocio: jest.fn(),
@@ -40,15 +39,6 @@ jest.mock('../../components/createDisciplinaForm/CreateDisciplinaForm', () => ({
         Confirmar creación
       </button>
       <button onClick={onCancel}>Cancelar creación</button>
-    </div>
-  ),
-}));
-
-jest.mock('../../components/verSocioModal/VerSocioModal', () => ({
-  VerSocioModal: ({ socio, onClose }) => (
-    <div data-testid="ver-socio-modal">
-      <span>{socio.nro_socio}</span>
-      <button onClick={onClose}>Cerrar socio</button>
     </div>
   ),
 }));
@@ -76,10 +66,10 @@ function ultimoBoton(nombre) {
 
 describe('DisciplinasPage', () => {
   beforeEach(() => {
+    usePermiso.mockReturnValue(true);
     getDisciplinas.mockResolvedValue([]);
     createDisciplina.mockResolvedValue({ id: 'test-id' });
     pausarDisciplina.mockResolvedValue(undefined);
-    getSociosByDisciplina.mockResolvedValue([]);
     inscribirSocioADisciplina.mockResolvedValue({});
     getSocioByNroSocio.mockResolvedValue({ id: 's-1', nro_socio: '2001' });
   });
@@ -278,117 +268,34 @@ describe('DisciplinasPage', () => {
     await waitFor(() => expect(screen.getByText('Pausada')).toBeInTheDocument());
   });
 
-  // ── Tests de socios inscriptos (punto 8) ──
+  // ── Tests de la sección "Inscribir socio" (Feedback: se quitó la vista de socios inscriptos) ──
 
-  test('muestra la sección "Socios inscriptos" en la vista de detalle', async () => {
+  test('no muestra la sección "Socios inscriptos" en la vista de detalle', async () => {
     await renderPage();
     crearDisciplinaHelper();
     irAlDetalle();
-    await waitFor(() => expect(screen.getByText('Socios inscriptos')).toBeInTheDocument());
-  });
-
-  test('muestra mensaje vacío cuando no hay socios inscriptos', async () => {
-    getSociosByDisciplina.mockResolvedValue([]);
-    await renderPage();
-    crearDisciplinaHelper();
-    irAlDetalle();
-    await waitFor(() => {
-      expect(screen.getByText('No hay socios inscriptos en esta disciplina.')).toBeInTheDocument();
-    });
-  });
-
-  test('muestra la tabla con socios cuando getSociosByDisciplina devuelve resultados', async () => {
-    getSociosByDisciplina.mockResolvedValue([
-      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
-      { id: 's-2', nro_socio: '2002', nombre: 'Carlos', apellido: 'Ruiz', estado: { nombre: 'Moroso' } },
-    ]);
-
-    await renderPage();
-    crearDisciplinaHelper();
-    irAlDetalle();
-
-    await waitFor(() => {
-      expect(screen.getByText('2001')).toBeInTheDocument();
-      expect(screen.getByText('López Ana')).toBeInTheDocument();
-      expect(screen.getByText('2002')).toBeInTheDocument();
-      expect(screen.getByText('Ruiz Carlos')).toBeInTheDocument();
-    });
-  });
-
-  test('llama getSociosByDisciplina con el id de la disciplina actual', async () => {
-    getDisciplinas.mockResolvedValue([
-      { id: 'disc-uuid-conocido', nombre: 'Natación', cupo_maximo: 30, arancelada: false, concepto_cobro: '', estado: 'Activa' },
-    ]);
-    await renderPage();
-    await waitFor(() => expect(screen.getByText('Natación')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Natación'));
-    await waitFor(() => {
-      expect(getSociosByDisciplina).toHaveBeenCalledWith('disc-uuid-conocido');
-    });
-  });
-
-  test('limpia los socios al volver a la lista', async () => {
-    getSociosByDisciplina.mockResolvedValue([
-      { id: 's-1', nro_socio: '3001', nombre: 'Pedro', apellido: 'García', estado: { nombre: 'Activo' } },
-    ]);
-
-    await renderPage();
-    crearDisciplinaHelper();
-    irAlDetalle();
-
-    await waitFor(() => expect(screen.getByText('3001')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByRole('button', { name: /volver/i }));
-
-    expect(screen.queryByText('3001')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('heading', { name: 'Inscribir socio' })).toBeInTheDocument());
     expect(screen.queryByText('Socios inscriptos')).not.toBeInTheDocument();
   });
 
-  test('muestra estado como string si el socio no tiene objeto estado', async () => {
-    getSociosByDisciplina.mockResolvedValue([
-      { id: 's-3', nro_socio: '4001', nombre: 'Laura', apellido: 'Díaz', estado: 'Activo' },
-    ]);
-
+  test('muestra un hint indicando que hay que filtrar por disciplina en Socios', async () => {
     await renderPage();
     crearDisciplinaHelper();
     irAlDetalle();
-
     await waitFor(() => {
-      expect(screen.getByText('4001')).toBeInTheDocument();
-      expect(screen.getByText('Activo')).toBeInTheDocument();
+      expect(screen.getByText(/filtrá por disciplina/i)).toBeInTheDocument();
     });
   });
 
-  test('hacer clic en el N° de socio abre el modal del socio', async () => {
-    getSociosByDisciplina.mockResolvedValue([
-      { id: 's-4', nro_socio: '5001', nombre: 'María', apellido: 'González', estado: { nombre: 'Activo' } },
+  test('no muestra la sección de inscribir socio sin permiso crear_disciplina', async () => {
+    getDisciplinas.mockResolvedValue([
+      { id: 'disc-1', nombre: 'Natación', cupo_maximo: 30, arancelada: false, concepto_cobro: '', estado: 'Activa' },
     ]);
-
+    usePermiso.mockImplementation((p) => p !== 'crear_disciplina');
     await renderPage();
-    crearDisciplinaHelper();
     irAlDetalle();
-
-    await waitFor(() => expect(screen.getByText('5001')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('5001'));
-
-    expect(screen.getByTestId('ver-socio-modal')).toBeInTheDocument();
-  });
-
-  test('cerrar el modal del socio lo desmonta', async () => {
-    getSociosByDisciplina.mockResolvedValue([
-      { id: 's-5', nro_socio: '6001', nombre: 'Pedro', apellido: 'Ríos', estado: { nombre: 'Activo' } },
-    ]);
-
-    await renderPage();
-    crearDisciplinaHelper();
-    irAlDetalle();
-
-    await waitFor(() => expect(screen.getByText('6001')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('6001'));
-    expect(screen.getByTestId('ver-socio-modal')).toBeInTheDocument();
-
-    fireEvent.click(screen.getByRole('button', { name: 'Cerrar socio' }));
-    expect(screen.queryByTestId('ver-socio-modal')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('button', { name: /volver/i })).toBeInTheDocument());
+    expect(screen.queryByRole('heading', { name: 'Inscribir socio' })).not.toBeInTheDocument();
   });
 
   test('navega al detalle cuando hay disciplinaId en location.state', async () => {
@@ -406,123 +313,6 @@ describe('DisciplinasPage', () => {
     expect(screen.getAllByText('Yoga').length).toBeGreaterThan(0);
   });
 
-  // ── Tests del buscador por N° de socio en socios inscriptos (Tarea 3) ──
-
-  test('muestra el input de filtro cuando hay socios inscriptos', async () => {
-    getSociosByDisciplina.mockResolvedValue([
-      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
-    ]);
-    await renderPage();
-    crearDisciplinaHelper();
-    irAlDetalle();
-    await waitFor(() => expect(screen.getByLabelText('Filtrar por número de socio')).toBeInTheDocument());
-  });
-
-  test('no muestra el input de filtro cuando no hay socios inscriptos', async () => {
-    getSociosByDisciplina.mockResolvedValue([]);
-    await renderPage();
-    crearDisciplinaHelper();
-    irAlDetalle();
-    await waitFor(() => expect(screen.getByText('No hay socios inscriptos en esta disciplina.')).toBeInTheDocument());
-    expect(screen.queryByLabelText('Filtrar por número de socio')).not.toBeInTheDocument();
-  });
-
-  test('tipear en el filtro reduce la tabla de socios en tiempo real', async () => {
-    getSociosByDisciplina.mockResolvedValue([
-      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
-      { id: 's-2', nro_socio: '2002', nombre: 'Carlos', apellido: 'Ruiz', estado: { nombre: 'Moroso' } },
-    ]);
-    await renderPage();
-    crearDisciplinaHelper();
-    irAlDetalle();
-    await waitFor(() => expect(screen.getByText('2001')).toBeInTheDocument());
-
-    fireEvent.change(screen.getByLabelText('Filtrar por número de socio'), { target: { value: '2001' } });
-
-    expect(screen.getByText('2001')).toBeInTheDocument();
-    expect(screen.queryByText('2002')).not.toBeInTheDocument();
-  });
-
-  test('limpiar el filtro vuelve a mostrar todos los socios', async () => {
-    getSociosByDisciplina.mockResolvedValue([
-      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
-      { id: 's-2', nro_socio: '2002', nombre: 'Carlos', apellido: 'Ruiz', estado: { nombre: 'Moroso' } },
-    ]);
-    await renderPage();
-    crearDisciplinaHelper();
-    irAlDetalle();
-    await waitFor(() => expect(screen.getByText('2001')).toBeInTheDocument());
-
-    fireEvent.change(screen.getByLabelText('Filtrar por número de socio'), { target: { value: '2001' } });
-    expect(screen.queryByText('2002')).not.toBeInTheDocument();
-
-    fireEvent.change(screen.getByLabelText('Filtrar por número de socio'), { target: { value: '' } });
-    expect(screen.getByText('2001')).toBeInTheDocument();
-    expect(screen.getByText('2002')).toBeInTheDocument();
-  });
-
-  test('muestra mensaje cuando el filtro no coincide con ningún socio', async () => {
-    getSociosByDisciplina.mockResolvedValue([
-      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
-    ]);
-    await renderPage();
-    crearDisciplinaHelper();
-    irAlDetalle();
-    await waitFor(() => expect(screen.getByText('2001')).toBeInTheDocument());
-
-    fireEvent.change(screen.getByLabelText('Filtrar por número de socio'), { target: { value: '9999' } });
-
-    expect(screen.queryByText('2001')).not.toBeInTheDocument();
-    expect(screen.getByText('No hay socios con ese número.')).toBeInTheDocument();
-  });
-
-  test('el filtro acepta coincidencia parcial del número de socio', async () => {
-    getSociosByDisciplina.mockResolvedValue([
-      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
-      { id: 's-2', nro_socio: '3001', nombre: 'Carlos', apellido: 'Ruiz', estado: { nombre: 'Moroso' } },
-    ]);
-    await renderPage();
-    crearDisciplinaHelper();
-    irAlDetalle();
-    await waitFor(() => expect(screen.getByText('2001')).toBeInTheDocument());
-
-    fireEvent.change(screen.getByLabelText('Filtrar por número de socio'), { target: { value: '001' } });
-
-    expect(screen.getByText('2001')).toBeInTheDocument();
-    expect(screen.getByText('3001')).toBeInTheDocument();
-  });
-
-  test('el filtro se resetea al salir y volver al detalle de una disciplina', async () => {
-    getSociosByDisciplina.mockResolvedValue([
-      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
-    ]);
-    await renderPage();
-    crearDisciplinaHelper();
-    irAlDetalle();
-    await waitFor(() => expect(screen.getByLabelText('Filtrar por número de socio')).toBeInTheDocument());
-
-    fireEvent.change(screen.getByLabelText('Filtrar por número de socio'), { target: { value: '9999' } });
-    expect(screen.getByLabelText('Filtrar por número de socio').value).toBe('9999');
-
-    fireEvent.click(screen.getByRole('button', { name: /volver/i }));
-    irAlDetalle();
-
-    await waitFor(() => expect(screen.getByLabelText('Filtrar por número de socio')).toBeInTheDocument());
-    expect(screen.getByLabelText('Filtrar por número de socio').value).toBe('');
-  });
-
-  test('limpia la lista de socios si getSociosByDisciplina falla', async () => {
-    getSociosByDisciplina.mockRejectedValueOnce(new Error('error de red'));
-
-    await renderPage();
-    crearDisciplinaHelper();
-    irAlDetalle();
-
-    await waitFor(() => {
-      expect(screen.getByText('No hay socios inscriptos en esta disciplina.')).toBeInTheDocument();
-    });
-  });
-
   // ── Tests de inscripción de socio a disciplina (Feature 1) ──
 
   test('muestra el formulario de inscripción de socio en el detalle', async () => {
@@ -532,15 +322,10 @@ describe('DisciplinasPage', () => {
     await waitFor(() => expect(screen.getByLabelText('Número de socio a inscribir')).toBeInTheDocument());
   });
 
-  test('inscribe un socio y refresca la lista de inscriptos', async () => {
+  test('inscribe un socio y muestra confirmación', async () => {
     getDisciplinas.mockResolvedValue([
       { id: 'disc-uuid-conocido', nombre: 'Natación', cupo_maximo: 30, arancelada: false, concepto_cobro: '', estado: 'Activa' },
     ]);
-    getSociosByDisciplina
-      .mockResolvedValueOnce([])
-      .mockResolvedValueOnce([
-        { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
-      ]);
 
     await renderPage();
     await waitFor(() => expect(screen.getByText('Natación')).toBeInTheDocument());
@@ -553,7 +338,7 @@ describe('DisciplinasPage', () => {
     await waitFor(() => {
       expect(getSocioByNroSocio).toHaveBeenCalledWith('2001');
       expect(inscribirSocioADisciplina).toHaveBeenCalledWith('disc-uuid-conocido', 's-1');
-      expect(screen.getByText('2001')).toBeInTheDocument();
+      expect(screen.getByText('Socio inscripto correctamente.')).toBeInTheDocument();
     });
     expect(screen.getByLabelText('Número de socio a inscribir').value).toBe('');
   });
@@ -598,70 +383,20 @@ describe('DisciplinasPage', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: 'Inscribir socio' })).toBeDisabled());
   });
 
-  // ── Tests de extensión de suscripción por socio (Feature 1) ──
-
-  test('muestra un botón "Extender suscripcion" por cada socio inscripto', async () => {
-    getSociosByDisciplina.mockResolvedValue([
-      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
-      { id: 's-2', nro_socio: '2002', nombre: 'Carlos', apellido: 'Ruiz', estado: { nombre: 'Activo' } },
-    ]);
+  test('el mensaje de éxito de inscripción se resetea al salir y volver al detalle', async () => {
     await renderPage();
     crearDisciplinaHelper();
     irAlDetalle();
-    await waitFor(() => expect(screen.getAllByText('Extender suscripcion')).toHaveLength(2));
-  });
+    await waitFor(() => expect(screen.getByLabelText('Número de socio a inscribir')).toBeInTheDocument());
 
-  test('extiende la suscripción de un socio y muestra confirmación', async () => {
-    getDisciplinas.mockResolvedValue([
-      { id: 'disc-uuid-conocido', nombre: 'Natación', cupo_maximo: 30, arancelada: false, concepto_cobro: '', estado: 'Activa' },
-    ]);
-    getSociosByDisciplina.mockResolvedValue([
-      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
-    ]);
-    extenderSuscripcionDisciplina.mockResolvedValueOnce({});
-    await renderPage();
-    await waitFor(() => expect(screen.getByText('Natación')).toBeInTheDocument());
-    fireEvent.click(screen.getByText('Natación'));
-    await waitFor(() => expect(screen.getByText('Extender suscripcion')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Extender suscripcion'));
-
-    await waitFor(() => expect(screen.getByText('Suscripción extendida')).toBeInTheDocument());
-    expect(extenderSuscripcionDisciplina).toHaveBeenCalledWith('disc-uuid-conocido', 's-1');
-  });
-
-  test('muestra error si falla la extensión de suscripción de un socio', async () => {
-    getSociosByDisciplina.mockResolvedValue([
-      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
-    ]);
-    extenderSuscripcionDisciplina.mockRejectedValueOnce(new Error('falla'));
-    await renderPage();
-    crearDisciplinaHelper();
-    irAlDetalle();
-    await waitFor(() => expect(screen.getByText('Extender suscripcion')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Extender suscripcion'));
-
-    await waitFor(() => expect(screen.getByText('Error, reintentar')).toBeInTheDocument());
-  });
-
-  test('el estado de extensión se resetea al salir y volver al detalle', async () => {
-    getSociosByDisciplina.mockResolvedValue([
-      { id: 's-1', nro_socio: '2001', nombre: 'Ana', apellido: 'López', estado: { nombre: 'Activo' } },
-    ]);
-    extenderSuscripcionDisciplina.mockResolvedValueOnce({});
-    await renderPage();
-    crearDisciplinaHelper();
-    irAlDetalle();
-    await waitFor(() => expect(screen.getByText('Extender suscripcion')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByText('Extender suscripcion'));
-    await waitFor(() => expect(screen.getByText('Suscripción extendida')).toBeInTheDocument());
+    fireEvent.change(screen.getByLabelText('Número de socio a inscribir'), { target: { value: '2001' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Inscribir socio' }));
+    await waitFor(() => expect(screen.getByText('Socio inscripto correctamente.')).toBeInTheDocument());
 
     fireEvent.click(screen.getByRole('button', { name: /volver/i }));
     irAlDetalle();
 
-    await waitFor(() => expect(screen.getByText('Extender suscripcion')).toBeInTheDocument());
+    expect(screen.queryByText('Socio inscripto correctamente.')).not.toBeInTheDocument();
   });
 
   test('revierte la disciplina optimista y muestra un banner de error si pausarDisciplina falla', async () => {
