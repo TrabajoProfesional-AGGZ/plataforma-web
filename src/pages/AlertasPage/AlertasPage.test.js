@@ -101,6 +101,23 @@ describe('AlertasPage', () => {
     expect(screen.getByText('Todos')).toBeInTheDocument();
   });
 
+  test('muestra "socios específicos" y oculta filtros para alertas dirigidas', async () => {
+    getAlertas.mockResolvedValue([{
+      ...ALERTA_MOCK,
+      filtro_categoria: null,
+      filtro_estado: null,
+      cantidad_destinatarios: 2,
+      socios_destino: [
+        { id: 's-1', nro_socio: '1000', nombre: 'Ana', apellido: 'Gómez' },
+        { id: 's-2', nro_socio: '1001', nombre: 'Luis', apellido: 'Pérez' },
+      ],
+    }]);
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Recordatorio de cuota pendiente')).toBeInTheDocument());
+    expect(screen.getByText('2 (socios específicos)')).toBeInTheDocument();
+    expect(screen.getAllByText('—')).toHaveLength(2);
+  });
+
   test('el botón "Nueva alerta" abre el formulario de creación', async () => {
     await renderPage();
     fireEvent.click(screen.getByRole('button', { name: /nueva alerta/i }));

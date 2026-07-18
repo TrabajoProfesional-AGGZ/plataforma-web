@@ -108,12 +108,19 @@ function AlertasPage() {
             </tr>
           </thead>
           <tbody>
-            {alertas.map((a) => (
+            {alertas.map((a) => {
+              const esDirigida = (a.socios_destino ?? []).length > 0;
+              const nombresDestino = (a.socios_destino ?? [])
+                .map((s) => `${s.nro_socio} — ${s.apellido} ${s.nombre}`)
+                .join(', ');
+              return (
               <tr key={a.id}>
                 <td className="td-truncate" title={a.mensaje}>{a.mensaje}</td>
-                <td>{a.filtro_categoria ?? 'Todas'}</td>
-                <td>{a.filtro_estado ?? 'Todos'}</td>
-                <td>{a.cantidad_destinatarios}</td>
+                <td>{esDirigida ? '—' : (a.filtro_categoria ?? 'Todas')}</td>
+                <td>{esDirigida ? '—' : (a.filtro_estado ?? 'Todos')}</td>
+                <td title={esDirigida ? nombresDestino : undefined}>
+                  {esDirigida ? `${a.cantidad_destinatarios} (socios específicos)` : a.cantidad_destinatarios}
+                </td>
                 <td>{formatearFecha(a.creado_en)}</td>
                 {puedeBorrarAlerta && (
                   <td>
@@ -128,7 +135,8 @@ function AlertasPage() {
                   </td>
                 )}
               </tr>
-            ))}
+              );
+            })}
           </tbody>
         </table>
       </div>
