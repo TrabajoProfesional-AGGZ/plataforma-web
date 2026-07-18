@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { MessageSquare, Tag, Activity, Users, Hash, X, AlertCircle } from 'lucide-react';
+import { MessageSquare, Tag, Activity, Users, Hash } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { fetchCategoriasSocio, fetchEstadosSocio } from '../../services/catalogosService';
 import { buscarSocioPorTexto } from '../../services/sociosService';
@@ -10,6 +10,7 @@ import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
 import { useTheme } from '../../hooks/useTheme';
 import { MAX_LEN } from '../../utils/formValidators';
+import { SociosSeleccionados } from '../SociosSeleccionados/SociosSeleccionados';
 
 const STEPS = [{ id: 1, label: 'Datos', icon: MessageSquare }];
 
@@ -169,38 +170,15 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
                   Agregar
                 </button>
               </div>
-              {buscando && (
-                <div className="csf-socio-buscando">
-                  <img src={logo} alt="" className="csf-socio-logo-spin" />
-                  <span>Buscando socio...</span>
-                </div>
-              )}
+              
+              <SociosSeleccionados 
+                buscando={buscando}
+                logo={logo}
+                sociosAgregados={sociosAgregados}
+                removerSocio={removerSocio}
+                errorListaSocios={errorListaSocios}
+              />
             </Field>
-
-            {sociosAgregados.length > 0 && (
-              <div className="csf-socios-lista">
-                {sociosAgregados.map((socio) => (
-                  <div key={socio.id} className="csf-socio-chip">
-                    <span>{socio.nro_socio} — {socio.apellido} {socio.nombre}</span>
-                    <button
-                      type="button"
-                      className="csf-socio-chip-remove"
-                      onClick={() => removerSocio(socio.id)}
-                      aria-label={`Quitar socio ${socio.nro_socio}`}
-                    >
-                      <X size={13} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {errorListaSocios && (
-              <p className="csf-error">
-                <AlertCircle size={12} />
-                {errorListaSocios}
-              </p>
-            )}
           </>
         )}
       </FormStep>
