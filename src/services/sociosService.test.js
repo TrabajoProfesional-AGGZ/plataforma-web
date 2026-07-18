@@ -1,4 +1,7 @@
-import { getSocios, createSocio, updateSocio, deleteSocio, getSocioByNroSocio } from './sociosService';
+import {
+  getSocios, createSocio, updateSocio, deleteSocio, getSocioByNroSocio,
+  getSocioByEmail, getSocioById, buscarSocioPorTexto,
+} from './sociosService';
 
 jest.mock('../utils/utils', () => ({ fetchTo: jest.fn() }));
 import { fetchTo } from '../utils/utils';
@@ -164,6 +167,81 @@ describe('sociosService', () => {
     test('lanza servicio-no-disponible en 500', async () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
       await expect(getSocioByNroSocio(1000)).rejects.toThrow('servicio-no-disponible');
+    });
+  });
+
+  describe('getSocioByEmail', () => {
+    test('llama al endpoint correcto con el email', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ id: 'uuid-1', email: 'ana@club.com' }),
+      });
+
+      await getSocioByEmail('ana@club.com');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/socios/por-email/ana%40club.com', 'GET');
+    });
+
+    test('lanza socio-no-encontrado en 404', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
+      await expect(getSocioByEmail('nadie@club.com')).rejects.toThrow('socio-no-encontrado');
+    });
+
+    test('lanza servicio-no-disponible en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(getSocioByEmail('ana@club.com')).rejects.toThrow('servicio-no-disponible');
+    });
+  });
+
+  describe('getSocioById', () => {
+    test('llama al endpoint correcto con el id', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ id: 'uuid-1' }),
+      });
+
+      await getSocioById('uuid-1');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/socios/uuid-1', 'GET');
+    });
+
+    test('lanza socio-no-encontrado en 404', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
+      await expect(getSocioById('uuid-inexistente')).rejects.toThrow('socio-no-encontrado');
+    });
+
+    test('lanza servicio-no-disponible en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(getSocioById('uuid-1')).rejects.toThrow('servicio-no-disponible');
+    });
+  });
+
+  describe('buscarSocioPorTexto', () => {
+    test('busca por email cuando el texto contiene @', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ id: 'uuid-1' }) });
+
+      await buscarSocioPorTexto('ana@club.com');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/socios/por-email/ana%40club.com', 'GET');
+    });
+
+    test('busca por id cuando el texto es un UUID', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ id: 'uuid-1' }) });
+      const uuid = '3fa85f64-5717-4562-b3fc-2c963f66afa6';
+
+      await buscarSocioPorTexto(uuid);
+
+      expect(fetchTo).toHaveBeenCalledWith(`/api/v1/socios/${uuid}`, 'GET');
+    });
+
+    test('busca por nro de socio en cualquier otro caso', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ id: 'uuid-1' }) });
+
+      await buscarSocioPorTexto(' 1000 ');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/socios/por-nro-socio/1000', 'GET');
     });
   });
 });

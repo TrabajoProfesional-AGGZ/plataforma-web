@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form';
 import { AnimatePresence } from 'framer-motion';
 import {
   User, Clock, CheckCircle2, AlertCircle,
-  Calendar, Building2, Hash, X,
+  Calendar, Building2, Hash
 } from 'lucide-react';
 import { createReserva, getTurnosDisponibles } from '../../services/reservasService';
 import { getSocioByNroSocio } from '../../services/sociosService';
@@ -13,6 +13,7 @@ import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFi
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
 import PropTypes from 'prop-types';
+import { SociosSeleccionados } from '../SociosSeleccionados/SociosSeleccionados';
 
 const STEPS = [
   { id: 1, label: 'Datos', icon: User },
@@ -225,38 +226,14 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
                   {socioPreview.apellido} {socioPreview.nombre}
                 </span>
               )}
-              {busquedaSocio && (
-                <div className="csf-socio-buscando">
-                  <img src={logo} alt="" className="csf-socio-logo-spin" />
-                  <span>Buscando socio...</span>
-                </div>
-              )}
+              <SociosSeleccionados 
+                buscando={busquedaSocio}
+                logo={logo}
+                sociosAgregados={sociosAgregados}
+                removerSocio={removerSocio}
+                errorListaSocios={errorListaSocios}
+              />
             </Field>
-
-            {sociosAgregados.length > 0 && (
-              <div className="csf-socios-lista">
-                {sociosAgregados.map((socio) => (
-                  <div key={socio.id} className="csf-socio-chip">
-                    <span>{socio.nro_socio} — {socio.apellido} {socio.nombre}</span>
-                    <button
-                      type="button"
-                      className="csf-socio-chip-remove"
-                      onClick={() => removerSocio(socio.id)}
-                      aria-label={`Quitar socio ${socio.nro_socio}`}
-                    >
-                      <X size={13} />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {errorListaSocios && (
-              <p className="csf-error">
-                <AlertCircle size={12} />
-                {errorListaSocios}
-              </p>
-            )}
 
             <Field label="Instalación" icon={Building2} error={errors.id_instalacion?.message}>
               <StyledSelect

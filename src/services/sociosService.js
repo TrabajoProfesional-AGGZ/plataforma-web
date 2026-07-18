@@ -36,3 +36,28 @@ export async function getSocioByNroSocio(nroSocio) {
   if (!res.ok) throw new Error('Error al buscar socio');
   return res.json();
 }
+
+export async function getSocioByEmail(email) {
+  const res = await fetchTo(`/api/v1/socios/por-email/${encodeURIComponent(email)}`, 'GET');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (res.status === 404) throw new Error('socio-no-encontrado');
+  if (!res.ok) throw new Error('Error al buscar socio');
+  return res.json();
+}
+
+export async function getSocioById(id) {
+  const res = await fetchTo(`/api/v1/socios/${encodeURIComponent(id)}`, 'GET');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (res.status === 404) throw new Error('socio-no-encontrado');
+  if (!res.ok) throw new Error('Error al buscar socio');
+  return res.json();
+}
+
+/** Busca un socio por N° de socio, email o UUID según el formato del valor ingresado. */
+export async function buscarSocioPorTexto(valor) {
+  const v = valor.trim();
+  if (v.includes('@')) return getSocioByEmail(v);
+  const esUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v);
+  if (esUuid) return getSocioById(v);
+  return getSocioByNroSocio(v);
+}
