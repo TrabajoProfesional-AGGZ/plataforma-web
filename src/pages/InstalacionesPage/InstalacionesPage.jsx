@@ -411,6 +411,7 @@ function InstalacionesPage() {
                 { label: 'Capacidad máxima', value: `${instalacionActual.capacidad_maxima} personas` },
                 { label: 'Valor por turno', value: `$${instalacionActual.valor_turno}/turno` },
                 { label: 'Duración del turno', value: `${instalacionActual.duracion_turno} minutos` },
+                { label: 'Cancelación', value: `Hasta ${instalacionActual.tiempo_minimo_cancelacion} minutos antes del turno`},
                 {
                   label: 'Estado',
                   value: instalacionActual.activa ? 'Activa' : 'Inactiva',
