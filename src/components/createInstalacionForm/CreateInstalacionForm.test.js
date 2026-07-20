@@ -154,20 +154,21 @@ describe('CreateInstalacionForm', () => {
       valor_turno: 2000,
       duracion_turno: 60,
       activa: true,
+      tiempo_minimo_cancelacion: null,
     });
   });
 
   test('el checkbox activa comienza marcado por defecto', async () => {
     renderForm();
     await avanzarAlPaso2();
-    const checkbox = screen.getByRole('checkbox');
+    const checkbox = screen.getByLabelText(/la instalación está activa/i);
     expect(checkbox).toBeChecked();
   });
 
   test('el checkbox activa se puede desmarcar', async () => {
     renderForm();
     await avanzarAlPaso2();
-    const checkbox = screen.getByRole('checkbox');
+    const checkbox = screen.getByLabelText(/la instalación está activa/i);
     fireEvent.click(checkbox);
     expect(checkbox).not.toBeChecked();
   });
@@ -177,12 +178,55 @@ describe('CreateInstalacionForm', () => {
     await avanzarAlPaso2();
     fireEvent.change(screen.getByPlaceholderText(/ej\. 50/i), { target: { value: '10' } });
     fireEvent.change(screen.getByPlaceholderText(/ej\. 1500/i), { target: { value: '0' } });
-    fireEvent.click(screen.getByRole('checkbox'));
+    fireEvent.click(screen.getByLabelText(/la instalación está activa/i));
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /crear instalación/i }));
     });
     await act(async () => { jest.advanceTimersByTime(1800); });
     expect(onSuccess).toHaveBeenCalledWith(expect.objectContaining({ activa: false }));
+  });
+
+  // ── Tests del tiempo mínimo de cancelación ──
+
+  test('el campo de tiempo mínimo de cancelación arranca deshabilitado (usa el valor por defecto)', async () => {
+    renderForm();
+    await avanzarAlPaso2();
+    expect(screen.getByPlaceholderText(/ej\. 60/i)).toBeDisabled();
+    expect(screen.getByLabelText(/usar valor por defecto/i)).toBeChecked();
+  });
+
+  test('destildar "usar valor por defecto" habilita el campo numérico', async () => {
+    renderForm();
+    await avanzarAlPaso2();
+    fireEvent.click(screen.getByLabelText(/usar valor por defecto/i));
+    expect(screen.getByPlaceholderText(/ej\. 60/i)).toBeEnabled();
+  });
+
+  test('exige un valor si se destilda "usar valor por defecto" y se deja vacío', async () => {
+    renderForm();
+    await avanzarAlPaso2();
+    fireEvent.change(screen.getByPlaceholderText(/ej\. 50/i), { target: { value: '10' } });
+    fireEvent.change(screen.getByPlaceholderText(/ej\. 1500/i), { target: { value: '0' } });
+    fireEvent.click(screen.getByLabelText(/usar valor por defecto/i));
+    fireEvent.click(screen.getByRole('button', { name: /crear instalación/i }));
+    await waitFor(() => {
+      expect(screen.getByText('El tiempo mínimo de cancelación es requerido')).toBeInTheDocument();
+    });
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  test('envía el valor numérico personalizado de tiempo mínimo de cancelación', async () => {
+    renderForm();
+    await avanzarAlPaso2();
+    fireEvent.change(screen.getByPlaceholderText(/ej\. 50/i), { target: { value: '10' } });
+    fireEvent.change(screen.getByPlaceholderText(/ej\. 1500/i), { target: { value: '0' } });
+    fireEvent.click(screen.getByLabelText(/usar valor por defecto/i));
+    fireEvent.change(screen.getByPlaceholderText(/ej\. 60/i), { target: { value: '120' } });
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: /crear instalación/i }));
+    });
+    await act(async () => { jest.advanceTimersByTime(1800); });
+    expect(onSuccess).toHaveBeenCalledWith(expect.objectContaining({ tiempo_minimo_cancelacion: 120 }));
   });
 
   test('muestra indicadores de pasos correctamente', () => {
