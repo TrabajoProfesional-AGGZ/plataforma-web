@@ -18,6 +18,52 @@ describe('ModalOverlay', () => {
     document.body.style.overflow = '';
   });
 
+  describe('historial del navegador (back gesture)', () => {
+    let pushStateSpy;
+    let backSpy;
+
+    beforeEach(() => {
+      pushStateSpy = jest.spyOn(window.history, 'pushState');
+      backSpy = jest.spyOn(window.history, 'back').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      pushStateSpy.mockRestore();
+      backSpy.mockRestore();
+    });
+
+    test('empuja una entrada de historial al montar', () => {
+      const { unmount } = renderModal();
+      expect(pushStateSpy).toHaveBeenCalledTimes(1);
+      unmount();
+    });
+
+    test('un evento popstate (gesto de atrás) cierra el modal', () => {
+      const onClose = jest.fn();
+      const { unmount } = renderModal(onClose);
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      expect(onClose).toHaveBeenCalledTimes(1);
+      unmount();
+    });
+
+    test('cerrar con Escape consume la entrada de historial pusheada (history.back)', () => {
+      const onClose = jest.fn();
+      const { unmount } = renderModal(onClose);
+      fireEvent.keyDown(document, { key: 'Escape' });
+      unmount();
+      expect(backSpy).toHaveBeenCalledTimes(1);
+    });
+
+    test('un popstate tras un cierre por Escape no vuelve a llamar onClose', () => {
+      const onClose = jest.fn();
+      const { unmount } = renderModal(onClose);
+      fireEvent.keyDown(document, { key: 'Escape' });
+      unmount();
+      window.dispatchEvent(new PopStateEvent('popstate'));
+      expect(onClose).toHaveBeenCalledTimes(1);
+    });
+  });
+
   test('expone role="dialog" y aria-modal="true"', () => {
     renderModal();
     const dialog = screen.getByRole('dialog', { name: /modal de prueba/i });

@@ -4,6 +4,7 @@ import { LayoutDashboard, Users, ShieldCheck, Building2, Trophy, Newspaper, Sett
 import { logout } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
+import { useBackToRoot } from '../../hooks/useBackToRoot';
 import './AppLayout.css';
 
 
@@ -29,6 +30,8 @@ function AppLayout() {
   const prevActiveIndexRef = useRef(-1);
   const animTimersRef = useRef([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
+
+  useBackToRoot(drawerOpen, false, () => setDrawerOpen(false));
 
   useLayoutEffect(() => {
     if (!navRef.current || !indicatorRef.current) return;
