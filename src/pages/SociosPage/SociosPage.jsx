@@ -8,6 +8,7 @@ import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDelet
 import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
 import { useListState } from '../../hooks/useListState';
+import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { estadoConfig } from '../../utils/estadoConfig';
 import { MAX_LEN } from '../../utils/formValidators';
 import { handleActivateKey } from '../../utils/a11y';
@@ -45,6 +46,7 @@ function SociosPage() {
 
   const [nroSocio, setNroSocio] = useState('');
   const [modo, setModo] = useState('idle'); // idle | socio | lista | no-encontrado
+  useBackToRoot(modo, 'lista', () => setModo('lista'));
   const { resultado, setResultado, loading, setLoading, error, setError } = useListState();
   const { orden, setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
 
