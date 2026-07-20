@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form';
-import { Building2, Settings, CheckCircle2, Users, DollarSign, Tag, Clock } from 'lucide-react';
+import { Building2, Settings, CheckCircle2, Users, DollarSign, Tag, Clock, Timer } from 'lucide-react';
 import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
@@ -13,7 +13,7 @@ const STEPS = [
 
 const stepFields = {
   1: ['nombre', 'tipo'],
-  2: ['capacidad_maxima', 'valor_turno', 'duracion_turno'],
+  2: ['capacidad_maxima', 'valor_turno', 'duracion_turno', 'tiempo_minimo_cancelacion'],
 };
 
 // Duraciones de turno (minutos) que dividen exactamente las 12hs disponibles (08:00-20:00)
@@ -26,8 +26,12 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
     register,
     handleSubmit,
     trigger,
+    watch,
+    getValues,
     formState: { errors, isSubmitting },
-  } = useForm({ mode: 'onTouched' });
+  } = useForm({ mode: 'onTouched', defaultValues: { usar_tolerancia_default: true } });
+
+  const usarToleranciaDefault = watch('usar_tolerancia_default');
 
   const goNext = async () => {
     const valid = await trigger(stepFields[step]);
@@ -45,6 +49,7 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
       valor_turno: Number(data.valor_turno),
       duracion_turno: Number(data.duracion_turno),
       activa: Boolean(data.activa),
+      tiempo_minimo_cancelacion: data.usar_tolerancia_default ? null : Number(data.tiempo_minimo_cancelacion),
     });
   };
 
@@ -127,6 +132,32 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
                 ))}
               </StyledSelect>
             </Field>
+            <Field label="Tiempo mínimo de cancelación (minutos)" icon={Timer} error={errors.tiempo_minimo_cancelacion?.message}>
+              <StyledInput
+                {...register('tiempo_minimo_cancelacion', {
+                  validate: (v) => {
+                    if (getValues('usar_tolerancia_default')) return true;
+                    if (!v) return 'El tiempo mínimo de cancelación es requerido';
+                    return Number(v) > 0 || 'Debe ser mayor a 0';
+                  },
+                })}
+                type="number"
+                min="1"
+                placeholder="Ej. 60"
+                disabled={usarToleranciaDefault}
+                error={!!errors.tiempo_minimo_cancelacion}
+              />
+            </Field>
+            <div className="csf-field">
+              <span className="csf-label">
+                <Timer size={13} strokeWidth={2} />
+                Tolerancia de cancelación
+              </span>
+              <label className="csf-checkbox-label">
+                <input type="checkbox" className="csf-checkbox-input" {...register('usar_tolerancia_default')} />
+                <span>Usar valor por defecto (60 min)</span>
+              </label>
+            </div>
             <div className="csf-field">
               <span className="csf-label">
                 <CheckCircle2 size={13} strokeWidth={2} />
