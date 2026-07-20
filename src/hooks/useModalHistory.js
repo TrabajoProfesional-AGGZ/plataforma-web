@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 
+let modalHistoryIdCounter = 0;
+
 /**
  * Ata el tiempo de vida de un modal a la entrada de historia del navegador
  * para que el gesto/boton de "atras" del celular cierre el modal en vez 
@@ -21,7 +23,7 @@ export function useModalHistory(onClose) {
   }, [onClose]);
 
   useEffect(() => {
-    const state = { modalOverlay: true, id: Date.now() + Math.random() };
+    const state = { modalOverlay: true, id: Date.now() + '-' + (modalHistoryIdCounter++) };
     pushedStateRef.current = state;
     window.history.pushState(state, '');
 

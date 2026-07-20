@@ -1,5 +1,7 @@
 import { useEffect, useRef } from 'react';
 
+let backToRootIdCounter = 0;
+
 /**
  * Ata la pantalla actual con el estado del navegador para que el gesto/boton 
  * del celular vuelva para atras al `rootValue` en vez de cerrar la aplicacion
@@ -33,7 +35,7 @@ export function useBackToRoot(current, rootValue, onBack) {
     const isAway = current !== rootValue;
 
     if (isAway && !isAwayRef.current) {
-      const state = { backToRoot: true, id: Date.now() + Math.random() };
+      const state = { backToRoot: true, id: Date.now() + '-' + (backToRootIdCounter++) };
       pushedStateRef.current = state;
       window.history.pushState(state, '');
       isAwayRef.current = true;
