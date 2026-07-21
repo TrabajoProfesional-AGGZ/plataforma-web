@@ -5,6 +5,7 @@ import { getDisciplinas, getSociosByDisciplina, extenderSuscripcionDisciplina } 
 import { CreateSocioForm } from '../../components/createForm/CreateSocioForm';
 import { EditSocioForm } from '../../components/editForm/EditSocioForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
+import { ResolverListaEsperaModal } from '../../components/resolverListaEsperaModal/ResolverListaEsperaModal';
 import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
 import { useListState } from '../../hooks/useListState';
@@ -55,9 +56,10 @@ function SociosPage() {
   const [filtroCategoria, setFiltroCategoria] = useState('');
   const [filtroDisciplina, setFiltroDisciplina] = useState('');
   const [disciplinas, setDisciplinas] = useState([]);
-  const [idsDisciplinaFiltro, setIdsDisciplinaFiltro] = useState(null);
+  const [estadoSuscripcionPorSocio, setEstadoSuscripcionPorSocio] = useState(null);
   const [errorDisciplinaFiltro, setErrorDisciplinaFiltro] = useState('');
   const [estadoExtension, setEstadoExtension] = useState({});
+  const [listaEsperaModal, setListaEsperaModal] = useState(null);
 
   const [crearModalOpen, setCrearModalOpen] = useState(false);
   const [editarModalOpen, setEditarModalOpen] = useState(false);
@@ -104,19 +106,33 @@ function SociosPage() {
     return () => { cancelled = true; };
   }, [puedeVerDisciplinas]);
 
+  async function recargarSociosDeDisciplina() {
+    if (!filtroDisciplina) return;
+    setErrorDisciplinaFiltro('');
+    try {
+      const data = await getSociosByDisciplina(filtroDisciplina);
+      setEstadoSuscripcionPorSocio(new Map(data.map((s) => [s.id, s.estado_suscripcion])));
+    } catch {
+      setEstadoSuscripcionPorSocio(new Map());
+      setErrorDisciplinaFiltro('No se pudieron obtener los socios de la disciplina.');
+    }
+  }
+
   useEffect(() => {
     if (!filtroDisciplina) {
-      setIdsDisciplinaFiltro(null);
+      setEstadoSuscripcionPorSocio(null);
       setErrorDisciplinaFiltro('');
       return;
     }
     let cancelled = false;
     setErrorDisciplinaFiltro('');
     getSociosByDisciplina(filtroDisciplina)
-      .then((data) => { if (!cancelled) setIdsDisciplinaFiltro(new Set(data.map((s) => s.id))); })
+      .then((data) => {
+        if (!cancelled) setEstadoSuscripcionPorSocio(new Map(data.map((s) => [s.id, s.estado_suscripcion])));
+      })
       .catch(() => {
         if (!cancelled) {
-          setIdsDisciplinaFiltro(new Set());
+          setEstadoSuscripcionPorSocio(new Map());
           setErrorDisciplinaFiltro('No se pudieron obtener los socios de la disciplina.');
         }
       });
@@ -224,6 +240,16 @@ function SociosPage() {
       case 'error': return 'Error, reintentar';
       default: return 'Extender suscripcion';
     }
+  }
+
+  function abrirListaEsperaModal(e, socio) {
+    e.stopPropagation();
+    setListaEsperaModal(socio);
+  }
+
+  async function handleListaEsperaSuccess() {
+    setListaEsperaModal(null);
+    await recargarSociosDeDisciplina();
   }
 
   function abrirEliminar() {
@@ -377,7 +403,7 @@ function SociosPage() {
         const listaFiltrada = resultado.filter(s => {
           const matchEstado = filtroEstado ? s.estado.nombre === filtroEstado : true;
           const matchCategoria = filtroCategoria ? s.categoria.nombre === filtroCategoria : true;
-          const matchDisciplina = filtroDisciplina ? (idsDisciplinaFiltro?.has(s.id) ?? false) : true;
+          const matchDisciplina = filtroDisciplina ? (estadoSuscripcionPorSocio?.has(s.id) ?? false) : true;
           return matchEstado && matchCategoria && matchDisciplina;
         });
         return (
@@ -500,14 +526,24 @@ function SociosPage() {
                           </td>
                           {mostrarColumnaSuscripcion && (
                             <td>
-                              <button
-                                type="button"
-                                className="socios-btn-extender"
-                                disabled={estadoExtension[s.id] === 'loading'}
-                                onClick={(e) => handleExtenderSuscripcion(e, s.id)}
-                              >
-                                {labelExtenderSuscripcion(s.id)}
-                              </button>
+                              {estadoSuscripcionPorSocio?.get(s.id) === 'en_espera' ? (
+                                <button
+                                  type="button"
+                                  className="socios-btn-extender"
+                                  onClick={(e) => abrirListaEsperaModal(e, s)}
+                                >
+                                  Quitar de lista de espera
+                                </button>
+                              ) : (
+                                <button
+                                  type="button"
+                                  className="socios-btn-extender"
+                                  disabled={estadoExtension[s.id] === 'loading'}
+                                  onClick={(e) => handleExtenderSuscripcion(e, s.id)}
+                                >
+                                  {labelExtenderSuscripcion(s.id)}
+                                </button>
+                              )}
                             </td>
                           )}
                         </tr>
@@ -547,6 +583,16 @@ function SociosPage() {
         guardando={guardando}
         errorModal={errorModal}
       />
+
+      {listaEsperaModal && (
+        <ResolverListaEsperaModal
+          idDisciplina={filtroDisciplina}
+          idSocio={listaEsperaModal.id}
+          nombreSocio={`${listaEsperaModal.apellido} ${listaEsperaModal.nombre}`}
+          onSuccess={handleListaEsperaSuccess}
+          onCancel={() => setListaEsperaModal(null)}
+        />
+      )}
     </div>
   );
 }
