@@ -370,7 +370,11 @@ function SociosPage() {
                   <span className="socios-card-label">Categoría</span>
                   <span>{resultado.categoria.nombre}</span>
                 </div>
-                <SocioAccionesExtra idSocio={resultado.id} nroSocio={resultado.nro_socio} />
+                <SocioAccionesExtra
+                  idSocio={resultado.id}
+                  nroSocio={resultado.nro_socio}
+                  nombreSocio={`${resultado.apellido} ${resultado.nombre}`}
+                />
               </div>
             </div>
             <div className="socios-card-actions">

@@ -95,7 +95,7 @@ function DisciplinasPage() {
   async function handleDisciplinaCreada(data) {
     setCrearOpen(false);
     const tempId = `temp-${Date.now()}`;
-    setDisciplinas((prev) => [...prev, { ...data, id: tempId, estado: 'Activa' }]);
+    setDisciplinas((prev) => [...prev, { ...data, id: tempId, estado: { nombre: 'Activa' } }]);
     try {
       const created = await createDisciplina(data);
       setDisciplinas((prev) =>
@@ -111,9 +111,9 @@ function DisciplinasPage() {
     if (guardando) return;
     setGuardando(true);
     const id = disciplinaActual.id;
-    const estadoAnterior = disciplinaActual.estado ?? 'Activa';
+    const estadoAnterior = disciplinaActual.estado ?? { nombre: 'Activa' };
     setDisciplinas((prev) =>
-      prev.map((d) => (d.id === id ? { ...d, estado: 'Pausada' } : d))
+      prev.map((d) => (d.id === id ? { ...d, estado: { nombre: 'Pausada' } } : d))
     );
     setVista('lista');
     setDisciplinaActual(null);
@@ -180,8 +180,8 @@ function DisciplinasPage() {
                   </EstadoBadge>
                 </td>
                 <td>
-                  <EstadoBadge variant={d.estado === 'Pausada' ? 'warning' : 'success'}>
-                    {d.estado ?? 'Activa'}
+                  <EstadoBadge variant={d.estado?.nombre === 'Pausada' ? 'warning' : 'success'}>
+                    {d.estado?.nombre ?? 'Activa'}
                   </EstadoBadge>
                 </td>
               </tr>
@@ -241,8 +241,8 @@ function DisciplinasPage() {
                   : []),
                 {
                   label: 'Estado',
-                  value: disciplinaActual.estado ?? 'Activa',
-                  color: disciplinaActual.estado === 'Pausada' ? 'var(--status-warning-border)' : 'var(--status-success-border)',
+                  value: disciplinaActual.estado?.nombre ?? 'Activa',
+                  color: disciplinaActual.estado?.nombre === 'Pausada' ? 'var(--status-warning-border)' : 'var(--status-success-border)',
                 },
               ].map((field, i, arr) => (
                 <div

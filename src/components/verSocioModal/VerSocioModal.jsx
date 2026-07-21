@@ -64,7 +64,11 @@ function VerSocioModal({ socio, onClose }) {
               </div>
             )}
             {socio.id && socio.nro_socio && (
-              <SocioAccionesExtra idSocio={String(socio.id)} nroSocio={String(socio.nro_socio)} />
+              <SocioAccionesExtra
+                idSocio={String(socio.id)}
+                nroSocio={String(socio.nro_socio)}
+                nombreSocio={`${socio.apellido} ${socio.nombre}`}
+              />
             )}
           </div>
         </div>
