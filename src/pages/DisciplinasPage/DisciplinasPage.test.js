@@ -120,7 +120,7 @@ describe('DisciplinasPage', () => {
   test('muestra la categoría de socio y la sede en la tabla', async () => {
     getDisciplinas.mockResolvedValue([
       {
-        id: 'disc-1', nombre: 'Tenis', cupo_maximo: 15, arancelada: false, concepto_cobro: '', estado: 'Activa',
+        id: 'disc-1', nombre: 'Tenis', cupo_maximo: 15, arancelada: false, concepto_cobro: '', estado: { nombre: 'Activa' },
         categoria_socio: { nombre: 'Infantil' }, sede: { nombre: 'Sede Norte' },
       },
     ]);
@@ -133,7 +133,7 @@ describe('DisciplinasPage', () => {
   test('muestra "—" en la tabla si la disciplina no tiene categoría de socio', async () => {
     getDisciplinas.mockResolvedValue([
       {
-        id: 'disc-1', nombre: 'Tenis', cupo_maximo: 15, arancelada: false, concepto_cobro: '', estado: 'Activa',
+        id: 'disc-1', nombre: 'Tenis', cupo_maximo: 15, arancelada: false, concepto_cobro: '', estado: { nombre: 'Activa' },
         categoria_socio: null, sede: { nombre: 'Sede Central' },
       },
     ]);
@@ -145,7 +145,7 @@ describe('DisciplinasPage', () => {
   test('muestra la categoría de socio y la sede en el detalle', async () => {
     getDisciplinas.mockResolvedValue([
       {
-        id: 'disc-1', nombre: 'Tenis', cupo_maximo: 15, arancelada: false, concepto_cobro: '', estado: 'Activa',
+        id: 'disc-1', nombre: 'Tenis', cupo_maximo: 15, arancelada: false, concepto_cobro: '', estado: { nombre: 'Activa' },
         categoria_socio: { nombre: 'Infantil' }, sede: { nombre: 'Sede Norte' },
       },
     ]);
@@ -254,7 +254,7 @@ describe('DisciplinasPage', () => {
 
   test('muestra disciplinas cargadas desde el servidor en la tabla', async () => {
     getDisciplinas.mockResolvedValue([
-      { id: 'disc-1', nombre: 'Tenis', cupo_maximo: 15, arancelada: true, concepto_cobro: 'Cuota tenis', estado: 'Activa' },
+      { id: 'disc-1', nombre: 'Tenis', cupo_maximo: 15, arancelada: true, concepto_cobro: 'Cuota tenis', estado: { nombre: 'Activa' } },
     ]);
     await renderPage();
     await waitFor(() => expect(screen.getByText('Tenis')).toBeInTheDocument());
@@ -264,7 +264,7 @@ describe('DisciplinasPage', () => {
 
   test('muestra el concepto de cobro en detalle si la disciplina es arancelada', async () => {
     getDisciplinas.mockResolvedValue([
-      { id: 'disc-1', nombre: 'Tenis', cupo_maximo: 15, arancelada: true, concepto_cobro: 'Cuota mensual', estado: 'Activa' },
+      { id: 'disc-1', nombre: 'Tenis', cupo_maximo: 15, arancelada: true, concepto_cobro: 'Cuota mensual', estado: { nombre: 'Activa' } },
     ]);
     await renderPage();
     await waitFor(() => expect(screen.getByText('Tenis')).toBeInTheDocument());
@@ -275,7 +275,7 @@ describe('DisciplinasPage', () => {
 
   test('no muestra concepto de cobro en detalle si no es arancelada', async () => {
     getDisciplinas.mockResolvedValue([
-      { id: 'disc-1', nombre: 'Fútbol', cupo_maximo: 22, arancelada: false, concepto_cobro: '', estado: 'Activa' },
+      { id: 'disc-1', nombre: 'Fútbol', cupo_maximo: 22, arancelada: false, concepto_cobro: '', estado: { nombre: 'Activa' } },
     ]);
     await renderPage();
     await waitFor(() => expect(screen.getByText('Fútbol')).toBeInTheDocument());
@@ -285,7 +285,7 @@ describe('DisciplinasPage', () => {
 
   test('muestra el ID de la disciplina bajo el detalle del card', async () => {
     getDisciplinas.mockResolvedValue([
-      { id: 'disc-known-id', nombre: 'Básquet', cupo_maximo: 12, arancelada: false, concepto_cobro: '', estado: 'Activa' },
+      { id: 'disc-known-id', nombre: 'Básquet', cupo_maximo: 12, arancelada: false, concepto_cobro: '', estado: { nombre: 'Activa' } },
     ]);
     await renderPage();
     await waitFor(() => expect(screen.getByText('Básquet')).toBeInTheDocument());
@@ -295,7 +295,7 @@ describe('DisciplinasPage', () => {
 
   test('muestra "Sin límite" en la lista si la disciplina no tiene cupo_maximo', async () => {
     getDisciplinas.mockResolvedValue([
-      { id: 'disc-1', nombre: 'Yoga', cupo_maximo: null, arancelada: false, concepto_cobro: '', estado: 'Activa' },
+      { id: 'disc-1', nombre: 'Yoga', cupo_maximo: null, arancelada: false, concepto_cobro: '', estado: { nombre: 'Activa' } },
     ]);
     await renderPage();
     await waitFor(() => expect(screen.getByText('Yoga')).toBeInTheDocument());
@@ -304,7 +304,7 @@ describe('DisciplinasPage', () => {
 
   test('muestra "Sin límite" en el detalle si la disciplina no tiene cupo_maximo', async () => {
     getDisciplinas.mockResolvedValue([
-      { id: 'disc-1', nombre: 'Yoga', cupo_maximo: null, arancelada: false, concepto_cobro: '', estado: 'Activa' },
+      { id: 'disc-1', nombre: 'Yoga', cupo_maximo: null, arancelada: false, concepto_cobro: '', estado: { nombre: 'Activa' } },
     ]);
     await renderPage();
     await waitFor(() => expect(screen.getByText('Yoga')).toBeInTheDocument());
@@ -314,7 +314,7 @@ describe('DisciplinasPage', () => {
 
   test('muestra badge "Pausada" para disciplinas con estado Pausada', async () => {
     getDisciplinas.mockResolvedValue([
-      { id: 'disc-1', nombre: 'Yoga', cupo_maximo: 10, arancelada: false, concepto_cobro: '', estado: 'Pausada' },
+      { id: 'disc-1', nombre: 'Yoga', cupo_maximo: 10, arancelada: false, concepto_cobro: '', estado: { nombre: 'Pausada' } },
     ]);
     await renderPage();
     await waitFor(() => expect(screen.getByText('Pausada')).toBeInTheDocument());
@@ -341,7 +341,7 @@ describe('DisciplinasPage', () => {
 
   test('no muestra la sección de inscribir socio sin permiso crear_disciplina', async () => {
     getDisciplinas.mockResolvedValue([
-      { id: 'disc-1', nombre: 'Natación', cupo_maximo: 30, arancelada: false, concepto_cobro: '', estado: 'Activa' },
+      { id: 'disc-1', nombre: 'Natación', cupo_maximo: 30, arancelada: false, concepto_cobro: '', estado: { nombre: 'Activa' } },
     ]);
     usePermiso.mockImplementation((p) => p !== 'crear_disciplina');
     await renderPage();
@@ -352,7 +352,7 @@ describe('DisciplinasPage', () => {
 
   test('navega al detalle cuando hay disciplinaId en location.state', async () => {
     getDisciplinas.mockResolvedValue([
-      { id: 'disc-state', nombre: 'Yoga', cupo_maximo: 10, arancelada: false, concepto_cobro: '', estado: 'Activa' },
+      { id: 'disc-state', nombre: 'Yoga', cupo_maximo: 10, arancelada: false, concepto_cobro: '', estado: { nombre: 'Activa' } },
     ]);
 
     render(
@@ -376,7 +376,7 @@ describe('DisciplinasPage', () => {
 
   test('inscribe un socio y muestra confirmación', async () => {
     getDisciplinas.mockResolvedValue([
-      { id: 'disc-uuid-conocido', nombre: 'Natación', cupo_maximo: 30, arancelada: false, concepto_cobro: '', estado: 'Activa' },
+      { id: 'disc-uuid-conocido', nombre: 'Natación', cupo_maximo: 30, arancelada: false, concepto_cobro: '', estado: { nombre: 'Activa' } },
     ]);
 
     await renderPage();
@@ -478,7 +478,7 @@ describe('DisciplinasPage', () => {
     await renderPage();
     expect(screen.getByRole('alert')).toBeInTheDocument();
 
-    getDisciplinas.mockResolvedValueOnce([{ id: 'd-1', nombre: 'Natación', cupo_maximo: 20, arancelada: false, estado: 'Activa' }]);
+    getDisciplinas.mockResolvedValueOnce([{ id: 'd-1', nombre: 'Natación', cupo_maximo: 20, arancelada: false, estado: { nombre: 'Activa' } }]);
     fireEvent.click(screen.getByRole('button', { name: /reintentar/i }));
     await waitFor(() => expect(screen.getByText('Natación')).toBeInTheDocument());
   });

@@ -6,7 +6,7 @@ import { SocioReservasModal } from '../socioReservasModal/SocioReservasModal';
 import { SocioTramitesModal } from '../socioTramitesModal/SocioTramitesModal';
 import './SocioAccionesExtra.css';
 
-function SocioAccionesExtra({ idSocio, nroSocio }) {
+function SocioAccionesExtra({ idSocio, nroSocio, nombreSocio }) {
   const puedeVerDisciplinas = usePermiso('ver_disciplinas');
   const puedeVerReservas = usePermiso('ver_reservas');
   const puedeVerTramites = usePermiso('ver_tramites');
@@ -51,6 +51,7 @@ function SocioAccionesExtra({ idSocio, nroSocio }) {
       {disciplinasOpen && (
         <SocioDisciplinasModal
           idSocio={idSocio}
+          nombreSocio={nombreSocio}
           onClose={() => setDisciplinasOpen(false)}
         />
       )}
@@ -75,6 +76,7 @@ function SocioAccionesExtra({ idSocio, nroSocio }) {
 SocioAccionesExtra.propTypes = {
   idSocio: PropTypes.string.isRequired,
   nroSocio: PropTypes.string.isRequired,
+  nombreSocio: PropTypes.string.isRequired,
 };
 
 export { SocioAccionesExtra };
