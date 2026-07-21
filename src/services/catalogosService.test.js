@@ -1,4 +1,4 @@
-import { fetchEstadosSocio, fetchCategoriasSocio } from './catalogosService';
+import { fetchEstadosSocio, fetchCategoriasSocio, fetchSedes } from './catalogosService';
 
 jest.mock('../utils/utils', () => ({ fetchTo: jest.fn() }));
 import { fetchTo } from '../utils/utils';
@@ -47,6 +47,27 @@ describe('catalogosService', () => {
     test('lanza error cuando la respuesta no es ok', async () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
       await expect(fetchCategoriasSocio()).rejects.toThrow('Error al obtener categorías');
+    });
+  });
+
+  describe('fetchSedes', () => {
+    test('llama al endpoint correcto y devuelve las sedes', async () => {
+      const sedes = [{ id: 1, nombre: 'Sede Central' }];
+      fetchTo.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => sedes,
+      });
+
+      const result = await fetchSedes();
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/sedes', 'GET');
+      expect(result).toEqual(sedes);
+    });
+
+    test('lanza error cuando la respuesta no es ok', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(fetchSedes()).rejects.toThrow('Error al obtener sedes');
     });
   });
 });

@@ -1,10 +1,12 @@
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { Activity, Users, DollarSign, Tag } from 'lucide-react';
+import { Activity, Users, DollarSign, Tag, MapPin } from 'lucide-react';
 import PropTypes from 'prop-types';
 import '../createForm/CreateSocioForm.css';
-import { Field, StyledInput, FormStep } from '../createForm/FormFields';
+import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
+import { fetchCategoriasSocio, fetchSedes } from '../../services/catalogosService';
 
 const STEPS = [
   { id: 1, label: 'Datos', icon: Tag },
@@ -21,10 +23,18 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
   const arancelada = watch('arancelada');
   const sinLimiteCupo = watch('sin_limite_cupo');
 
+  const [categorias, setCategorias] = useState([]);
+  const [sedes, setSedes] = useState([]);
+
+  useEffect(() => {
+    fetchCategoriasSocio().then(setCategorias).catch(() => setCategorias([]));
+    fetchSedes().then(setSedes).catch(() => setSedes([]));
+  }, []);
+
   const goNext = async () => {
     const fieldsToValidate = step === 1
       ? ['nombre']
-      : ['cupo_maximo', ...(getValues('arancelada') ? ['concepto_cobro'] : [])];
+      : ['cupo_maximo', 'categoria_socio', 'sede', ...(getValues('arancelada') ? ['concepto_cobro', 'monto_mensual'] : [])];
     const valid = await trigger(fieldsToValidate);
     if (!valid) return;
     advance();
@@ -38,6 +48,9 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
       cupo_maximo: data.sin_limite_cupo ? null : Number(data.cupo_maximo),
       arancelada: Boolean(data.arancelada),
       concepto_cobro: data.arancelada ? (data.concepto_cobro?.trim() ?? '') : '',
+      monto_mensual: data.arancelada ? Number(data.monto_mensual) : null,
+      categoria_socio: data.categoria_socio,
+      sede: data.sede,
     });
   };
 
@@ -73,6 +86,30 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
 
         {step === 2 && (
           <FormStep key="step2" direction={direction}>
+            <Field label="Categoría de socio" icon={Tag} error={errors.categoria_socio?.message}>
+              <StyledSelect
+                {...register('categoria_socio', { required: 'La categoría de socio es requerida' })}
+                error={!!errors.categoria_socio}
+                defaultValue=""
+              >
+                <option value="" disabled>Seleccionar...</option>
+                {categorias.map((c) => (
+                  <option key={c.id} value={c.nombre}>{c.nombre}</option>
+                ))}
+              </StyledSelect>
+            </Field>
+            <Field label="Sede" icon={MapPin} error={errors.sede?.message}>
+              <StyledSelect
+                {...register('sede', { required: 'La sede es requerida' })}
+                error={!!errors.sede}
+                defaultValue=""
+              >
+                <option value="" disabled>Seleccionar...</option>
+                {sedes.map((s) => (
+                  <option key={s.id} value={s.nombre}>{s.nombre}</option>
+                ))}
+              </StyledSelect>
+            </Field>
             <Field label="Cupo máximo (personas)" icon={Users} error={errors.cupo_maximo?.message}>
               <StyledInput
                 {...register('cupo_maximo', {
@@ -122,6 +159,24 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
                   })}
                   placeholder="Ej. Cuota mensual de natación"
                   error={!!errors.concepto_cobro}
+                />
+              </Field>
+            )}
+            {arancelada && (
+              <Field label="Arancel mensual" icon={DollarSign} error={errors.monto_mensual?.message}>
+                <StyledInput
+                  {...register('monto_mensual', {
+                    validate: (v) => {
+                      if (!getValues('arancelada')) return true;
+                      if (!v) return 'El arancel mensual es requerido para disciplinas aranceladas';
+                      return Number(v) >= 0 || 'Debe ser mayor o igual a 0';
+                    },
+                  })}
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  placeholder="Ej. 5000"
+                  error={!!errors.monto_mensual}
                 />
               </Field>
             )}
