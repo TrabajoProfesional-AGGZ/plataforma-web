@@ -35,7 +35,14 @@ jest.mock('../../assets/logo-naranja.png', () => 'logo-naranja.png');
 jest.mock('../../components/createDisciplinaForm/CreateDisciplinaForm', () => ({
   CreateDisciplinaForm: ({ onSuccess, onCancel }) => ( // NOSONAR
     <div>
-      <button onClick={() => onSuccess({ nombre: 'Natación', cupo_maximo: 30, arancelada: false, concepto_cobro: '' })}>
+      <button onClick={() => onSuccess({
+        nombre: 'Natación',
+        cupo_maximo: 30,
+        arancelada: false,
+        concepto_cobro: '',
+        categoria_socio: 'Activo',
+        sede: 'Sede Central',
+      })}>
         Confirmar creación
       </button>
       <button onClick={onCancel}>Cancelar creación</button>
@@ -68,7 +75,11 @@ describe('DisciplinasPage', () => {
   beforeEach(() => {
     usePermiso.mockReturnValue(true);
     getDisciplinas.mockResolvedValue([]);
-    createDisciplina.mockResolvedValue({ id: 'test-id' });
+    createDisciplina.mockResolvedValue({
+      id: 'test-id',
+      categoria_socio: { nombre: 'Activo' },
+      sede: { nombre: 'Sede Central' },
+    });
     pausarDisciplina.mockResolvedValue(undefined);
     inscribirSocioADisciplina.mockResolvedValue({});
     getSocioByNroSocio.mockResolvedValue({ id: 's-1', nro_socio: '2001' });
@@ -104,6 +115,47 @@ describe('DisciplinasPage', () => {
     expect(screen.getByText('30 personas')).toBeInTheDocument();
     expect(screen.getByText('No')).toBeInTheDocument();
     expect(screen.getByText('Activa')).toBeInTheDocument();
+  });
+
+  test('muestra la categoría de socio y la sede en la tabla', async () => {
+    getDisciplinas.mockResolvedValue([
+      {
+        id: 'disc-1', nombre: 'Tenis', cupo_maximo: 15, arancelada: false, concepto_cobro: '', estado: 'Activa',
+        categoria_socio: { nombre: 'Infantil' }, sede: { nombre: 'Sede Norte' },
+      },
+    ]);
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Tenis')).toBeInTheDocument());
+    expect(screen.getByText('Infantil')).toBeInTheDocument();
+    expect(screen.getByText('Sede Norte')).toBeInTheDocument();
+  });
+
+  test('muestra "—" en la tabla si la disciplina no tiene categoría de socio', async () => {
+    getDisciplinas.mockResolvedValue([
+      {
+        id: 'disc-1', nombre: 'Tenis', cupo_maximo: 15, arancelada: false, concepto_cobro: '', estado: 'Activa',
+        categoria_socio: null, sede: { nombre: 'Sede Central' },
+      },
+    ]);
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Tenis')).toBeInTheDocument());
+    expect(screen.getByText('—')).toBeInTheDocument();
+  });
+
+  test('muestra la categoría de socio y la sede en el detalle', async () => {
+    getDisciplinas.mockResolvedValue([
+      {
+        id: 'disc-1', nombre: 'Tenis', cupo_maximo: 15, arancelada: false, concepto_cobro: '', estado: 'Activa',
+        categoria_socio: { nombre: 'Infantil' }, sede: { nombre: 'Sede Norte' },
+      },
+    ]);
+    await renderPage();
+    await waitFor(() => expect(screen.getByText('Tenis')).toBeInTheDocument());
+    fireEvent.click(screen.getByText('Tenis'));
+    expect(screen.getByText('Categoría de socio')).toBeInTheDocument();
+    expect(screen.getByText('Infantil')).toBeInTheDocument();
+    expect(screen.getByText('Sede')).toBeInTheDocument();
+    expect(screen.getByText('Sede Norte')).toBeInTheDocument();
   });
 
   test('navega a la vista de detalle al hacer clic en una disciplina', async () => {

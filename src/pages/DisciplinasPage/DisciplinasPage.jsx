@@ -150,6 +150,8 @@ function DisciplinasPage() {
           <thead>
             <tr>
               <th>Nombre</th>
+              <th>Categoría de socio</th>
+              <th>Sede</th>
               <th>Cupo máximo</th>
               <th>Arancelada</th>
               <th>Estado</th>
@@ -169,6 +171,8 @@ function DisciplinasPage() {
                 onKeyDown={handleActivateKey(verDetalle)}
               >
                 <td>{d.nombre}</td>
+                <td>{d.categoria_socio?.nombre ?? '—'}</td>
+                <td>{d.sede?.nombre ?? '—'}</td>
                 <td>{d.cupo_maximo != null ? `${d.cupo_maximo} personas` : 'Sin límite'}</td>
                 <td>
                   <EstadoBadge variant={d.arancelada ? 'success' : 'neutral'}>
@@ -225,6 +229,8 @@ function DisciplinasPage() {
 
             <div className="disciplinas-detalle-card">
               {[
+                { label: 'Categoría de socio', value: disciplinaActual.categoria_socio?.nombre ?? '—' },
+                { label: 'Sede', value: disciplinaActual.sede?.nombre ?? '—' },
                 {
                   label: 'Cupo máximo',
                   value: disciplinaActual.cupo_maximo != null ? `${disciplinaActual.cupo_maximo} personas` : 'Sin límite',

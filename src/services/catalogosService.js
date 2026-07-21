@@ -11,3 +11,9 @@ export async function fetchCategoriasSocio() {
   if (!res.ok) throw new Error('Error al obtener categorías');
   return res.json();
 }
+
+export async function fetchSedes() {
+  const res = await fetchTo('/api/v1/sedes', 'GET');
+  if (!res.ok) throw new Error('Error al obtener sedes');
+  return res.json();
+}
