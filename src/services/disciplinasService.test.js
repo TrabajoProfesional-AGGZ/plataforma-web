@@ -6,6 +6,7 @@ import {
   getDisciplinasBySocio,
   inscribirSocioADisciplina,
   extenderSuscripcionDisciplina,
+  resolverListaEspera,
 } from './disciplinasService';
 
 jest.mock('../utils/utils', () => ({ fetchTo: jest.fn() }));
@@ -220,6 +221,39 @@ describe('disciplinasService', () => {
     test('lanza error genérico cuando la respuesta no es ok', async () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
       await expect(extenderSuscripcionDisciplina('disc-uuid-1', 'socio-uuid-1')).rejects.toThrow('Error al extender la suscripción');
+    });
+  });
+
+  describe('resolverListaEspera', () => {
+    test('hace PATCH al endpoint correcto con la acción elegida', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: true,
+        status: 200,
+        json: async () => ({ estado_suscripcion: 'activa' }),
+      });
+
+      await resolverListaEspera('disc-uuid-1', 'socio-uuid-1', 'activar');
+
+      expect(fetchTo).toHaveBeenCalledWith(
+        '/api/v1/disciplinas/disc-uuid-1/socios/socio-uuid-1/lista-espera',
+        'PATCH',
+        { accion: 'activar' }
+      );
+    });
+
+    test('lanza servicio-no-disponible en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(resolverListaEspera('disc-uuid-1', 'socio-uuid-1', 'eliminar')).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza no-en-espera en 404', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
+      await expect(resolverListaEspera('disc-uuid-1', 'socio-uuid-1', 'activar')).rejects.toThrow('no-en-espera');
+    });
+
+    test('lanza error genérico cuando la respuesta no es ok', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 400 });
+      await expect(resolverListaEspera('disc-uuid-1', 'socio-uuid-1', 'activar')).rejects.toThrow('Error al resolver la lista de espera');
     });
   });
 });

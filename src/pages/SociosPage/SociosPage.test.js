@@ -22,8 +22,14 @@ jest.mock('../../services/disciplinasService', () => ({
   getDisciplinas: jest.fn(),
   getSociosByDisciplina: jest.fn(),
   extenderSuscripcionDisciplina: jest.fn(),
+  resolverListaEspera: jest.fn(),
 }));
-import { getDisciplinas, getSociosByDisciplina, extenderSuscripcionDisciplina } from '../../services/disciplinasService';
+import {
+  getDisciplinas,
+  getSociosByDisciplina,
+  extenderSuscripcionDisciplina,
+  resolverListaEspera,
+} from '../../services/disciplinasService';
 
 jest.mock('../../components/createForm/CreateSocioForm', () => ({
   CreateSocioForm: ({ onSuccess, onCancel }) => (
@@ -555,6 +561,45 @@ describe('SociosPage', () => {
       expect(screen.getByText('Pérez')).toBeInTheDocument();
       expect(screen.getByText('García')).toBeInTheDocument();
     });
+  });
+
+  test('un socio en_espera muestra el botón "Quitar de lista de espera" en vez de extender', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    getDisciplinas.mockResolvedValue([{ id: 'disc-1', nombre: 'Natación' }]);
+    getSociosByDisciplina.mockResolvedValue([
+      { id: socioMock.id, nro_socio: socioMock.nro_socio, estado_suscripcion: 'en_espera' },
+    ]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
+
+    expect(await screen.findByText('Quitar de lista de espera')).toBeInTheDocument();
+    expect(screen.queryByText('Extender suscripcion')).not.toBeInTheDocument();
+  });
+
+  test('resolver la lista de espera a "activar" refresca la fila sin abrir el detalle del socio', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    getDisciplinas.mockResolvedValue([{ id: 'disc-1', nombre: 'Natación' }]);
+    getSociosByDisciplina
+      .mockResolvedValueOnce([{ id: socioMock.id, nro_socio: socioMock.nro_socio, estado_suscripcion: 'en_espera' }])
+      .mockResolvedValueOnce([{ id: socioMock.id, nro_socio: socioMock.nro_socio, estado_suscripcion: 'activa' }]);
+    resolverListaEspera.mockResolvedValue({ estado_suscripcion: 'activa' });
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
+    fireEvent.click(await screen.findByText('Quitar de lista de espera'));
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Pasar inscripción a activa' }));
+
+    await waitFor(() => {
+      expect(resolverListaEspera).toHaveBeenCalledWith('disc-1', socioMock.id, 'activar');
+      expect(getSociosByDisciplina).toHaveBeenCalledTimes(2);
+    });
+    expect(screen.queryByRole('button', { name: /editar/i })).not.toBeInTheDocument();
   });
 
   test('muestra error en modal al fallar la eliminación', async () => {

@@ -51,3 +51,11 @@ export async function extenderSuscripcionDisciplina(idDisciplina, idSocio) {
   if (!res.ok) throw new Error('Error al extender la suscripción');
   return res.json();
 }
+
+export async function resolverListaEspera(idDisciplina, idSocio, accion) {
+  const res = await fetchTo(`/api/v1/disciplinas/${idDisciplina}/socios/${idSocio}/lista-espera`, 'PATCH', { accion });
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (res.status === 404) throw new Error('no-en-espera');
+  if (!res.ok) throw new Error('Error al resolver la lista de espera');
+  return res.json();
+}
