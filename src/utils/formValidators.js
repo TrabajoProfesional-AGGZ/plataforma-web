@@ -49,6 +49,8 @@ export const MAX_LEN = {
   TITULO_IMAGEN: 150,
   EMAIL: 254,
   OBSERVACIONES_TRAMITE: 500,
+  NOMBRE_EVENTO: 100,
+  DESCRIPCION_EVENTO: 2000,
 };
 
 // eslint-disable-next-line no-control-regex
