@@ -8,8 +8,9 @@ jest.mock('../../hooks/useTheme', () => ({
 jest.mock('../../firebase', () => ({ auth: {} }));
 
 jest.mock('../../hooks/usePermiso', () => ({
-  usePermiso: () => true,
+  usePermiso: jest.fn(() => true),
 }));
+import { usePermiso } from '../../hooks/usePermiso';
 
 jest.mock('../../services/eventosService', () => ({
   getEventos: jest.fn(),
@@ -66,6 +67,7 @@ async function renderPage() {
 
 describe('EventosPage', () => {
   beforeEach(() => {
+    usePermiso.mockReturnValue(true);
     getEventos.mockResolvedValue([]);
     createEvento.mockResolvedValue({ ...EVENTO_LISTA, id: 'e-new', nombre: 'Evento nuevo' });
   });
@@ -135,5 +137,38 @@ describe('EventosPage', () => {
       expect(screen.getByText('El servicio no está disponible. Intentá de nuevo más tarde.')).toBeInTheDocument()
     );
     expect(screen.queryByText('Evento nuevo')).not.toBeInTheDocument();
+  });
+
+  test('no muestra el botón "Nuevo evento" sin el permiso crear_evento', async () => {
+    usePermiso.mockImplementation((nombre) => nombre !== 'crear_evento');
+    await renderPage();
+    expect(screen.queryByRole('button', { name: /nuevo evento/i })).not.toBeInTheDocument();
+  });
+
+  test('no carga eventos si no tiene el permiso ver_eventos', async () => {
+    usePermiso.mockImplementation((nombre) => nombre !== 'ver_eventos');
+    render(<EventosPage />);
+    await waitFor(() => expect(screen.getByText('Eventos')).toBeInTheDocument());
+    expect(getEventos).not.toHaveBeenCalled();
+  });
+
+  test('muestra la foto del evento cuando tiene foto_url', async () => {
+    getEventos.mockResolvedValue([{ ...EVENTO_LISTA, foto_url: 'https://res.cloudinary.com/x/foto.jpg' }]);
+    await renderPage();
+    const img = document.querySelector('.eventos-thumb');
+    expect(img).toHaveAttribute('src', 'https://res.cloudinary.com/x/foto.jpg');
+  });
+
+  test('muestra el banner de error sobre la tabla si falla la creación con eventos ya cargados', async () => {
+    getEventos.mockResolvedValue([EVENTO_LISTA]);
+    createEvento.mockRejectedValue(new Error('servicio-no-disponible'));
+    await renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /nuevo evento/i }));
+    fireEvent.click(screen.getByText('Confirmar creación'));
+
+    await waitFor(() =>
+      expect(screen.getByText('El servicio no está disponible. Intentá de nuevo más tarde.')).toBeInTheDocument()
+    );
+    expect(screen.getByText('Fiesta de fin de año')).toBeInTheDocument();
   });
 });
