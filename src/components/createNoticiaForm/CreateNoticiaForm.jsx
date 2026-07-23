@@ -1,12 +1,13 @@
-import { useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { FileText, Calendar, UploadCloud, CheckCircle2, XCircle } from 'lucide-react';
+import { FileText, Calendar } from 'lucide-react';
 import PropTypes from 'prop-types';
 import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput, FormStep } from '../createForm/FormFields';
+import { ImagenUploadField } from '../createForm/ImagenUploadField';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
-import { getImagenUrlRules, validarArchivoImagen, MAX_LEN } from '../../utils/formValidators';
+import { useImagenUpload } from '../../hooks/useImagenUpload';
+import { MAX_LEN } from '../../utils/formValidators';
 import { subirImagenNoticia } from '../../services/noticiasService';
 
 const STEPS = [{ id: 1, label: 'Datos', icon: FileText }];
@@ -21,11 +22,14 @@ const TEXTO_ESTADO_IMAGEN = {
 
 export function CreateNoticiaForm({ onSuccess, onCancel }) {
   const { step, direction, submitted, setSubmitted, navGuard } = useMultiStepFormState();
-  const fileInputRef = useRef(null);
-  const [imagenPreview, setImagenPreview] = useState(null);
-  const [archivoDataUrl, setArchivoDataUrl] = useState(null);
-  const [estadoImagen, setEstadoImagen] = useState('vacio');
-  const [errorImagen, setErrorImagen] = useState('');
+  const {
+    fileInputRef,
+    imagenPreview,
+    estadoImagen,
+    errorImagen,
+    handleArchivoSeleccionado,
+    subirSiCorresponde,
+  } = useImagenUpload();
 
   const {
     register,
@@ -35,23 +39,14 @@ export function CreateNoticiaForm({ onSuccess, onCancel }) {
   } = useForm({ mode: 'onTouched' });
 
   const onSubmit = async (data) => {
-    let imagenUrl = null;
-
-    if (archivoDataUrl) {
-      setEstadoImagen('subiendo');
-      setErrorImagen('');
-      try {
-        const tituloFoto = data.tituloFoto?.trim() || data.titulo.trim();
-        const { url } = await subirImagenNoticia(archivoDataUrl, tituloFoto);
-        imagenUrl = url;
-        setValue('imagen', url, { shouldValidate: true });
-        setEstadoImagen('exito');
-      } catch {
-        setErrorImagen('No se pudo subir la imagen. Intentá de nuevo.');
-        setEstadoImagen('error');
-        return;
-      }
+    const tituloFoto = data.tituloFoto?.trim() || data.titulo.trim();
+    let imagenUrl;
+    try {
+      imagenUrl = await subirSiCorresponde((dataUrl) => subirImagenNoticia(dataUrl, tituloFoto));
+    } catch {
+      return;
     }
+    if (imagenUrl) setValue('imagen', imagenUrl, { shouldValidate: true });
 
     setSubmitted(true);
     await new Promise((resolve) => setTimeout(resolve, 1800));
@@ -59,31 +54,8 @@ export function CreateNoticiaForm({ onSuccess, onCancel }) {
       titulo: data.titulo.trim(),
       cuerpo: data.cuerpo.trim(),
       fecha_expiracion: data.fecha_expiracion,
-      imagen: imagenUrl,
+      imagen: imagenUrl ?? null,
     });
-  };
-
-  const handleArchivoSeleccionado = (e) => {
-    const file = e.target.files?.[0];
-    e.target.value = '';
-    if (!file) return;
-
-    const errorValidacion = validarArchivoImagen(file);
-    if (errorValidacion) {
-      setErrorImagen(errorValidacion);
-      setEstadoImagen('error');
-      setArchivoDataUrl(null);
-      return;
-    }
-
-    const lector = new FileReader();
-    lector.onload = () => {
-      setImagenPreview(lector.result);
-      setArchivoDataUrl(lector.result);
-      setEstadoImagen('lista');
-      setErrorImagen('');
-    };
-    lector.readAsDataURL(file);
   };
 
   return (
@@ -127,40 +99,17 @@ export function CreateNoticiaForm({ onSuccess, onCancel }) {
             style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: 14 }}
           />
         </Field>
-        <Field label="Imagen (opcional)" icon={UploadCloud} error={errorImagen || errors.imagen?.message}>
-          <input type="hidden" {...register('imagen', getImagenUrlRules())} />
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            onChange={handleArchivoSeleccionado}
-            style={{ display: 'none' }}
-            aria-label="Subir archivo desde la computadora"
-          />
-          <button
-            type="button"
-            className={`csf-upload-box csf-upload-box--${estadoImagen}`}
-            onClick={() => fileInputRef.current?.click()}
-            disabled={estadoImagen === 'subiendo'}
-          >
-            {estadoImagen === 'exito' && (
-              <CheckCircle2 size={20} className="csf-upload-status-icon csf-upload-status-icon--exito" />
-            )}
-            {estadoImagen === 'error' && (
-              <XCircle size={20} className="csf-upload-status-icon csf-upload-status-icon--error" />
-            )}
-            {imagenPreview ? (
-              <img src={imagenPreview} alt="Previsualización" className="csf-upload-preview" />
-            ) : (
-              <UploadCloud size={32} strokeWidth={1.6} className="csf-upload-icon" />
-            )}
-            <div className="csf-upload-texto">
-              <span>{TEXTO_ESTADO_IMAGEN[estadoImagen].titulo}</span>
-              <span className="csf-upload-hint">{TEXTO_ESTADO_IMAGEN[estadoImagen].hint}</span>
-            </div>
-            {estadoImagen === 'subiendo' && <span className="csf-spinner csf-spinner--dark" />}
-          </button>
-        </Field>
+        <ImagenUploadField
+          label="Imagen (opcional)"
+          fieldName="imagen"
+          register={register}
+          error={errorImagen || errors.imagen?.message}
+          fileInputRef={fileInputRef}
+          estadoImagen={estadoImagen}
+          imagenPreview={imagenPreview}
+          onFileChange={handleArchivoSeleccionado}
+          textoEstado={TEXTO_ESTADO_IMAGEN}
+        />
         <Field label="Título de la foto (opcional)" icon={FileText}>
           <StyledInput
             {...register('tituloFoto', {

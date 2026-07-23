@@ -24,5 +24,7 @@ export const PERMISO_LABELS = {
   'ver_alertas': 'Ver alertas',
   'borrar_alerta': 'Dar de baja alerta',
   'ver_metricas': 'Ver las metricas del club',
-  'ver_tramites': 'Ver trámites'
+  'ver_tramites': 'Ver trámites',
+  'crear_evento': 'Crear evento',
+  'ver_eventos': 'Ver eventos'
 };
