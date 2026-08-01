@@ -5,6 +5,7 @@ import { logout } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
+import { ShoppingBag } from 'lucide-react';
 import './AppLayout.css';
 
 
@@ -18,7 +19,8 @@ const NAV_ITEMS_BASE = [
   { to: '/eventos', label: 'Eventos', Icon: Ticket, permiso: 'ver_eventos' },
   { to: '/metricas', label: 'Métricas', Icon: BarChart3, permiso: 'ver_metricas' },
   { to: '/alertas', label: 'Alertas', Icon: Bell, permiso: 'ver_alertas' },
-  { to: '/perfil', label: 'Perfil', Icon: Settings, permiso: ''}
+  { to: '/perfil', label: 'Perfil', Icon: Settings, permiso: ''},
+  { to: '/tienda', label: 'Tienda', Icon: ShoppingBag, permiso: null },
 ];
 
 function AppLayout() {
