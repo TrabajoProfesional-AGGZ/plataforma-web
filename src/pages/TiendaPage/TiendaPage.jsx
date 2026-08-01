@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, ChevronLeft } from 'lucide-react';
 import { getProductos, getProducto } from '../../services/productosService';
-import { usePermiso } from '../../hooks/usePermiso';
 import { CreateProductoForm } from '../../components/createProductoForm/CreateProductoForm';
 import { EditProductoForm } from '../../components/editProductoForm/EditProductoForm';
 import { createProducto } from '../../services/productosService';

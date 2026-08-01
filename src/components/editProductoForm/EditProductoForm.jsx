@@ -27,7 +27,7 @@ export function EditProductoForm({ producto, onSuccess, onCancel }) {
   } = useImagenUpload();
 
   const {
-    register, handleSubmit, setValue,
+    register, handleSubmit,
     formState: { errors, isSubmitting },
   } = useForm({
     mode: 'onTouched',
