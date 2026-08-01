@@ -75,7 +75,7 @@ describe('TiendaPage', () => {
   test('botón Nuevo producto abre el formulario de creación', async () => {
     getProductos.mockResolvedValue([]);
     await renderPage();
-    fireEvent.click(screen.getByText('Nuevo producto'));
-    expect(screen.getByText('Nuevo producto')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Nuevo producto' }));
+    expect(screen.getByPlaceholderText('Ej. Remera oficial del club')).toBeInTheDocument();
   });
 });
