@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Plus, ChevronLeft } from 'lucide-react';
+import { Plus, ChevronLeft, PackageSearch } from 'lucide-react';
 import { getProductos, getProducto } from '../../services/productosService';
 import { CreateProductoForm } from '../../components/createProductoForm/CreateProductoForm';
 import { EditProductoForm } from '../../components/editProductoForm/EditProductoForm';
@@ -161,51 +161,85 @@ function TiendaPage() {
       )}
 
       {vista === 'detalle' && (
-        <>
-          <div className="noticias-nav">
-            <button
-              className="noticias-btn-volver"
-              onClick={() => { setVista('lista'); setProductoActual(null); setErrorDetalle(''); }}
-            >
-              <ChevronLeft size={16} aria-hidden="true" />
-              Volver
-            </button>
-          </div>
+        <div className="tienda-detalle-view">
+          <button
+            type="button"
+            className="tienda-btn-volver"
+            onClick={() => { setVista('lista'); setProductoActual(null); setErrorDetalle(''); }}
+          >
+            <ChevronLeft size={16} aria-hidden="true" />
+            Volver a la tienda
+          </button>
 
           {loadingDetalle && (
             <div className="list-loading"><img src={logo} alt="" className="loading-logo" /></div>
           )}
 
-          {errorDetalle && !loadingDetalle && <p className="noticias-error">{errorDetalle}</p>}
+          {errorDetalle && !loadingDetalle && <p className="tienda-detalle-error">{errorDetalle}</p>}
 
           {!loadingDetalle && !errorDetalle && productoActual && (
-            <div className="tienda-detalle-admin">
-              {imagenSegura && (
-                <img src={imagenSegura} alt={productoActual.nombre} className="tienda-detalle-admin-img" referrerPolicy="no-referrer" />
-              )}
-              <div className="tienda-detalle-admin-info">
-                <h2>{productoActual.nombre}</h2>
-                <div className="tienda-detalle-admin-meta">
-                  <span className="tienda-detalle-admin-precio">
+            <article className="tienda-detalle-card">
+              <div className="tienda-detalle-media">
+                {imagenSegura ? (
+                  <img
+                    src={imagenSegura}
+                    alt={productoActual.nombre}
+                    className="tienda-detalle-img"
+                    referrerPolicy="no-referrer"
+                  />
+                ) : (
+                  <div className="tienda-detalle-img-placeholder" aria-hidden="true">
+                    <PackageSearch size={36} strokeWidth={1.5} />
+                    <span>Sin foto</span>
+                  </div>
+                )}
+              </div>
+
+              <div className="tienda-detalle-info">
+                <span className="tienda-detalle-eyebrow">Artículo de tienda</span>
+                <h2 className="tienda-detalle-nombre">{productoActual.nombre}</h2>
+
+                <div className="tienda-detalle-price-row">
+                  <span className="tienda-detalle-precio">
                     ${Number(productoActual.precio).toLocaleString('es-AR')}
                   </span>
-                  <span>Stock: {productoActual.stock}</span>
                   <EstadoBadge variant={productoActual.activo ? 'success' : 'warning'}>
                     {productoActual.activo ? 'Activo' : 'Inactivo'}
                   </EstadoBadge>
                 </div>
+
+                <div
+                  className={`tienda-detalle-stock ${
+                    productoActual.stock > 0 ? 'tienda-detalle-stock--ok' : 'tienda-detalle-stock--agotado'
+                  }`}
+                >
+                  <span className="tienda-detalle-stock-dot" aria-hidden="true" />
+                  {productoActual.stock > 0
+                    ? `${productoActual.stock} unidades disponibles`
+                    : 'Sin stock disponible'}
+                </div>
+
                 {productoActual.descripcion && (
-                  <p className="tienda-detalle-admin-desc">{productoActual.descripcion}</p>
+                  <>
+                    <div className="tienda-detalle-divider" />
+                    <p className="tienda-detalle-desc-label">Descripción</p>
+                    <p className="tienda-detalle-desc">{productoActual.descripcion}</p>
+                  </>
                 )}
-                <div className="noticias-detalle-actions">
-                  <button className="noticias-btn-editar" onClick={() => setEditarOpen(true)}>
-                    Editar
+
+                <div className="tienda-detalle-actions">
+                  <button
+                    type="button"
+                    className="tienda-btn-editar"
+                    onClick={() => setEditarOpen(true)}
+                  >
+                    Editar producto
                   </button>
                 </div>
               </div>
-            </div>
+            </article>
           )}
-        </>
+        </div>
       )}
 
       {crearOpen && (
