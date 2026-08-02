@@ -71,6 +71,23 @@ describe('TiendaPage', () => {
     expect(screen.getByText('Gorra del club')).toBeInTheDocument();
   });
 
+  test('muestra el mensaje genérico cuando falla la carga por un error distinto', async () => {
+    getProductos.mockRejectedValue(new Error('otro-error'));
+    await renderPage();
+    expect(screen.getByText('No se pudieron cargar los productos.')).toBeInTheDocument();
+  });
+
+  test('muestra la miniatura del producto cuando tiene imagen', async () => {
+    getProductos.mockResolvedValue([
+      { ...PRODUCTOS[0], imagen_url: 'https://cdn.example.com/remera-thumb.jpg' },
+    ]);
+    await renderPage();
+    expect(document.querySelector('.tienda-thumb')).toHaveAttribute(
+      'src',
+      'https://cdn.example.com/remera-thumb.jpg'
+    );
+  });
+
   test('muestra estado vacío cuando no hay productos', async () => {
     getProductos.mockResolvedValue([]);
     await renderPage();
@@ -191,6 +208,33 @@ describe('TiendaPage', () => {
       expect(screen.getByRole('heading', { name: 'Remera edición limitada' })).toBeInTheDocument();
     });
     expect(screen.queryByText('Confirmar edición')).not.toBeInTheDocument();
+  });
+
+  test('el detalle muestra la foto del producto cuando tiene una URL válida', async () => {
+    getProductos.mockResolvedValue(PRODUCTOS);
+    getProducto.mockResolvedValue({ ...PRODUCTOS[0], imagen_url: 'https://cdn.example.com/remera.jpg' });
+    await renderPage();
+    await act(async () => {
+      fireEvent.click(screen.getByText('Remera oficial'));
+    });
+    await waitFor(() => {
+      expect(screen.getByRole('img', { name: 'Remera oficial' })).toHaveAttribute(
+        'src',
+        'https://cdn.example.com/remera.jpg'
+      );
+    });
+  });
+
+  test('el detalle muestra "Sin stock disponible" cuando el stock es 0', async () => {
+    getProductos.mockResolvedValue(PRODUCTOS);
+    getProducto.mockResolvedValue(PRODUCTOS[1]);
+    await renderPage();
+    await act(async () => {
+      fireEvent.click(screen.getByText('Gorra del club'));
+    });
+    await waitFor(() => {
+      expect(screen.getByText('Sin stock disponible')).toBeInTheDocument();
+    });
   });
 
   test('cancelar la edición cierra el formulario sin modificar el detalle', async () => {
