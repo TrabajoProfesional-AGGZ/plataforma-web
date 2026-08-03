@@ -14,6 +14,7 @@ import AlertasPage from './pages/AlertasPage/AlertasPage';
 import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import AppLayout from './components/AppLayout/AppLayout';
 import MetricasPage from './pages/MetricasPage/MetricasPage';
+import TiendaPage from './pages/TiendaPage/TiendaPage';
 
 function App() {
   return (
@@ -72,6 +73,11 @@ function App() {
           <Route element={<PrivateRoute requiredPermiso="ver_alertas" />}>
             <Route element={<AppLayout />}>
               <Route path="/alertas" element={<AlertasPage />} />
+            </Route>
+          </Route>
+          <Route element={<PrivateRoute />}>
+            <Route element={<AppLayout />}>
+              <Route path="/tienda" element={<TiendaPage />} />
             </Route>
           </Route>
         </Routes>

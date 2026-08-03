@@ -85,12 +85,15 @@ describe('FinanzasTab', () => {
       expect(getDashboardFinanzas).toHaveBeenCalledTimes(1);
     });
 
+    const hoy = new Date();
+    const mesAnterior = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 1);
+    const periodoDistinto = `${mesAnterior.getFullYear()}-${String(mesAnterior.getMonth() + 1).padStart(2, '0')}`;  
     const inputMes = screen.getByLabelText(/Período a consultar:/i);
-    fireEvent.change(inputMes, { target: { value: '2026-08' } });
-
+    fireEvent.change(inputMes, { target: { value: periodoDistinto } });
+  
     await waitFor(() => {
       expect(getDashboardFinanzas).toHaveBeenCalledTimes(2);
-      expect(getDashboardFinanzas).toHaveBeenLastCalledWith('2026-08');
+      expect(getDashboardFinanzas).toHaveBeenLastCalledWith(periodoDistinto);
     });
   });
 });
