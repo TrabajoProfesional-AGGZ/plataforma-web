@@ -75,6 +75,19 @@
   border-color: var(--color-border-strong);
 }
 
+/* El navegador (autocompletar / sugerencia de mail guardado) pinta su propio
+   fondo blanco vía :-webkit-autofill, ignorando background-color normal —
+   se fuerza con box-shadow inset + text-fill-color, y se retrasa la
+   transición nativa para que no haga flash blanco al elegir la sugerencia. */
+.login-field input:-webkit-autofill,
+.login-field input:-webkit-autofill:hover,
+.login-field input:-webkit-autofill:focus {
+  -webkit-text-fill-color: var(--color-text-primary);
+  -webkit-box-shadow: 0 0 0 1000px var(--color-surface) inset;
+  box-shadow: 0 0 0 1000px var(--color-surface) inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .login-password-wrapper {
   position: relative;
   display: flex;

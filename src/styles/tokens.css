@@ -7,20 +7,22 @@
   color-scheme: light;
 
   /* Colors */
-  --color-text-primary: #003c82;
-  --color-text-secondary: #5c7285;
-  --color-bg: #f3f6f9;
-  --color-surface: #ffffff;
+  /* Paleta de club (rama demo): Mamelodi Sundowns — #FFDC00 / #039F5D / #FFD25A.
+     Ver nota "Colores por club (rama demo)" más abajo en este CLAUDE.md. */
+  --color-text-primary: #039f5d;
+  --color-text-secondary: #01824c;
+  --color-bg: #ffd35a3c;
+  --color-surface: #ffd25a;
   --color-border: #e8e8e8;
-  --color-border-medium: #d7dee4;
-  --color-border-strong: #003c82;
-  --color-border-light: #efefef;
-  --color-accent: #12a0d7;
-  --color-accent-hover: #0f8ab8;
+  --color-border-medium: #039f5d;
+  --color-border-strong: #039f5d;
+  --color-border-light: #039f5d;
+  --color-accent: #039f5d;
+  --color-accent-hover: #039f5d;
   --color-danger: #c0392b;
   --color-danger-hover: #96281b;
-  --color-row-hover: #f8f8f8;
-  --color-bg-subtle: #f0f0f0;
+  --color-row-hover: #039f5d;
+  --color-bg-subtle: #f9d980;
   --color-overlay: rgba(0, 0, 0, 0.4);
 
   /* Texto fijo sobre botones de color sólido (ej. danger) — a diferencia de
@@ -101,16 +103,16 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --color-text-primary: #cfeafa;
+  --color-text-primary: #ffd25a;
   --color-text-secondary: #93aabd;
   --color-bg: #0e1b2b;
   --color-surface: #16283a;
   --color-border: #22384a;
   --color-border-medium: #2d4a5f;
-  --color-border-strong: #cfeafa;
+  --color-border-strong: #ffd25a;
   --color-border-light: #1c2e3f;
-  --color-accent: #2cb2e0;
-  --color-accent-hover: #12a0d7;
+  --color-accent: #ffdc00;
+  --color-accent-hover: #039f5d;
   --color-danger: #f87171;
   --color-danger-hover: #ef4444;
   --color-row-hover: #1a2c3d;

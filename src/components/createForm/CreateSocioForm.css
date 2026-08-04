@@ -170,34 +170,34 @@ button.csf-overlay {
   outline: none;
   font-size: 14px;
   font-family: inherit;
-  color: var(--color-text-primary);
+  color: #ffdc00;
   border: 2px solid transparent;
-  background-color: var(--color-bg);
+  background-color: #039f5d;
   transition: background-color var(--transition-normal), border-color var(--transition-normal);
   box-sizing: border-box;
 }
 
 .csf-input:focus,
 .csf-select:focus {
-  background-color: var(--color-surface);
-  border-color: var(--color-border-strong);
+  background-color: #039f5d;
+  border-color: #ffdc00;
 }
 
 .csf-input--error,
 .csf-select--error {
   border-color: var(--color-danger);
-  background-color: var(--color-surface);
+  background-color: #039f5d;
 }
 
 .csf-input::placeholder {
-  color: var(--color-border-medium);
+  color: rgba(255, 220, 0, 0.65);
 }
 
 .csf-select {
   cursor: pointer;
   appearance: none;
   padding-right: 36px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%234A4A4A' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8' fill='none'%3E%3Cpath d='M1 1L6 6L11 1' stroke='%23FFDC00' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right var(--space-4) center;
   background-size: 12px 8px;
@@ -263,14 +263,14 @@ button.csf-overlay {
 }
 
 .csf-btn-back {
-  border: 2px solid var(--color-border);
+  border: 2px solid #039f5d;
   background: transparent;
   color: var(--color-text-secondary);
   transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 
 .csf-btn-back:hover {
-  border-color: var(--color-text-secondary);
+  border-color: #039f5d;
   color: var(--color-text-primary);
 }
 

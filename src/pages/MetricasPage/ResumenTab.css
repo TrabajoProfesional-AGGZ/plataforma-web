@@ -140,6 +140,13 @@
   grid-template-columns: 1fr 1fr auto;
   align-items: center;
   gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid #039f5d;
+}
+
+.ocupacion-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
 }
 
 .ocupacion-info { display: flex; flex-direction: column; }
@@ -150,6 +157,7 @@
   position: relative;
   height: 20px;
   background: var(--color-bg);
+  border: 1px solid #039f5d;
   border-radius: var(--radius-full);
   overflow: hidden;
 }
