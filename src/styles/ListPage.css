@@ -251,7 +251,7 @@
 .disciplinas-tabla td,
 .instalaciones-tabla td {
   padding: var(--space-3) var(--space-5);
-  border-bottom: 1px solid #039f5d;
+  border-bottom: 1px solid var(--color-border);
   color: var(--color-text-primary);
   vertical-align: middle;
   font-variant-numeric: tabular-nums;
@@ -296,17 +296,6 @@
 .disciplinas-tr-clickable:hover td,
 .instalaciones-tr-clickable:hover td {
   background-color: var(--color-row-hover);
-  color: #ffdc00;
-}
-
-/* Modo oscuro: fila de hover invertida (fondo amarillo, texto verde) en vez
-   de la combinación verde/amarillo del modo claro. */
-:root[data-theme="dark"] .socios-tr-clickable:hover td,
-:root[data-theme="dark"] .usuarios-tr-clickable:hover td,
-:root[data-theme="dark"] .disciplinas-tr-clickable:hover td,
-:root[data-theme="dark"] .instalaciones-tr-clickable:hover td {
-  background-color: #ffdc00;
-  color: #039f5d;
 }
 
 /* ── Badge base ──────────────────────────────────────────────── */
