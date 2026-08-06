@@ -26,5 +26,7 @@ export const PERMISO_LABELS = {
   'ver_metricas': 'Ver las metricas del club',
   'ver_tramites': 'Ver trámites',
   'crear_evento': 'Crear evento',
-  'ver_eventos': 'Ver eventos'
+  'ver_eventos': 'Ver eventos',
+  'ver_pagos_pendientes': 'Ver pagos pendientes',
+  'crear_entrada': 'Reservar entrada para socio'
 };

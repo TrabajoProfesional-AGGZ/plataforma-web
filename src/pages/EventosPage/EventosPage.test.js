@@ -45,6 +45,16 @@ jest.mock('../../components/createEventoForm/CreateEventoForm', () => ({
   ),
 }));
 
+jest.mock('../../components/reservarEntradaForm/ReservarEntradaForm', () => ({
+  ReservarEntradaForm: ({ evento, onSuccess, onCancel }) => ( // NOSONAR
+    <div>
+      <span>Reservando entrada para {evento.nombre}</span>
+      <button onClick={onSuccess}>Confirmar reserva de entrada</button>
+      <button onClick={onCancel}>Cancelar reserva de entrada</button>
+    </div>
+  ),
+}));
+
 const EVENTO_LISTA = {
   id: 'e-1',
   nombre: 'Fiesta de fin de año',
@@ -170,5 +180,47 @@ describe('EventosPage', () => {
       expect(screen.getByText('El servicio no está disponible. Intentá de nuevo más tarde.')).toBeInTheDocument()
     );
     expect(screen.getByText('Fiesta de fin de año')).toBeInTheDocument();
+  });
+
+  test('no muestra la columna de acciones ni el botón "Reservar entrada" sin el permiso crear_entrada', async () => {
+    usePermiso.mockImplementation((nombre) => nombre !== 'crear_entrada');
+    getEventos.mockResolvedValue([EVENTO_LISTA]);
+    await renderPage();
+    expect(screen.queryByRole('button', { name: /reservar entrada/i })).not.toBeInTheDocument();
+  });
+
+  test('abre el formulario de reservar entrada al hacer click en el botón de la fila', async () => {
+    getEventos.mockResolvedValue([EVENTO_LISTA]);
+    await renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /reservar entrada/i }));
+    expect(screen.getByText('Reservando entrada para Fiesta de fin de año')).toBeInTheDocument();
+  });
+
+  test('cierra el formulario de reservar entrada al cancelar', async () => {
+    getEventos.mockResolvedValue([EVENTO_LISTA]);
+    await renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /reservar entrada/i }));
+    fireEvent.click(screen.getByText('Cancelar reserva de entrada'));
+    expect(screen.queryByText('Reservando entrada para Fiesta de fin de año')).not.toBeInTheDocument();
+  });
+
+  test('al confirmar la reserva de entrada, incrementa entradas_vendidas y cierra el formulario', async () => {
+    getEventos.mockResolvedValue([EVENTO_LISTA]);
+    await renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /reservar entrada/i }));
+    fireEvent.click(screen.getByText('Confirmar reserva de entrada'));
+
+    expect(screen.queryByText('Reservando entrada para Fiesta de fin de año')).not.toBeInTheDocument();
+    expect(screen.getByText('11 / 100')).toBeInTheDocument();
+  });
+
+  test('deshabilita el botón "Reservar entrada" para un evento creado de forma optimista', async () => {
+    getEventos.mockResolvedValue([]);
+    await renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /nuevo evento/i }));
+    fireEvent.click(screen.getByText('Confirmar creación'));
+
+    expect(await screen.findByText('Evento nuevo')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /reservar entrada/i })).toBeDisabled();
   });
 });
