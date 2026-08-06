@@ -4,6 +4,7 @@ const ENDPOINT_POR_TIPO = {
   cuota: 'cuotas',
   reserva: 'reservas',
   entrada: 'entradas',
+  compra: 'compras',
 };
 
 export async function getResumenFinanciero(idSocio) {

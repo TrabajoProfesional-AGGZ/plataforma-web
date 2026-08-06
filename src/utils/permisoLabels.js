@@ -28,5 +28,6 @@ export const PERMISO_LABELS = {
   'crear_evento': 'Crear evento',
   'ver_eventos': 'Ver eventos',
   'ver_pagos_pendientes': 'Ver pagos pendientes',
-  'crear_entrada': 'Reservar entrada para socio'
+  'crear_entrada': 'Reservar entrada para socio',
+  'crear_compra': 'Crear compra para socio'
 };

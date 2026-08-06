@@ -66,6 +66,14 @@ describe('finanzasService', () => {
       expect(fetchTo).toHaveBeenCalledWith('/api/v1/internos/entradas/e-1/marcar-pagada', 'POST', { pagado_en_caja: true });
     });
 
+    test('llama al endpoint de compras cuando el tipo es compra', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ estado: 'Pagada' }) });
+
+      await marcarPagadaCaja('compra', 'co-1');
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/internos/compras/co-1/marcar-pagada', 'POST', { pagado_en_caja: true });
+    });
+
     test('encodea caracteres especiales del id', async () => {
       fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({}) });
 
