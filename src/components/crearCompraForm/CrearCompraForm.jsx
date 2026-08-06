@@ -1,13 +1,15 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { CheckCircle2, Hash, Package } from 'lucide-react';
+import { Package } from 'lucide-react';
 import PropTypes from 'prop-types';
-import { getSocioByNroSocio } from '../../services/sociosService';
 import { crearCompra } from '../../services/comprasService';
 import { marcarPagadaCaja } from '../../services/finanzasService';
+import { useBuscadorSocio } from '../../hooks/useBuscadorSocio';
 import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput } from '../createForm/FormFields';
+import { FormFooterActions } from '../createForm/FormFooterActions';
 import { ModalOverlay } from '../createForm/ModalOverlay';
+import { SocioBuscadorField } from '../createForm/SocioBuscadorField';
 
 const AVISOS_ESTADO_SOCIO = {
   Moroso: 'No se puede crear una compra para este socio hasta que no regularice su situación financiera con el club.',
@@ -22,54 +24,21 @@ const MENSAJES_ERROR_SUBMIT = {
 };
 
 export function CrearCompraForm({ producto, onSuccess, onCancel }) {
-  const [nroSocioInput, setNroSocioInput] = useState('');
-  const [busquedaSocio, setBusquedaSocio] = useState(false);
-  const [errorSocio, setErrorSocio] = useState('');
-  const [socioPreview, setSocioPreview] = useState(null);
-  const [socioSeleccionado, setSocioSeleccionado] = useState(null);
+  const buscador = useBuscadorSocio();
   const [cantidad, setCantidad] = useState(1);
   const [guardando, setGuardando] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
-  const previewSocio = async (value) => {
-    if (!value?.trim()) return;
-    try {
-      const socio = await getSocioByNroSocio(value.trim());
-      setSocioPreview(socio);
-    } catch {
-      // preview silently fails
-    }
-  };
-
-  const buscarSocio = async () => {
-    const nro = nroSocioInput.trim();
-    if (!nro) return;
-
-    const socioYaResuelto = socioPreview?.nro_socio === nro ? socioPreview : null;
-    if (socioYaResuelto) {
-      setSocioSeleccionado(socioYaResuelto);
-      setErrorSocio('');
-      return;
-    }
-
-    setBusquedaSocio(true);
-    setErrorSocio('');
-    try {
-      const socio = await getSocioByNroSocio(nro);
-      setSocioSeleccionado(socio);
-    } catch {
-      setErrorSocio('No se encontró ningún socio con ese número.');
-    } finally {
-      setBusquedaSocio(false);
-    }
-  };
-
   async function handleConfirmar() {
-    if (!socioSeleccionado) return;
+    if (!buscador.socioSeleccionado) return;
     setGuardando(true);
     setSubmitError('');
     try {
-      const compra = await crearCompra({ id_producto: producto.id, id_socio: socioSeleccionado.id, cantidad });
+      const compra = await crearCompra({
+        id_producto: producto.id,
+        id_socio: buscador.socioSeleccionado.id,
+        cantidad,
+      });
       await marcarPagadaCaja('compra', compra.id);
       onSuccess();
     } catch (e) {
@@ -94,39 +63,15 @@ export function CrearCompraForm({ producto, onSuccess, onCancel }) {
 
         <div className="csf-card">
           <div className="csf-fields">
-            <Field label="N° de socio" icon={Hash} error={errorSocio}>
-              <div className="csf-socio-input-row">
-                <StyledInput
-                  type="text"
-                  placeholder="Ej. 1234"
-                  value={nroSocioInput}
-                  onChange={(e) => {
-                    setNroSocioInput(e.target.value);
-                    setSocioPreview(null);
-                    setSocioSeleccionado(null);
-                    setErrorSocio('');
-                  }}
-                  onBlur={(e) => previewSocio(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') { e.preventDefault(); buscarSocio(); }
-                  }}
-                />
-                <button
-                  type="button"
-                  className="csf-btn-agregar-socio"
-                  onClick={buscarSocio}
-                  disabled={busquedaSocio || !nroSocioInput.trim()}
-                >
-                  Buscar
-                </button>
-              </div>
-              {socioSeleccionado && (
-                <span className="csf-socio-nombre-inline">
-                  <CheckCircle2 size={13} color="var(--status-success-border)" />
-                  {socioSeleccionado.apellido} {socioSeleccionado.nombre}
-                </span>
-              )}
-            </Field>
+            <SocioBuscadorField
+              nroSocioInput={buscador.nroSocioInput}
+              busquedaSocio={buscador.busquedaSocio}
+              errorSocio={buscador.errorSocio}
+              socioSeleccionado={buscador.socioSeleccionado}
+              onChange={buscador.handleNroSocioChange}
+              onBlurPreview={buscador.previewSocio}
+              onBuscar={buscador.buscarSocio}
+            />
 
             <Field label="Cantidad" icon={Package}>
               <StyledInput
@@ -143,36 +88,13 @@ export function CrearCompraForm({ producto, onSuccess, onCancel }) {
 
             {submitError && <p className="csf-form-error">{submitError}</p>}
 
-            <div className="csf-nav csf-nav--between">
-              <motion.button
-                type="button"
-                onClick={onCancel}
-                whileHover={{ scale: 1.015 }}
-                whileTap={{ scale: 0.985 }}
-                className="csf-btn-back"
-              >
-                Cancelar
-              </motion.button>
-              <motion.button
-                type="button"
-                onClick={handleConfirmar}
-                disabled={!socioSeleccionado || guardando}
-                whileHover={{ scale: 1.015 }}
-                whileTap={{ scale: 0.985 }}
-                className="csf-btn-submit"
-              >
-                {guardando ? (
-                  <>
-                    <motion.span
-                      className="csf-spinner"
-                      animate={{ rotate: 360 }}
-                      transition={{ repeat: Infinity, duration: 0.8, ease: 'linear' }}
-                    />
-                    Guardando...
-                  </>
-                ) : 'Crear compra'}
-              </motion.button>
-            </div>
+            <FormFooterActions
+              onCancel={onCancel}
+              onSubmit={handleConfirmar}
+              disabled={!buscador.socioSeleccionado || guardando}
+              loading={guardando}
+              submitLabel="Crear compra"
+            />
           </div>
         </div>
       </motion.div>
