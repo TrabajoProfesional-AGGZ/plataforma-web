@@ -1,29 +1,31 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { Package } from 'lucide-react';
 import PropTypes from 'prop-types';
-import { createEntrada } from '../../services/entradasService';
+import { crearCompra } from '../../services/comprasService';
 import { marcarPagadaCaja } from '../../services/finanzasService';
 import { useBuscadorSocio } from '../../hooks/useBuscadorSocio';
 import '../createForm/CreateSocioForm.css';
+import { Field, StyledInput } from '../createForm/FormFields';
 import { FormFooterActions } from '../createForm/FormFooterActions';
 import { ModalOverlay } from '../createForm/ModalOverlay';
 import { SocioBuscadorField } from '../createForm/SocioBuscadorField';
 
 const AVISOS_ESTADO_SOCIO = {
-  Moroso: 'No se puede reservar una entrada para este socio hasta que no regularice su situación financiera con el club.',
-  Suspendido: 'No se puede reservar una entrada para este socio hasta que no termine su suspensión.',
+  Moroso: 'No se puede crear una compra para este socio hasta que no regularice su situación financiera con el club.',
+  Suspendido: 'No se puede crear una compra para este socio hasta que no termine su suspensión.',
 };
 
 const MENSAJES_ERROR_SUBMIT = {
-  'socio-moroso': AVISOS_ESTADO_SOCIO.Moroso,
-  'socio-suspendido': AVISOS_ESTADO_SOCIO.Suspendido,
-  fuera_de_plazo: 'Ya no se pueden reservar entradas para este evento (falta menos de una hora para que empiece).',
-  ya_tiene_entrada: 'Este socio ya tiene una entrada para este evento.',
-  sin_cupo: 'No quedan entradas disponibles para este evento.',
+  moroso: AVISOS_ESTADO_SOCIO.Moroso,
+  suspendido: AVISOS_ESTADO_SOCIO.Suspendido,
+  sin_stock: 'No queda stock suficiente de este producto.',
+  producto_inactivo: 'Este producto ya no está disponible.',
 };
 
-export function ReservarEntradaForm({ evento, onSuccess, onCancel }) {
+export function CrearCompraForm({ producto, onSuccess, onCancel }) {
   const buscador = useBuscadorSocio();
+  const [cantidad, setCantidad] = useState(1);
   const [guardando, setGuardando] = useState(false);
   const [submitError, setSubmitError] = useState('');
 
@@ -32,18 +34,22 @@ export function ReservarEntradaForm({ evento, onSuccess, onCancel }) {
     setGuardando(true);
     setSubmitError('');
     try {
-      const entrada = await createEntrada({ id_evento: evento.id, id_socio: buscador.socioSeleccionado.id });
-      await marcarPagadaCaja('entrada', entrada.id);
+      const compra = await crearCompra({
+        id_producto: producto.id,
+        id_socio: buscador.socioSeleccionado.id,
+        cantidad,
+      });
+      await marcarPagadaCaja('compra', compra.id);
       onSuccess();
     } catch (e) {
-      setSubmitError(MENSAJES_ERROR_SUBMIT[e.message] || 'No se pudo reservar la entrada. Intentá de nuevo.');
+      setSubmitError(MENSAJES_ERROR_SUBMIT[e.message] || 'No se pudo crear la compra. Intentá de nuevo.');
     } finally {
       setGuardando(false);
     }
   }
 
   return (
-    <ModalOverlay onClose={onCancel} ariaLabel={`Reservar entrada: ${evento.nombre}`}>
+    <ModalOverlay onClose={onCancel} ariaLabel={`Crear compra: ${producto.nombre}`}>
       <motion.div
         key="form"
         initial={{ opacity: 0, y: 16 }}
@@ -51,8 +57,8 @@ export function ReservarEntradaForm({ evento, onSuccess, onCancel }) {
         className="csf-outer-card"
       >
         <div className="csf-header">
-          <h1>Reservar entrada</h1>
-          <p>{evento.nombre}</p>
+          <h1>Crear compra</h1>
+          <p>{producto.nombre}</p>
         </div>
 
         <div className="csf-card">
@@ -67,6 +73,19 @@ export function ReservarEntradaForm({ evento, onSuccess, onCancel }) {
               onBuscar={buscador.buscarSocio}
             />
 
+            <Field label="Cantidad" icon={Package}>
+              <StyledInput
+                type="number"
+                min={1}
+                max={producto.stock}
+                value={cantidad}
+                onChange={(e) => {
+                  const valor = Number(e.target.value);
+                  setCantidad(Math.min(Math.max(valor || 1, 1), producto.stock));
+                }}
+              />
+            </Field>
+
             {submitError && <p className="csf-form-error">{submitError}</p>}
 
             <FormFooterActions
@@ -74,7 +93,7 @@ export function ReservarEntradaForm({ evento, onSuccess, onCancel }) {
               onSubmit={handleConfirmar}
               disabled={!buscador.socioSeleccionado || guardando}
               loading={guardando}
-              submitLabel="Reservar entrada"
+              submitLabel="Crear compra"
             />
           </div>
         </div>
@@ -83,10 +102,11 @@ export function ReservarEntradaForm({ evento, onSuccess, onCancel }) {
   );
 }
 
-ReservarEntradaForm.propTypes = {
-  evento: PropTypes.shape({
+CrearCompraForm.propTypes = {
+  producto: PropTypes.shape({
     id: PropTypes.string.isRequired,
     nombre: PropTypes.string.isRequired,
+    stock: PropTypes.number.isRequired,
   }).isRequired,
   onSuccess: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,

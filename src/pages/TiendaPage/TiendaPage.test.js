@@ -9,8 +9,9 @@ jest.mock('../../hooks/useTheme', () => ({
 jest.mock('../../firebase', () => ({ auth: {} }));
 
 jest.mock('../../hooks/usePermiso', () => ({
-  usePermiso: () => true,
+  usePermiso: jest.fn(),
 }));
+import { usePermiso } from '../../hooks/usePermiso';
 
 jest.mock('../../services/productosService', () => ({
   getProductos: jest.fn(),
@@ -49,6 +50,17 @@ jest.mock('../../components/editProductoForm/EditProductoForm', () => ({
   ),
 }));
 
+jest.mock('../../components/crearCompraForm/CrearCompraForm', () => ({
+  CrearCompraForm: ({ producto, onSuccess, onCancel }) => (
+    <div>
+      <h2>Crear compra</h2>
+      <span>{producto.nombre}</span>
+      <button onClick={onSuccess}>Confirmar compra</button>
+      <button onClick={onCancel}>Cancelar compra</button>
+    </div>
+  ),
+}));
+
 const PRODUCTOS = [
   { id: 'p-1', nombre: 'Remera oficial', precio: 15000, stock: 25, activo: true, imagen_url: null },
   { id: 'p-2', nombre: 'Gorra del club', precio: 8000, stock: 0, activo: false, imagen_url: null },
@@ -62,7 +74,10 @@ async function renderPage() {
 }
 
 describe('TiendaPage', () => {
-  beforeEach(() => { jest.clearAllMocks(); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    usePermiso.mockReturnValue(true);
+  });
 
   test('muestra la lista de productos', async () => {
     getProductos.mockResolvedValue(PRODUCTOS);
@@ -249,5 +264,52 @@ describe('TiendaPage', () => {
     fireEvent.click(screen.getByText('Cancelar edición'));
     expect(screen.queryByText('Confirmar edición')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Remera oficial' })).toBeInTheDocument();
+  });
+
+  test('el botón "Crear compra" solo se muestra con el permiso crear_compra', async () => {
+    usePermiso.mockReturnValue(false);
+    getProductos.mockResolvedValue(PRODUCTOS);
+    getProducto.mockResolvedValue(PRODUCTOS[0]);
+    await renderPage();
+    await act(async () => {
+      fireEvent.click(screen.getByText('Remera oficial'));
+    });
+    await screen.findByText('Editar producto');
+    expect(screen.queryByText('Crear compra')).not.toBeInTheDocument();
+  });
+
+  test('"Crear compra" abre el modal y al confirmar refresca el detalle', async () => {
+    getProductos.mockResolvedValue(PRODUCTOS);
+    getProducto
+      .mockResolvedValueOnce(PRODUCTOS[0])
+      .mockResolvedValueOnce({ ...PRODUCTOS[0], stock: 24 });
+    await renderPage();
+    fireEvent.click(screen.getByText('Remera oficial'));
+    await screen.findByText('Crear compra', { selector: 'button' });
+
+    fireEvent.click(screen.getByText('Crear compra', { selector: 'button' }));
+    expect(screen.getByRole('heading', { name: 'Crear compra' })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Confirmar compra'));
+
+    await waitFor(() => {
+      expect(getProducto).toHaveBeenCalledTimes(2);
+      expect(screen.queryByRole('heading', { name: 'Crear compra' })).not.toBeInTheDocument();
+      expect(screen.getByText('24 unidades disponibles')).toBeInTheDocument();
+    });
+  });
+
+  test('cancelar "Crear compra" cierra el modal sin refrescar el detalle', async () => {
+    getProductos.mockResolvedValue(PRODUCTOS);
+    getProducto.mockResolvedValue(PRODUCTOS[0]);
+    await renderPage();
+    fireEvent.click(screen.getByText('Remera oficial'));
+    await screen.findByText('Crear compra', { selector: 'button' });
+
+    fireEvent.click(screen.getByText('Crear compra', { selector: 'button' }));
+    fireEvent.click(screen.getByText('Cancelar compra'));
+
+    expect(screen.queryByRole('heading', { name: 'Crear compra' })).not.toBeInTheDocument();
+    expect(getProducto).toHaveBeenCalledTimes(1);
   });
 });

@@ -3,6 +3,7 @@ import { Plus, ChevronLeft, PackageSearch } from 'lucide-react';
 import { getProductos, getProducto } from '../../services/productosService';
 import { CreateProductoForm } from '../../components/createProductoForm/CreateProductoForm';
 import { EditProductoForm } from '../../components/editProductoForm/EditProductoForm';
+import { CrearCompraForm } from '../../components/crearCompraForm/CrearCompraForm';
 import { createProducto } from '../../services/productosService';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
@@ -10,6 +11,7 @@ import EmptyState from '../../components/feedback/EmptyState';
 import { urlImagenSegura } from '../../utils/utils';
 import { handleActivateKey } from '../../utils/a11y';
 import { useTheme } from '../../hooks/useTheme';
+import { usePermiso } from '../../hooks/usePermiso';
 import './TiendaPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
@@ -23,6 +25,7 @@ function mensajeError(err, fallback) {
 
 function TiendaPage() {
   const { logoSocio: logo } = useTheme();
+  const puedeCrearCompra = usePermiso('crear_compra');
 
   const [vista, setVista] = useState('lista');
   const [productos, setProductos] = useState([]);
@@ -33,6 +36,7 @@ function TiendaPage() {
   const [errorDetalle, setErrorDetalle] = useState('');
   const [crearOpen, setCrearOpen] = useState(false);
   const [editarOpen, setEditarOpen] = useState(false);
+  const [crearCompraOpen, setCrearCompraOpen] = useState(false);
 
   const imagenSegura = urlImagenSegura(productoActual?.imagen_url);
 
@@ -84,6 +88,21 @@ function TiendaPage() {
       prev.map((p) => (p.id === actualizado.id ? { ...p, ...actualizado } : p))
     );
     setEditarOpen(false);
+  }
+
+  async function handleCompraCreada() {
+    setCrearCompraOpen(false);
+    // Refresca el detalle en vez de decrementar client-side, para no
+    // desincronizar con el descuento de stock real hecho en el backend.
+    try {
+      const actualizado = await getProducto(productoActual.id);
+      setProductoActual(actualizado);
+      setProductos((prev) =>
+        prev.map((p) => (p.id === actualizado.id ? { ...p, ...actualizado } : p))
+      );
+    } catch (err) {
+      setErrorDetalle(mensajeError(err, 'No se pudo actualizar el stock del producto.'));
+    }
   }
 
   function renderLista() {
@@ -235,6 +254,16 @@ function TiendaPage() {
                   >
                     Editar producto
                   </button>
+                  {puedeCrearCompra && (
+                    <button
+                      type="button"
+                      className="tienda-btn-editar"
+                      onClick={() => setCrearCompraOpen(true)}
+                      disabled={productoActual.stock <= 0}
+                    >
+                      Crear compra
+                    </button>
+                  )}
                 </div>
               </div>
             </article>
@@ -254,6 +283,14 @@ function TiendaPage() {
           producto={productoActual}
           onSuccess={handleEditarExito}
           onCancel={() => setEditarOpen(false)}
+        />
+      )}
+
+      {crearCompraOpen && productoActual && (
+        <CrearCompraForm
+          producto={productoActual}
+          onSuccess={handleCompraCreada}
+          onCancel={() => setCrearCompraOpen(false)}
         />
       )}
     </div>
