@@ -274,7 +274,7 @@ describe('TiendaPage', () => {
     await act(async () => {
       fireEvent.click(screen.getByText('Remera oficial'));
     });
-    await waitFor(() => screen.getByText('Editar producto'));
+    await screen.findByText('Editar producto');
     expect(screen.queryByText('Crear compra')).not.toBeInTheDocument();
   });
 
@@ -284,10 +284,8 @@ describe('TiendaPage', () => {
       .mockResolvedValueOnce(PRODUCTOS[0])
       .mockResolvedValueOnce({ ...PRODUCTOS[0], stock: 24 });
     await renderPage();
-    await act(async () => {
-      fireEvent.click(screen.getByText('Remera oficial'));
-    });
-    await waitFor(() => screen.getByText('Crear compra', { selector: 'button' }));
+    fireEvent.click(screen.getByText('Remera oficial'));
+    await screen.findByText('Crear compra', { selector: 'button' });
 
     fireEvent.click(screen.getByText('Crear compra', { selector: 'button' }));
     expect(screen.getByRole('heading', { name: 'Crear compra' })).toBeInTheDocument();
@@ -305,10 +303,8 @@ describe('TiendaPage', () => {
     getProductos.mockResolvedValue(PRODUCTOS);
     getProducto.mockResolvedValue(PRODUCTOS[0]);
     await renderPage();
-    await act(async () => {
-      fireEvent.click(screen.getByText('Remera oficial'));
-    });
-    await waitFor(() => screen.getByText('Crear compra', { selector: 'button' }));
+    fireEvent.click(screen.getByText('Remera oficial'));
+    await screen.findByText('Crear compra', { selector: 'button' });
 
     fireEvent.click(screen.getByText('Crear compra', { selector: 'button' }));
     fireEvent.click(screen.getByText('Cancelar compra'));
