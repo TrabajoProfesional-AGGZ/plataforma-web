@@ -74,14 +74,14 @@ describe('SocioPagosPendientesModal', () => {
   test('muestra mensaje vacío cuando el socio no tiene pagos pendientes', async () => {
     getResumenFinanciero.mockResolvedValueOnce({ cuotas: [] });
     render(<SocioPagosPendientesModal idSocio="s-1" onClose={onClose} />);
-    await waitFor(() => expect(screen.getByText('El socio no tiene pagos pendientes.')).toBeInTheDocument());
+    expect(await screen.findByText('El socio no tiene pagos pendientes.')).toBeInTheDocument();
   });
 
   test('lista cuotas y reservas pendientes, y no lista items ya pagados', async () => {
     getResumenFinanciero.mockResolvedValueOnce({ cuotas: [CUOTA_PENDIENTE, RESERVA_PENDIENTE, CUOTA_PAGADA] });
     render(<SocioPagosPendientesModal idSocio="s-1" onClose={onClose} />);
 
-    await waitFor(() => expect(screen.getByText('Cuota Social')).toBeInTheDocument());
+    expect(await screen.findByText('Cuota Social')).toBeInTheDocument();
     expect(screen.getByText('Reserva: Cancha 1')).toBeInTheDocument();
     expect(screen.queryByText('Cuota Social Anterior')).not.toBeInTheDocument();
   });
@@ -89,14 +89,14 @@ describe('SocioPagosPendientesModal', () => {
   test('muestra un mensaje de error si falla la carga del resumen financiero', async () => {
     getResumenFinanciero.mockRejectedValueOnce(new Error('servicio-no-disponible'));
     render(<SocioPagosPendientesModal idSocio="s-1" onClose={onClose} />);
-    await waitFor(() => expect(screen.getByText('El servicio no está disponible. Intentá de nuevo más tarde.')).toBeInTheDocument());
+    expect(await screen.findByText('El servicio no está disponible. Intentá de nuevo más tarde.')).toBeInTheDocument();
   });
 
   test('al hacer click en Marcar como pagada abre el modal de confirmación', async () => {
     getResumenFinanciero.mockResolvedValueOnce({ cuotas: [CUOTA_PENDIENTE] });
     render(<SocioPagosPendientesModal idSocio="s-1" onClose={onClose} />);
 
-    await waitFor(() => expect(screen.getByText('Cuota Social')).toBeInTheDocument());
+    expect(await screen.findByText('Cuota Social')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Marcar como pagada' }));
 
     const confirmModal = screen.getByTestId('confirm-modal');
@@ -109,7 +109,7 @@ describe('SocioPagosPendientesModal', () => {
     marcarPagadaCaja.mockResolvedValueOnce({ estado: 'Pagada' });
     render(<SocioPagosPendientesModal idSocio="s-1" onClose={onClose} />);
 
-    await waitFor(() => expect(screen.getByText('Cuota Social')).toBeInTheDocument());
+    expect(await screen.findByText('Cuota Social')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Marcar como pagada' }));
     fireEvent.click(screen.getByRole('button', { name: 'Confirmar' }));
 
@@ -122,7 +122,7 @@ describe('SocioPagosPendientesModal', () => {
     getResumenFinanciero.mockResolvedValueOnce({ cuotas: [CUOTA_PENDIENTE] });
     render(<SocioPagosPendientesModal idSocio="s-1" onClose={onClose} />);
 
-    await waitFor(() => expect(screen.getByText('Cuota Social')).toBeInTheDocument());
+    expect(await screen.findByText('Cuota Social')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Marcar como pagada' }));
     fireEvent.click(screen.getByText('Cancelar confirm'));
 
@@ -136,11 +136,11 @@ describe('SocioPagosPendientesModal', () => {
     marcarPagadaCaja.mockRejectedValueOnce(new Error('otro-error'));
     render(<SocioPagosPendientesModal idSocio="s-1" onClose={onClose} />);
 
-    await waitFor(() => expect(screen.getByText('Cuota Social')).toBeInTheDocument());
+    expect(await screen.findByText('Cuota Social')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Marcar como pagada' }));
     fireEvent.click(screen.getByRole('button', { name: 'Confirmar' }));
 
-    await waitFor(() => expect(screen.getByText('No se pudo marcar el pago. Intentá de nuevo.')).toBeInTheDocument());
+    expect(await screen.findByText('No se pudo marcar el pago. Intentá de nuevo.')).toBeInTheDocument();
     expect(screen.getByText('Cuota Social')).toBeInTheDocument();
   });
 });

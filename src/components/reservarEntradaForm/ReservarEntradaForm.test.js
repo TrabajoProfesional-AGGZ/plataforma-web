@@ -31,7 +31,7 @@ async function buscarSocio(nroSocio = '1234') {
   const input = screen.getByPlaceholderText(/ej\. 1234/i);
   fireEvent.change(input, { target: { value: nroSocio } });
   fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
-  await waitFor(() => expect(screen.getByText(/García/)).toBeInTheDocument());
+  expect(await screen.findByText(/García/)).toBeInTheDocument();
 }
 
 describe('ReservarEntradaForm', () => {
@@ -66,7 +66,7 @@ describe('ReservarEntradaForm', () => {
     const input = screen.getByPlaceholderText(/ej\. 1234/i);
     fireEvent.change(input, { target: { value: '9999' } });
     fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
-    await waitFor(() => expect(screen.getByText('No se encontró ningún socio con ese número.')).toBeInTheDocument());
+    expect(await screen.findByText('No se encontró ningún socio con ese número.')).toBeInTheDocument();
   });
 
   test('llama a onCancel al hacer click en Cancelar', () => {
@@ -93,7 +93,7 @@ describe('ReservarEntradaForm', () => {
     await buscarSocio('1234');
     fireEvent.click(screen.getByRole('button', { name: /reservar entrada/i }));
 
-    await waitFor(() => expect(screen.getByText(/regularice su situación financiera/i)).toBeInTheDocument());
+    expect(await screen.findByText(/regularice su situación financiera/i)).toBeInTheDocument();
   });
 
   test('muestra el error de sin cupo', async () => {
@@ -102,7 +102,7 @@ describe('ReservarEntradaForm', () => {
     await buscarSocio('1234');
     fireEvent.click(screen.getByRole('button', { name: /reservar entrada/i }));
 
-    await waitFor(() => expect(screen.getByText('No quedan entradas disponibles para este evento.')).toBeInTheDocument());
+    expect(await screen.findByText('No quedan entradas disponibles para este evento.')).toBeInTheDocument();
   });
 
   test('muestra un error genérico ante fallos desconocidos', async () => {
@@ -111,7 +111,7 @@ describe('ReservarEntradaForm', () => {
     await buscarSocio('1234');
     fireEvent.click(screen.getByRole('button', { name: /reservar entrada/i }));
 
-    await waitFor(() => expect(screen.getByText('No se pudo reservar la entrada. Intentá de nuevo.')).toBeInTheDocument());
+    expect(await screen.findByText('No se pudo reservar la entrada. Intentá de nuevo.')).toBeInTheDocument();
   });
 
   test('llama a onCancel al hacer click en el overlay', () => {

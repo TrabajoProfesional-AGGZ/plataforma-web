@@ -62,44 +62,51 @@ function SocioPagosPendientesModal({ idSocio, onClose }) {
     }
   }
 
+  let contenido;
+  if (loading) {
+    contenido = (
+      <div className="socio-modal-loading">
+        <img src={logo} alt="" className="loading-logo" />
+      </div>
+    );
+  } else if (error) {
+    contenido = <p className="socio-modal-empty">{error}</p>;
+  } else if (items.length === 0) {
+    contenido = <p className="socio-modal-empty">El socio no tiene pagos pendientes.</p>;
+  } else {
+    contenido = (
+      <ul className="socio-modal-lista">
+        {items.map((item) => (
+          <li key={`${item.tipo}-${item.id}`} className="socio-modal-item socio-pagos-pendientes-item">
+            <div className="socio-modal-item-info socio-pagos-pendientes-info">
+              <span className="socio-modal-item-nombre">{item.concepto}</span>
+              <span className="socio-pagos-pendientes-detalle">
+                {formatearMonto(item.monto)} · vence {item.fecha_vencimiento}
+              </span>
+              <EstadoBadge variant={ESTADO_VARIANT[item.estado] ?? 'neutral'}>
+                {item.estado}
+              </EstadoBadge>
+            </div>
+            <button
+              type="button"
+              className="socio-modal-btn-ver"
+              onClick={() => setItemAConfirmar(item)}
+            >
+              Marcar como pagada
+            </button>
+          </li>
+        ))}
+      </ul>
+    );
+  }
+
   return (
     <SocioSubModal
       titulo="Pagos pendientes"
       wrapperClass="socio-pagos-pendientes-wrapper"
       onClose={itemAConfirmar ? () => {} : handleClose}
     >
-      {loading ? (
-        <div className="socio-modal-loading">
-          <img src={logo} alt="" className="loading-logo" />
-        </div>
-      ) : error ? (
-        <p className="socio-modal-empty">{error}</p>
-      ) : items.length === 0 ? (
-        <p className="socio-modal-empty">El socio no tiene pagos pendientes.</p>
-      ) : (
-        <ul className="socio-modal-lista">
-          {items.map((item) => (
-            <li key={`${item.tipo}-${item.id}`} className="socio-modal-item socio-pagos-pendientes-item">
-              <div className="socio-modal-item-info socio-pagos-pendientes-info">
-                <span className="socio-modal-item-nombre">{item.concepto}</span>
-                <span className="socio-pagos-pendientes-detalle">
-                  {formatearMonto(item.monto)} · vence {item.fecha_vencimiento}
-                </span>
-                <EstadoBadge variant={ESTADO_VARIANT[item.estado] ?? 'neutral'}>
-                  {item.estado}
-                </EstadoBadge>
-              </div>
-              <button
-                type="button"
-                className="socio-modal-btn-ver"
-                onClick={() => setItemAConfirmar(item)}
-              >
-                Marcar como pagada
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      {contenido}
 
       <ConfirmDeleteModal
         open={!!itemAConfirmar}
