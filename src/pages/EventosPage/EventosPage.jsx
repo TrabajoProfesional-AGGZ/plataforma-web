@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Plus } from 'lucide-react';
+import { Plus, Ticket } from 'lucide-react';
 import { getEventos, createEvento } from '../../services/eventosService';
 import { usePermiso } from '../../hooks/usePermiso';
 import { CreateEventoForm } from '../../components/createEventoForm/CreateEventoForm';
+import { ReservarEntradaForm } from '../../components/reservarEntradaForm/ReservarEntradaForm';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
 import { urlImagenSegura } from '../../utils/utils';
@@ -22,11 +23,13 @@ function EventosPage() {
   const { logoSocio: logo } = useTheme();
   const puedeVerEventos = usePermiso('ver_eventos');
   const puedeCrearEvento = usePermiso('crear_evento');
+  const puedeCrearEntrada = usePermiso('crear_entrada');
 
   const [eventos, setEventos] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [crearOpen, setCrearOpen] = useState(false);
+  const [eventoReserva, setEventoReserva] = useState(null);
 
   function cargarEventos() {
     setLoading(true);
@@ -80,6 +83,7 @@ function EventosPage() {
               <th>Horario</th>
               <th>Entradas</th>
               <th>Valor</th>
+              {puedeCrearEntrada && <th>Acciones</th>}
             </tr>
           </thead>
           <tbody>
@@ -104,6 +108,19 @@ function EventosPage() {
                   <td>{e.hora_inicio?.slice(0, 5)} - {e.hora_fin?.slice(0, 5)}</td>
                   <td>{e.entradas_vendidas} / {e.capacidad_maxima}</td>
                   <td>${Number(e.valor_entrada).toLocaleString('es-AR')}</td>
+                  {puedeCrearEntrada && (
+                    <td>
+                      <button
+                        type="button"
+                        className="eventos-btn-reservar-entrada"
+                        onClick={() => setEventoReserva(e)}
+                        disabled={String(e.id).startsWith('temp-')}
+                      >
+                        <Ticket size={14} aria-hidden="true" />
+                        Reservar entrada
+                      </button>
+                    </td>
+                  )}
                 </tr>
               );
             })}
@@ -131,6 +148,19 @@ function EventosPage() {
         <CreateEventoForm
           onSuccess={handleEventoCreado}
           onCancel={() => setCrearOpen(false)}
+        />
+      )}
+
+      {eventoReserva && (
+        <ReservarEntradaForm
+          evento={eventoReserva}
+          onSuccess={() => {
+            setEventos((prev) => prev.map((e) => (
+              e.id === eventoReserva.id ? { ...e, entradas_vendidas: e.entradas_vendidas + 1 } : e
+            )));
+            setEventoReserva(null);
+          }}
+          onCancel={() => setEventoReserva(null)}
         />
       )}
     </div>
