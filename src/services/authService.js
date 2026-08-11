@@ -41,6 +41,9 @@ export async function logout() {
 
 export async function changePassword(currentPassword, newPassword) {
   const user = auth.currentUser;
+  if (!user || !user.email) {
+    throw new Error('no-authenticated-user');
+  }
   const credential = EmailAuthProvider.credential(user.email, currentPassword);
   await reauthenticateWithCredential(user, credential);
   await updatePassword(user, newPassword);

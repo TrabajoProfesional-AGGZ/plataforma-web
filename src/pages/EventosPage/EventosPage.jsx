@@ -171,11 +171,11 @@ function EventosPage() {
 
       <div className="eventos-vista-toggle">
         {vista === 'vigentes' ? (
-          <button className="eventos-btn-vista-toggle" onClick={verHistoricos}>
+          <button type="button" className="eventos-btn-vista-toggle" onClick={verHistoricos}>
             Ver eventos históricos
           </button>
         ) : (
-          <button className="eventos-btn-vista-toggle" onClick={() => setVista('vigentes')}>
+          <button type="button" className="eventos-btn-vista-toggle" onClick={() => setVista('vigentes')}>
             Ver eventos vigentes
           </button>
         )}

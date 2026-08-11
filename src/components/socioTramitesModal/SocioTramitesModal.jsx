@@ -78,6 +78,34 @@ function SocioTramitesModal({ idSocio, onClose }) {
     ? urlImagenSegura(tramiteActual.archivo_url)
     : null;
 
+  function renderArchivo() {
+    if (imagenArchivo) {
+      return (
+        <img
+          src={imagenArchivo}
+          alt="Archivo del trámite"
+          className="socio-tramites-imagen"
+          referrerPolicy="no-referrer"
+        />
+      );
+    }
+
+    if (esUrlSegura(tramiteActual.archivo_url)) {
+      return (
+        <a
+          href={tramiteActual.archivo_url}
+          target="_blank"
+          rel="noreferrer"
+          className="socio-tramites-link-archivo"
+        >
+          Ver archivo
+        </a>
+      );
+    }
+
+    return <span className="csf-hint">Enlace no válido</span>;
+  }
+
   return (
     <SocioSubModal
       titulo="Trámites"
@@ -145,25 +173,7 @@ function SocioTramitesModal({ idSocio, onClose }) {
                 <p className="socio-tramites-dato">Fecha de vencimiento: {tramiteActual.fecha_vencimiento}</p>
               )}
 
-              {imagenArchivo ? (
-                <img
-                  src={imagenArchivo}
-                  alt="Archivo del trámite"
-                  className="socio-tramites-imagen"
-                  referrerPolicy="no-referrer"
-                />
-              ) : esUrlSegura(tramiteActual.archivo_url) ? (
-                <a
-                  href={tramiteActual.archivo_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="socio-tramites-link-archivo"
-                >
-                  Ver archivo
-                </a>
-              ) : (
-                <span className="csf-hint">Enlace no válido</span>
-              )}
+              {renderArchivo()}
 
               {tramiteActual.observaciones && (
                 <p className="socio-tramites-dato">Observaciones: {tramiteActual.observaciones}</p>

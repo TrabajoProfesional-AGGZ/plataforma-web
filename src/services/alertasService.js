@@ -15,7 +15,7 @@ export async function createAlerta(data) {
 }
 
 export async function borrarAlerta(id) {
-  const res = await fetchTo(`/api/v1/alertas/${id}`, 'DELETE');
+  const res = await fetchTo(`/api/v1/alertas/${encodeURIComponent(id)}`, 'DELETE');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al borrar alerta');
 }
