@@ -8,17 +8,12 @@ async function fetchReservas(url, errorMsg = 'Error al obtener reservas') {
   return data.reservas ?? data;
 }
 
-export async function getReservas(instalacionId) {
-  const res = await fetchTo('/api/v1/reservas', 'GET');
-  if (res.status >= 500) throw new Error('servicio-no-disponible');
-  if (!res.ok) throw new Error('Error al obtener reservas');
-  const data = await res.json();
-  const todas = data.reservas ?? data;
-  return todas.filter((r) => (r.id_instalacion ?? r.instalacion_id) === instalacionId);
-}
-
 export async function getReservasPorInstalacion(instalacionId) {
   return fetchReservas(`/api/v1/reservas/por-instalacion/${encodeURIComponent(instalacionId)}`);
+}
+
+export async function getReservas(instalacionId) {
+  return getReservasPorInstalacion(instalacionId);
 }
 
 export async function getReservasPorSocio(nroSocio) {

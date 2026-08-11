@@ -5,6 +5,7 @@ import { editarUsuario } from '../../services/usuariosService';
 import '../createForm/CreateSocioForm.css';
 import { Field, StyledInput } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
+import { MAX_LEN } from '../../utils/formValidators';
 
 const STEPS = [{ id: 1, label: 'Datos', icon: User }];
 
@@ -63,7 +64,11 @@ export function EditUserForm({ usuario, onSuccess, onCancel }) {
         <Field id="edit-nombre" label="Nombre" icon={User} error={errors.nombre?.message}>
           <StyledInput
             id="edit-nombre"
-            {...register('nombre', { required: 'El nombre es obligatorio' })}
+            maxLength={MAX_LEN.NOMBRE}
+            {...register('nombre', {
+              required: 'El nombre es obligatorio',
+              maxLength: { value: MAX_LEN.NOMBRE, message: `El nombre no puede superar los ${MAX_LEN.NOMBRE} caracteres` },
+            })}
             placeholder="ej: Juan"
             error={!!errors.nombre}
           />
@@ -71,7 +76,11 @@ export function EditUserForm({ usuario, onSuccess, onCancel }) {
         <Field id="edit-apellido" label="Apellido" icon={User} error={errors.apellido?.message}>
           <StyledInput
             id="edit-apellido"
-            {...register('apellido', { required: 'El apellido es obligatorio' })}
+            maxLength={MAX_LEN.APELLIDO}
+            {...register('apellido', {
+              required: 'El apellido es obligatorio',
+              maxLength: { value: MAX_LEN.APELLIDO, message: `El apellido no puede superar los ${MAX_LEN.APELLIDO} caracteres` },
+            })}
             placeholder="ej: Pérez"
             error={!!errors.apellido}
           />

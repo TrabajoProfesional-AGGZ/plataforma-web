@@ -72,5 +72,11 @@ describe('alertasService', () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
       await expect(borrarAlerta('a-1')).rejects.toThrow('Error al borrar alerta');
     });
+
+    test('escapa el id en la URL para evitar manipulación de la ruta', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 204 });
+      await borrarAlerta('a/1?#2');
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/alertas/a%2F1%3F%232', 'DELETE');
+    });
   });
 });

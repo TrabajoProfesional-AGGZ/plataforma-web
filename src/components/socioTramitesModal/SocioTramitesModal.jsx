@@ -26,6 +26,10 @@ function esImagen(url) {
   return /\.(jpe?g|png|webp)(\?|$)/i.test(url ?? '');
 }
 
+function esUrlSegura(url) {
+  return typeof url === 'string' && /^https?:\/\//i.test(url);
+}
+
 function SocioTramitesModal({ idSocio, onClose }) {
   const { logoSocio: logo } = useTheme();
   const [vista, setVista] = useState('lista');
@@ -73,6 +77,34 @@ function SocioTramitesModal({ idSocio, onClose }) {
   const imagenArchivo = tramiteActual && esImagen(tramiteActual.archivo_url)
     ? urlImagenSegura(tramiteActual.archivo_url)
     : null;
+
+  function renderArchivo() {
+    if (imagenArchivo) {
+      return (
+        <img
+          src={imagenArchivo}
+          alt="Archivo del trámite"
+          className="socio-tramites-imagen"
+          referrerPolicy="no-referrer"
+        />
+      );
+    }
+
+    if (esUrlSegura(tramiteActual.archivo_url)) {
+      return (
+        <a
+          href={tramiteActual.archivo_url}
+          target="_blank"
+          rel="noreferrer"
+          className="socio-tramites-link-archivo"
+        >
+          Ver archivo
+        </a>
+      );
+    }
+
+    return <span className="csf-hint">Enlace no válido</span>;
+  }
 
   return (
     <SocioSubModal
@@ -141,23 +173,7 @@ function SocioTramitesModal({ idSocio, onClose }) {
                 <p className="socio-tramites-dato">Fecha de vencimiento: {tramiteActual.fecha_vencimiento}</p>
               )}
 
-              {imagenArchivo ? (
-                <img
-                  src={imagenArchivo}
-                  alt="Archivo del trámite"
-                  className="socio-tramites-imagen"
-                  referrerPolicy="no-referrer"
-                />
-              ) : (
-                <a
-                  href={tramiteActual.archivo_url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="socio-tramites-link-archivo"
-                >
-                  Ver archivo
-                </a>
-              )}
+              {renderArchivo()}
 
               {tramiteActual.observaciones && (
                 <p className="socio-tramites-dato">Observaciones: {tramiteActual.observaciones}</p>

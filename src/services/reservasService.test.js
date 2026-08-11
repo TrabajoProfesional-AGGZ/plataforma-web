@@ -9,7 +9,7 @@ describe('reservasService', () => {
   });
 
   describe('getReservas', () => {
-    test('llama al endpoint correcto y filtra por instalacion', async () => {
+    test('delega en el endpoint por-instalacion (no trae el listado global)', async () => {
       fetchTo.mockResolvedValueOnce({
         ok: true,
         status: 200,
@@ -18,18 +18,7 @@ describe('reservasService', () => {
 
       const result = await getReservas('inst-1');
 
-      expect(fetchTo).toHaveBeenCalledWith('/api/v1/reservas', 'GET');
-      expect(result).toHaveLength(1);
-    });
-
-    test('devuelve la respuesta directa si no tiene clave reservas, filtrando por instalacion', async () => {
-      fetchTo.mockResolvedValueOnce({
-        ok: true,
-        status: 200,
-        json: async () => [{ id: '1', id_instalacion: 'inst-1' }],
-      });
-
-      const result = await getReservas('inst-1');
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/reservas/por-instalacion/inst-1', 'GET');
       expect(result).toHaveLength(1);
     });
 

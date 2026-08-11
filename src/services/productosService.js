@@ -8,7 +8,7 @@ export async function getProductos() {
 }
 
 export async function getProducto(id) {
-  const res = await fetchTo(`/api/v1/productos/${id}`, 'GET');
+  const res = await fetchTo(`/api/v1/productos/${encodeURIComponent(id)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al obtener el producto');
   return res.json();
@@ -31,7 +31,7 @@ export async function createProducto(data) {
 }
 
 export async function editarProducto(id, data) {
-  const res = await fetchTo(`/api/v1/productos/${id}`, 'PATCH', data);
+  const res = await fetchTo(`/api/v1/productos/${encodeURIComponent(id)}`, 'PATCH', data);
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al editar producto');
   return res.json();

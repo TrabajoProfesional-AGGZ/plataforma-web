@@ -1,4 +1,4 @@
-import { render, screen, waitFor, act } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { AuthProvider, useAuthContext } from './AuthContext';
 
 jest.mock('../firebase', () => ({ auth: {} }));
@@ -46,20 +46,17 @@ describe('AuthContext', () => {
   });
 
   test('cuando no hay usuario, limpia el estado y sale del loading', async () => {
-    jest.useFakeTimers();
     mockOnAuthStateChanged.mockImplementation((auth, callback) => {
       callback(null);
       return () => {};
     });
 
     renderProvider();
-    act(() => jest.runAllTimers());
 
     await waitFor(() => {
       expect(screen.getByTestId('user')).toHaveTextContent('sin-usuario');
       expect(screen.getByTestId('permisos')).toHaveTextContent('');
     });
-    jest.useRealTimers();
   });
 
   test('cuando hay usuario válido, carga rol y permisos desde el backend', async () => {
@@ -85,20 +82,13 @@ describe('AuthContext', () => {
       }),
     });
 
-    jest.useFakeTimers();
     renderProvider();
-
-    await act(async () => {
-      await Promise.resolve();
-    });
-    act(() => jest.runAllTimers());
 
     await waitFor(() => {
       expect(screen.getByTestId('role')).toHaveTextContent('SuperAdmin');
       expect(screen.getByTestId('permisos')).toHaveTextContent('ver_socios,ver_usuarios');
       expect(screen.getByTestId('userData')).toHaveTextContent('Carlos');
     });
-    jest.useRealTimers();
   });
 
   test('cuando el backend rechaza, hace signOut', async () => {

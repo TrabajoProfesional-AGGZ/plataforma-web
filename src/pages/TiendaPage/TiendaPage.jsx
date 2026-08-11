@@ -142,8 +142,13 @@ function TiendaPage() {
                 onKeyDown={handleActivateKey(() => handleClickFila(p))}
               >
                 <td className="tienda-td-producto">
-                  {p.imagen_url && (
-                    <img src={p.imagen_url} alt="" className="tienda-thumb" referrerPolicy="no-referrer" />
+                  {urlImagenSegura(p.imagen_url) && (
+                    <img
+                      src={urlImagenSegura(p.imagen_url)}
+                      alt=""
+                      className="tienda-thumb"
+                      referrerPolicy="no-referrer"
+                    />
                   )}
                   {p.nombre}
                 </td>

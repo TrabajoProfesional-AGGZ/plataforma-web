@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import { Field, StyledInput } from './FormFields';
 
 export function SocioBuscadorField({
+  id = 'socio-buscador-input',
   nroSocioInput,
   busquedaSocio,
   errorSocio,
@@ -12,9 +13,10 @@ export function SocioBuscadorField({
   onBuscar,
 }) {
   return (
-    <Field label="N° de socio" icon={Hash} error={errorSocio}>
+    <Field id={id} label="N° de socio" icon={Hash} error={errorSocio}>
       <div className="csf-socio-input-row">
         <StyledInput
+          id={id}
           type="text"
           placeholder="Ej. 1234"
           value={nroSocioInput}
@@ -44,6 +46,7 @@ export function SocioBuscadorField({
 }
 
 SocioBuscadorField.propTypes = {
+  id: PropTypes.string,
   nroSocioInput: PropTypes.string.isRequired,
   busquedaSocio: PropTypes.bool.isRequired,
   errorSocio: PropTypes.string,
