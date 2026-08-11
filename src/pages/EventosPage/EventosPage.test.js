@@ -14,9 +14,10 @@ import { usePermiso } from '../../hooks/usePermiso';
 
 jest.mock('../../services/eventosService', () => ({
   getEventos: jest.fn(),
+  getEventosHistoricos: jest.fn(),
   createEvento: jest.fn(),
 }));
-import { getEventos, createEvento } from '../../services/eventosService';
+import { getEventos, getEventosHistoricos, createEvento } from '../../services/eventosService';
 
 jest.mock('../../assets/logo_socio.png', () => 'logo_socio.png');
 jest.mock('../../assets/logo-verde.png', () => 'logo-verde.png');
@@ -79,6 +80,7 @@ describe('EventosPage', () => {
   beforeEach(() => {
     usePermiso.mockReturnValue(true);
     getEventos.mockResolvedValue([]);
+    getEventosHistoricos.mockResolvedValue([]);
     createEvento.mockResolvedValue({ ...EVENTO_LISTA, id: 'e-new', nombre: 'Evento nuevo' });
   });
 
@@ -222,5 +224,80 @@ describe('EventosPage', () => {
 
     expect(await screen.findByText('Evento nuevo')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /reservar entrada/i })).toBeDisabled();
+  });
+
+  describe('toggle vigentes / históricos', () => {
+    const EVENTO_HISTORICO = {
+      id: 'e-viejo',
+      nombre: 'Torneo del año pasado',
+      descripcion: 'Un evento ya finalizado',
+      dia: '2020-01-01',
+      hora_inicio: '20:00:00',
+      hora_fin: '23:00:00',
+      capacidad_maxima: 50,
+      valor_entrada: '1000.00',
+      entradas_vendidas: 50,
+      foto_url: null,
+    };
+
+    test('al hacer clic en "Ver eventos históricos" carga y muestra los históricos', async () => {
+      getEventos.mockResolvedValue([EVENTO_LISTA]);
+      getEventosHistoricos.mockResolvedValue([EVENTO_HISTORICO]);
+      await renderPage();
+
+      fireEvent.click(screen.getByRole('button', { name: /ver eventos históricos/i }));
+
+      expect(await screen.findByText('Torneo del año pasado')).toBeInTheDocument();
+      expect(screen.queryByText('Fiesta de fin de año')).not.toBeInTheDocument();
+      expect(getEventosHistoricos).toHaveBeenCalled();
+    });
+
+    test('oculta "Nuevo evento" y la columna de acciones en la vista de históricos', async () => {
+      getEventos.mockResolvedValue([EVENTO_LISTA]);
+      getEventosHistoricos.mockResolvedValue([EVENTO_HISTORICO]);
+      await renderPage();
+
+      fireEvent.click(screen.getByRole('button', { name: /ver eventos históricos/i }));
+      await screen.findByText('Torneo del año pasado');
+
+      expect(screen.queryByRole('button', { name: /nuevo evento/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /reservar entrada/i })).not.toBeInTheDocument();
+    });
+
+    test('vuelve a la vista de vigentes con "Ver eventos vigentes"', async () => {
+      getEventos.mockResolvedValue([EVENTO_LISTA]);
+      getEventosHistoricos.mockResolvedValue([EVENTO_HISTORICO]);
+      await renderPage();
+
+      fireEvent.click(screen.getByRole('button', { name: /ver eventos históricos/i }));
+      await screen.findByText('Torneo del año pasado');
+
+      fireEvent.click(screen.getByRole('button', { name: /ver eventos vigentes/i }));
+
+      expect(screen.getByText('Fiesta de fin de año')).toBeInTheDocument();
+      expect(screen.queryByText('Torneo del año pasado')).not.toBeInTheDocument();
+    });
+
+    test('muestra estado vacío específico si no hay eventos históricos', async () => {
+      getEventos.mockResolvedValue([]);
+      getEventosHistoricos.mockResolvedValue([]);
+      await renderPage();
+
+      fireEvent.click(screen.getByRole('button', { name: /ver eventos históricos/i }));
+
+      expect(await screen.findByText('No hay eventos históricos.')).toBeInTheDocument();
+    });
+
+    test('muestra error si falla la carga de históricos', async () => {
+      getEventos.mockResolvedValue([]);
+      getEventosHistoricos.mockRejectedValue(new Error('servicio-no-disponible'));
+      await renderPage();
+
+      fireEvent.click(screen.getByRole('button', { name: /ver eventos históricos/i }));
+
+      expect(
+        await screen.findByText('El servicio no está disponible. Intentá de nuevo más tarde.')
+      ).toBeInTheDocument();
+    });
   });
 });

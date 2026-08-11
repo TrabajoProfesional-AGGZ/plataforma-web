@@ -75,6 +75,23 @@
 /* Table styles → src/styles/ListPage.css (.disciplinas-table-wrapper, .disciplinas-tabla)
    Empty state → .disciplinas-empty en src/styles/ListPage.css */
 
+.eventos-vista-toggle {
+  display: flex;
+  justify-content: flex-start;
+  margin-top: var(--space-2);
+}
+
+.eventos-btn-vista-toggle {
+  background: none;
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-sm);
+  padding: 6px 14px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  color: var(--color-text-primary);
+}
+
 @media (max-width: 480px) {
   .eventos-title {
     font-size: 24px;

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Plus, Ticket } from 'lucide-react';
-import { getEventos, createEvento } from '../../services/eventosService';
+import { getEventos, getEventosHistoricos, createEvento } from '../../services/eventosService';
 import { usePermiso } from '../../hooks/usePermiso';
 import { CreateEventoForm } from '../../components/createEventoForm/CreateEventoForm';
 import { ReservarEntradaForm } from '../../components/reservarEntradaForm/ReservarEntradaForm';
@@ -26,7 +26,10 @@ function EventosPage() {
   const puedeCrearEntrada = usePermiso('crear_entrada');
 
   const [eventos, setEventos] = useState([]);
+  const [eventosHistoricos, setEventosHistoricos] = useState([]);
+  const [vista, setVista] = useState('vigentes');
   const [loading, setLoading] = useState(false);
+  const [cargandoHistoricos, setCargandoHistoricos] = useState(false);
   const [error, setError] = useState('');
   const [crearOpen, setCrearOpen] = useState(false);
   const [eventoReserva, setEventoReserva] = useState(null);
@@ -38,6 +41,18 @@ function EventosPage() {
       .then((data) => setEventos(data))
       .catch((err) => setError(mensajeError(err, 'No se pudieron cargar los eventos.')))
       .finally(() => setLoading(false));
+  }
+
+  function verHistoricos() {
+    setCargandoHistoricos(true);
+    setError('');
+    getEventosHistoricos()
+      .then((data) => {
+        setEventosHistoricos(data);
+        setVista('historicos');
+      })
+      .catch((err) => setError(mensajeError(err, 'No se pudieron cargar los eventos históricos.')))
+      .finally(() => setCargandoHistoricos(false));
   }
 
   useEffect(() => {
@@ -59,18 +74,26 @@ function EventosPage() {
   }
 
   function renderLista() {
-    if (loading) {
+    const esVigentes = vista === 'vigentes';
+    const listaActual = esVigentes ? eventos : eventosHistoricos;
+    const cargandoActual = esVigentes ? loading : cargandoHistoricos;
+
+    if (cargandoActual) {
       return (
         <div className="list-loading">
           <img src={logo} alt="" className="loading-logo" />
         </div>
       );
     }
-    if (error && eventos.length === 0) {
-      return <ErrorBanner mensaje={error} onReintentar={cargarEventos} />;
+    if (error && listaActual.length === 0) {
+      return <ErrorBanner mensaje={error} onReintentar={esVigentes ? cargarEventos : verHistoricos} />;
     }
-    if (eventos.length === 0) {
-      return <EmptyState mensaje="No hay eventos registrados." />;
+    if (listaActual.length === 0) {
+      return (
+        <EmptyState
+          mensaje={esVigentes ? 'No hay eventos registrados.' : 'No hay eventos históricos.'}
+        />
+      );
     }
     return (
       <div className="disciplinas-table-wrapper">
@@ -83,11 +106,11 @@ function EventosPage() {
               <th>Horario</th>
               <th>Entradas</th>
               <th>Valor</th>
-              {puedeCrearEntrada && <th>Acciones</th>}
+              {esVigentes && puedeCrearEntrada && <th>Acciones</th>}
             </tr>
           </thead>
           <tbody>
-            {eventos.map((e) => {
+            {listaActual.map((e) => {
               const imagenSegura = urlImagenSegura(e.foto_url);
               return (
                 <tr key={e.id}>
@@ -108,7 +131,7 @@ function EventosPage() {
                   <td>{e.hora_inicio?.slice(0, 5)} - {e.hora_fin?.slice(0, 5)}</td>
                   <td>{e.entradas_vendidas} / {e.capacidad_maxima}</td>
                   <td>${Number(e.valor_entrada).toLocaleString('es-AR')}</td>
-                  {puedeCrearEntrada && (
+                  {esVigentes && puedeCrearEntrada && (
                     <td>
                       <button
                         type="button"
@@ -134,15 +157,29 @@ function EventosPage() {
     <div className="eventos-page">
       <h1 className="eventos-title">Eventos</h1>
       <div className="eventos-toolbar">
-        {puedeCrearEvento && (
+        {puedeCrearEvento && vista === 'vigentes' && (
           <button className="eventos-btn-crear" onClick={() => setCrearOpen(true)}>
             <Plus size={15} aria-hidden="true" />
             Nuevo evento
           </button>
         )}
       </div>
-      {error && eventos.length > 0 && <ErrorBanner mensaje={error} />}
+      {error && (vista === 'vigentes' ? eventos : eventosHistoricos).length > 0 && (
+        <ErrorBanner mensaje={error} />
+      )}
       {renderLista()}
+
+      <div className="eventos-vista-toggle">
+        {vista === 'vigentes' ? (
+          <button className="eventos-btn-vista-toggle" onClick={verHistoricos}>
+            Ver eventos históricos
+          </button>
+        ) : (
+          <button className="eventos-btn-vista-toggle" onClick={() => setVista('vigentes')}>
+            Ver eventos vigentes
+          </button>
+        )}
+      </div>
 
       {crearOpen && (
         <CreateEventoForm
