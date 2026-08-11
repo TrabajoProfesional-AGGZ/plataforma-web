@@ -11,6 +11,7 @@ import { useSortedList } from '../../hooks/useSortedList';
 import { useListState } from '../../hooks/useListState';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { estadoConfig } from '../../utils/estadoConfig';
+import { urlImagenSegura } from '../../utils/utils';
 import { MAX_LEN } from '../../utils/formValidators';
 import { handleActivateKey } from '../../utils/a11y';
 import EmptyState from '../../components/feedback/EmptyState';
@@ -329,12 +330,13 @@ function SociosPage() {
 
       {!loading && modo === 'socio' && resultado && (() => {
         const cfg = estadoConfig(resultado.estado.nombre);
+        const fotoSegura = urlImagenSegura(resultado.foto_url);
         return (
           <div className="socios-card">
             <div className="socios-card-inner">
               <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
-                {resultado.foto_url
-                  ? <img src={resultado.foto_url} alt="" className="detalle-logo-img" referrerPolicy="no-referrer" />
+                {fotoSegura
+                  ? <img src={fotoSegura} alt="" className="detalle-logo-img" referrerPolicy="no-referrer" />
                   : <img src={cfg.logo} alt="" className="detalle-logo-img" />}
               </div>
               <div className="socios-card-data">

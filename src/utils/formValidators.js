@@ -51,6 +51,8 @@ export const MAX_LEN = {
   OBSERVACIONES_TRAMITE: 500,
   NOMBRE_EVENTO: 100,
   DESCRIPCION_EVENTO: 2000,
+  NOMBRE: 50,
+  APELLIDO: 50,
 };
 
 // eslint-disable-next-line no-control-regex

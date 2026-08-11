@@ -1,5 +1,6 @@
 import PropTypes from 'prop-types';
 import { estadoConfig } from '../../utils/estadoConfig';
+import { urlImagenSegura } from '../../utils/utils';
 import { SocioAccionesExtra } from '../socioAccionesExtra/SocioAccionesExtra';
 import { ModalOverlay } from '../createForm/ModalOverlay';
 import '../../styles/SocioCard.css';
@@ -8,6 +9,7 @@ import '../../styles/ListDetailShared.css';
 function VerSocioModal({ socio, onClose }) {
   const cfg = estadoConfig(socio.estado);
   const estadoNombre = typeof socio.estado === 'object' ? (socio.estado?.nombre ?? '') : (socio.estado ?? '');
+  const fotoSegura = urlImagenSegura(socio.foto_url);
   return (
     <ModalOverlay
       onClose={onClose}
@@ -18,8 +20,8 @@ function VerSocioModal({ socio, onClose }) {
         <button type="button" className="ver-socio-btn-x" aria-label="Cerrar" onClick={onClose}>×</button>
         <div className="socios-card-inner">
           <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
-            {socio.foto_url
-              ? <img src={socio.foto_url} alt="" className="detalle-logo-img" referrerPolicy="no-referrer" />
+            {fotoSegura
+              ? <img src={fotoSegura} alt="" className="detalle-logo-img" referrerPolicy="no-referrer" />
               : <img src={cfg.logo} alt="" className="detalle-logo-img" />}
           </div>
           <div className="socios-card-data">
