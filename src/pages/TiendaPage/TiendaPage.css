@@ -176,6 +176,9 @@
   }
 
   .tienda-detalle-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
     margin-top: var(--space-8);
     padding-top: var(--space-6);
     border-top: 1px solid var(--color-border);
