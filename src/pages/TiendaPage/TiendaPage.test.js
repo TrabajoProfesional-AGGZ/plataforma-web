@@ -312,4 +312,73 @@ describe('TiendaPage', () => {
     expect(screen.queryByRole('heading', { name: 'Crear compra' })).not.toBeInTheDocument();
     expect(getProducto).toHaveBeenCalledTimes(1);
   });
+
+  // --- Paginación y orden ---
+
+  function crearProductos(cantidad) {
+    return Array.from({ length: cantidad }, (_, i) => ({
+      id: `p-${i + 1}`,
+      nombre: `Producto${String(i + 1).padStart(2, '0')}`,
+      precio: (i + 1) * 100,
+      stock: 10,
+      activo: true,
+      imagen_url: null,
+    }));
+  }
+
+  test('no muestra controles de paginación cuando hay 10 productos o menos', async () => {
+    getProductos.mockResolvedValue(crearProductos(10));
+    await renderPage();
+    expect(screen.queryByLabelText(/paginación/i)).not.toBeInTheDocument();
+  });
+
+  test('muestra como máximo 10 filas por página y permite avanzar/retroceder', async () => {
+    getProductos.mockResolvedValue(crearProductos(15));
+    await renderPage();
+
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument();
+    expect(screen.getByText('Producto01')).toBeInTheDocument();
+    expect(screen.queryByText('Producto11')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /página siguiente/i }));
+
+    expect(screen.getByText('Página 2 de 2')).toBeInTheDocument();
+    expect(screen.getByText('Producto11')).toBeInTheDocument();
+    expect(screen.queryByText('Producto01')).not.toBeInTheDocument();
+  });
+
+  test('por defecto la tabla está ordenada alfabéticamente por nombre', async () => {
+    getProductos.mockResolvedValue([
+      { id: 'a', nombre: 'Zapatillas', precio: 100, stock: 1, activo: true, imagen_url: null },
+      { id: 'b', nombre: 'Buzo', precio: 200, stock: 1, activo: true, imagen_url: null },
+      { id: 'c', nombre: 'Medias', precio: 50, stock: 1, activo: true, imagen_url: null },
+    ]);
+    await renderPage();
+
+    const nombres = screen
+      .getAllByRole('button', { name: /ver detalle de/i })
+      .map((fila) => fila.querySelector('td').textContent);
+    expect(nombres).toEqual(['Buzo', 'Medias', 'Zapatillas']);
+  });
+
+  test('permite ordenar por precio ascendente y descendente', async () => {
+    getProductos.mockResolvedValue([
+      { id: 'a', nombre: 'Zapatillas', precio: 300, stock: 1, activo: true, imagen_url: null },
+      { id: 'b', nombre: 'Buzo', precio: 100, stock: 1, activo: true, imagen_url: null },
+      { id: 'c', nombre: 'Medias', precio: 200, stock: 1, activo: true, imagen_url: null },
+    ]);
+    await renderPage();
+
+    fireEvent.change(screen.getByLabelText('Ordenar por'), { target: { value: 'precio_asc' } });
+    let nombres = screen
+      .getAllByRole('button', { name: /ver detalle de/i })
+      .map((fila) => fila.querySelector('td').textContent);
+    expect(nombres).toEqual(['Buzo', 'Medias', 'Zapatillas']);
+
+    fireEvent.change(screen.getByLabelText('Ordenar por'), { target: { value: 'precio_desc' } });
+    nombres = screen
+      .getAllByRole('button', { name: /ver detalle de/i })
+      .map((fila) => fila.querySelector('td').textContent);
+    expect(nombres).toEqual(['Zapatillas', 'Medias', 'Buzo']);
+  });
 });

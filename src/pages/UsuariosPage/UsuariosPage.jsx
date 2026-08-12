@@ -10,15 +10,19 @@ import { PermisosModal } from '../../components/permisosModal/PermisosModal';
 import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
 import { useListState } from '../../hooks/useListState';
+import { usePaginacion } from '../../hooks/usePaginacion';
 import { useAuthContext } from '../../context/AuthContext';
 import { estadoConfig } from '../../utils/estadoConfig';
 import { handleActivateKey } from '../../utils/a11y';
 import EmptyState from '../../components/feedback/EmptyState';
+import { Paginacion } from '../../components/paginacion/Paginacion';
 import { useTheme } from '../../hooks/useTheme';
 import './UsuariosPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/ListDetailShared.css';
 import '../../styles/PageTableHeader.css';
+
+const ORDEN_INICIAL = { campo: 'apellido', dir: 'asc' };
 
 function getValorOrden(usuario, campo) {
   if (campo === 'rol') return String(usuario.rol?.nombre ?? '').toLowerCase();
@@ -44,7 +48,7 @@ function UsuariosPage() {
   const [busqueda, setBusqueda] = useState('');
   const [modo, setModo] = useState('lista');
   const { resultado, setResultado, loading, setLoading, error, setError } = useListState();
-  const { orden, setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
+  const { orden, setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden, ORDEN_INICIAL);
 
   const [filtroRol, setFiltroRol] = useState('');
   const [filtroAbierto, setFiltroAbierto] = useState(false);
@@ -121,7 +125,7 @@ function UsuariosPage() {
     setFiltroBusqueda('');
     setFiltroRol('');
     setFiltroAbierto(false);
-    setOrden({ campo: null, dir: 'asc' });
+    setOrden(ORDEN_INICIAL);
     cacheUsuariosRef.current = null;
     await fetchYActualizarUsuarios();
   }
@@ -149,7 +153,7 @@ function UsuariosPage() {
     setFiltroBusqueda('');
     setFiltroRol('');
     setFiltroAbierto(false);
-    setOrden({ campo: null, dir: 'asc' });
+    setOrden(ORDEN_INICIAL);
     setError(null);
     if (cacheUsuariosRef.current !== null) {
       setResultado(cacheUsuariosRef.current);
@@ -201,6 +205,14 @@ function UsuariosPage() {
   });
 
   const rolesUnicos = [...new Set(listaBase.map((u) => u.rol?.nombre).filter(Boolean))].sort();
+
+  const listaOrdenada = aplicarOrden(listaFiltrada);
+  const { pagina, totalPaginas, listaPaginada, irAPagina, resetPagina } = usePaginacion(listaOrdenada, 10);
+
+  useEffect(() => {
+    resetPagina();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resultado, filtroRol, filtroBusqueda]);
 
   return (
     <div className="usuarios-page">
@@ -313,7 +325,7 @@ function UsuariosPage() {
                   </tr>
                 </thead>
                 <tbody>
-                  {aplicarOrden(listaFiltrada).map((u) => {
+                  {listaPaginada.map((u) => {
                     const cfg = estadoConfig(u.estado?.nombre);
                     const verDetalle = () => {
                       if (buscarTimeoutRef.current) {
@@ -356,6 +368,7 @@ function UsuariosPage() {
               </table>
             )}
           </div>
+          <Paginacion pagina={pagina} totalPaginas={totalPaginas} onCambiarPagina={irAPagina} />
         </>
       )}
 
