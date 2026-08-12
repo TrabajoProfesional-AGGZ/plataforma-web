@@ -68,7 +68,10 @@ function TiendaPage() {
     resetPagina();
   }
 
-  useEffect(() => { cargarProductos(); }, []);
+  useEffect(() => {
+    cargarProductos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleClickFila(p) {
     setLoadingDetalle(true);
