@@ -274,4 +274,52 @@ describe('NoticiasPage', () => {
     expect(borrarNoticia).toHaveBeenCalledWith('n-1');
     expect(screen.getByRole('alert')).toHaveTextContent('No se pudo eliminar la noticia.');
   });
+
+  // --- Paginación y orden ---
+
+  function crearNoticias(cantidad) {
+    return Array.from({ length: cantidad }, (_, i) => ({
+      id: `n-${i + 1}`,
+      titulo: `Noticia${String(i + 1).padStart(2, '0')}`,
+      fecha_publicacion: `2026-01-${String(i + 1).padStart(2, '0')}`,
+      fecha_expiracion: '2026-12-31',
+      estado: 'Publicada',
+    }));
+  }
+
+  test('no muestra controles de paginación cuando hay 10 noticias o menos', async () => {
+    getNoticias.mockResolvedValue(crearNoticias(10));
+    await renderPage();
+    expect(screen.queryByLabelText(/paginación/i)).not.toBeInTheDocument();
+  });
+
+  test('muestra como máximo 10 filas por página y permite avanzar/retroceder', async () => {
+    getNoticias.mockResolvedValue(crearNoticias(15));
+    await renderPage();
+
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument();
+    // La más nueva (Noticia15, fecha 2026-01-15) va primero.
+    expect(screen.getByText('Noticia15')).toBeInTheDocument();
+    expect(screen.queryByText('Noticia05')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /página siguiente/i }));
+
+    expect(screen.getByText('Página 2 de 2')).toBeInTheDocument();
+    expect(screen.getByText('Noticia05')).toBeInTheDocument();
+    expect(screen.queryByText('Noticia15')).not.toBeInTheDocument();
+  });
+
+  test('la tabla está ordenada por fecha de publicación, la más nueva primero', async () => {
+    getNoticias.mockResolvedValue([
+      { id: 'a', titulo: 'Vieja', fecha_publicacion: '2026-01-01', fecha_expiracion: '', estado: 'Publicada' },
+      { id: 'b', titulo: 'Nueva', fecha_publicacion: '2026-06-01', fecha_expiracion: '', estado: 'Publicada' },
+      { id: 'c', titulo: 'Media', fecha_publicacion: '2026-03-01', fecha_expiracion: '', estado: 'Publicada' },
+    ]);
+    await renderPage();
+
+    const titulos = screen
+      .getAllByRole('button', { name: /ver detalle de/i })
+      .map((fila) => fila.querySelector('td').textContent);
+    expect(titulos).toEqual(['Nueva', 'Media', 'Vieja']);
+  });
 });

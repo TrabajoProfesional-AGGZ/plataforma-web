@@ -2,12 +2,14 @@ import { useState, useEffect } from 'react';
 import { Plus, ChevronLeft } from 'lucide-react';
 import { getNoticias, getNoticiasHistoricas, getNoticia, createNoticia, borrarNoticia } from '../../services/noticiasService';
 import { usePermiso } from '../../hooks/usePermiso';
+import { usePaginacion } from '../../hooks/usePaginacion';
 import { CreateNoticiaForm } from '../../components/createNoticiaForm/CreateNoticiaForm';
 import { EditNoticiaForm } from '../../components/editNoticiaForm/EditNoticiaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
+import { Paginacion } from '../../components/paginacion/Paginacion';
 import { urlImagenSegura } from '../../utils/utils';
 import { handleActivateKey } from '../../utils/a11y';
 import { useTheme } from '../../hooks/useTheme';
@@ -44,12 +46,18 @@ function NoticiasPage() {
 
   const imagenSegura = urlImagenSegura(noticiaActual?.imagen);
 
+  const noticiasOrdenadas = [...noticias].sort((a, b) =>
+    (b.fecha_publicacion ?? '').localeCompare(a.fecha_publicacion ?? '')
+  );
+  const { pagina, totalPaginas, listaPaginada, irAPagina, resetPagina } = usePaginacion(noticiasOrdenadas, 10);
+
   async function cargarNoticias(historicas = verHistoricas) {
     setLoading(true);
     setError('');
     try {
       const data = historicas ? await getNoticiasHistoricas() : await getNoticias();
       setNoticias(data);
+      resetPagina();
     } catch (err) {
       setError(mensajeError(err, 'No se pudieron cargar las noticias.'));
     } finally {
@@ -161,7 +169,7 @@ function NoticiasPage() {
             </tr>
           </thead>
           <tbody>
-            {noticias.map((n) => (
+            {listaPaginada.map((n) => (
               <tr
                 key={n.id}
                 className="disciplinas-tr-clickable"
@@ -183,6 +191,7 @@ function NoticiasPage() {
             ))}
           </tbody>
         </table>
+        <Paginacion pagina={pagina} totalPaginas={totalPaginas} onCambiarPagina={irAPagina} />
       </div>
     );
   }
