@@ -697,11 +697,11 @@ describe('SociosPage', () => {
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
+    // El orden por defecto de la página de Socios ya es N° de Socio ascendente.
     const thNroSocio = screen.getAllByRole('columnheader')[0];
-    const btnNroSocio = within(thNroSocio).getByRole('button');
-    fireEvent.click(btnNroSocio);
     expect(thNroSocio.textContent).toContain('↑');
     expect(thNroSocio).toHaveAttribute('aria-sort', 'ascending');
+    const btnNroSocio = within(thNroSocio).getByRole('button');
 
     fireEvent.click(btnNroSocio);
     expect(thNroSocio.textContent).toContain('↓');
@@ -710,6 +710,10 @@ describe('SociosPage', () => {
     fireEvent.click(btnNroSocio);
     expect(thNroSocio.textContent).toContain('↕');
     expect(thNroSocio).toHaveAttribute('aria-sort', 'none');
+
+    fireEvent.click(btnNroSocio);
+    expect(thNroSocio.textContent).toContain('↑');
+    expect(thNroSocio).toHaveAttribute('aria-sort', 'ascending');
   });
 
   test('ordena por columna con objetos anidados (estado)', async () => {
@@ -825,5 +829,90 @@ describe('SociosPage', () => {
       expect(getSocios).toHaveBeenCalledTimes(2);
       expect(screen.getByRole('table')).toBeInTheDocument();
     });
+  });
+
+  // --- Paginación ---
+
+  function crearSocios(cantidad) {
+    return Array.from({ length: cantidad }, (_, i) => ({
+      id: `id-${i + 1}`,
+      nro_socio: String(1000 + i + 1),
+      nombre: `Nombre${i + 1}`,
+      apellido: `Apellido${i + 1}`,
+      nro_documento: '12345678',
+      fecha_nacimiento: '1990-01-01',
+      email: `socio${i + 1}@example.com`,
+      telefono: null,
+      categoria: { nombre: 'Activo' },
+      estado: { nombre: 'Al día' },
+    }));
+  }
+
+  test('no muestra controles de paginación cuando hay 10 socios o menos', async () => {
+    getSocios.mockResolvedValue(crearSocios(10));
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    expect(screen.queryByLabelText(/paginación/i)).not.toBeInTheDocument();
+  });
+
+  test('muestra como máximo 10 filas por página y permite avanzar/retroceder', async () => {
+    getSocios.mockResolvedValue(crearSocios(15));
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /ver detalle de/i })).toHaveLength(10);
+    expect(screen.getByText('1001')).toBeInTheDocument();
+    expect(screen.queryByText('1011')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /página siguiente/i }));
+
+    expect(screen.getByText('Página 2 de 2')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /ver detalle de/i })).toHaveLength(5);
+    expect(screen.getByText('1011')).toBeInTheDocument();
+    expect(screen.queryByText('1001')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /página siguiente/i })).toBeDisabled();
+
+    fireEvent.click(screen.getByRole('button', { name: /página anterior/i }));
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument();
+    expect(screen.getByText('1001')).toBeInTheDocument();
+  });
+
+  test('la tabla por defecto está ordenada por N° de socio ascendente', async () => {
+    const desordenados = [
+      { ...crearSocios(1)[0], id: 'a', nro_socio: '1003' },
+      { ...crearSocios(1)[0], id: 'b', nro_socio: '1001' },
+      { ...crearSocios(1)[0], id: 'c', nro_socio: '1002' },
+    ];
+    getSocios.mockResolvedValue(desordenados);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    const celdasNroSocio = screen
+      .getAllByRole('button', { name: /ver detalle de/i })
+      .map((fila) => fila.querySelector('td').textContent);
+    expect(celdasNroSocio).toEqual(['1001', '1002', '1003']);
+  });
+
+  test('cambiar de filtro reinicia la paginación a la página 1', async () => {
+    const socios = crearSocios(15).map((s, i) => ({
+      ...s,
+      estado: { nombre: i < 12 ? 'Al día' : 'Moroso' },
+    }));
+    getSocios.mockResolvedValue(socios);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /página siguiente/i }));
+    expect(screen.getByText('Página 2 de 2')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByDisplayValue('Estado: Todos'), { target: { value: 'Moroso' } });
+
+    await waitFor(() => {
+      expect(screen.queryByLabelText(/paginación/i)).not.toBeInTheDocument();
+    });
+    expect(screen.getAllByRole('button', { name: /ver detalle de/i })).toHaveLength(3);
   });
 });
