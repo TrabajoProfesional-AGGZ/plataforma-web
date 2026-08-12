@@ -482,4 +482,54 @@ describe('DisciplinasPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /reintentar/i }));
     await waitFor(() => expect(screen.getByText('Natación')).toBeInTheDocument());
   });
+
+  // --- Paginación y orden ---
+
+  function crearDisciplinas(cantidad) {
+    return Array.from({ length: cantidad }, (_, i) => ({
+      id: `d-${i + 1}`,
+      nombre: `Disciplina${String(i + 1).padStart(2, '0')}`,
+      cupo_maximo: 20,
+      arancelada: false,
+      estado: { nombre: 'Activa' },
+    }));
+  }
+
+  test('no muestra controles de paginación cuando hay 10 disciplinas o menos', async () => {
+    getDisciplinas.mockResolvedValue(crearDisciplinas(10));
+    await renderPage();
+    expect(screen.queryByLabelText(/paginación/i)).not.toBeInTheDocument();
+  });
+
+  test('muestra como máximo 10 filas por página y permite avanzar/retroceder', async () => {
+    getDisciplinas.mockResolvedValue(crearDisciplinas(15));
+    await renderPage();
+
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument();
+    expect(screen.getByText('Disciplina01')).toBeInTheDocument();
+    expect(screen.queryByText('Disciplina11')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /página siguiente/i }));
+
+    expect(screen.getByText('Página 2 de 2')).toBeInTheDocument();
+    expect(screen.getByText('Disciplina11')).toBeInTheDocument();
+    expect(screen.queryByText('Disciplina01')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /página anterior/i }));
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument();
+  });
+
+  test('la tabla está ordenada alfabéticamente por nombre', async () => {
+    getDisciplinas.mockResolvedValue([
+      { id: 'a', nombre: 'Zumba', cupo_maximo: 20, arancelada: false, estado: { nombre: 'Activa' } },
+      { id: 'b', nombre: 'Ajedrez', cupo_maximo: 20, arancelada: false, estado: { nombre: 'Activa' } },
+      { id: 'c', nombre: 'Natación', cupo_maximo: 20, arancelada: false, estado: { nombre: 'Activa' } },
+    ]);
+    await renderPage();
+
+    const nombres = screen
+      .getAllByRole('button', { name: /ver detalle de/i })
+      .map((fila) => fila.querySelector('td').textContent);
+    expect(nombres).toEqual(['Ajedrez', 'Natación', 'Zumba']);
+  });
 });

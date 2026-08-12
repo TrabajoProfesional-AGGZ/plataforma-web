@@ -300,4 +300,55 @@ describe('EventosPage', () => {
       ).toBeInTheDocument();
     });
   });
+
+  // --- Paginación y orden ---
+
+  function crearEventos(cantidad) {
+    return Array.from({ length: cantidad }, (_, i) => ({
+      id: `e-${i + 1}`,
+      nombre: `Evento${String(i + 1).padStart(2, '0')}`,
+      descripcion: 'Desc',
+      dia: `2026-01-${String(i + 1).padStart(2, '0')}`,
+      hora_inicio: '20:00:00',
+      hora_fin: '23:00:00',
+      capacidad_maxima: 100,
+      valor_entrada: '5000.00',
+      entradas_vendidas: 0,
+      foto_url: null,
+    }));
+  }
+
+  test('no muestra controles de paginación cuando hay 10 eventos o menos', async () => {
+    getEventos.mockResolvedValue(crearEventos(10));
+    await renderPage();
+    expect(screen.queryByLabelText(/paginación/i)).not.toBeInTheDocument();
+  });
+
+  test('muestra como máximo 10 filas por página y permite avanzar/retroceder', async () => {
+    getEventos.mockResolvedValue(crearEventos(15));
+    await renderPage();
+
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument();
+    // El próximo evento (Evento01, día 2026-01-01) va primero.
+    expect(screen.getByText('Evento01')).toBeInTheDocument();
+    expect(screen.queryByText('Evento11')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /página siguiente/i }));
+
+    expect(screen.getByText('Página 2 de 2')).toBeInTheDocument();
+    expect(screen.getByText('Evento11')).toBeInTheDocument();
+    expect(screen.queryByText('Evento01')).not.toBeInTheDocument();
+  });
+
+  test('la tabla está ordenada por día, el más próximo primero', async () => {
+    getEventos.mockResolvedValue([
+      { id: 'a', nombre: 'Lejano', descripcion: '', dia: '2026-12-01', hora_inicio: '10:00:00', hora_fin: '12:00:00', capacidad_maxima: 10, valor_entrada: '100', entradas_vendidas: 0, foto_url: null },
+      { id: 'b', nombre: 'Proximo', descripcion: '', dia: '2026-02-01', hora_inicio: '10:00:00', hora_fin: '12:00:00', capacidad_maxima: 10, valor_entrada: '100', entradas_vendidas: 0, foto_url: null },
+      { id: 'c', nombre: 'Medio', descripcion: '', dia: '2026-06-01', hora_inicio: '10:00:00', hora_fin: '12:00:00', capacidad_maxima: 10, valor_entrada: '100', entradas_vendidas: 0, foto_url: null },
+    ]);
+    await renderPage();
+
+    const nombres = screen.getAllByRole('row').slice(1).map((fila) => fila.querySelectorAll('td')[1].textContent);
+    expect(nombres).toEqual(['Proximo', 'Medio', 'Lejano']);
+  });
 });

@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { Plus, Trash2 } from 'lucide-react';
 import { getAlertas, createAlerta, borrarAlerta } from '../../services/alertasService';
 import { usePermiso } from '../../hooks/usePermiso';
+import { usePaginacion } from '../../hooks/usePaginacion';
 import { CreateAlertaForm } from '../../components/createAlertaForm/CreateAlertaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
+import { Paginacion } from '../../components/paginacion/Paginacion';
 import { useTheme } from '../../hooks/useTheme';
 import './AlertasPage.css';
 import '../../styles/ListPage.css';
@@ -36,11 +38,16 @@ function AlertasPage() {
   const [alertaAEliminar, setAlertaAEliminar] = useState(null);
   const [guardando, setGuardando] = useState(false);
 
+  const alertasOrdenadas = [...alertas].sort(
+    (a, b) => new Date(b.creado_en) - new Date(a.creado_en)
+  );
+  const { pagina, totalPaginas, listaPaginada, irAPagina, resetPagina } = usePaginacion(alertasOrdenadas, 10);
+
   function cargarAlertas() {
     setLoading(true);
     setError('');
     getAlertas()
-      .then((data) => setAlertas(data))
+      .then((data) => { setAlertas(data); resetPagina(); })
       .catch((err) => setError(mensajeError(err, 'No se pudieron cargar las alertas.')))
       .finally(() => setLoading(false));
   }
@@ -108,7 +115,7 @@ function AlertasPage() {
             </tr>
           </thead>
           <tbody>
-            {alertas.map((a) => {
+            {listaPaginada.map((a) => {
               const esDirigida = (a.socios_destino ?? []).length > 0;
               const nombresDestino = (a.socios_destino ?? [])
                 .map((s) => `${s.nro_socio} — ${s.apellido} ${s.nombre}`)
@@ -139,6 +146,7 @@ function AlertasPage() {
             })}
           </tbody>
         </table>
+        <Paginacion pagina={pagina} totalPaginas={totalPaginas} onCambiarPagina={irAPagina} />
       </div>
     );
   }

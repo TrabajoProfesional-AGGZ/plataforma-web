@@ -6,9 +6,11 @@ import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDelet
 import { getDisciplinas, createDisciplina, pausarDisciplina, inscribirSocioADisciplina } from '../../services/disciplinasService';
 import { getSocioByNroSocio } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
+import { usePaginacion } from '../../hooks/usePaginacion';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
+import { Paginacion } from '../../components/paginacion/Paginacion';
 import { handleActivateKey } from '../../utils/a11y';
 import { useTheme } from '../../hooks/useTheme';
 import './DisciplinasPage.css';
@@ -42,11 +44,14 @@ function DisciplinasPage() {
   const [inscribiendoError, setInscribiendoError] = useState('');
   const [inscribiendoExito, setInscribiendoExito] = useState(false);
 
+  const listaOrdenada = [...disciplinas].sort((a, b) => a.nombre.localeCompare(b.nombre));
+  const { pagina, totalPaginas, listaPaginada, irAPagina, resetPagina } = usePaginacion(listaOrdenada, 10);
+
   function cargarDisciplinas() {
     setLoading(true);
     setError('');
     getDisciplinas()
-      .then((data) => setDisciplinas(data))
+      .then((data) => { setDisciplinas(data); resetPagina(); })
       .catch((err) => setError(mensajeError(err, 'No se pudieron cargar las disciplinas.')))
       .finally(() => setLoading(false));
   }
@@ -158,7 +163,7 @@ function DisciplinasPage() {
             </tr>
           </thead>
           <tbody>
-            {disciplinas.map((d) => {
+            {listaPaginada.map((d) => {
               const verDetalle = () => { setDisciplinaActual(d); setVista('detalle'); };
               return (
               <tr
@@ -189,6 +194,7 @@ function DisciplinasPage() {
             })}
           </tbody>
         </table>
+        <Paginacion pagina={pagina} totalPaginas={totalPaginas} onCambiarPagina={irAPagina} />
       </div>
     );
   }

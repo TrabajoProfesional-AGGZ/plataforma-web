@@ -463,11 +463,11 @@ describe('UsuariosPage', () => {
     render(<UsuariosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
+    // El orden por defecto de la página de Usuarios ya es Apellido ascendente.
     const thApellido = screen.getAllByRole('columnheader')[0];
-    const btnApellido = within(thApellido).getByRole('button');
-    fireEvent.click(btnApellido);
     expect(thApellido.textContent).toContain('↑');
     expect(thApellido).toHaveAttribute('aria-sort', 'ascending');
+    const btnApellido = within(thApellido).getByRole('button');
 
     fireEvent.click(btnApellido);
     expect(thApellido.textContent).toContain('↓');
@@ -476,6 +476,10 @@ describe('UsuariosPage', () => {
     fireEvent.click(btnApellido);
     expect(thApellido.textContent).toContain('↕');
     expect(thApellido).toHaveAttribute('aria-sort', 'none');
+
+    fireEvent.click(btnApellido);
+    expect(thApellido.textContent).toContain('↑');
+    expect(thApellido).toHaveAttribute('aria-sort', 'ascending');
   });
 
   test('ordena la tabla al hacer click en los encabezados Nombre, Email, Rol y Estado', async () => {
@@ -591,5 +595,88 @@ describe('UsuariosPage', () => {
     await waitFor(() => {
       expect(screen.getByRole('button', { name: /cambiar rol/i })).toBeInTheDocument();
     });
+  });
+
+  // --- Paginación ---
+
+  function crearUsuarios(cantidad) {
+    return Array.from({ length: cantidad }, (_, i) => ({
+      id: `uuid-${String(i + 1).padStart(4, '0')}`,
+      firebase_uid: `firebase-uid-${i + 1}`,
+      nombre: `Nombre${i + 1}`,
+      apellido: `Apellido${String(i + 1).padStart(2, '0')}`,
+      email: `usuario${i + 1}@club.com`,
+      fecha_nacimiento: '1990-01-01',
+      rol: { nombre: 'ADMIN', permisos: [] },
+      estado: { nombre: 'Activo' },
+    }));
+  }
+
+  test('no muestra controles de paginación cuando hay 10 usuarios o menos', async () => {
+    fetchUsuarios.mockResolvedValue(crearUsuarios(10));
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    expect(screen.queryByLabelText(/paginación/i)).not.toBeInTheDocument();
+  });
+
+  test('muestra como máximo 10 filas por página y permite avanzar/retroceder', async () => {
+    fetchUsuarios.mockResolvedValue(crearUsuarios(15));
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /ver detalle de/i })).toHaveLength(10);
+    expect(screen.getByText('Apellido01')).toBeInTheDocument();
+    expect(screen.queryByText('Apellido11')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /página siguiente/i }));
+
+    expect(screen.getByText('Página 2 de 2')).toBeInTheDocument();
+    expect(screen.getAllByRole('button', { name: /ver detalle de/i })).toHaveLength(5);
+    expect(screen.getByText('Apellido11')).toBeInTheDocument();
+    expect(screen.queryByText('Apellido01')).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /página siguiente/i })).toBeDisabled();
+
+    fireEvent.click(screen.getByRole('button', { name: /página anterior/i }));
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument();
+    expect(screen.getByText('Apellido01')).toBeInTheDocument();
+  });
+
+  test('la tabla por defecto está ordenada por apellido de la A a la Z', async () => {
+    const desordenados = [
+      { ...crearUsuarios(1)[0], id: 'a', apellido: 'Zeta' },
+      { ...crearUsuarios(1)[0], id: 'b', apellido: 'Alfa' },
+      { ...crearUsuarios(1)[0], id: 'c', apellido: 'Mesa' },
+    ];
+    fetchUsuarios.mockResolvedValue(desordenados);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    const celdasApellido = screen
+      .getAllByRole('button', { name: /ver detalle de/i })
+      .map((fila) => fila.querySelector('td').textContent);
+    expect(celdasApellido).toEqual(['Alfa', 'Mesa', 'Zeta']);
+  });
+
+  test('cambiar de filtro reinicia la paginación a la página 1', async () => {
+    const usuarios = crearUsuarios(15).map((u, i) => ({
+      ...u,
+      rol: { nombre: i < 12 ? 'ADMIN' : 'PRESIDENTE', permisos: [] },
+    }));
+    fetchUsuarios.mockResolvedValue(usuarios);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /página siguiente/i }));
+    expect(screen.getByText('Página 2 de 2')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByDisplayValue('Rol: Todos'), { target: { value: 'PRESIDENTE' } });
+
+    await waitFor(() => {
+      expect(screen.queryByLabelText(/paginación/i)).not.toBeInTheDocument();
+    });
+    expect(screen.getAllByRole('button', { name: /ver detalle de/i })).toHaveLength(3);
   });
 });
