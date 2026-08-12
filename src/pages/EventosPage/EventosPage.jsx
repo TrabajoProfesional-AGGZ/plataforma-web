@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { Plus, Ticket } from 'lucide-react';
 import { getEventos, getEventosHistoricos, createEvento } from '../../services/eventosService';
 import { usePermiso } from '../../hooks/usePermiso';
+import { usePaginacion } from '../../hooks/usePaginacion';
 import { CreateEventoForm } from '../../components/createEventoForm/CreateEventoForm';
 import { ReservarEntradaForm } from '../../components/reservarEntradaForm/ReservarEntradaForm';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
+import { Paginacion } from '../../components/paginacion/Paginacion';
 import { urlImagenSegura } from '../../utils/utils';
 import { useTheme } from '../../hooks/useTheme';
 import './EventosPage.css';
@@ -38,7 +40,7 @@ function EventosPage() {
     setLoading(true);
     setError('');
     getEventos()
-      .then((data) => setEventos(data))
+      .then((data) => { setEventos(data); resetPagina(); })
       .catch((err) => setError(mensajeError(err, 'No se pudieron cargar los eventos.')))
       .finally(() => setLoading(false));
   }
@@ -50,6 +52,7 @@ function EventosPage() {
       .then((data) => {
         setEventosHistoricos(data);
         setVista('historicos');
+        resetPagina();
       })
       .catch((err) => setError(mensajeError(err, 'No se pudieron cargar los eventos históricos.')))
       .finally(() => setCargandoHistoricos(false));
@@ -73,11 +76,13 @@ function EventosPage() {
     }
   }
 
-  function renderLista() {
-    const esVigentes = vista === 'vigentes';
-    const listaActual = esVigentes ? eventos : eventosHistoricos;
-    const cargandoActual = esVigentes ? loading : cargandoHistoricos;
+  const esVigentes = vista === 'vigentes';
+  const listaActual = esVigentes ? eventos : eventosHistoricos;
+  const cargandoActual = esVigentes ? loading : cargandoHistoricos;
+  const listaOrdenada = [...listaActual].sort((a, b) => (a.dia ?? '').localeCompare(b.dia ?? ''));
+  const { pagina, totalPaginas, listaPaginada, irAPagina, resetPagina } = usePaginacion(listaOrdenada, 10);
 
+  function renderLista() {
     if (cargandoActual) {
       return (
         <div className="list-loading">
@@ -110,7 +115,7 @@ function EventosPage() {
             </tr>
           </thead>
           <tbody>
-            {listaActual.map((e) => {
+            {listaPaginada.map((e) => {
               const imagenSegura = urlImagenSegura(e.foto_url);
               return (
                 <tr key={e.id}>
@@ -149,6 +154,7 @@ function EventosPage() {
             })}
           </tbody>
         </table>
+        <Paginacion pagina={pagina} totalPaginas={totalPaginas} onCambiarPagina={irAPagina} />
       </div>
     );
   }
@@ -175,7 +181,7 @@ function EventosPage() {
             Ver eventos históricos
           </button>
         ) : (
-          <button type="button" className="eventos-btn-vista-toggle" onClick={() => setVista('vigentes')}>
+          <button type="button" className="eventos-btn-vista-toggle" onClick={() => { setVista('vigentes'); resetPagina(); }}>
             Ver eventos vigentes
           </button>
         )}
