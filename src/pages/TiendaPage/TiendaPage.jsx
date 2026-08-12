@@ -12,6 +12,8 @@ import { urlImagenSegura } from '../../utils/utils';
 import { handleActivateKey } from '../../utils/a11y';
 import { useTheme } from '../../hooks/useTheme';
 import { usePermiso } from '../../hooks/usePermiso';
+import { usePaginacion } from '../../hooks/usePaginacion';
+import { Paginacion } from '../../components/paginacion/Paginacion';
 import './TiendaPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
@@ -37,19 +39,33 @@ function TiendaPage() {
   const [crearOpen, setCrearOpen] = useState(false);
   const [editarOpen, setEditarOpen] = useState(false);
   const [crearCompraOpen, setCrearCompraOpen] = useState(false);
+  const [ordenTienda, setOrdenTienda] = useState('nombre_asc');
 
   const imagenSegura = urlImagenSegura(productoActual?.imagen_url);
+
+  const productosOrdenados = [...productos].sort((a, b) => {
+    if (ordenTienda === 'precio_asc') return Number(a.precio) - Number(b.precio);
+    if (ordenTienda === 'precio_desc') return Number(b.precio) - Number(a.precio);
+    return a.nombre.localeCompare(b.nombre);
+  });
+  const { pagina, totalPaginas, listaPaginada, irAPagina, resetPagina } = usePaginacion(productosOrdenados, 10);
 
   async function cargarProductos() {
     setLoading(true);
     setError('');
     try {
       setProductos(await getProductos());
+      resetPagina();
     } catch (err) {
       setError(mensajeError(err, 'No se pudieron cargar los productos.'));
     } finally {
       setLoading(false);
     }
+  }
+
+  function handleCambiarOrden(e) {
+    setOrdenTienda(e.target.value);
+    resetPagina();
   }
 
   useEffect(() => { cargarProductos(); }, []);
@@ -131,7 +147,7 @@ function TiendaPage() {
             </tr>
           </thead>
           <tbody>
-            {productos.map((p) => (
+            {listaPaginada.map((p) => (
               <tr
                 key={p.id}
                 className="disciplinas-tr-clickable"
@@ -163,6 +179,7 @@ function TiendaPage() {
             ))}
           </tbody>
         </table>
+        <Paginacion pagina={pagina} totalPaginas={totalPaginas} onCambiarPagina={irAPagina} />
       </div>
     );
   }
@@ -173,7 +190,16 @@ function TiendaPage() {
         <>
           <h1 className="noticias-title">Tienda</h1>
           <div className="noticias-toolbar">
-            <div />
+            <select
+              className="tienda-orden-select"
+              value={ordenTienda}
+              onChange={handleCambiarOrden}
+              aria-label="Ordenar por"
+            >
+              <option value="nombre_asc">Nombre (A-Z)</option>
+              <option value="precio_asc">Precio: menor a mayor</option>
+              <option value="precio_desc">Precio: mayor a menor</option>
+            </select>
             <button className="noticias-btn-crear" onClick={() => setCrearOpen(true)}>
               <Plus size={15} aria-hidden="true" />
               Nuevo producto
