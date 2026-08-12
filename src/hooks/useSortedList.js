@@ -2,8 +2,8 @@ import { useState } from 'react';
 
 const ICONOS_ORDEN = { asc: ' ↑', desc: ' ↓', none: ' ↕' };
 
-export function useSortedList(getValorOrden) {
-  const [orden, setOrden] = useState({ campo: null, dir: 'asc' });
+export function useSortedList(getValorOrden, ordenInicial = { campo: null, dir: 'asc' }) {
+  const [orden, setOrden] = useState(ordenInicial);
 
   function toggleOrden(campo) {
     setOrden((prev) => {
