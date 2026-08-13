@@ -3,12 +3,18 @@ import { usePermiso } from '../../hooks/usePermiso';
 import ResumenTab from './ResumenTab';
 import FinanzasTab from './FinanzasTab';
 import MorosidadTab from './MorosidadTab';
+import EventosTab from './EventosTab';
+import TiendaTab from './TiendaTab';
+import CajaTab from './CajaTab';
 import './MetricasPage.css';
 
 const TABS = [
   { id: 'resumen', label: 'Instalaciones', Component: ResumenTab },
   { id: 'finanzas', label: 'Finanzas', Component: FinanzasTab },
   { id: 'morosidad', label: 'Morosidad', Component: MorosidadTab },
+  { id: 'eventos', label: 'Eventos', Component: EventosTab },
+  { id: 'tienda', label: 'Tienda', Component: TiendaTab },
+  { id: 'caja', label: 'Caja', Component: CajaTab },
 ];
 
 function MetricasPage() {

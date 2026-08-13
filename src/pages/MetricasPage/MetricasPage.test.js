@@ -8,6 +8,9 @@ jest.mock('../../hooks/usePermiso');
 jest.mock('./ResumenTab', () => () => <div data-testid="panel-resumen">Panel Resumen</div>);
 jest.mock('./FinanzasTab', () => () => <div data-testid="panel-finanzas">Panel Finanzas</div>);
 jest.mock('./MorosidadTab', () => () => <div data-testid="panel-morosidad">Panel Morosidad</div>);
+jest.mock('./EventosTab', () => () => <div data-testid="panel-eventos">Panel Eventos</div>);
+jest.mock('./TiendaTab', () => () => <div data-testid="panel-tienda">Panel Tienda</div>);
+jest.mock('./CajaTab', () => () => <div data-testid="panel-caja">Panel Caja</div>);
 
 describe('MetricasPage', () => {
   beforeEach(() => {
@@ -58,6 +61,36 @@ describe('MetricasPage', () => {
     expect(screen.getByTestId('panel-morosidad')).toBeInTheDocument();
   });
 
+  test('click en la pestaña Eventos muestra su panel', () => {
+    usePermiso.mockReturnValue(true);
+
+    render(<MetricasPage />);
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Eventos' }));
+
+    expect(screen.getByTestId('panel-eventos')).toBeInTheDocument();
+  });
+
+  test('click en la pestaña Tienda muestra su panel', () => {
+    usePermiso.mockReturnValue(true);
+
+    render(<MetricasPage />);
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Tienda' }));
+
+    expect(screen.getByTestId('panel-tienda')).toBeInTheDocument();
+  });
+
+  test('click en la pestaña Caja muestra su panel', () => {
+    usePermiso.mockReturnValue(true);
+
+    render(<MetricasPage />);
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Caja' }));
+
+    expect(screen.getByTestId('panel-caja')).toBeInTheDocument();
+  });
+
   test('la flecha derecha mueve la selección a la siguiente pestaña', () => {
     usePermiso.mockReturnValue(true);
 
@@ -78,7 +111,7 @@ describe('MetricasPage', () => {
     const tablist = screen.getByRole('tablist');
     fireEvent.keyDown(tablist, { key: 'ArrowLeft' });
 
-    expect(screen.getByRole('tab', { name: 'Morosidad' })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByTestId('panel-morosidad')).toBeInTheDocument();
+    expect(screen.getByRole('tab', { name: 'Caja' })).toHaveAttribute('aria-selected', 'true');
+    expect(screen.getByTestId('panel-caja')).toBeInTheDocument();
   });
 });

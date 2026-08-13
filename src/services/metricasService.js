@@ -14,6 +14,27 @@ export async function getOcupacionInstalaciones(dias = 30) {
   return res.json();
 }
 
+export async function getTopEventos(limite = 5) {
+  const res = await fetchTo(`/api/v1/metricas/eventos/top?limite=${encodeURIComponent(limite)}`, 'GET');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error('Error al obtener ranking de eventos');
+  return res.json();
+}
+
+export async function getTopProductos(limite = 5) {
+  const res = await fetchTo(`/api/v1/metricas/productos/top?limite=${encodeURIComponent(limite)}`, 'GET');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error('Error al obtener ranking de productos');
+  return res.json();
+}
+
+export async function getPagosEnCaja() {
+  const res = await fetchTo('/api/v1/metricas/pagos-caja', 'GET');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error('Error al obtener pagos en caja');
+  return res.json();
+}
+
 export async function getDashboardFinanzas(periodo=null) {
     let url = ''
     if (periodo) {
