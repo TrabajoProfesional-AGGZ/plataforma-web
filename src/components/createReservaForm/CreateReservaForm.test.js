@@ -18,8 +18,8 @@ jest.mock('../../services/sociosService', () => ({
 import { getSocioByNroSocio } from '../../services/sociosService';
 
 const INSTALACIONES_TEST = [
-  { id: 'inst-uuid-1', nombre: 'Cancha de fútbol' },
-  { id: 'inst-uuid-2', nombre: 'Pileta' },
+  { id: 'inst-uuid-1', nombre: 'Cancha de fútbol', capacidad_maxima: 6 },
+  { id: 'inst-uuid-2', nombre: 'Pileta', capacidad_maxima: 10 },
 ];
 
 const SOCIO_TEST = { id: 'socio-uuid-1', nro_socio: '1234', nombre: 'Juan', apellido: 'García' };
@@ -60,7 +60,7 @@ async function llenarYEnviarPaso2(turno = '09:00:00') {
   await act(async () => {
     fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
   });
-  await waitFor(() => expect(screen.getByRole('option', { name: turno.slice(0, 5) })).toBeInTheDocument());
+  await waitFor(() => expect(screen.getByRole('option', { name: new RegExp(`^${turno.slice(0, 5)} `) })).toBeInTheDocument());
   fireEvent.change(screen.getByRole('combobox'), { target: { value: turno } });
   await act(async () => {
     fireEvent.click(screen.getByRole('button', { name: /registrar reserva/i }));
@@ -72,7 +72,11 @@ beforeEach(() => {
   jest.useFakeTimers();
   createReserva.mockResolvedValue({ id: 'reserva-nueva' });
   getSocioByNroSocio.mockResolvedValue(SOCIO_TEST);
-  getTurnosDisponibles.mockResolvedValue(['09:00:00', '10:00:00', '11:00:00']);
+  getTurnosDisponibles.mockResolvedValue([
+    { hora_inicio: '09:00:00', cupos_disponibles: 6 },
+    { hora_inicio: '10:00:00', cupos_disponibles: 3 },
+    { hora_inicio: '11:00:00', cupos_disponibles: 6 },
+  ]);
 });
 
 afterEach(() => {
@@ -257,6 +261,26 @@ describe('CreateReservaForm', () => {
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
+  test('muestra error de cupo cuando createReserva lanza "sin-cupo"', async () => {
+    const error = new Error('sin-cupo');
+    error.cuposDisponibles = 1;
+    createReserva.mockRejectedValue(error);
+    await llenarYEnviarPaso2();
+    await waitFor(() => {
+      expect(screen.getByText('Ya no quedan cupos suficientes para ese turno con la cantidad de socios elegida.')).toBeInTheDocument();
+    });
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  test('muestra error de conflicto temporal cuando createReserva lanza "conflicto-temporal"', async () => {
+    createReserva.mockRejectedValue(new Error('conflicto-temporal'));
+    await llenarYEnviarPaso2();
+    await waitFor(() => {
+      expect(screen.getByText('La instalación está siendo actualizada por otra reserva. Probá de nuevo en unos segundos.')).toBeInTheDocument();
+    });
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
   test('el select de instalación aplica focus y blur', () => {
     renderForm();
     const select = screen.getByRole('combobox');
@@ -394,7 +418,7 @@ describe('CreateReservaForm', () => {
     await act(async () => {
       fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
     });
-    await waitFor(() => expect(screen.getByRole('option', { name: '11:00' })).toBeInTheDocument());
+    expect(await screen.findByRole('option', { name: /^11:00 / })).toBeInTheDocument();
     fireEvent.change(screen.getByRole('combobox'), { target: { value: '11:00:00' } });
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /registrar reserva/i }));
@@ -475,11 +499,11 @@ describe('CreateReservaForm', () => {
     fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
 
     await waitFor(() => expect(screen.getByText('Cargando turnos...')).toBeInTheDocument());
-    await act(async () => { resolveTurnos(['09:00:00']); });
+    await act(async () => { resolveTurnos([{ hora_inicio: '09:00:00', cupos_disponibles: 6 }]); });
     expect(screen.queryByText('Cargando turnos...')).not.toBeInTheDocument();
   });
 
-  test('muestra los turnos disponibles como opciones del select', async () => {
+  test('muestra los turnos disponibles con sus cupos como opciones del select', async () => {
     renderForm();
     await avanzarAlPaso2();
 
@@ -487,9 +511,9 @@ describe('CreateReservaForm', () => {
     fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
 
     await waitFor(() => {
-      expect(screen.getByRole('option', { name: '09:00' })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: '10:00' })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: '11:00' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: '09:00 (6/6 lugares)' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: '10:00 (3/6 lugares)' })).toBeInTheDocument();
+      expect(screen.getByRole('option', { name: '11:00 (6/6 lugares)' })).toBeInTheDocument();
     });
   });
 
@@ -508,14 +532,151 @@ describe('CreateReservaForm', () => {
     });
   });
 
-  test('no envía si no se seleccionó ningún turno', async () => {
+  test('en el paso 1, deshabilita "Agregar" y muestra aviso al llegar al cupo del turno ya elegido', async () => {
+    const SOCIO_TEST_3 = { id: 'socio-uuid-3', nro_socio: '9012', nombre: 'Lucas', apellido: 'Diaz' };
+    getSocioByNroSocio
+      .mockResolvedValueOnce(SOCIO_TEST)
+      .mockResolvedValueOnce(SOCIO_TEST_2)
+      .mockResolvedValueOnce(SOCIO_TEST_3);
+
+    renderForm();
+    await avanzarAlPaso2(); // agrega el socio 1234 y llega al paso 2
+
+    const fechaInput = document.querySelector('input[type="date"]');
+    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+    // Turno 10:00 tiene cupo=3 (ver mock de getTurnosDisponibles en beforeEach)
+    expect(await screen.findByRole('option', { name: '10:00 (3/6 lugares)' })).toBeInTheDocument();
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: '10:00:00' } });
+
+    fireEvent.click(screen.getByRole('button', { name: /atrás/i }));
+    expect(await screen.findByText(/paso 1 de 2/i)).toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText(/ej\. 1234/i), { target: { value: '5678' } });
+    fireEvent.click(screen.getByRole('button', { name: /agregar/i }));
+    expect(await screen.findByText('5678 — Perez Maria')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText(/ej\. 1234/i), { target: { value: '9012' } });
+    fireEvent.click(screen.getByRole('button', { name: /agregar/i }));
+    expect(await screen.findByText('9012 — Diaz Lucas')).toBeInTheDocument();
+
+    // Con 3 socios agregados (cupo del turno elegido), el botón se deshabilita.
+    fireEvent.change(screen.getByPlaceholderText(/ej\. 1234/i), { target: { value: '3456' } });
+    expect(screen.getByRole('button', { name: /agregar/i })).toBeDisabled();
+    expect(screen.getByText('Ya alcanzaste el cupo disponible para el turno elegido (3 personas).')).toBeInTheDocument();
+  });
+
+  test('muestra error si falla la carga de turnos disponibles', async () => {
+    getTurnosDisponibles.mockRejectedValue(new Error('network error'));
     renderForm();
     await avanzarAlPaso2();
+
     const fechaInput = document.querySelector('input[type="date"]');
     await act(async () => {
       fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
     });
-    await waitFor(() => expect(screen.getByRole('option', { name: '09:00' })).toBeInTheDocument());
+
+    await waitFor(() => {
+      expect(screen.getByText('No se pudieron cargar los turnos disponibles.')).toBeInTheDocument();
+    });
+  });
+
+  test('presionar Enter al llegar al cupo del turno muestra el aviso sin agregar el socio', async () => {
+    const SOCIO_TEST_3 = { id: 'socio-uuid-3', nro_socio: '9012', nombre: 'Lucas', apellido: 'Diaz' };
+    getSocioByNroSocio
+      .mockResolvedValueOnce(SOCIO_TEST)
+      .mockResolvedValueOnce(SOCIO_TEST_2)
+      .mockResolvedValueOnce(SOCIO_TEST_3);
+
+    renderForm();
+    await avanzarAlPaso2();
+
+    const fechaInput = document.querySelector('input[type="date"]');
+    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+    // Turno 10:00 tiene cupo=3 (ver mock de getTurnosDisponibles en beforeEach)
+    expect(await screen.findByRole('option', { name: '10:00 (3/6 lugares)' })).toBeInTheDocument();
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: '10:00:00' } });
+
+    fireEvent.click(screen.getByRole('button', { name: /atrás/i }));
+    expect(await screen.findByText(/paso 1 de 2/i)).toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText(/ej\. 1234/i), { target: { value: '5678' } });
+    fireEvent.click(screen.getByRole('button', { name: /agregar/i }));
+    expect(await screen.findByText('5678 — Perez Maria')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText(/ej\. 1234/i), { target: { value: '9012' } });
+    fireEvent.click(screen.getByRole('button', { name: /agregar/i }));
+    expect(await screen.findByText('9012 — Diaz Lucas')).toBeInTheDocument();
+
+    // Con 3 socios agregados (cupo del turno elegido), el botón se deshabilita
+    // pero el input sigue habilitado — Enter bypasea el botón y llega al chequeo interno.
+    const input = screen.getByPlaceholderText(/ej\. 1234/i);
+    fireEvent.change(input, { target: { value: '3456' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(screen.getAllByText('Ya alcanzaste el cupo disponible para el turno elegido (3 personas).').length).toBeGreaterThan(0);
+    expect(screen.queryByText(/3456/)).not.toBeInTheDocument();
+    expect(getSocioByNroSocio).toHaveBeenCalledTimes(3);
+  });
+
+  test('no agrega el socio si otro número resuelve al mismo id ya agregado', async () => {
+    getSocioByNroSocio
+      .mockResolvedValueOnce(SOCIO_TEST)
+      .mockResolvedValueOnce({ ...SOCIO_TEST, nro_socio: '01234' });
+    renderForm();
+    await agregarSocioAlForm('1234');
+    expect(screen.getByText('1234 — García Juan')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByPlaceholderText(/ej\. 1234/i), { target: { value: '01234' } });
+    fireEvent.click(screen.getByRole('button', { name: /agregar/i }));
+    expect(await screen.findByText('Este socio ya fue agregado.')).toBeInTheDocument();
+    expect(screen.getAllByText('1234 — García Juan').length).toBe(1);
+    expect(screen.queryByText(/01234/)).not.toBeInTheDocument();
+  });
+
+  test('muestra error de cupo al enviar si el turno elegido tiene menos cupo que socios agregados', async () => {
+    const SOCIO_TEST_3 = { id: 'socio-uuid-3', nro_socio: '9012', nombre: 'Lucas', apellido: 'Diaz' };
+    const SOCIO_TEST_4 = { id: 'socio-uuid-4', nro_socio: '3456', nombre: 'Ana', apellido: 'Lopez' };
+    getSocioByNroSocio
+      .mockResolvedValueOnce(SOCIO_TEST)
+      .mockResolvedValueOnce(SOCIO_TEST_2)
+      .mockResolvedValueOnce(SOCIO_TEST_3)
+      .mockResolvedValueOnce(SOCIO_TEST_4);
+
+    renderForm();
+    await agregarSocioAlForm('1234');
+    for (const nro of ['5678', '9012', '3456']) {
+      fireEvent.change(screen.getByPlaceholderText(/ej\. 1234/i), { target: { value: nro } });
+      fireEvent.click(screen.getByRole('button', { name: /agregar/i }));
+      // eslint-disable-next-line no-await-in-loop
+      expect(await screen.findByText(new RegExp(nro))).toBeInTheDocument();
+    }
+
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'inst-uuid-1' } });
+    fireEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+    expect(await screen.findByText(/paso 2 de 2/i)).toBeInTheDocument();
+    act(() => jest.advanceTimersByTime(300));
+
+    const fechaInput = document.querySelector('input[type="date"]');
+    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+    // Turno 09:00 tiene cupo=6, alcanza para los 4 socios agregados.
+    expect(await screen.findByRole('option', { name: '09:00 (6/6 lugares)' })).toBeInTheDocument();
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: '09:00:00' } });
+
+    // Cambia a un turno con menos cupo (10:00, cupo=3) que la cantidad de socios (4).
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: '10:00:00' } });
+    fireEvent.click(screen.getByRole('button', { name: /registrar reserva/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Ya no quedan cupos suficientes para ese turno con la cantidad de socios elegida.')).toBeInTheDocument();
+    });
+    expect(createReserva).not.toHaveBeenCalled();
+  });
+
+  test('no envía si no se seleccionó ningún turno', async () => {
+    renderForm();
+    await avanzarAlPaso2();
+    const fechaInput = document.querySelector('input[type="date"]');
+    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+    expect(await screen.findByRole('option', { name: /^09:00 /  })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /registrar reserva/i }));
 
@@ -523,5 +684,69 @@ describe('CreateReservaForm', () => {
       expect(screen.getByText('Debe seleccionar un turno')).toBeInTheDocument();
     });
     expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  test('funciona sin la prop instalaciones (usa el default)', () => {
+    render(<CreateReservaForm onSuccess={onSuccess} onCancel={onCancel} />);
+    expect(screen.getByRole('combobox')).toBeInTheDocument();
+  });
+
+  test('presionar una tecla distinta de Enter no agrega el socio', async () => {
+    renderForm();
+    const input = screen.getByPlaceholderText(/ej\. 1234/i);
+    fireEvent.change(input, { target: { value: '1234' } });
+    fireEvent.keyDown(input, { key: 'a' });
+    expect(getSocioByNroSocio).not.toHaveBeenCalled();
+  });
+
+  test('presionar Enter con el campo vacío no llama a la API', async () => {
+    renderForm();
+    const input = screen.getByPlaceholderText(/ej\. 1234/i);
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(getSocioByNroSocio).not.toHaveBeenCalled();
+  });
+
+  test('usa "?" como capacidad si la instalación seleccionada no tiene capacidad_maxima', async () => {
+    const INSTALACION_SIN_CAPACIDAD = { id: 'inst-uuid-3', nombre: 'Cancha sin capacidad definida' };
+    renderForm([...INSTALACIONES_TEST, INSTALACION_SIN_CAPACIDAD]);
+    await agregarSocioAlForm('1234');
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'inst-uuid-3' } });
+    fireEvent.click(screen.getByRole('button', { name: /siguiente/i }));
+    expect(await screen.findByText(/paso 2 de 2/i)).toBeInTheDocument();
+    act(() => jest.advanceTimersByTime(300));
+
+    const fechaInput = document.querySelector('input[type="date"]');
+    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+    expect(await screen.findByRole('option', { name: '09:00 (6/? lugares)' })).toBeInTheDocument();
+  });
+
+  test('no actualiza los turnos si el componente se desmonta mientras la petición está pendiente (resuelve)', async () => {
+    let resolveTurnos;
+    getTurnosDisponibles.mockReturnValue(new Promise((resolve) => { resolveTurnos = resolve; }));
+    const { unmount } = renderForm();
+    await avanzarAlPaso2();
+
+    const fechaInput = document.querySelector('input[type="date"]');
+    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+
+    unmount();
+    await act(async () => {
+      resolveTurnos([{ hora_inicio: '09:00:00', cupos_disponibles: 6 }]);
+    });
+  });
+
+  test('no actualiza los turnos si el componente se desmonta mientras la petición está pendiente (rechaza)', async () => {
+    let rejectTurnos;
+    getTurnosDisponibles.mockReturnValue(new Promise((_resolve, reject) => { rejectTurnos = reject; }));
+    const { unmount } = renderForm();
+    await avanzarAlPaso2();
+
+    const fechaInput = document.querySelector('input[type="date"]');
+    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+
+    unmount();
+    await act(async () => {
+      rejectTurnos(new Error('network error'));
+    });
   });
 });
