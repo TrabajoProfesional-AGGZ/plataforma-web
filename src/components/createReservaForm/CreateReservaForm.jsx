@@ -159,15 +159,10 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
     const valid = await trigger(stepFields[step]);
     if (!valid) return;
 
-    if (step === 1) {
-      if (sociosAgregados.length === 0) {
-        setErrorListaSocios('Debe agregar al menos un socio.');
-        return;
-      }
-      advance();
+    if (sociosAgregados.length === 0) {
+      setErrorListaSocios('Debe agregar al menos un socio.');
       return;
     }
-
     advance();
   };
 
