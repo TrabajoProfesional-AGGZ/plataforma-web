@@ -1,11 +1,21 @@
 import { fetchTo } from '../utils/utils';
 
 export async function getSocios() {
-  const res = await fetchTo('/api/v1/socios?pagina=1&limite=100', 'GET');
-  if (res.status >= 500) throw new Error('servicio-no-disponible');
-  if (!res.ok) throw new Error('Error al obtener socios');
-  const data = await res.json();
-  return data.socios ?? data;
+  const limite = 100;
+  let pagina = 1;
+  let socios = [];
+  while (true) {
+    const res = await fetchTo(`/api/v1/socios?pagina=${pagina}&limite=${limite}`, 'GET');
+    if (res.status >= 500) throw new Error('servicio-no-disponible');
+    if (!res.ok) throw new Error('Error al obtener socios');
+    const data = await res.json();
+    const socioPagina = data.socios ?? data;
+    if (!Array.isArray(socioPagina)) return socioPagina;
+    socios = socios.concat(socioPagina);
+    if (socioPagina.length < limite) break;
+    pagina++;
+  }
+  return socios;
 }
 
 export async function createSocio(data) {

@@ -36,6 +36,28 @@ describe('sociosService', () => {
       expect(result).toHaveLength(1);
     });
 
+    test('trae todas las páginas cuando el backend devuelve más de una página', async () => {
+      const pagina1 = Array.from({ length: 100 }, (_, i) => ({ id: `${i}` }));
+      const pagina2 = Array.from({ length: 30 }, (_, i) => ({ id: `${100 + i}` }));
+      fetchTo
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: async () => ({ socios: pagina1, total: 130 }),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: async () => ({ socios: pagina2, total: 130 }),
+        });
+
+      const result = await getSocios();
+
+      expect(fetchTo).toHaveBeenNthCalledWith(1, '/api/v1/socios?pagina=1&limite=100', 'GET');
+      expect(fetchTo).toHaveBeenNthCalledWith(2, '/api/v1/socios?pagina=2&limite=100', 'GET');
+      expect(result).toHaveLength(130);
+    });
+
     test('lanza servicio-no-disponible en 500', async () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
       await expect(getSocios()).rejects.toThrow('servicio-no-disponible');
