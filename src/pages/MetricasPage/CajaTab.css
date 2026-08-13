@@ -1,0 +1,136 @@
+.caja-tab-loading {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-12) 0;
+}
+
+.caja-tab-error {
+  text-align: center;
+  color: var(--color-danger);
+  font-size: 14px;
+  background-color: var(--status-error-surface-bg);
+  border: 1px solid var(--status-error-surface-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+
+.caja-tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+}
+
+/* KPI Card */
+.caja-tab-kpi-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-md);
+  padding: var(--space-6);
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.caja-tab-kpi-title {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--space-2) 0;
+  font-weight: 600;
+}
+
+.caja-tab-kpi-value {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  margin: 0;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.caja-tab-kpi-subtitle {
+  display: block;
+  font-size: 13px;
+  color: var(--color-text-secondary);
+  margin-top: var(--space-2);
+}
+
+/* Desglose */
+.caja-tab-desglose-container {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.caja-tab-desglose-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-primary);
+}
+
+.caja-tab-desglose-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.caja-tab-rule {
+  border: none;
+  border-top: 1px solid var(--color-border-light);
+  margin: var(--space-3) 0 var(--space-5) 0;
+}
+
+.caja-tab-empty {
+  color: var(--color-text-secondary);
+  font-size: 14px;
+  text-align: center;
+}
+
+.caja-tab-desglose-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.caja-tab-desglose-item {
+  display: grid;
+  grid-template-columns: 36px 1fr auto;
+  align-items: center;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border-light);
+}
+
+.caja-tab-desglose-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.caja-tab-desglose-icono {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--color-bg);
+  color: var(--color-text-primary);
+}
+
+.caja-tab-desglose-info { display: flex; flex-direction: column; }
+.caja-tab-desglose-label { font-weight: 600; font-size: 14px; color: var(--color-text-primary); }
+.caja-tab-desglose-cantidad { font-size: 12px; color: var(--color-text-secondary); }
+
+.caja-tab-desglose-monto {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 480px) {
+  .caja-tab-kpi-value { font-size: 36px; }
+}

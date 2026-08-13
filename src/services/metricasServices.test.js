@@ -1,4 +1,11 @@
-import { getDashboardFinanzas, getTopDisciplinas, getOcupacionInstalaciones } from './metricasService';
+import {
+  getDashboardFinanzas,
+  getTopDisciplinas,
+  getOcupacionInstalaciones,
+  getTopEventos,
+  getTopProductos,
+  getPagosEnCaja,
+} from './metricasService';
 
 // Mockeamos la utilidad de fetch exactamente como en el resto de los servicios
 jest.mock('../utils/utils', () => ({ fetchTo: jest.fn() }));
@@ -27,6 +34,28 @@ const OCUPACION_MOCK = {
   total: 1,
   promedio_ocupacion: 23.8,
   periodo_dias: 30,
+};
+
+const EVENTOS_MOCK = {
+  ranking: [
+    { id: '1', nombre: 'Fiesta aniversario', capacidad_maxima: 200, entradas_vendidas: 150, porcentaje_ocupacion: 75.0 },
+  ],
+  total: 1,
+};
+
+const PRODUCTOS_MOCK = {
+  ranking: [
+    { id: '1', nombre: 'Remera club', cantidad_vendida: 40, monto_total: 200000 },
+  ],
+  total: 1,
+};
+
+const PAGOS_CAJA_MOCK = {
+  desglose: [
+    { tipo: 'cuota', cantidad: 2, monto_total: 40000 },
+  ],
+  total_cantidad: 2,
+  total_monto: 40000,
 };
 
 describe('metricasService', () => {
@@ -77,6 +106,75 @@ describe('metricasService', () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
 
       await expect(getOcupacionInstalaciones(30)).rejects.toThrow('Error al obtener ocupación de instalaciones');
+    });
+  });
+
+  describe('getTopEventos', () => {
+    test('llama al endpoint correcto con el límite indicado', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => EVENTOS_MOCK });
+
+      const result = await getTopEventos(5);
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/metricas/eventos/top?limite=5', 'GET');
+      expect(result.ranking).toHaveLength(1);
+    });
+
+    test('lanza "servicio-no-disponible" en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+
+      await expect(getTopEventos(5)).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza error genérico cuando la respuesta no es ok (ej: 404)', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
+
+      await expect(getTopEventos(5)).rejects.toThrow('Error al obtener ranking de eventos');
+    });
+  });
+
+  describe('getTopProductos', () => {
+    test('llama al endpoint correcto con el límite indicado', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => PRODUCTOS_MOCK });
+
+      const result = await getTopProductos(5);
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/metricas/productos/top?limite=5', 'GET');
+      expect(result.ranking).toHaveLength(1);
+    });
+
+    test('lanza "servicio-no-disponible" en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+
+      await expect(getTopProductos(5)).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza error genérico cuando la respuesta no es ok (ej: 404)', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
+
+      await expect(getTopProductos(5)).rejects.toThrow('Error al obtener ranking de productos');
+    });
+  });
+
+  describe('getPagosEnCaja', () => {
+    test('llama al endpoint correcto', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => PAGOS_CAJA_MOCK });
+
+      const result = await getPagosEnCaja();
+
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/metricas/pagos-caja', 'GET');
+      expect(result.total_cantidad).toBe(2);
+    });
+
+    test('lanza "servicio-no-disponible" en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+
+      await expect(getPagosEnCaja()).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza error genérico cuando la respuesta no es ok (ej: 404)', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
+
+      await expect(getPagosEnCaja()).rejects.toThrow('Error al obtener pagos en caja');
     });
   });
 
