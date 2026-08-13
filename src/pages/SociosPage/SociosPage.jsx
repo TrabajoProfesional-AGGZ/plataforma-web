@@ -80,7 +80,16 @@ function SociosPage() {
       setLoading(true);
       setError(null);
       try {
-        const socios = await getSocios();
+        const socios = await getSocios({
+          onPage: (parcial) => {
+            if (!cancelled) {
+              cacheSociosRef.current = parcial;
+              setResultado(parcial);
+              setModo('lista');
+              setLoading(false);
+            }
+          },
+        });
         if (!cancelled) {
           cacheSociosRef.current = socios;
           setResultado(socios);
@@ -149,7 +158,14 @@ function SociosPage() {
     setLoading(true);
     setError(null);
     try {
-      const socios = await getSocios();
+      const socios = await getSocios({
+        onPage: (parcial) => {
+          cacheSociosRef.current = parcial;
+          setResultado(parcial);
+          setModo('lista');
+          setLoading(false);
+        },
+      });
       cacheSociosRef.current = socios;
       setResultado(socios);
       setModo('lista');
