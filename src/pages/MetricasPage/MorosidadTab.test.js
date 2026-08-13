@@ -127,4 +127,32 @@ describe('MorosidadTab', () => {
       expect(screen.getByText('No se pudieron cargar las métricas de morosidad.')).toBeInTheDocument();
     });
   });
+
+  test('pagina la predicción de morosidad de a 10 socios', async () => {
+    const prediccionLarga = Array.from({ length: 15 }, (_, i) => ({
+      socio_id: i + 1,
+      nombre_completo: `Socio ${i + 1}`,
+      probabilidad_atraso: 1 - i * 0.01,
+      dias_promedio_historico: i,
+      nivel_riesgo: 'Bajo',
+    }));
+    getDashboardFidelizacion.mockResolvedValueOnce({ ...mockDatos, prediccion_morosidad: prediccionLarga });
+
+    render(<MorosidadTab />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Socio 1')).toBeInTheDocument();
+    });
+
+    expect(screen.getAllByRole('row')).toHaveLength(11); // header + 10 filas
+    expect(screen.queryByText('Socio 11')).not.toBeInTheDocument();
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Página siguiente' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('Socio 11')).toBeInTheDocument();
+    });
+    expect(screen.queryByText('Socio 1')).not.toBeInTheDocument();
+  });
 });

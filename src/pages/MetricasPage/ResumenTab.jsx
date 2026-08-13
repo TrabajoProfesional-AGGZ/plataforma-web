@@ -109,7 +109,9 @@ function ResumenTab() {
 
         {ocupacion?.instalaciones?.length > 0 ? (
           <div className="ocupacion-list">
-            {ocupacion.instalaciones.map((inst) => (
+            {[...ocupacion.instalaciones]
+              .sort((a, b) => b.porcentaje_ocupacion - a.porcentaje_ocupacion)
+              .map((inst) => (
               <div key={inst.id} className="ocupacion-item">
                 <div className="ocupacion-info">
                   <span className="ocupacion-nombre">{inst.nombre}</span>
