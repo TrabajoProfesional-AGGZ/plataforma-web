@@ -32,6 +32,8 @@ const AVISOS_ESTADO_SOCIO = {
 
 const MENSAJES_ERROR_SUBMIT = {
   superposicion: 'Ya existe una reserva en ese horario para esta instalación.',
+  'sin-cupo': 'Ya no quedan cupos suficientes para ese turno con la cantidad de socios elegida.',
+  'conflicto-temporal': 'La instalación está siendo actualizada por otra reserva. Probá de nuevo en unos segundos.',
   'socio-moroso': AVISOS_ESTADO_SOCIO.Moroso,
   'socio-suspendido': AVISOS_ESTADO_SOCIO.Suspendido,
 };
@@ -61,6 +63,11 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
 
   const idInstalacionSeleccionada = watch('id_instalacion');
   const fechaSeleccionada = watch('fecha_reserva');
+  const horaInicioSeleccionada = watch('hora_inicio');
+
+  const turnoSeleccionado = turnosDisponibles.find((t) => t.hora_inicio === horaInicioSeleccionada);
+  const cuposDisponiblesTurno = turnoSeleccionado?.cupos_disponibles ?? null;
+  const topeSociosAlcanzado = cuposDisponiblesTurno != null && sociosAgregados.length >= cuposDisponiblesTurno;
 
   useEffect(() => {
     if (!idInstalacionSeleccionada || !fechaSeleccionada) {
@@ -113,6 +120,10 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
     const nro = nroSocioInput.trim();
     if (!nro) return;
 
+    if (topeSociosAlcanzado) {
+      setErrorSocio(`Ya alcanzaste el cupo disponible para el turno elegido (${cuposDisponiblesTurno} personas).`);
+      return;
+    }
     if (sociosAgregados.some((s) => s.nro_socio === nro)) {
       setErrorSocio('Este socio ya fue agregado.');
       return;
@@ -162,6 +173,10 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
 
   const onSubmit = async (data) => {
     setSubmitError('');
+    if (cuposDisponiblesTurno != null && sociosAgregados.length > cuposDisponiblesTurno) {
+      setSubmitError(MENSAJES_ERROR_SUBMIT['sin-cupo']);
+      return;
+    }
     try {
       await createReserva({
         ids_socios: sociosAgregados.map((s) => s.id),
@@ -215,11 +230,17 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
                   type="button"
                   className="csf-btn-agregar-socio"
                   onClick={agregarSocio}
-                  disabled={busquedaSocio || !nroSocioInput.trim()}
+                  disabled={busquedaSocio || !nroSocioInput.trim() || topeSociosAlcanzado}
                 >
                   Agregar
                 </button>
               </div>
+              {topeSociosAlcanzado && (
+                <p className="csf-error">
+                  <AlertCircle size={12} />
+                  {`Ya alcanzaste el cupo disponible para el turno elegido (${cuposDisponiblesTurno} personas).`}
+                </p>
+              )}
               {socioPreview && socioPreview.nro_socio === nroSocioInput.trim() && (
                 <span className="csf-socio-nombre-inline">
                   <CheckCircle2 size={13} color="var(--status-success-border)" />
@@ -268,7 +289,11 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
                   {cargandoTurnos ? 'Cargando turnos...' : 'Seleccionar turno...'}
                 </option>
                 {turnosDisponibles.map((turno) => (
-                  <option key={turno} value={turno}>{turno.slice(0, 5)}</option>
+                  <option key={turno.hora_inicio} value={turno.hora_inicio}>
+                    {turno.hora_inicio.slice(0, 5)} ({turno.cupos_disponibles}/{
+                      instalaciones.find((i) => i.id === idInstalacionSeleccionada)?.capacidad_maxima ?? '?'
+                    } lugares)
+                  </option>
                 ))}
               </StyledSelect>
             </Field>

@@ -135,9 +135,33 @@ describe('reservasService', () => {
       await expect(createReserva(datos)).rejects.toThrow('servicio-no-disponible');
     });
 
-    test('lanza "superposicion" cuando la respuesta es 409', async () => {
+    test('lanza "superposicion" cuando la respuesta es 409 sin body reconocible', async () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 409 });
       await expect(createReserva(datos)).rejects.toThrow('superposicion');
+    });
+
+    test('lanza "sin-cupo" cuando la respuesta es 409 con tipo sin_cupo, incluyendo los cupos disponibles', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: false,
+        status: 409,
+        json: async () => ({ detail: { tipo: 'sin_cupo', cupos_disponibles: 2 } }),
+      });
+      try {
+        await createReserva(datos);
+        throw new Error('no debería llegar acá');
+      } catch (e) {
+        expect(e.message).toBe('sin-cupo');
+        expect(e.cuposDisponibles).toBe(2);
+      }
+    });
+
+    test('lanza "conflicto-temporal" cuando la respuesta es 409 con tipo conflicto_temporal', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: false,
+        status: 409,
+        json: async () => ({ detail: { tipo: 'conflicto_temporal' } }),
+      });
+      await expect(createReserva(datos)).rejects.toThrow('conflicto-temporal');
     });
 
     test('lanza "socio-moroso" cuando la respuesta es 403 con tipo moroso', async () => {
