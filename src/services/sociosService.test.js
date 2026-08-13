@@ -36,6 +36,69 @@ describe('sociosService', () => {
       expect(result).toHaveLength(1);
     });
 
+    test('trae todas las páginas cuando el backend devuelve más de una página', async () => {
+      const pagina1 = Array.from({ length: 100 }, (_, i) => ({ id: `${i}` }));
+      const pagina2 = Array.from({ length: 30 }, (_, i) => ({ id: `${100 + i}` }));
+      fetchTo
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: async () => ({ socios: pagina1, total: 130 }),
+        })
+        .mockResolvedValueOnce({
+          ok: true,
+          status: 200,
+          json: async () => ({ socios: pagina2, total: 130 }),
+        });
+
+      const result = await getSocios();
+
+      expect(fetchTo).toHaveBeenNthCalledWith(1, '/api/v1/socios?pagina=1&limite=100', 'GET');
+      expect(fetchTo).toHaveBeenNthCalledWith(2, '/api/v1/socios?pagina=2&limite=100', 'GET');
+      expect(result).toHaveLength(130);
+    });
+
+    test('llama a onPage con lo acumulado luego de cada página, antes de tener todo', async () => {
+      const pagina1 = Array.from({ length: 100 }, (_, i) => ({ id: `${i}` }));
+      const pagina2 = Array.from({ length: 30 }, (_, i) => ({ id: `${100 + i}` }));
+      fetchTo
+        .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ socios: pagina1, total: 130 }) })
+        .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ socios: pagina2, total: 130 }) });
+
+      const onPage = jest.fn();
+      const result = await getSocios({ onPage });
+
+      expect(onPage).toHaveBeenCalledTimes(2);
+      expect(onPage).toHaveBeenNthCalledWith(1, expect.arrayContaining(pagina1));
+      expect(onPage.mock.calls[0][0]).toHaveLength(100);
+      expect(onPage).toHaveBeenNthCalledWith(2, expect.arrayContaining([...pagina1, ...pagina2]));
+      expect(result).toHaveLength(130);
+    });
+
+    test('llamados concurrentes comparten la misma secuencia de páginas en vez de duplicar pedidos', async () => {
+      const pagina1 = Array.from({ length: 100 }, (_, i) => ({ id: `${i}` }));
+      const pagina2 = Array.from({ length: 30 }, (_, i) => ({ id: `${100 + i}` }));
+      let resolverPagina1;
+      fetchTo
+        .mockImplementationOnce(() => new Promise((resolve) => { resolverPagina1 = resolve; }))
+        .mockResolvedValueOnce({ ok: true, status: 200, json: async () => ({ socios: pagina2, total: 130 }) });
+
+      const onPageA = jest.fn();
+      const onPageB = jest.fn();
+      const promiseA = getSocios({ onPage: onPageA });
+      const promiseB = getSocios({ onPage: onPageB });
+
+      resolverPagina1({ ok: true, status: 200, json: async () => ({ socios: pagina1, total: 130 }) });
+      const [resultA, resultB] = await Promise.all([promiseA, promiseB]);
+
+      // Un solo request por página, sin importar que dos llamadores lo hayan pedido "al mismo tiempo".
+      expect(fetchTo).toHaveBeenCalledTimes(2);
+      expect(resultA).toHaveLength(130);
+      expect(resultB).toBe(resultA);
+      expect(onPageA).toHaveBeenCalledTimes(2);
+      expect(onPageB).toHaveBeenCalledTimes(2);
+    });
+
     test('lanza servicio-no-disponible en 500', async () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
       await expect(getSocios()).rejects.toThrow('servicio-no-disponible');

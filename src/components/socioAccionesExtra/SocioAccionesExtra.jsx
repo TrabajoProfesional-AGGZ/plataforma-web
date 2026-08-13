@@ -4,17 +4,20 @@ import { usePermiso } from '../../hooks/usePermiso';
 import { SocioDisciplinasModal } from '../socioDisciplinasModal/SocioDisciplinasModal';
 import { SocioReservasModal } from '../socioReservasModal/SocioReservasModal';
 import { SocioTramitesModal } from '../socioTramitesModal/SocioTramitesModal';
+import { SocioPagosPendientesModal } from '../socioPagosPendientesModal/SocioPagosPendientesModal';
 import './SocioAccionesExtra.css';
 
 function SocioAccionesExtra({ idSocio, nroSocio, nombreSocio }) {
   const puedeVerDisciplinas = usePermiso('ver_disciplinas');
   const puedeVerReservas = usePermiso('ver_reservas');
   const puedeVerTramites = usePermiso('ver_tramites');
+  const puedeVerPagosPendientes = usePermiso('ver_pagos_pendientes');
   const [disciplinasOpen, setDisciplinasOpen] = useState(false);
   const [reservasOpen, setReservasOpen] = useState(false);
   const [tramitesOpen, setTramitesOpen] = useState(false);
+  const [pagosPendientesOpen, setPagosPendientesOpen] = useState(false);
 
-  if (!puedeVerDisciplinas && !puedeVerReservas && !puedeVerTramites) return null;
+  if (!puedeVerDisciplinas && !puedeVerReservas && !puedeVerTramites && !puedeVerPagosPendientes) return null;
 
   return (
     <>
@@ -46,6 +49,15 @@ function SocioAccionesExtra({ idSocio, nroSocio, nombreSocio }) {
             Ver trámites
           </button>
         )}
+        {puedeVerPagosPendientes && (
+          <button
+            type="button"
+            className="socio-acciones-btn"
+            onClick={() => setPagosPendientesOpen(true)}
+          >
+            Pagos pendientes
+          </button>
+        )}
       </div>
 
       {disciplinasOpen && (
@@ -67,6 +79,13 @@ function SocioAccionesExtra({ idSocio, nroSocio, nombreSocio }) {
         <SocioTramitesModal
           idSocio={idSocio}
           onClose={() => setTramitesOpen(false)}
+        />
+      )}
+
+      {pagosPendientesOpen && (
+        <SocioPagosPendientesModal
+          idSocio={idSocio}
+          onClose={() => setPagosPendientesOpen(false)}
         />
       )}
     </>

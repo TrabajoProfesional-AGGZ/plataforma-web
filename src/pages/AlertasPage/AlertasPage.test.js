@@ -201,4 +201,51 @@ describe('AlertasPage', () => {
     expect(borrarAlerta).toHaveBeenCalledWith('a-1');
     expect(screen.getByRole('alert')).toHaveTextContent('No se pudo eliminar la alerta.');
   });
+
+  // --- Paginación y orden ---
+
+  function crearAlertas(cantidad) {
+    return Array.from({ length: cantidad }, (_, i) => ({
+      id: `a-${i + 1}`,
+      mensaje: `Mensaje${String(i + 1).padStart(2, '0')}`,
+      filtro_categoria: null,
+      filtro_estado: null,
+      cantidad_destinatarios: 5,
+      creado_en: `2026-01-${String(i + 1).padStart(2, '0')}T12:00:00Z`,
+    }));
+  }
+
+  test('no muestra controles de paginación cuando hay 10 alertas o menos', async () => {
+    getAlertas.mockResolvedValue(crearAlertas(10));
+    await renderPage();
+    expect(screen.queryByLabelText(/paginación/i)).not.toBeInTheDocument();
+  });
+
+  test('muestra como máximo 10 filas por página y permite avanzar/retroceder', async () => {
+    getAlertas.mockResolvedValue(crearAlertas(15));
+    await renderPage();
+
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument();
+    // La más nueva (Mensaje15, creada el 2026-01-15) va primero.
+    expect(screen.getByText('Mensaje15')).toBeInTheDocument();
+    expect(screen.queryByText('Mensaje05')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /página siguiente/i }));
+
+    expect(screen.getByText('Página 2 de 2')).toBeInTheDocument();
+    expect(screen.getByText('Mensaje05')).toBeInTheDocument();
+    expect(screen.queryByText('Mensaje15')).not.toBeInTheDocument();
+  });
+
+  test('la tabla está ordenada por fecha de creación, la más nueva primero', async () => {
+    getAlertas.mockResolvedValue([
+      { id: 'a', mensaje: 'Vieja', filtro_categoria: null, filtro_estado: null, cantidad_destinatarios: 1, creado_en: '2026-01-01T00:00:00Z' },
+      { id: 'b', mensaje: 'Nueva', filtro_categoria: null, filtro_estado: null, cantidad_destinatarios: 1, creado_en: '2026-06-01T00:00:00Z' },
+      { id: 'c', mensaje: 'Media', filtro_categoria: null, filtro_estado: null, cantidad_destinatarios: 1, creado_en: '2026-03-01T00:00:00Z' },
+    ]);
+    await renderPage();
+
+    const mensajes = screen.getAllByRole('row').slice(1).map((fila) => fila.querySelector('td').textContent);
+    expect(mensajes).toEqual(['Nueva', 'Media', 'Vieja']);
+  });
 });

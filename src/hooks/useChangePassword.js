@@ -30,6 +30,10 @@ export function useChangePassword() {
       navigate('/', { state: { passwordChanged: true } });
     } catch {
       setError('Contraseña actual incorrecta o error al cambiar contraseña');
+    } finally {
+      setActual('');
+      setNueva('');
+      setConfirmar('');
       setLoading(false);
     }
   }

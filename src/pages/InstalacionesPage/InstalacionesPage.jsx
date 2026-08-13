@@ -8,10 +8,12 @@ import { getInstalaciones, createInstalacion, deleteInstalacion } from '../../se
 import { getReservasPorInstalacion, getReservasPorSocio, deleteReserva, getReservasHistoricasPorInstalacion } from '../../services/reservasService';
 import { getSocios } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
+import { usePaginacion } from '../../hooks/usePaginacion';
 import { VerSocioModal } from '../../components/verSocioModal/VerSocioModal';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
+import { Paginacion } from '../../components/paginacion/Paginacion';
 import { handleActivateKey } from '../../utils/a11y';
 import { useTheme } from '../../hooks/useTheme';
 import './InstalacionesPage.css';
@@ -85,11 +87,13 @@ function InstalacionesPage() {
     })));
     setReservasBusqueda(null);
     setFiltroNroSocio('');
+    resetPaginaReservas();
   }
 
   async function buscarPorSocio(nroSocio) {
     if (!nroSocio.trim()) {
       setReservasBusqueda(null);
+      resetPaginaReservas();
       return;
     }
     const todas = await getReservasPorSocio(nroSocio.trim());
@@ -100,6 +104,7 @@ function InstalacionesPage() {
       ...r,
       socios: (r.socios ?? []).map((s) => socioMap[s.id] ?? s),
     })));
+    resetPaginaReservas();
   }
 
   useEffect(() => {
@@ -156,6 +161,19 @@ function InstalacionesPage() {
   const instalacionesFiltradas = filtroTipo
     ? instalaciones.filter((i) => i.tipo === filtroTipo)
     : instalaciones;
+  const instalacionesOrdenadas = [...instalacionesFiltradas].sort((a, b) => a.nombre.localeCompare(b.nombre));
+  const {
+    pagina: paginaInstalaciones,
+    totalPaginas: totalPaginasInstalaciones,
+    listaPaginada: instalacionesPaginadas,
+    irAPagina: irAPaginaInstalaciones,
+    resetPagina: resetPaginaInstalaciones,
+  } = usePaginacion(instalacionesOrdenadas, 10);
+
+  useEffect(() => {
+    resetPaginaInstalaciones();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filtroTipo, instalaciones]);
 
   // === Reservas (en detalle de instalación) ===
 
@@ -169,6 +187,19 @@ function InstalacionesPage() {
   const reservasHistoricasFiltradas = filtroNroSocio.trim()
     ? reservasHistoricas.filter((r) => r.socios?.some((s) => String(s.nro_socio) === filtroNroSocio.trim()))
     : reservasHistoricas;
+
+  const reservasVisiblesActuales = vistaReservas === 'activas' ? reservasFiltradas : reservasHistoricasFiltradas;
+  const reservasOrdenadasActuales = [...reservasVisiblesActuales].sort((a, b) =>
+    (a.fecha_reserva ?? a.fecha ?? '').localeCompare(b.fecha_reserva ?? b.fecha ?? '') ||
+    (a.hora_inicio ?? '').localeCompare(b.hora_inicio ?? '')
+  );
+  const {
+    pagina: paginaReservas,
+    totalPaginas: totalPaginasReservas,
+    listaPaginada: reservasPaginadas,
+    irAPagina: irAPaginaReservas,
+    resetPagina: resetPaginaReservas,
+  } = usePaginacion(reservasOrdenadasActuales, 10);
 
   function abrirEliminarReserva(reserva) {
     setReservaActual(reserva);
@@ -203,6 +234,7 @@ function InstalacionesPage() {
       ...r,
       socios: (r.socios ?? []).map((s) => socioMap[s.id] ?? s),
     })));
+    resetPaginaReservas();
   }
 
   function abrirVerSocio(socio) {
@@ -243,7 +275,7 @@ function InstalacionesPage() {
             </tr>
           </thead>
           <tbody>
-            {instalacionesFiltradas.map((inst) => {
+            {instalacionesPaginadas.map((inst) => {
               const verDetalle = () => { setInstalacionActual(inst); setVista('detalle'); };
               return (
               <tr
@@ -269,6 +301,11 @@ function InstalacionesPage() {
             })}
           </tbody>
         </table>
+        <Paginacion
+          pagina={paginaInstalaciones}
+          totalPaginas={totalPaginasInstalaciones}
+          onCambiarPagina={irAPaginaInstalaciones}
+        />
       </div>
     );
   };
@@ -283,11 +320,6 @@ function InstalacionesPage() {
         />
       );
     }
-
-    const reservasOrdenadas = [...datos].sort((a, b) =>
-      (a.fecha_reserva ?? a.fecha ?? '').localeCompare(b.fecha_reserva ?? b.fecha ?? '') ||
-      (a.hora_inicio ?? '').localeCompare(b.hora_inicio ?? '')
-    );
 
     return (
       <div className="instalaciones-table-wrapper">
@@ -304,7 +336,7 @@ function InstalacionesPage() {
             </tr>
           </thead>
           <tbody>
-            {reservasOrdenadas.map((r) => (
+            {reservasPaginadas.map((r) => (
               <tr key={r.id}>
                 <td>{r.id}</td>
                 <td>
@@ -343,6 +375,11 @@ function InstalacionesPage() {
             ))}
           </tbody>
         </table>
+        <Paginacion
+          pagina={paginaReservas}
+          totalPaginas={totalPaginasReservas}
+          onCambiarPagina={irAPaginaReservas}
+        />
       </div>
     );
   };
@@ -411,7 +448,7 @@ function InstalacionesPage() {
                 { label: 'Capacidad máxima', value: `${instalacionActual.capacidad_maxima} personas` },
                 { label: 'Valor por turno', value: `$${instalacionActual.valor_turno}/turno` },
                 { label: 'Duración del turno', value: `${instalacionActual.duracion_turno} minutos` },
-                { label: 'Cancelación', value: `Hasta ${instalacionActual.tiempo_minimo_cancelacion} minutos antes del turno`},
+                { label: 'Cancelación', value: `Hasta ${instalacionActual.tiempo_minimo_cancelacion ?? 60} minutos antes del turno`},
                 {
                   label: 'Estado',
                   value: instalacionActual.activa ? 'Activa' : 'Inactiva',
@@ -453,7 +490,7 @@ function InstalacionesPage() {
                     type="date"
                     className="instalaciones-filtro-fecha"
                     value={filtroFecha}
-                    onChange={(e) => setFiltroFecha(e.target.value)}
+                    onChange={(e) => { setFiltroFecha(e.target.value); resetPaginaReservas(); }}
                     aria-label="Filtrar por fecha"
                   />
                 )}
@@ -468,6 +505,7 @@ function InstalacionesPage() {
                       const val = e.target.value;
                       setFiltroNroSocio(val);
                       if (!val.trim()) setReservasBusqueda(null);
+                      resetPaginaReservas();
                     }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter' && vistaReservas === 'activas') {
@@ -521,6 +559,7 @@ function InstalacionesPage() {
                           setFiltroNroSocio('');
                           setReservasBusqueda(null);
                           setVistaReservas('activas');
+                          resetPaginaReservas();
                         }}
                       >
                         Ver reservas activas

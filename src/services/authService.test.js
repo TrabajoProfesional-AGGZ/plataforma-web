@@ -1,4 +1,5 @@
 import { login, logout, changePassword } from './authService';
+import { auth } from '../firebase';
 import {
   signInWithEmailAndPassword,
   signOut,
@@ -120,6 +121,36 @@ describe('authService', () => {
         'auth/wrong-password'
       );
       expect(updatePassword).not.toHaveBeenCalled();
+    });
+
+    test('rechaza sin llamar a Firebase si no hay usuario autenticado', async () => {
+      const currentUserOriginal = auth.currentUser;
+      auth.currentUser = null;
+
+      try {
+        await expect(changePassword('actual123', 'nueva456')).rejects.toThrow(
+          'no-authenticated-user'
+        );
+        expect(EmailAuthProvider.credential).not.toHaveBeenCalled();
+        expect(reauthenticateWithCredential).not.toHaveBeenCalled();
+      } finally {
+        auth.currentUser = currentUserOriginal;
+      }
+    });
+
+    test('rechaza sin llamar a Firebase si el usuario autenticado no tiene email', async () => {
+      const currentUserOriginal = auth.currentUser;
+      auth.currentUser = { email: null };
+
+      try {
+        await expect(changePassword('actual123', 'nueva456')).rejects.toThrow(
+          'no-authenticated-user'
+        );
+        expect(EmailAuthProvider.credential).not.toHaveBeenCalled();
+        expect(reauthenticateWithCredential).not.toHaveBeenCalled();
+      } finally {
+        auth.currentUser = currentUserOriginal;
+      }
     });
   });
 });

@@ -1,11 +1,49 @@
 import { fetchTo } from '../utils/utils';
 
-export async function getSocios() {
-  const res = await fetchTo('/api/v1/socios?pagina=1&limite=100', 'GET');
-  if (res.status >= 500) throw new Error('servicio-no-disponible');
-  if (!res.ok) throw new Error('Error al obtener socios');
-  const data = await res.json();
-  return data.socios ?? data;
+// Fetch de socios en curso, compartido entre llamadores concurrentes (ver getSocios).
+let sociosEnCurso = null;
+
+async function fetchTodasLasPaginasDeSocios(listeners) {
+  const limite = 100;
+  let pagina = 1;
+  let socios = [];
+  while (true) {
+    const res = await fetchTo(`/api/v1/socios?pagina=${pagina}&limite=${limite}`, 'GET');
+    if (res.status >= 500) throw new Error('servicio-no-disponible');
+    if (!res.ok) throw new Error('Error al obtener socios');
+    const data = await res.json();
+    const socioPagina = data.socios ?? data;
+    if (!Array.isArray(socioPagina)) return socioPagina;
+    socios = socios.concat(socioPagina);
+    for (const onPage of listeners) onPage(socios);
+    if (socioPagina.length < limite) break;
+    pagina++;
+  }
+  return socios;
+}
+
+/**
+ * Trae todos los socios, paginando contra el backend (tope de 100 por página).
+ * `onPage(sociosHastaAhora)` se invoca luego de cada página, para poder renderizar
+ * la primera página ya mientras el resto se sigue trayendo en segundo plano.
+ *
+ * Si ya hay una secuencia de páginas en curso (ej. React StrictMode invoca el mismo
+ * efecto dos veces en desarrollo), los llamadores concurrentes se enganchan a esa
+ * misma secuencia en vez de disparar cada uno la suya — así el backend nunca recibe
+ * más de un pedido de página a la vez, sin importar cuántos componentes lo pidan.
+ */
+export async function getSocios({ onPage } = {}) {
+  if (sociosEnCurso) {
+    if (onPage) sociosEnCurso.listeners.add(onPage);
+    return sociosEnCurso.promise;
+  }
+
+  const listeners = new Set(onPage ? [onPage] : []);
+  const promise = fetchTodasLasPaginasDeSocios(listeners).finally(() => {
+    sociosEnCurso = null;
+  });
+  sociosEnCurso = { promise, listeners };
+  return promise;
 }
 
 export async function createSocio(data) {

@@ -16,13 +16,13 @@ export async function createDisciplina(data) {
 }
 
 export async function pausarDisciplina(id) {
-  const res = await fetchTo(`/api/v1/disciplinas/${id}`, 'DELETE');
+  const res = await fetchTo(`/api/v1/disciplinas/${encodeURIComponent(id)}`, 'DELETE');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al pausar disciplina');
 }
 
 export async function getSociosByDisciplina(idDisciplina) {
-  const res = await fetchTo(`/api/v1/socios/por-disciplina/${idDisciplina}`, 'GET');
+  const res = await fetchTo(`/api/v1/socios/por-disciplina/${encodeURIComponent(idDisciplina)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al obtener socios de la disciplina');
   const data = await res.json();
@@ -30,7 +30,7 @@ export async function getSociosByDisciplina(idDisciplina) {
 }
 
 export async function getDisciplinasBySocio(idSocio) {
-  const res = await fetchTo(`/api/v1/disciplinas/por-socio/${idSocio}`, 'GET');
+  const res = await fetchTo(`/api/v1/disciplinas/por-socio/${encodeURIComponent(idSocio)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al obtener disciplinas del socio');
   const data = await res.json();
@@ -38,7 +38,7 @@ export async function getDisciplinasBySocio(idSocio) {
 }
 
 export async function inscribirSocioADisciplina(idDisciplina, idSocio) {
-  const res = await fetchTo(`/api/v1/disciplinas/${idDisciplina}/socios/${idSocio}`, 'POST');
+  const res = await fetchTo(`/api/v1/disciplinas/${encodeURIComponent(idDisciplina)}/socios/${encodeURIComponent(idSocio)}`, 'POST');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (res.status === 409) throw new Error('ya-inscripto');
   if (!res.ok) throw new Error('Error al inscribir al socio en la disciplina');
@@ -46,14 +46,14 @@ export async function inscribirSocioADisciplina(idDisciplina, idSocio) {
 }
 
 export async function extenderSuscripcionDisciplina(idDisciplina, idSocio) {
-  const res = await fetchTo(`/api/v1/disciplinas/${idDisciplina}/socios/${idSocio}/extender`, 'PATCH');
+  const res = await fetchTo(`/api/v1/disciplinas/${encodeURIComponent(idDisciplina)}/socios/${encodeURIComponent(idSocio)}/extender`, 'PATCH');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al extender la suscripción');
   return res.json();
 }
 
 export async function resolverListaEspera(idDisciplina, idSocio, accion) {
-  const res = await fetchTo(`/api/v1/disciplinas/${idDisciplina}/socios/${idSocio}/lista-espera`, 'PATCH', { accion });
+  const res = await fetchTo(`/api/v1/disciplinas/${encodeURIComponent(idDisciplina)}/socios/${encodeURIComponent(idSocio)}/lista-espera`, 'PATCH', { accion });
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (res.status === 404) throw new Error('no-en-espera');
   if (!res.ok) throw new Error('Error al resolver la lista de espera');

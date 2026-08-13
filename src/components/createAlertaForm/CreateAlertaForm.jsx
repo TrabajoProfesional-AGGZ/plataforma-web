@@ -147,9 +147,10 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
           </>
         ) : (
           <>
-            <Field label="Buscar socio" icon={Hash} error={errorBusqueda}>
+            <Field id="alerta-buscar-socio" label="Buscar socio" icon={Hash} error={errorBusqueda}>
               <div className="csf-socio-input-row">
                 <StyledInput
+                  id="alerta-buscar-socio"
                   type="text"
                   placeholder="N° de socio, email o ID"
                   value={busquedaInput}

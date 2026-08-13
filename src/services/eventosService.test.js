@@ -1,4 +1,4 @@
-import { getEventos, subirImagenEvento, createEvento } from './eventosService';
+import { getEventos, getEventosHistoricos, subirImagenEvento, createEvento } from './eventosService';
 
 jest.mock('../utils/utils', () => ({ fetchTo: jest.fn() }));
 import { fetchTo } from '../utils/utils';
@@ -37,6 +37,25 @@ describe('eventosService', () => {
     test('lanza error genérico cuando la respuesta no es ok', async () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
       await expect(getEventos()).rejects.toThrow('Error al obtener eventos');
+    });
+  });
+
+  describe('getEventosHistoricos', () => {
+    test('llama al endpoint /api/v1/eventos/historicos con GET', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: true, status: 200, json: async () => [EVENTO_MOCK] });
+      const result = await getEventosHistoricos();
+      expect(fetchTo).toHaveBeenCalledWith('/api/v1/eventos/historicos', 'GET');
+      expect(result).toHaveLength(1);
+    });
+
+    test('lanza servicio-no-disponible en 500', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 500 });
+      await expect(getEventosHistoricos()).rejects.toThrow('servicio-no-disponible');
+    });
+
+    test('lanza error genérico cuando la respuesta no es ok', async () => {
+      fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
+      await expect(getEventosHistoricos()).rejects.toThrow('Error al obtener eventos históricos');
     });
   });
 

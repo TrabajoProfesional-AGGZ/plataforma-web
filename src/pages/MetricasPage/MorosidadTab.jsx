@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { getDashboardFidelizacion } from '../../services/fidelizacionService';
 import { useListState } from '../../hooks/useListState';
+import { usePaginacion } from '../../hooks/usePaginacion';
+import { Paginacion } from '../../components/paginacion/Paginacion';
 import { TendenciasPagoChart } from '../../components/charts/TendenciasPagoChart';
 import { riesgoConfig } from '../../utils/riesgoConfig';
 import { useTheme } from '../../hooks/useTheme';
@@ -32,6 +34,17 @@ function MorosidadTab() {
   const [mesDesde, setMesDesde] = useState('');
   const [mesHasta, setMesHasta] = useState('');
 
+  const prediccionOrdenada = [...(datos?.prediccion_morosidad ?? [])].sort(
+    (a, b) => b.probabilidad_atraso - a.probabilidad_atraso
+  );
+  const {
+    pagina: paginaPrediccion,
+    totalPaginas: totalPaginasPrediccion,
+    listaPaginada: prediccionPaginada,
+    irAPagina: irAPaginaPrediccion,
+    resetPagina: resetPaginaPrediccion,
+  } = usePaginacion(prediccionOrdenada, 10);
+
   useEffect(() => {
     let cancelled = false;
 
@@ -42,6 +55,7 @@ function MorosidadTab() {
       .then((data) => {
         if (cancelled) return;
         setDatos(data);
+        resetPaginaPrediccion();
         const meses = (data.tendencias_pago ?? []).map((t) => t.mes);
         setMesDesde(meses[0] ?? '');
         setMesHasta(meses[meses.length - 1] ?? '');
@@ -73,10 +87,6 @@ function MorosidadTab() {
     const idx = mesesDisponibles.indexOf(t.mes);
     return idx >= idxDesde && idx <= idxHasta;
   });
-
-  const prediccionOrdenada = [...(datos?.prediccion_morosidad ?? [])].sort(
-    (a, b) => b.probabilidad_atraso - a.probabilidad_atraso
-  );
 
   if (loading) {
     return (
@@ -116,7 +126,7 @@ function MorosidadTab() {
                 </tr>
               </thead>
               <tbody>
-                {prediccionOrdenada.map((p) => {
+                {prediccionPaginada.map((p) => {
                   const { bg, border } = riesgoConfig(p.nivel_riesgo);
                   return (
                     <tr key={p.socio_id}>
@@ -136,6 +146,11 @@ function MorosidadTab() {
                 })}
               </tbody>
             </table>
+            <Paginacion
+              pagina={paginaPrediccion}
+              totalPaginas={totalPaginasPrediccion}
+              onCambiarPagina={irAPaginaPrediccion}
+            />
           </div>
         )}
       </div>

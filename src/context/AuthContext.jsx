@@ -4,7 +4,7 @@ import { auth } from '../firebase';
 
 const AuthContext = createContext(null);
 
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '';
 
 async function fetchLoginData(currentUser) {
   const idToken = await currentUser.getIdToken();
@@ -41,7 +41,7 @@ export function AuthProvider({ children }) {
             apellido: data.apellido,
             email: data.email,
           });
-          setTimeout(() => setLoading(false), 1500);
+          setLoading(false);
         } catch {
           // Usuario autenticado en Firebase pero sin acceso en el sistema
           await signOut(auth);
@@ -51,7 +51,7 @@ export function AuthProvider({ children }) {
         setRole(null);
         setPermisos([]);
         setUserData(null);
-        setTimeout(() => setLoading(false), 1500);
+        setLoading(false);
       }
     });
     return unsubscribe;

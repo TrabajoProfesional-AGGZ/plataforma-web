@@ -17,21 +17,21 @@ export async function crearUsuario(datos) {
 }
 
 export async function editarUsuario(id, datos) {
-  const res = await fetchTo(`/api/v1/usuarios/${id}`, 'PATCH', datos);
+  const res = await fetchTo(`/api/v1/usuarios/${encodeURIComponent(id)}`, 'PATCH', datos);
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al modificar usuario');
   return res.json();
 }
 
 export async function cambiarRolUsuario(id, rol) {
-  const res = await fetchTo(`/api/v1/auth/usuarios/${id}/rol`, 'PATCH', { rol });
+  const res = await fetchTo(`/api/v1/auth/usuarios/${encodeURIComponent(id)}/rol`, 'PATCH', { rol });
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al cambiar rol');
   return res.json();
 }
 
 export async function eliminarUsuario(id) {
-  const res = await fetchTo(`/api/v1/usuarios/${id}`, 'DELETE');
+  const res = await fetchTo(`/api/v1/usuarios/${encodeURIComponent(id)}`, 'DELETE');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al eliminar usuario');
 }

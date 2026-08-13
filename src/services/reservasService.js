@@ -8,17 +8,12 @@ async function fetchReservas(url, errorMsg = 'Error al obtener reservas') {
   return data.reservas ?? data;
 }
 
-export async function getReservas(instalacionId) {
-  const res = await fetchTo('/api/v1/reservas', 'GET');
-  if (res.status >= 500) throw new Error('servicio-no-disponible');
-  if (!res.ok) throw new Error('Error al obtener reservas');
-  const data = await res.json();
-  const todas = data.reservas ?? data;
-  return todas.filter((r) => (r.id_instalacion ?? r.instalacion_id) === instalacionId);
-}
-
 export async function getReservasPorInstalacion(instalacionId) {
   return fetchReservas(`/api/v1/reservas/por-instalacion/${encodeURIComponent(instalacionId)}`);
+}
+
+export async function getReservas(instalacionId) {
+  return getReservasPorInstalacion(instalacionId);
 }
 
 export async function getReservasPorSocio(nroSocio) {
@@ -28,7 +23,17 @@ export async function getReservasPorSocio(nroSocio) {
 export async function createReserva(data) {
   const res = await fetchTo('/api/v1/reservas', 'POST', data);
   if (res.status >= 500) throw new Error('servicio-no-disponible');
-  if (res.status === 409) throw new Error('superposicion');
+  if (res.status === 409) {
+    const body = await res.json?.().catch(() => null);
+    const tipo = body?.detail?.tipo;
+    if (tipo === 'sin_cupo') {
+      const error = new Error('sin-cupo');
+      error.cuposDisponibles = body?.detail?.cupos_disponibles ?? null;
+      throw error;
+    }
+    if (tipo === 'conflicto_temporal') throw new Error('conflicto-temporal');
+    throw new Error('superposicion');
+  }
   if (res.status === 403) {
     const body = await res.json().catch(() => null);
     const tipo = body?.detail?.tipo;

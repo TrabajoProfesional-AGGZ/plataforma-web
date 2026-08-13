@@ -16,7 +16,7 @@ export async function createInstalacion(data) {
 }
 
 export async function deleteInstalacion(id) {
-  const res = await fetchTo(`/api/v1/instalaciones/${id}`, 'DELETE');
+  const res = await fetchTo(`/api/v1/instalaciones/${encodeURIComponent(id)}`, 'DELETE');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al eliminar instalación');
 }

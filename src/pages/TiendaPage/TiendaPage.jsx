@@ -3,6 +3,7 @@ import { Plus, ChevronLeft, PackageSearch } from 'lucide-react';
 import { getProductos, getProducto } from '../../services/productosService';
 import { CreateProductoForm } from '../../components/createProductoForm/CreateProductoForm';
 import { EditProductoForm } from '../../components/editProductoForm/EditProductoForm';
+import { CrearCompraForm } from '../../components/crearCompraForm/CrearCompraForm';
 import { createProducto } from '../../services/productosService';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
@@ -10,6 +11,9 @@ import EmptyState from '../../components/feedback/EmptyState';
 import { urlImagenSegura } from '../../utils/utils';
 import { handleActivateKey } from '../../utils/a11y';
 import { useTheme } from '../../hooks/useTheme';
+import { usePermiso } from '../../hooks/usePermiso';
+import { usePaginacion } from '../../hooks/usePaginacion';
+import { Paginacion } from '../../components/paginacion/Paginacion';
 import './TiendaPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
@@ -23,6 +27,7 @@ function mensajeError(err, fallback) {
 
 function TiendaPage() {
   const { logoSocio: logo } = useTheme();
+  const puedeCrearCompra = usePermiso('crear_compra');
 
   const [vista, setVista] = useState('lista');
   const [productos, setProductos] = useState([]);
@@ -33,14 +38,24 @@ function TiendaPage() {
   const [errorDetalle, setErrorDetalle] = useState('');
   const [crearOpen, setCrearOpen] = useState(false);
   const [editarOpen, setEditarOpen] = useState(false);
+  const [crearCompraOpen, setCrearCompraOpen] = useState(false);
+  const [ordenTienda, setOrdenTienda] = useState('nombre_asc');
 
   const imagenSegura = urlImagenSegura(productoActual?.imagen_url);
+
+  const productosOrdenados = [...productos].sort((a, b) => {
+    if (ordenTienda === 'precio_asc') return Number(a.precio) - Number(b.precio);
+    if (ordenTienda === 'precio_desc') return Number(b.precio) - Number(a.precio);
+    return a.nombre.localeCompare(b.nombre);
+  });
+  const { pagina, totalPaginas, listaPaginada, irAPagina, resetPagina } = usePaginacion(productosOrdenados, 10);
 
   async function cargarProductos() {
     setLoading(true);
     setError('');
     try {
       setProductos(await getProductos());
+      resetPagina();
     } catch (err) {
       setError(mensajeError(err, 'No se pudieron cargar los productos.'));
     } finally {
@@ -48,7 +63,15 @@ function TiendaPage() {
     }
   }
 
-  useEffect(() => { cargarProductos(); }, []);
+  function handleCambiarOrden(e) {
+    setOrdenTienda(e.target.value);
+    resetPagina();
+  }
+
+  useEffect(() => {
+    cargarProductos();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function handleClickFila(p) {
     setLoadingDetalle(true);
@@ -86,6 +109,21 @@ function TiendaPage() {
     setEditarOpen(false);
   }
 
+  async function handleCompraCreada() {
+    setCrearCompraOpen(false);
+    // Refresca el detalle en vez de decrementar client-side, para no
+    // desincronizar con el descuento de stock real hecho en el backend.
+    try {
+      const actualizado = await getProducto(productoActual.id);
+      setProductoActual(actualizado);
+      setProductos((prev) =>
+        prev.map((p) => (p.id === actualizado.id ? { ...p, ...actualizado } : p))
+      );
+    } catch (err) {
+      setErrorDetalle(mensajeError(err, 'No se pudo actualizar el stock del producto.'));
+    }
+  }
+
   function renderLista() {
     if (loading) {
       return (
@@ -112,7 +150,7 @@ function TiendaPage() {
             </tr>
           </thead>
           <tbody>
-            {productos.map((p) => (
+            {listaPaginada.map((p) => (
               <tr
                 key={p.id}
                 className="disciplinas-tr-clickable"
@@ -123,8 +161,13 @@ function TiendaPage() {
                 onKeyDown={handleActivateKey(() => handleClickFila(p))}
               >
                 <td className="tienda-td-producto">
-                  {p.imagen_url && (
-                    <img src={p.imagen_url} alt="" className="tienda-thumb" referrerPolicy="no-referrer" />
+                  {urlImagenSegura(p.imagen_url) && (
+                    <img
+                      src={urlImagenSegura(p.imagen_url)}
+                      alt=""
+                      className="tienda-thumb"
+                      referrerPolicy="no-referrer"
+                    />
                   )}
                   {p.nombre}
                 </td>
@@ -139,6 +182,7 @@ function TiendaPage() {
             ))}
           </tbody>
         </table>
+        <Paginacion pagina={pagina} totalPaginas={totalPaginas} onCambiarPagina={irAPagina} />
       </div>
     );
   }
@@ -149,7 +193,16 @@ function TiendaPage() {
         <>
           <h1 className="noticias-title">Tienda</h1>
           <div className="noticias-toolbar">
-            <div />
+            <select
+              className="tienda-orden-select"
+              value={ordenTienda}
+              onChange={handleCambiarOrden}
+              aria-label="Ordenar por"
+            >
+              <option value="nombre_asc">Nombre (A-Z)</option>
+              <option value="precio_asc">Precio: menor a mayor</option>
+              <option value="precio_desc">Precio: mayor a menor</option>
+            </select>
             <button className="noticias-btn-crear" onClick={() => setCrearOpen(true)}>
               <Plus size={15} aria-hidden="true" />
               Nuevo producto
@@ -235,6 +288,16 @@ function TiendaPage() {
                   >
                     Editar producto
                   </button>
+                  {puedeCrearCompra && (
+                    <button
+                      type="button"
+                      className="tienda-btn-editar"
+                      onClick={() => setCrearCompraOpen(true)}
+                      disabled={productoActual.stock <= 0}
+                    >
+                      Crear compra
+                    </button>
+                  )}
                 </div>
               </div>
             </article>
@@ -254,6 +317,14 @@ function TiendaPage() {
           producto={productoActual}
           onSuccess={handleEditarExito}
           onCancel={() => setEditarOpen(false)}
+        />
+      )}
+
+      {crearCompraOpen && productoActual && (
+        <CrearCompraForm
+          producto={productoActual}
+          onSuccess={handleCompraCreada}
+          onCancel={() => setCrearCompraOpen(false)}
         />
       )}
     </div>

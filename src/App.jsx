@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { MotionConfig } from 'framer-motion';
 import LoginPage from './pages/LoginPage/LoginPage';
 import DashboardPage from './pages/DashboardPage/DashboardPage';
@@ -80,6 +80,8 @@ function App() {
               <Route path="/tienda" element={<TiendaPage />} />
             </Route>
           </Route>
+
+          <Route path="*" element={<Navigate to="/dashboard" replace />} />
         </Routes>
       </BrowserRouter>
     </MotionConfig>

@@ -1,0 +1,43 @@
+.tienda-tab-loading {
+  display: flex;
+  justify-content: center;
+  padding: var(--space-12) 0;
+}
+
+.tienda-tab-error {
+  text-align: center;
+  color: var(--color-danger);
+  font-size: 14px;
+  background-color: var(--status-error-surface-bg);
+  border: 1px solid var(--status-error-surface-border);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+}
+
+.tienda-tab-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-md);
+  padding: var(--space-5);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+}
+
+.tienda-tab-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+  color: var(--color-text-primary);
+}
+
+.tienda-tab-card-header h2 {
+  font-size: 16px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.tienda-tab-monto {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--color-text-primary);
+}

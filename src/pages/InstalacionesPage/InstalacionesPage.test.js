@@ -496,6 +496,24 @@ describe('InstalacionesPage', () => {
     expect(screen.queryByRole('button', { name: 'Editar' })).not.toBeInTheDocument();
   });
 
+  test('muestra la tolerancia de cancelación por defecto (60 min) cuando tiempo_minimo_cancelacion es null', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-1', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1500, activa: true, tiempo_minimo_cancelacion: null },
+    ]);
+    await renderPage();
+    irAlDetalle();
+    expect(screen.getByText('Hasta 60 minutos antes del turno')).toBeInTheDocument();
+  });
+
+  test('muestra la tolerancia de cancelación personalizada cuando tiempo_minimo_cancelacion tiene un valor', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-1', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1500, activa: true, tiempo_minimo_cancelacion: 120 },
+    ]);
+    await renderPage();
+    irAlDetalle();
+    expect(screen.getByText('Hasta 120 minutos antes del turno')).toBeInTheDocument();
+  });
+
   test('filtra instalaciones por tipo al cambiar el selector', async () => {
     await renderPage();
     crearInstalacionHelper();
@@ -1009,5 +1027,116 @@ describe('InstalacionesPage', () => {
     });
 
     expect(screen.getByText('2026-09-01')).toBeInTheDocument();
+  });
+
+  // --- Paginación y orden ---
+
+  function crearInstalaciones(cantidad) {
+    return Array.from({ length: cantidad }, (_, i) => ({
+      id: `inst-${i + 1}`,
+      nombre: `Instalacion${String(i + 1).padStart(2, '0')}`,
+      tipo: 'Deportiva',
+      capacidad_maxima: 10,
+      valor_turno: 100,
+      activa: true,
+    }));
+  }
+
+  test('no muestra controles de paginación cuando hay 10 instalaciones o menos', async () => {
+    getInstalaciones.mockResolvedValue(crearInstalaciones(10));
+    await renderPage();
+    expect(screen.queryByLabelText(/paginación/i)).not.toBeInTheDocument();
+  });
+
+  test('muestra como máximo 10 filas por página y permite avanzar/retroceder', async () => {
+    getInstalaciones.mockResolvedValue(crearInstalaciones(15));
+    await renderPage();
+
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument();
+    expect(screen.getByText('Instalacion01')).toBeInTheDocument();
+    expect(screen.queryByText('Instalacion11')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /página siguiente/i }));
+
+    expect(screen.getByText('Página 2 de 2')).toBeInTheDocument();
+    expect(screen.getByText('Instalacion11')).toBeInTheDocument();
+    expect(screen.queryByText('Instalacion01')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /página anterior/i }));
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument();
+  });
+
+  test('la tabla está ordenada alfabéticamente por nombre', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'a', nombre: 'Zumba Salon', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 100, activa: true },
+      { id: 'b', nombre: 'Cancha de Fútbol', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 100, activa: true },
+      { id: 'c', nombre: 'Natatorio', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 100, activa: true },
+    ]);
+    await renderPage();
+
+    const nombres = screen
+      .getAllByRole('button', { name: /ver detalle de/i })
+      .map((fila) => fila.querySelector('td').textContent);
+    expect(nombres).toEqual(['Cancha de Fútbol', 'Natatorio', 'Zumba Salon']);
+  });
+
+  // --- Paginación y orden de reservas dentro del detalle de instalación ---
+
+  function crearReservas(cantidad) {
+    return Array.from({ length: cantidad }, (_, i) => ({
+      id: `r-${i + 1}`,
+      socios: [SOCIO_MOCK],
+      fecha_reserva: `2026-01-${String(i + 1).padStart(2, '0')}`,
+      hora_inicio: '10:00',
+      hora_fin: '11:00',
+    }));
+  }
+
+  test('no muestra controles de paginación de reservas cuando hay 10 o menos', async () => {
+    getReservasPorInstalacion.mockImplementation((instalacionId) =>
+      Promise.resolve(crearReservas(10).map((r) => ({ ...r, id_instalacion: instalacionId })))
+    );
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('2026-01-01')).toBeInTheDocument());
+    expect(screen.queryByLabelText(/paginación/i)).not.toBeInTheDocument();
+  });
+
+  test('pagina las reservas de a 10 y permite avanzar/retroceder', async () => {
+    getReservasPorInstalacion.mockImplementation((instalacionId) =>
+      Promise.resolve(crearReservas(15).map((r) => ({ ...r, id_instalacion: instalacionId })))
+    );
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getByText('Página 1 de 2')).toBeInTheDocument());
+    // La más cercana (2026-01-01) va primero.
+    expect(screen.getByText('2026-01-01')).toBeInTheDocument();
+    expect(screen.queryByText('2026-01-11')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /página siguiente/i }));
+
+    expect(screen.getByText('Página 2 de 2')).toBeInTheDocument();
+    expect(screen.getByText('2026-01-11')).toBeInTheDocument();
+    expect(screen.queryByText('2026-01-01')).not.toBeInTheDocument();
+  });
+
+  test('las reservas se ordenan por fecha y hora, la más cercana primero', async () => {
+    getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
+      { id: 'r-1', id_instalacion: instalacionId, socios: [SOCIO_MOCK], fecha_reserva: '2026-08-05', hora_inicio: '09:00', hora_fin: '10:00' },
+      { id: 'r-2', id_instalacion: instalacionId, socios: [SOCIO_MOCK], fecha_reserva: '2026-08-01', hora_inicio: '15:00', hora_fin: '16:00' },
+      { id: 'r-3', id_instalacion: instalacionId, socios: [SOCIO_MOCK], fecha_reserva: '2026-08-01', hora_inicio: '08:00', hora_fin: '09:00' },
+    ]));
+    await renderPage();
+    crearInstalacionHelper();
+    irAlDetalle();
+
+    await waitFor(() => expect(screen.getAllByText('1234').length).toBe(3));
+
+    const fechas = screen.getAllByRole('row').slice(1).map((fila) => fila.querySelectorAll('td')[2].textContent);
+    expect(fechas).toEqual(['2026-08-01', '2026-08-01', '2026-08-05']);
   });
 });

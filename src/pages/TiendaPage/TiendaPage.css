@@ -1,3 +1,20 @@
+/* ── Orden ────────────────────────────────────────────────────── */
+.tienda-orden-select {
+  margin-right: auto;
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  font-size: 13px;
+  color: var(--color-text-primary);
+  background-color: var(--color-surface);
+  outline: none;
+  cursor: pointer;
+}
+
+.tienda-orden-select:focus {
+  border-color: var(--color-border-strong);
+}
+
 /* Thumbnail en la tabla */
 .tienda-td-producto {
     display: flex;
@@ -176,6 +193,9 @@
   }
 
   .tienda-detalle-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: var(--space-3);
     margin-top: var(--space-8);
     padding-top: var(--space-6);
     border-top: 1px solid var(--color-border);

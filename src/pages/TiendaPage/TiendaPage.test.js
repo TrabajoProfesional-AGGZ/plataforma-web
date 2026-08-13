@@ -9,8 +9,9 @@ jest.mock('../../hooks/useTheme', () => ({
 jest.mock('../../firebase', () => ({ auth: {} }));
 
 jest.mock('../../hooks/usePermiso', () => ({
-  usePermiso: () => true,
+  usePermiso: jest.fn(),
 }));
+import { usePermiso } from '../../hooks/usePermiso';
 
 jest.mock('../../services/productosService', () => ({
   getProductos: jest.fn(),
@@ -49,6 +50,17 @@ jest.mock('../../components/editProductoForm/EditProductoForm', () => ({
   ),
 }));
 
+jest.mock('../../components/crearCompraForm/CrearCompraForm', () => ({
+  CrearCompraForm: ({ producto, onSuccess, onCancel }) => (
+    <div>
+      <h2>Crear compra</h2>
+      <span>{producto.nombre}</span>
+      <button onClick={onSuccess}>Confirmar compra</button>
+      <button onClick={onCancel}>Cancelar compra</button>
+    </div>
+  ),
+}));
+
 const PRODUCTOS = [
   { id: 'p-1', nombre: 'Remera oficial', precio: 15000, stock: 25, activo: true, imagen_url: null },
   { id: 'p-2', nombre: 'Gorra del club', precio: 8000, stock: 0, activo: false, imagen_url: null },
@@ -62,7 +74,10 @@ async function renderPage() {
 }
 
 describe('TiendaPage', () => {
-  beforeEach(() => { jest.clearAllMocks(); });
+  beforeEach(() => {
+    jest.clearAllMocks();
+    usePermiso.mockReturnValue(true);
+  });
 
   test('muestra la lista de productos', async () => {
     getProductos.mockResolvedValue(PRODUCTOS);
@@ -249,5 +264,121 @@ describe('TiendaPage', () => {
     fireEvent.click(screen.getByText('Cancelar edición'));
     expect(screen.queryByText('Confirmar edición')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Remera oficial' })).toBeInTheDocument();
+  });
+
+  test('el botón "Crear compra" solo se muestra con el permiso crear_compra', async () => {
+    usePermiso.mockReturnValue(false);
+    getProductos.mockResolvedValue(PRODUCTOS);
+    getProducto.mockResolvedValue(PRODUCTOS[0]);
+    await renderPage();
+    await act(async () => {
+      fireEvent.click(screen.getByText('Remera oficial'));
+    });
+    await screen.findByText('Editar producto');
+    expect(screen.queryByText('Crear compra')).not.toBeInTheDocument();
+  });
+
+  test('"Crear compra" abre el modal y al confirmar refresca el detalle', async () => {
+    getProductos.mockResolvedValue(PRODUCTOS);
+    getProducto
+      .mockResolvedValueOnce(PRODUCTOS[0])
+      .mockResolvedValueOnce({ ...PRODUCTOS[0], stock: 24 });
+    await renderPage();
+    fireEvent.click(screen.getByText('Remera oficial'));
+    await screen.findByText('Crear compra', { selector: 'button' });
+
+    fireEvent.click(screen.getByText('Crear compra', { selector: 'button' }));
+    expect(screen.getByRole('heading', { name: 'Crear compra' })).toBeInTheDocument();
+
+    fireEvent.click(screen.getByText('Confirmar compra'));
+
+    await waitFor(() => {
+      expect(getProducto).toHaveBeenCalledTimes(2);
+      expect(screen.queryByRole('heading', { name: 'Crear compra' })).not.toBeInTheDocument();
+      expect(screen.getByText('24 unidades disponibles')).toBeInTheDocument();
+    });
+  });
+
+  test('cancelar "Crear compra" cierra el modal sin refrescar el detalle', async () => {
+    getProductos.mockResolvedValue(PRODUCTOS);
+    getProducto.mockResolvedValue(PRODUCTOS[0]);
+    await renderPage();
+    fireEvent.click(screen.getByText('Remera oficial'));
+    await screen.findByText('Crear compra', { selector: 'button' });
+
+    fireEvent.click(screen.getByText('Crear compra', { selector: 'button' }));
+    fireEvent.click(screen.getByText('Cancelar compra'));
+
+    expect(screen.queryByRole('heading', { name: 'Crear compra' })).not.toBeInTheDocument();
+    expect(getProducto).toHaveBeenCalledTimes(1);
+  });
+
+  // --- Paginación y orden ---
+
+  function crearProductos(cantidad) {
+    return Array.from({ length: cantidad }, (_, i) => ({
+      id: `p-${i + 1}`,
+      nombre: `Producto${String(i + 1).padStart(2, '0')}`,
+      precio: (i + 1) * 100,
+      stock: 10,
+      activo: true,
+      imagen_url: null,
+    }));
+  }
+
+  test('no muestra controles de paginación cuando hay 10 productos o menos', async () => {
+    getProductos.mockResolvedValue(crearProductos(10));
+    await renderPage();
+    expect(screen.queryByLabelText(/paginación/i)).not.toBeInTheDocument();
+  });
+
+  test('muestra como máximo 10 filas por página y permite avanzar/retroceder', async () => {
+    getProductos.mockResolvedValue(crearProductos(15));
+    await renderPage();
+
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument();
+    expect(screen.getByText('Producto01')).toBeInTheDocument();
+    expect(screen.queryByText('Producto11')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /página siguiente/i }));
+
+    expect(screen.getByText('Página 2 de 2')).toBeInTheDocument();
+    expect(screen.getByText('Producto11')).toBeInTheDocument();
+    expect(screen.queryByText('Producto01')).not.toBeInTheDocument();
+  });
+
+  test('por defecto la tabla está ordenada alfabéticamente por nombre', async () => {
+    getProductos.mockResolvedValue([
+      { id: 'a', nombre: 'Zapatillas', precio: 100, stock: 1, activo: true, imagen_url: null },
+      { id: 'b', nombre: 'Buzo', precio: 200, stock: 1, activo: true, imagen_url: null },
+      { id: 'c', nombre: 'Medias', precio: 50, stock: 1, activo: true, imagen_url: null },
+    ]);
+    await renderPage();
+
+    const nombres = screen
+      .getAllByRole('button', { name: /ver detalle de/i })
+      .map((fila) => fila.querySelector('td').textContent);
+    expect(nombres).toEqual(['Buzo', 'Medias', 'Zapatillas']);
+  });
+
+  test('permite ordenar por precio ascendente y descendente', async () => {
+    getProductos.mockResolvedValue([
+      { id: 'a', nombre: 'Zapatillas', precio: 300, stock: 1, activo: true, imagen_url: null },
+      { id: 'b', nombre: 'Buzo', precio: 100, stock: 1, activo: true, imagen_url: null },
+      { id: 'c', nombre: 'Medias', precio: 200, stock: 1, activo: true, imagen_url: null },
+    ]);
+    await renderPage();
+
+    fireEvent.change(screen.getByLabelText('Ordenar por'), { target: { value: 'precio_asc' } });
+    let nombres = screen
+      .getAllByRole('button', { name: /ver detalle de/i })
+      .map((fila) => fila.querySelector('td').textContent);
+    expect(nombres).toEqual(['Buzo', 'Medias', 'Zapatillas']);
+
+    fireEvent.change(screen.getByLabelText('Ordenar por'), { target: { value: 'precio_desc' } });
+    nombres = screen
+      .getAllByRole('button', { name: /ver detalle de/i })
+      .map((fila) => fila.querySelector('td').textContent);
+    expect(nombres).toEqual(['Zapatillas', 'Medias', 'Buzo']);
   });
 });

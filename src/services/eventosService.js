@@ -7,6 +7,13 @@ export async function getEventos() {
   return res.json();
 }
 
+export async function getEventosHistoricos() {
+  const res = await fetchTo('/api/v1/eventos/historicos', 'GET');
+  if (res.status >= 500) throw new Error('servicio-no-disponible');
+  if (!res.ok) throw new Error('Error al obtener eventos históricos');
+  return res.json();
+}
+
 export async function subirImagenEvento(imagenBase64, tituloFoto) {
   const res = await fetchTo('/api/v1/eventos/imagen', 'POST', {
     imagen_base64: imagenBase64,

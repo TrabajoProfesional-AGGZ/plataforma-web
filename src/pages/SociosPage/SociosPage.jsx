@@ -10,11 +10,14 @@ import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
 import { useListState } from '../../hooks/useListState';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
+import { usePaginacion } from '../../hooks/usePaginacion';
 import { estadoConfig } from '../../utils/estadoConfig';
+import { urlImagenSegura } from '../../utils/utils';
 import { MAX_LEN } from '../../utils/formValidators';
 import { handleActivateKey } from '../../utils/a11y';
 import EmptyState from '../../components/feedback/EmptyState';
 import { SocioAccionesExtra } from '../../components/socioAccionesExtra/SocioAccionesExtra';
+import { Paginacion } from '../../components/paginacion/Paginacion';
 import { useTheme } from '../../hooks/useTheme';
 import './SociosPage.css';
 import '../../styles/ListPage.css';
@@ -22,9 +25,12 @@ import '../../styles/ListDetailShared.css';
 import '../../styles/SocioCard.css';
 import '../../styles/PageTableHeader.css';
 
+const ORDEN_INICIAL = { campo: 'nro_socio', dir: 'asc' };
+
 function getValorOrden(socio, campo) {
   const val = socio[campo];
   if (val && typeof val === 'object') return String(val.nombre ?? '').toLowerCase();
+  if (campo === 'nro_socio') return Number(val) || 0;
   return String(val ?? '').toLowerCase();
 }
 
@@ -49,7 +55,7 @@ function SociosPage() {
   const [modo, setModo] = useState('idle'); // idle | socio | lista | no-encontrado
   useBackToRoot(modo, 'lista', () => setModo('lista'));
   const { resultado, setResultado, loading, setLoading, error, setError } = useListState();
-  const { orden, setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden);
+  const { orden, setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden, ORDEN_INICIAL);
 
   const [filtroEstado, setFiltroEstado] = useState('');
   const [filtroAbierto, setFiltroAbierto] = useState(false);
@@ -74,7 +80,16 @@ function SociosPage() {
       setLoading(true);
       setError(null);
       try {
-        const socios = await getSocios();
+        const socios = await getSocios({
+          onPage: (parcial) => {
+            if (!cancelled) {
+              cacheSociosRef.current = parcial;
+              setResultado(parcial);
+              setModo('lista');
+              setLoading(false);
+            }
+          },
+        });
         if (!cancelled) {
           cacheSociosRef.current = socios;
           setResultado(socios);
@@ -143,7 +158,14 @@ function SociosPage() {
     setLoading(true);
     setError(null);
     try {
-      const socios = await getSocios();
+      const socios = await getSocios({
+        onPage: (parcial) => {
+          cacheSociosRef.current = parcial;
+          setResultado(parcial);
+          setModo('lista');
+          setLoading(false);
+        },
+      });
       cacheSociosRef.current = socios;
       setResultado(socios);
       setModo('lista');
@@ -160,7 +182,7 @@ function SociosPage() {
 
   async function recargarSocios() {
     setNroSocio('');
-    setOrden({ campo: null, dir: 'asc' });
+    setOrden(ORDEN_INICIAL);
     setFiltroEstado('');
     setFiltroAbierto(false);
     setFiltroCategoria('');
@@ -202,7 +224,7 @@ function SociosPage() {
 
   function handleVerTodos() {
     setNroSocio('');
-    setOrden({ campo: null, dir: 'asc' });
+    setOrden(ORDEN_INICIAL);
     setFiltroEstado('');
     setFiltroAbierto(false);
     setFiltroCategoria('');
@@ -277,6 +299,21 @@ function SociosPage() {
     }
   }
 
+  const listaBase = Array.isArray(resultado) ? resultado : [];
+  const listaFiltrada = listaBase.filter((s) => {
+    const matchEstado = filtroEstado ? s.estado.nombre === filtroEstado : true;
+    const matchCategoria = filtroCategoria ? s.categoria.nombre === filtroCategoria : true;
+    const matchDisciplina = filtroDisciplina ? (estadoSuscripcionPorSocio?.has(s.id) ?? false) : true;
+    return matchEstado && matchCategoria && matchDisciplina;
+  });
+  const listaOrdenada = aplicarOrden(listaFiltrada);
+  const { pagina, totalPaginas, listaPaginada, irAPagina, resetPagina } = usePaginacion(listaOrdenada, 10);
+
+  useEffect(() => {
+    resetPagina();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [resultado, filtroEstado, filtroCategoria, filtroDisciplina]);
+
   return (
     <div className="socios-page">
       <h1 className="socios-title">Consultar Socios</h1>
@@ -329,12 +366,13 @@ function SociosPage() {
 
       {!loading && modo === 'socio' && resultado && (() => {
         const cfg = estadoConfig(resultado.estado.nombre);
+        const fotoSegura = urlImagenSegura(resultado.foto_url);
         return (
           <div className="socios-card">
             <div className="socios-card-inner">
               <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
-                {resultado.foto_url
-                  ? <img src={resultado.foto_url} alt="" className="detalle-logo-img" referrerPolicy="no-referrer" />
+                {fotoSegura
+                  ? <img src={fotoSegura} alt="" className="detalle-logo-img" referrerPolicy="no-referrer" />
                   : <img src={cfg.logo} alt="" className="detalle-logo-img" />}
               </div>
               <div className="socios-card-data">
@@ -404,12 +442,6 @@ function SociosPage() {
         const estadosUnicos = [...new Set(resultado.map(s => s.estado.nombre))].sort();
         const categoriasUnicas = [...new Set(resultado.map(s => s.categoria.nombre))].sort();
         const mostrarColumnaSuscripcion = !!filtroDisciplina && puedeCrearDisciplina;
-        const listaFiltrada = resultado.filter(s => {
-          const matchEstado = filtroEstado ? s.estado.nombre === filtroEstado : true;
-          const matchCategoria = filtroCategoria ? s.categoria.nombre === filtroCategoria : true;
-          const matchDisciplina = filtroDisciplina ? (estadoSuscripcionPorSocio?.has(s.id) ?? false) : true;
-          return matchEstado && matchCategoria && matchDisciplina;
-        });
         return (
           <>
             <div className="socios-filtros">
@@ -502,7 +534,7 @@ function SociosPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {aplicarOrden(listaFiltrada).map((s) => {
+                    {listaPaginada.map((s) => {
                       const cfg = estadoConfig(s.estado.nombre);
                       const verDetalle = () => { setResultado(s); setModo('socio'); };
                       return (
@@ -557,6 +589,7 @@ function SociosPage() {
                 </table>
               )}
             </div>
+            <Paginacion pagina={pagina} totalPaginas={totalPaginas} onCambiarPagina={irAPagina} />
           </>
         );
       })()}

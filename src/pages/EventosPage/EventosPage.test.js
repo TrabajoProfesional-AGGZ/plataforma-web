@@ -14,9 +14,10 @@ import { usePermiso } from '../../hooks/usePermiso';
 
 jest.mock('../../services/eventosService', () => ({
   getEventos: jest.fn(),
+  getEventosHistoricos: jest.fn(),
   createEvento: jest.fn(),
 }));
-import { getEventos, createEvento } from '../../services/eventosService';
+import { getEventos, getEventosHistoricos, createEvento } from '../../services/eventosService';
 
 jest.mock('../../assets/logo_socio.png', () => 'logo_socio.png');
 jest.mock('../../assets/logo-verde.png', () => 'logo-verde.png');
@@ -45,6 +46,16 @@ jest.mock('../../components/createEventoForm/CreateEventoForm', () => ({
   ),
 }));
 
+jest.mock('../../components/reservarEntradaForm/ReservarEntradaForm', () => ({
+  ReservarEntradaForm: ({ evento, onSuccess, onCancel }) => ( // NOSONAR
+    <div>
+      <span>Reservando entrada para {evento.nombre}</span>
+      <button onClick={onSuccess}>Confirmar reserva de entrada</button>
+      <button onClick={onCancel}>Cancelar reserva de entrada</button>
+    </div>
+  ),
+}));
+
 const EVENTO_LISTA = {
   id: 'e-1',
   nombre: 'Fiesta de fin de año',
@@ -69,6 +80,7 @@ describe('EventosPage', () => {
   beforeEach(() => {
     usePermiso.mockReturnValue(true);
     getEventos.mockResolvedValue([]);
+    getEventosHistoricos.mockResolvedValue([]);
     createEvento.mockResolvedValue({ ...EVENTO_LISTA, id: 'e-new', nombre: 'Evento nuevo' });
   });
 
@@ -170,5 +182,173 @@ describe('EventosPage', () => {
       expect(screen.getByText('El servicio no está disponible. Intentá de nuevo más tarde.')).toBeInTheDocument()
     );
     expect(screen.getByText('Fiesta de fin de año')).toBeInTheDocument();
+  });
+
+  test('no muestra la columna de acciones ni el botón "Reservar entrada" sin el permiso crear_entrada', async () => {
+    usePermiso.mockImplementation((nombre) => nombre !== 'crear_entrada');
+    getEventos.mockResolvedValue([EVENTO_LISTA]);
+    await renderPage();
+    expect(screen.queryByRole('button', { name: /reservar entrada/i })).not.toBeInTheDocument();
+  });
+
+  test('abre el formulario de reservar entrada al hacer click en el botón de la fila', async () => {
+    getEventos.mockResolvedValue([EVENTO_LISTA]);
+    await renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /reservar entrada/i }));
+    expect(screen.getByText('Reservando entrada para Fiesta de fin de año')).toBeInTheDocument();
+  });
+
+  test('cierra el formulario de reservar entrada al cancelar', async () => {
+    getEventos.mockResolvedValue([EVENTO_LISTA]);
+    await renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /reservar entrada/i }));
+    fireEvent.click(screen.getByText('Cancelar reserva de entrada'));
+    expect(screen.queryByText('Reservando entrada para Fiesta de fin de año')).not.toBeInTheDocument();
+  });
+
+  test('al confirmar la reserva de entrada, incrementa entradas_vendidas y cierra el formulario', async () => {
+    getEventos.mockResolvedValue([EVENTO_LISTA]);
+    await renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /reservar entrada/i }));
+    fireEvent.click(screen.getByText('Confirmar reserva de entrada'));
+
+    expect(screen.queryByText('Reservando entrada para Fiesta de fin de año')).not.toBeInTheDocument();
+    expect(screen.getByText('11 / 100')).toBeInTheDocument();
+  });
+
+  test('deshabilita el botón "Reservar entrada" para un evento creado de forma optimista', async () => {
+    getEventos.mockResolvedValue([]);
+    await renderPage();
+    fireEvent.click(screen.getByRole('button', { name: /nuevo evento/i }));
+    fireEvent.click(screen.getByText('Confirmar creación'));
+
+    expect(await screen.findByText('Evento nuevo')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /reservar entrada/i })).toBeDisabled();
+  });
+
+  describe('toggle vigentes / históricos', () => {
+    const EVENTO_HISTORICO = {
+      id: 'e-viejo',
+      nombre: 'Torneo del año pasado',
+      descripcion: 'Un evento ya finalizado',
+      dia: '2020-01-01',
+      hora_inicio: '20:00:00',
+      hora_fin: '23:00:00',
+      capacidad_maxima: 50,
+      valor_entrada: '1000.00',
+      entradas_vendidas: 50,
+      foto_url: null,
+    };
+
+    test('al hacer clic en "Ver eventos históricos" carga y muestra los históricos', async () => {
+      getEventos.mockResolvedValue([EVENTO_LISTA]);
+      getEventosHistoricos.mockResolvedValue([EVENTO_HISTORICO]);
+      await renderPage();
+
+      fireEvent.click(screen.getByRole('button', { name: /ver eventos históricos/i }));
+
+      expect(await screen.findByText('Torneo del año pasado')).toBeInTheDocument();
+      expect(screen.queryByText('Fiesta de fin de año')).not.toBeInTheDocument();
+      expect(getEventosHistoricos).toHaveBeenCalled();
+    });
+
+    test('oculta "Nuevo evento" y la columna de acciones en la vista de históricos', async () => {
+      getEventos.mockResolvedValue([EVENTO_LISTA]);
+      getEventosHistoricos.mockResolvedValue([EVENTO_HISTORICO]);
+      await renderPage();
+
+      fireEvent.click(screen.getByRole('button', { name: /ver eventos históricos/i }));
+      await screen.findByText('Torneo del año pasado');
+
+      expect(screen.queryByRole('button', { name: /nuevo evento/i })).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /reservar entrada/i })).not.toBeInTheDocument();
+    });
+
+    test('vuelve a la vista de vigentes con "Ver eventos vigentes"', async () => {
+      getEventos.mockResolvedValue([EVENTO_LISTA]);
+      getEventosHistoricos.mockResolvedValue([EVENTO_HISTORICO]);
+      await renderPage();
+
+      fireEvent.click(screen.getByRole('button', { name: /ver eventos históricos/i }));
+      await screen.findByText('Torneo del año pasado');
+
+      fireEvent.click(screen.getByRole('button', { name: /ver eventos vigentes/i }));
+
+      expect(screen.getByText('Fiesta de fin de año')).toBeInTheDocument();
+      expect(screen.queryByText('Torneo del año pasado')).not.toBeInTheDocument();
+    });
+
+    test('muestra estado vacío específico si no hay eventos históricos', async () => {
+      getEventos.mockResolvedValue([]);
+      getEventosHistoricos.mockResolvedValue([]);
+      await renderPage();
+
+      fireEvent.click(screen.getByRole('button', { name: /ver eventos históricos/i }));
+
+      expect(await screen.findByText('No hay eventos históricos.')).toBeInTheDocument();
+    });
+
+    test('muestra error si falla la carga de históricos', async () => {
+      getEventos.mockResolvedValue([]);
+      getEventosHistoricos.mockRejectedValue(new Error('servicio-no-disponible'));
+      await renderPage();
+
+      fireEvent.click(screen.getByRole('button', { name: /ver eventos históricos/i }));
+
+      expect(
+        await screen.findByText('El servicio no está disponible. Intentá de nuevo más tarde.')
+      ).toBeInTheDocument();
+    });
+  });
+
+  // --- Paginación y orden ---
+
+  function crearEventos(cantidad) {
+    return Array.from({ length: cantidad }, (_, i) => ({
+      id: `e-${i + 1}`,
+      nombre: `Evento${String(i + 1).padStart(2, '0')}`,
+      descripcion: 'Desc',
+      dia: `2026-01-${String(i + 1).padStart(2, '0')}`,
+      hora_inicio: '20:00:00',
+      hora_fin: '23:00:00',
+      capacidad_maxima: 100,
+      valor_entrada: '5000.00',
+      entradas_vendidas: 0,
+      foto_url: null,
+    }));
+  }
+
+  test('no muestra controles de paginación cuando hay 10 eventos o menos', async () => {
+    getEventos.mockResolvedValue(crearEventos(10));
+    await renderPage();
+    expect(screen.queryByLabelText(/paginación/i)).not.toBeInTheDocument();
+  });
+
+  test('muestra como máximo 10 filas por página y permite avanzar/retroceder', async () => {
+    getEventos.mockResolvedValue(crearEventos(15));
+    await renderPage();
+
+    expect(screen.getByText('Página 1 de 2')).toBeInTheDocument();
+    // El próximo evento (Evento01, día 2026-01-01) va primero.
+    expect(screen.getByText('Evento01')).toBeInTheDocument();
+    expect(screen.queryByText('Evento11')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: /página siguiente/i }));
+
+    expect(screen.getByText('Página 2 de 2')).toBeInTheDocument();
+    expect(screen.getByText('Evento11')).toBeInTheDocument();
+    expect(screen.queryByText('Evento01')).not.toBeInTheDocument();
+  });
+
+  test('la tabla está ordenada por día, el más próximo primero', async () => {
+    getEventos.mockResolvedValue([
+      { id: 'a', nombre: 'Lejano', descripcion: '', dia: '2026-12-01', hora_inicio: '10:00:00', hora_fin: '12:00:00', capacidad_maxima: 10, valor_entrada: '100', entradas_vendidas: 0, foto_url: null },
+      { id: 'b', nombre: 'Proximo', descripcion: '', dia: '2026-02-01', hora_inicio: '10:00:00', hora_fin: '12:00:00', capacidad_maxima: 10, valor_entrada: '100', entradas_vendidas: 0, foto_url: null },
+      { id: 'c', nombre: 'Medio', descripcion: '', dia: '2026-06-01', hora_inicio: '10:00:00', hora_fin: '12:00:00', capacidad_maxima: 10, valor_entrada: '100', entradas_vendidas: 0, foto_url: null },
+    ]);
+    await renderPage();
+
+    const nombres = screen.getAllByRole('row').slice(1).map((fila) => fila.querySelectorAll('td')[1].textContent);
+    expect(nombres).toEqual(['Proximo', 'Medio', 'Lejano']);
   });
 });
