@@ -83,3 +83,23 @@ test('muestra mensaje vacío cuando no hay instalaciones activas', async () => {
 
   expect(await screen.findByText('No hay instalaciones activas.')).toBeInTheDocument();
 });
+
+test('ordena las instalaciones por porcentaje de ocupación descendente', async () => {
+  getOcupacionInstalaciones.mockResolvedValue({
+    instalaciones: [
+      { id: '1', nombre: 'Pileta', tipo: 'deportiva', horas_reservadas: 50, horas_disponibles: 420, porcentaje_ocupacion: 11.9 },
+      { id: '2', nombre: 'Gimnasio', tipo: 'deportiva', horas_reservadas: 380, horas_disponibles: 420, porcentaje_ocupacion: 90.5 },
+      { id: '3', nombre: 'Cancha', tipo: 'deportiva', horas_reservadas: 100, horas_disponibles: 420, porcentaje_ocupacion: 23.8 },
+    ],
+    total: 3,
+    promedio_ocupacion: 42,
+    periodo_dias: 30,
+  });
+
+  render(<ResumenTab />);
+
+  await screen.findByText('Gimnasio');
+
+  const nombres = screen.getAllByText(/Pileta|Gimnasio|Cancha/).map((el) => el.textContent);
+  expect(nombres).toEqual(['Gimnasio', 'Cancha', 'Pileta']);
+});
