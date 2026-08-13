@@ -496,6 +496,24 @@ describe('InstalacionesPage', () => {
     expect(screen.queryByRole('button', { name: 'Editar' })).not.toBeInTheDocument();
   });
 
+  test('muestra la tolerancia de cancelación por defecto (60 min) cuando tiempo_minimo_cancelacion es null', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-1', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1500, activa: true, tiempo_minimo_cancelacion: null },
+    ]);
+    await renderPage();
+    irAlDetalle();
+    expect(screen.getByText('Hasta 60 minutos antes del turno')).toBeInTheDocument();
+  });
+
+  test('muestra la tolerancia de cancelación personalizada cuando tiempo_minimo_cancelacion tiene un valor', async () => {
+    getInstalaciones.mockResolvedValue([
+      { id: 'inst-1', nombre: 'Test', tipo: 'Deportiva', capacidad_maxima: 10, valor_turno: 1500, activa: true, tiempo_minimo_cancelacion: 120 },
+    ]);
+    await renderPage();
+    irAlDetalle();
+    expect(screen.getByText('Hasta 120 minutos antes del turno')).toBeInTheDocument();
+  });
+
   test('filtra instalaciones por tipo al cambiar el selector', async () => {
     await renderPage();
     crearInstalacionHelper();
