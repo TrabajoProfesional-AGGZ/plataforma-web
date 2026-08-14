@@ -6,23 +6,23 @@ nav_order: 3
 
 # 🛠️ Justificación tecnológica
 
-En esta sección documentamos las decisiones técnicas tomadas para la construcción de la plataforma, asegurando que cada herramienta elegida aporte valor real al desarrollo y mantenimiento del producto.
+En esta sección documentamos las decisiones técnicas tomadas para la construcción de la Plataforma Web de Administración, asegurando que la herramienta sea robusta, segura y capaz de manejar altos volúmenes de datos.
 
-## Lenguajes y Frameworks
+## Lenguajes, Frameworks y Herramientas
 
-X.
+Para el panel de control administrativo, la prioridad fue la estructuración modular, la seguridad en el acceso a datos y la representación visual de métricas complejas:
 
-## Integración y Despliegue Continuo (CI/CD)
+* **React + Vite:** Se eligió React por su arquitectura basada en componentes, permitiendo crear una interfaz rica y dinámica (Data DataGrids, Modales, Gráficos) de manera eficiente. **Vite** se utiliza como entorno de construcción por su velocidad superior de empaquetado y HMR, optimizando los tiempos de desarrollo.
+* **JavaScript y CSS Modular:** Al igual que en las demás interfaces del ecosistema, combinamos JavaScript moderno con CSS modular (apoyado en `tokens.css` y temas configurables). Esto asegura una transición fluida al aplicar la identidad visual (marca blanca) de cada club cliente sin reescribir la lógica.
+* **Autenticación Delegada (Firebase):** La plataforma delega la gestión de sesiones seguras y recuperación de credenciales a Firebase, interactuando constantemente con el microservicio de autenticación para validar los permisos granulares (Roles) de cada administrador.
+* **Visualización de Datos:** Se emplean librerías especializadas (como Recharts o Chart.js) encapsuladas en componentes (`DesgloseFinanzasChart.jsx`, `TendenciasPagoChart.jsx`) para renderizar de forma clara los KPIs financieros y predictivos del club.
 
-La implementación de pipelines de CI/CD es fundamental en la plataforma para garantizar entregas ágiles y seguras. Nos permite automatizar la ejecución de pruebas y el despliegue a los distintos entornos, reduciendo el error humano y acelerando el *time-to-market*.
+## Calidad y Testing
 
-## Pruebas unitarias y Code Coverage
+* **Jest y React Testing Library:** Herramientas fundamentales (`jest.config.cjs` y archivos `*.test.js`) para garantizar que la compleja lógica de estado, paginación y renderizado condicional según permisos funcione sin fallas en cada módulo administrativo.
+* **ESLint:** Configurado (`eslint.config.js`) para enforzar buenas prácticas, mantener un código limpio y reducir la deuda técnica en un repositorio de gran tamaño.
 
-Para asegurar la robustez y estabilidad del código, mantenemos un estándar estricto de calidad:
+## Integración y Despliegue (CI/CD)
 
-* Se ha implementado una gran cantidad de pruebas unitarias cubriendo los casos de uso principales y casos borde.
-* Mantenemos un **estricto nivel de Code Coverage** (cobertura de código) fijado en un mínimo del **[90]%**, el cual es validado automáticamente en cada Pull Request mediante nuestro pipeline.
-
-## Documentación integral
-
-Utilizamos **JustTheDocs** para mantener esta documentación viva, versionada junto con el código y fácilmente accesible para cualquier miembro del equipo. Esto centraliza el conocimiento y reduce los cuellos de botella en la comunicación.
+* **Vercel:** Plataforma de despliegue (`vercel.json`) que garantiza alta disponibilidad, latencia mínima mediante su CDN y previsualizaciones automáticas por cada cambio en el repositorio.
+* **GitHub Actions:** Utilizamos flujos de integración continua (`ci.yml`) para automatizar la ejecución de la batería de pruebas y asegurar que la rama principal siempre contenga código estable y funcional.
