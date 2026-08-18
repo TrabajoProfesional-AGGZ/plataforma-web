@@ -17,11 +17,11 @@ La puerta de entrada segura para el personal administrativo y directivo del club
 <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
   <div style="text-align: center;">
     <h4>SocioUnido Neutro</h4>
-    <img src="img/login_neutro.png" alt="Login Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <img src="img/login_neutro.jpeg" alt="Login Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
     <h4>Mamelodi Sundowns</h4>
-    <img src="img/login_mamelodi.png" alt="Login Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <img src="img/login_mamelodi.jpeg" alt="Login Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
 
@@ -34,11 +34,11 @@ El panel principal que ofrece un resumen operativo rápido y accesos directos a 
 <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
   <div style="text-align: center;">
     <h4>SocioUnido Neutro</h4>
-    <img src="img/home_neutro.png" alt="Home Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <img src="img/home_neutro.jpeg" alt="Home Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
     <h4>Mamelodi Sundowns</h4>
-    <img src="img/home_mamelodi.png" alt="Home Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <img src="img/home_mamelodi.jpeg" alt="Home Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
 
@@ -51,11 +51,11 @@ Vista detallada de los KPIs del club, incluyendo recaudación, tendencias de pag
 <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
   <div style="text-align: center;">
     <h4>SocioUnido Neutro</h4>
-    <img src="img/metricas_neutro.png" alt="Métricas Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <img src="img/metricas_neutro.jpeg" alt="Métricas Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
     <h4>Mamelodi Sundowns</h4>
-    <img src="img/metricas_mamelodi.png" alt="Métricas Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <img src="img/metricas_mamelodi.jpeg" alt="Métricas Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
 
@@ -68,11 +68,11 @@ Módulo para la creación, configuración (cupos, aranceles, sedes) y seguimient
 <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
   <div style="text-align: center;">
     <h4>SocioUnido Neutro</h4>
-    <img src="img/disciplinas_neutro.png" alt="Disciplinas Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <img src="img/disciplinas_neutro.jpeg" alt="Disciplinas Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
     <h4>Mamelodi Sundowns</h4>
-    <img src="img/disciplinas_mamelodi.png" alt="Disciplinas Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <img src="img/disciplinas_mamelodi.jpeg" alt="Disciplinas Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
 
@@ -85,11 +85,11 @@ Directorio centralizado para la administración de la masa societaria, revisión
 <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
   <div style="text-align: center;">
     <h4>SocioUnido Neutro</h4>
-    <img src="img/socios_neutro.png" alt="Socios Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <img src="img/socios_neutro.jpeg" alt="Socios Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
     <h4>Mamelodi Sundowns</h4>
-    <img src="img/socios_mamelodi.png" alt="Socios Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <img src="img/socios_mamelodi.jpeg" alt="Socios Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
 
@@ -102,10 +102,10 @@ Interfaz para la gestión del inventario, actualización de precios, control de 
 <div style="display: flex; gap: 20px; justify-content: center; flex-wrap: wrap;">
   <div style="text-align: center;">
     <h4>SocioUnido Neutro</h4>
-    <img src="img/tienda_neutro.png" alt="Tienda Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <img src="img/tienda_neutro.jpeg" alt="Tienda Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
     <h4>Mamelodi Sundowns</h4>
-    <img src="img/tienda_mamelodi.png" alt="Tienda Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <img src="img/tienda_mamelodi.jpeg" alt="Tienda Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>

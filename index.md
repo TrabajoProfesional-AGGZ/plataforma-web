@@ -5,7 +5,7 @@ nav_order: 1
 description: "Documentación de la Plataforma Web de administración de SocioUnido"
 ---
 
-# Plataforma Web (Panel de administración)
+# Plataforma web (Panel de administración)
 
 Aplicación frontend diseñada como un panel de control (Dashboard) centralizado para la administración integral del ecosistema "SocioUnido".
 
@@ -24,5 +24,5 @@ A continuación, se detalla toda la información visual, técnica y organizativa
 
 * 📱 **[Interfaces](interfaces.html):** Galería visual de las pantallas principales del panel de administración, contrastando el tema neutro con un caso de uso real (Mamelodi Sundowns).
 * 🛠️ **[Justificación tecnológica](justificacion.html):** El porqué de los lenguajes y librerías elegidas, nuestro pipeline de CI/CD, estrategia de testing y despliegue.
-* 🏗️ **[Arquitectura y diagramas](diagramas.html):** Representación visual de la arquitectura de la aplicación utilizando los modelos C3 y C4.
+* 🏗️ **[Arquitectura y diagramas](diagramas.html):** Representación visual de la arquitectura de la aplicación utilizando el modelo C4.
 * 📊 **[Métricas de la implementación](metricas.html):** Estadísticas del desarrollo, cantidad de commits, Pull Requests y distribución del trabajo en el equipo frontend.
