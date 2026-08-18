@@ -42,8 +42,8 @@ describe('LoginPage', () => {
     expect(screen.queryByRole('status')).not.toBeInTheDocument();
   });
 
-  test('muestra "Credenciales incorrectas" cuando el login falla', async () => {
-    authService.login.mockRejectedValueOnce(new Error('auth/wrong-password'));
+  test('muestra "Credenciales incorrectas" cuando Firebase rechaza por credenciales inválidas', async () => {
+    authService.login.mockRejectedValueOnce({ code: 'auth/wrong-password' });
     renderLoginPage();
 
     fireEvent.change(screen.getByLabelText(/email/i), {
@@ -56,6 +56,40 @@ describe('LoginPage', () => {
 
     await waitFor(() => {
       expect(screen.getByRole('alert')).toHaveTextContent('Credenciales incorrectas');
+    });
+  });
+
+  test('muestra "Credenciales incorrectas" cuando el backend rechaza el acceso (rol inválido)', async () => {
+    authService.login.mockRejectedValueOnce(new Error('unauthorized'));
+    renderLoginPage();
+
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: 'test@test.com' },
+    });
+    fireEvent.change(screen.getByLabelText('Contraseña'), {
+      target: { value: 'password' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /ingresar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Credenciales incorrectas');
+    });
+  });
+
+  test('muestra "Servicio no disponible" cuando falla por otro motivo (no de credenciales)', async () => {
+    authService.login.mockRejectedValueOnce({ code: 'auth/network-request-failed' });
+    renderLoginPage();
+
+    fireEvent.change(screen.getByLabelText(/email/i), {
+      target: { value: 'test@test.com' },
+    });
+    fireEvent.change(screen.getByLabelText('Contraseña'), {
+      target: { value: 'password' },
+    });
+    fireEvent.click(screen.getByRole('button', { name: /ingresar/i }));
+
+    await waitFor(() => {
+      expect(screen.getByRole('alert')).toHaveTextContent('Servicio no disponible');
     });
   });
 
