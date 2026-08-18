@@ -20,6 +20,19 @@ const formItemVariants = {
   exiting: { x: -20, opacity: 0, transition: { duration: 0.25, ease: 'easeIn' } },
 };
 
+const CODIGOS_CREDENCIALES_INVALIDAS = [
+  'auth/invalid-credential',
+  'auth/user-not-found',
+  'auth/wrong-password',
+];
+
+function resolverMensajeErrorLogin(err) {
+  if (err.message === 'unauthorized' || CODIGOS_CREDENCIALES_INVALIDAS.includes(err.code)) {
+    return 'Credenciales incorrectas';
+  }
+  return 'Servicio no disponible';
+}
+
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -61,8 +74,8 @@ function LoginPage() {
         setExiting(true);
         setTimeout(safeNavigate, 2000);
       }
-    } catch {
-      setError('Credenciales incorrectas');
+    } catch (err) {
+      setError(resolverMensajeErrorLogin(err));
       setLoading(false);
     }
   }
