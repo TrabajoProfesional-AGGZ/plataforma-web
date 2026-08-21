@@ -7,7 +7,7 @@
 .tienda-tab-error {
   text-align: center;
   color: var(--color-danger);
-  font-size: 14px;
+  font-size: 0.875rem;
   background-color: var(--status-error-surface-bg);
   border: 1px solid var(--status-error-surface-border);
   border-radius: var(--radius-sm);
@@ -31,13 +31,13 @@
 }
 
 .tienda-tab-card-header h2 {
-  font-size: 16px;
+  font-size: 1rem;
   font-weight: 600;
   margin: 0;
 }
 
 .tienda-tab-monto {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 700;
   color: var(--color-text-primary);
 }

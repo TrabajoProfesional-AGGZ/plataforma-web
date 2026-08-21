@@ -3,7 +3,7 @@
 /* ── Título de página ────────────────────────────────────────── */
 .socios-title,
 .usuarios-title {
-  font-size: 32px;
+  font-size: 2rem;
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0 0 var(--space-6) 0;
@@ -120,14 +120,14 @@
   background: transparent;
   color: var(--color-text-primary);
   width: 100%;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .socios-search-button, .socios-ver-todos-button,
 .usuarios-search-button, .usuarios-ver-todos-button {
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
@@ -145,7 +145,7 @@
 .socios-error,
 .usuarios-error {
   color: var(--color-danger);
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: center;
   background-color: var(--status-error-surface-bg);
   border: 1px solid var(--status-error-surface-border);
@@ -156,7 +156,7 @@
 .socios-no-encontrado,
 .usuarios-no-encontrado {
   color: var(--color-text-secondary);
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: center;
 }
 
@@ -168,7 +168,7 @@
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--color-text-primary);
   cursor: pointer;
@@ -181,26 +181,35 @@
   background-color: var(--color-bg);
 }
 
-.socios-filtro-select, .usuarios-filtro-select,
-.instalaciones-filtro-fecha, .instalaciones-filtro-tipo {
+/* StyledSelect usado como filtro: por defecto usa el mismo fondo que la
+   página (--color-bg), pensado para contrastar contra la tarjeta blanca de
+   los formularios de creación — acá el filtro va directo sobre el fondo de
+   la página, así que necesita fondo blanco propio para distinguirse. */
+.filtros-select-trigger {
+  background-color: var(--color-surface);
+}
+
+.filtros-select-trigger:hover:not(:disabled) {
+  background-color: var(--color-bg);
+}
+
+/* En los forms de creación value="" es un placeholder real ("Seleccionar...")
+   y StyledSelect lo pinta en gris tenue (--color-border-medium). Acá value=""
+   es una opción con significado propio ("Categoría: Todas", etc.), no un
+   placeholder, así que necesita el mismo color de texto que el resto. */
+.filtros-select-trigger .csf-picker-placeholder {
+  color: var(--color-text-primary);
+}
+
+.instalaciones-filtro-fecha {
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
   padding: 6px 10px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-text-primary);
   background-color: var(--color-surface);
   outline: none;
   cursor: pointer;
-}
-
-.socios-filtro-select,
-.usuarios-filtro-select {
-  width: 100%;
-}
-
-.socios-filtro-select:focus,
-.usuarios-filtro-select:focus {
-  border-color: var(--color-border-strong);
 }
 
 /* ── Contenedor de tabla ─────────────────────────────────────── */
@@ -243,7 +252,7 @@
 .instalaciones-tabla {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .socios-table td,
@@ -304,7 +313,7 @@
   display: inline-block;
   padding: 3px 10px;
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   border: 1px solid;
 }
@@ -315,7 +324,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--color-text-primary);
   padding: 4px 10px 4px 6px;
@@ -333,6 +342,6 @@
 @media (max-width: 480px) {
   .socios-title,
   .usuarios-title {
-    font-size: 24px;
+    font-size: 1.5rem;
   }
 }

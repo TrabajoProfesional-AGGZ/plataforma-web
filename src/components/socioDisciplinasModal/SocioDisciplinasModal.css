@@ -15,7 +15,7 @@
 
 .socio-modal-empty {
   color: var(--color-text-secondary);
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: center;
   padding: var(--space-2) 0;
 }
@@ -50,7 +50,7 @@
 }
 
 .socio-modal-item-nombre {
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--color-text-primary);
   font-weight: 500;
   white-space: nowrap;
@@ -59,7 +59,7 @@
 }
 
 .socio-modal-badge {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 600;
   padding: 2px var(--space-2);
   border-radius: var(--radius-full);
@@ -82,7 +82,7 @@
   border: none;
   border-radius: var(--radius-sm);
   padding: 5px var(--space-3);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;

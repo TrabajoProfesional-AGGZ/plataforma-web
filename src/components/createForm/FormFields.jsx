@@ -1,7 +1,13 @@
-import { Children, cloneElement, isValidElement } from 'react';
+import { Children, cloneElement, isValidElement, useEffect, useRef, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { AlertCircle, User, CreditCard, Phone, Mail } from 'lucide-react';
+import { AlertCircle, User, CreditCard, Phone, Mail, ChevronDown, Check } from 'lucide-react';
 import PropTypes from 'prop-types';
+import { DatePicker } from './DatePicker';
+import { TimePicker } from './TimePicker';
+import { setNativeValue, mergeRefs } from './nativeInputUtils';
+import { usePickerPopover } from './usePickerPopover';
+import './Pickers.css';
 
 export const slideVariants = {
   enter: (dir) => ({ x: dir > 0 ? 52 : -52, opacity: 0 }),
@@ -84,8 +90,15 @@ Field.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
-/** Input con el estilo estándar de los formularios, con estado de error opcional. */
+/**
+ * Input con el estilo estándar de los formularios, con estado de error opcional.
+ * `type="date"`/`type="time"` delegan en `DatePicker`/`TimePicker` (calendario
+ * y selector de horario custom) sin cambiar la API — cualquier `<StyledInput
+ * type="date" {...register(...)} />` existente se actualiza solo.
+ */
 export function StyledInput({ error, ...props }) {
+  if (props.type === 'date') return <DatePicker error={error} {...props} />;
+  if (props.type === 'time') return <TimePicker error={error} {...props} />;
   return (
     <input
       {...props}
@@ -200,19 +213,144 @@ EmailField.propTypes = {
   placeholder: PropTypes.string,
 };
 
-/** Select con el estilo estándar de los formularios, con estado de error opcional. */
-export function StyledSelect({ error, children, ...props }) {
+/**
+ * Select con el estilo estándar de los formularios, con estado de error opcional.
+ *
+ * Por debajo sigue siendo un `<select>` real (recibe `children`/`register()`/
+ * `value`+`onChange` exactamente igual que antes) — pero visualmente queda
+ * oculto vía clip (no `display:none`, sigue en el árbol de accesibilidad y
+ * lo encuentran `getByRole('combobox')`/`getByLabelText` de los tests
+ * existentes) y se reemplaza por un listbox custom animado. El listbox lee
+ * las opciones resueltas del DOM del `<select>` (`selectRef.current.options`)
+ * en vez de parsear `children`, así funciona igual si las opciones vienen de
+ * un `.map()` o de un sub-componente como `<DocTypeOptions />`. Al elegir una
+ * opción, escribe en el `<select>` real con `setNativeValue` — dispara un
+ * evento `change` nativo, así que tanto un `onChange` pasado directo como el
+ * que devuelve `register()` de react-hook-form lo reciben sin cambios.
+ */
+export function StyledSelect({ error, className, children, ref: forwardedRef, ...props }) {
+  const selectRef = useRef(null);
+  const {
+    open, toggle, closePopover, position, triggerRef, popoverRef,
+  } = usePickerPopover({ width: 260, height: 260 });
+  const [options, setOptions] = useState([]);
+  const [currentValue, setCurrentValue] = useState('');
+  const [highlighted, setHighlighted] = useState(0);
+
+  // Sin array de deps a propósito: re-lee `el.options`/`el.value` en cada render para
+  // detectar cambios en `children` (options dinámicas) sin depender de identidad de props.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    const el = selectRef.current;
+    if (!el) return;
+    const next = Array.from(el.options).map((o) => ({ value: o.value, label: o.text, disabled: o.disabled }));
+    setOptions((prev) => {
+      const same = prev.length === next.length
+        && prev.every((o, i) => o.value === next[i].value && o.label === next[i].label && o.disabled === next[i].disabled);
+      return same ? prev : next;
+    });
+    setCurrentValue(el.value);
+  });
+
+  useEffect(() => {
+    if (!open) return;
+    const idx = options.findIndex((o) => o.value === currentValue);
+    setHighlighted(idx >= 0 ? idx : 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
+
+  function selectOption(opt) {
+    if (opt.disabled) return;
+    setNativeValue(selectRef.current, opt.value);
+    closePopover();
+    triggerRef.current?.focus();
+  }
+
+  function handleTriggerKeyDown(e) {
+    if (!open && ['ArrowDown', 'ArrowUp', 'Enter', ' '].includes(e.key)) {
+      e.preventDefault();
+      toggle();
+      return;
+    }
+    if (!open) return;
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setHighlighted((h) => Math.min(h + 1, options.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setHighlighted((h) => Math.max(h - 1, 0));
+    } else if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      if (options[highlighted]) selectOption(options[highlighted]);
+    }
+  }
+
+  const selectedOption = options.find((o) => o.value === currentValue);
+  const isPlaceholder = !currentValue;
+
   return (
-    <select
-      {...props}
-      className={`csf-select${error ? ' csf-select--error' : ''}`}
-    >
-      {children}
-    </select>
+    <div className="csf-picker">
+      <select ref={mergeRefs(selectRef, forwardedRef)} tabIndex={-1} className="csf-native-hidden" {...props}>
+        {children}
+      </select>
+      <button
+        ref={triggerRef}
+        type="button"
+        className={[
+          'csf-picker-trigger',
+          'csf-dropdown-trigger',
+          error && 'csf-picker-trigger--error',
+          className,
+        ].filter(Boolean).join(' ')}
+        onClick={toggle}
+        onKeyDown={handleTriggerKeyDown}
+        disabled={props.disabled}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+      >
+        <span className={isPlaceholder ? 'csf-picker-placeholder' : ''}>
+          {selectedOption?.label || 'Seleccionar...'}
+        </span>
+        <ChevronDown size={14} strokeWidth={2} />
+      </button>
+
+      {open && createPortal(
+        <ul
+          ref={popoverRef}
+          className="csf-dropdown-popover"
+          role="listbox"
+          aria-label="Opciones"
+          style={{ top: position.top, left: position.left, minWidth: triggerRef.current?.offsetWidth }}
+        >
+          {options.map((opt, i) => (
+            <li key={`${opt.value}-${i}`}>
+              <button
+                type="button"
+                role="option"
+                aria-selected={opt.value === currentValue}
+                disabled={opt.disabled}
+                className={[
+                  'csf-dropdown-option',
+                  i === highlighted && 'csf-dropdown-option--highlighted',
+                  opt.value === currentValue && 'csf-dropdown-option--selected',
+                ].filter(Boolean).join(' ')}
+                onMouseEnter={() => setHighlighted(i)}
+                onClick={() => selectOption(opt)}
+              >
+                <span>{opt.label}</span>
+                {opt.value === currentValue && <Check size={14} strokeWidth={2.5} />}
+              </button>
+            </li>
+          ))}
+        </ul>,
+        document.body,
+      )}
+    </div>
   );
 }
 
 StyledSelect.propTypes = {
   error: PropTypes.bool,
+  className: PropTypes.string,
   children: PropTypes.node.isRequired,
 };

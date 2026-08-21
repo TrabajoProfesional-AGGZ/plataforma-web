@@ -13,12 +13,12 @@
 }
 
 .socio-reservas-detalle {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-text-secondary);
 }
 
 .socio-reservas-estado {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 600;
   color: var(--color-text-primary);
 }

@@ -7,6 +7,7 @@ import { CreateUserForm } from '../../components/createUserForm/CreateUserForm';
 import { EditUserForm } from '../../components/editUserForm/EditUserForm';
 import { CambiarRolForm } from '../../components/cambiarRolForm/CambiarRolForm';
 import { PermisosModal } from '../../components/permisosModal/PermisosModal';
+import { StyledSelect } from '../../components/createForm/FormFields';
 import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
 import { useListState } from '../../hooks/useListState';
@@ -277,8 +278,8 @@ function UsuariosPage() {
             {filtroAbierto && (
               <div className="usuarios-filtros-dropdowns">
                 <div className="usuarios-filtros-grupo">
-                  <select
-                    className="usuarios-filtro-select"
+                  <StyledSelect
+                    className="filtros-select-trigger"
                     value={filtroRol}
                     onChange={(e) => setFiltroRol(e.target.value)}
                   >
@@ -286,7 +287,7 @@ function UsuariosPage() {
                     {rolesUnicos.map((r) => (
                       <option key={r} value={r}>{r}</option>
                     ))}
-                  </select>
+                  </StyledSelect>
                 </div>
               </div>
             )}

@@ -59,7 +59,7 @@ function ConfirmDeleteModal({
               alignItems: 'flex-start',
             }}>
               <AlertTriangle size={20} color="var(--color-danger)" strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }} />
-              <p style={{ margin: 0, fontSize: 14, color: 'var(--color-danger)', lineHeight: 1.5 }}>
+              <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--color-danger)', lineHeight: 1.5 }}>
                 {mensaje}
               </p>
             </div>

@@ -1,18 +1,7 @@
 /* ── Orden ────────────────────────────────────────────────────── */
-.tienda-orden-select {
+.tienda-orden-select-wrap {
   margin-right: auto;
-  border: 1px solid var(--color-border-medium);
-  border-radius: var(--radius-sm);
-  padding: 6px 10px;
-  font-size: 13px;
-  color: var(--color-text-primary);
-  background-color: var(--color-surface);
-  outline: none;
-  cursor: pointer;
-}
-
-.tienda-orden-select:focus {
-  border-color: var(--color-border-strong);
+  width: 220px;
 }
 
 /* Miniatura en la tabla */
@@ -45,7 +34,7 @@
     margin-left: calc(var(--space-2) * -1);
     border: none;
     background: none;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 500;
     color: var(--color-text-secondary);
     cursor: pointer;
@@ -101,7 +90,7 @@
   }
 
   .tienda-detalle-img-placeholder span {
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-weight: 500;
   }
 
@@ -113,7 +102,7 @@
   }
 
   .tienda-detalle-eyebrow {
-    font-size: 12px;
+    font-size: 0.75rem;
     font-weight: 600;
     letter-spacing: 0.08em;
     text-transform: uppercase;
@@ -150,7 +139,7 @@
     align-items: center;
     gap: var(--space-2);
     width: fit-content;
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 500;
     color: var(--color-text-secondary);
     margin-bottom: var(--space-6);
@@ -178,7 +167,7 @@
 
   .tienda-detalle-desc-label {
     margin: 0 0 var(--space-2);
-    font-size: 13px;
+    font-size: 0.8125rem;
     font-style: italic;
     font-weight: 500;
     color: var(--color-text-secondary);
@@ -205,7 +194,7 @@
     padding: var(--space-3) var(--space-6);
     border: none;
     border-radius: var(--radius-sm);
-    font-size: 14px;
+    font-size: 0.875rem;
     font-weight: 600;
     color: var(--color-surface);
     background-color: var(--color-text-primary);

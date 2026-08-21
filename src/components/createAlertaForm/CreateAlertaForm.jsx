@@ -41,9 +41,11 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
   const [errorListaSocios, setErrorListaSocios] = useState('');
 
   useEffect(() => {
+    let cancelled = false;
     Promise.all([fetchCategoriasSocio(), fetchEstadosSocio()])
-      .then(([categorias, estados]) => setCatalogo({ categorias, estados }))
+      .then(([categorias, estados]) => { if (!cancelled) setCatalogo({ categorias, estados }); })
       .catch(() => {});
+    return () => { cancelled = true; };
   }, []);
 
   const agregarSocio = async () => {
@@ -117,7 +119,7 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
             placeholder="Redactá el mensaje de la alerta..."
             rows={5}
             className={`csf-input${errors.mensaje ? ' csf-input--error' : ''}`}
-            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: 14 }}
+            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: '0.875rem' }}
           />
         </Field>
 

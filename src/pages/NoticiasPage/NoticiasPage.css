@@ -4,7 +4,7 @@
 }
 
 .noticias-title {
-  font-size: 32px;
+  font-size: 2rem;
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0 0 var(--space-5) 0;
@@ -28,7 +28,7 @@
   padding: var(--space-2) var(--space-4);
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   background-color: var(--color-text-primary);
@@ -44,7 +44,7 @@
   padding: var(--space-2) var(--space-4);
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   background-color: var(--color-surface);
@@ -76,7 +76,7 @@
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--color-text-primary);
   cursor: pointer;
@@ -93,7 +93,7 @@
 .noticias-error {
   text-align: center;
   color: var(--color-danger);
-  font-size: 14px;
+  font-size: 0.875rem;
   background-color: var(--status-error-surface-bg);
   border: 1px solid var(--status-error-surface-border);
   border-radius: var(--radius-sm);
@@ -117,7 +117,7 @@
 }
 
 .noticias-diario-seccion {
-  font-size: 11px;
+  font-size: 0.6875rem;
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -132,13 +132,13 @@
 }
 
 .noticias-diario-fecha {
-  font-size: 12px;
+  font-size: 0.75rem;
   color: var(--color-text-secondary);
 }
 
 .noticias-diario-titulo {
   font-family: Georgia, 'Times New Roman', serif;
-  font-size: 44px;
+  font-size: 2.75rem;
   font-weight: 700;
   line-height: 1.1;
   letter-spacing: -0.02em;
@@ -171,7 +171,7 @@
 }
 
 .noticias-diario-cuerpo p {
-  font-size: 17px;
+  font-size: 1.0625rem;
   line-height: 1.78;
   color: var(--color-text-primary);
   margin: 0 0 var(--space-4) 0;
@@ -198,7 +198,7 @@
 .noticias-btn-editar {
   padding: var(--space-2) var(--space-5);
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   border: 1px solid var(--color-border-medium);
@@ -214,7 +214,7 @@
 .noticias-btn-eliminar {
   padding: var(--space-2) var(--space-5);
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   border: none;
@@ -230,13 +230,13 @@
 /* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
 @media (max-width: 768px) {
   .noticias-diario-titulo {
-    font-size: 32px;
+    font-size: 2rem;
   }
 }
 
 @media (max-width: 480px) {
   .noticias-title {
-    font-size: 24px;
+    font-size: 1.5rem;
   }
 
   .noticias-diario-masthead {
@@ -249,6 +249,6 @@
   }
 
   .noticias-diario-titulo {
-    font-size: 26px;
+    font-size: 1.625rem;
   }
 }

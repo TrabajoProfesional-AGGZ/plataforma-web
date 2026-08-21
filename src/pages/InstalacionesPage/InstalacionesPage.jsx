@@ -2,7 +2,9 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Plus, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { CreateInstalacionForm } from '../../components/createInstalacionForm/CreateInstalacionForm';
+import { DatePicker } from '../../components/createForm/DatePicker';
 import { CreateReservaForm } from '../../components/createReservaForm/CreateReservaForm';
+import { StyledSelect } from '../../components/createForm/FormFields';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { getInstalaciones, createInstalacion, deleteInstalacion } from '../../services/instalacionesService';
 import { getReservasPorInstalacion, getReservasPorSocio, deleteReserva, getReservasHistoricasPorInstalacion } from '../../services/reservasService';
@@ -409,8 +411,8 @@ function InstalacionesPage() {
               <div className="instalaciones-seccion-toolbar">
                 <div>
                   {tiposDisponibles.length > 0 && (
-                    <select
-                      className="instalaciones-filtro-tipo"
+                    <StyledSelect
+                      className="filtros-select-trigger"
                       value={filtroTipo}
                       onChange={(e) => setFiltroTipo(e.target.value)}
                       aria-label="Filtrar por tipo"
@@ -419,7 +421,7 @@ function InstalacionesPage() {
                       {tiposDisponibles.map((tipo) => (
                         <option key={tipo} value={tipo}>{tipo}</option>
                       ))}
-                    </select>
+                    </StyledSelect>
                   )}
                 </div>
                 {puedeCrearInstalacion && (
@@ -494,9 +496,8 @@ function InstalacionesPage() {
             <div className="instalaciones-reservas-controles">
               <div className="instalaciones-reservas-controles-izq">
                 {puedeVerReservas && reservasDeInstalacion.length > 0 && (
-                  <input
-                    type="date"
-                    className="instalaciones-filtro-fecha"
+                  <DatePicker
+                    style={{ width: 172 }}
                     value={filtroFecha}
                     onChange={(e) => { setFiltroFecha(e.target.value); resetPaginaReservas(); }}
                     aria-label="Filtrar por fecha"
@@ -591,8 +592,7 @@ function InstalacionesPage() {
 
       {crearReservaFormOpen && instalacionActual && (
         <CreateReservaForm
-          instalaciones={[instalacionActual]}
-          instalacionPreseleccionada={instalacionActual.id}
+          instalacion={instalacionActual}
           onSuccess={async () => {
             setCrearReservaFormOpen(false);
             await cargarReservas(instalacionActual.id);

@@ -1,0 +1,112 @@
+.turno-loading-label {
+  margin: 0 0 var(--space-2);
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+}
+
+/* Grilla de turnos disponibles (reemplaza el <select> nativo de hora_inicio). */
+.turno-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(92px, 1fr));
+  gap: var(--space-2);
+}
+
+.turno-chip {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: var(--space-2) var(--space-2);
+  border-radius: var(--radius-sm);
+  border: 2px solid var(--color-border);
+  background-color: var(--color-bg);
+  color: var(--color-text-primary);
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform var(--transition-fast), box-shadow var(--transition-fast),
+    background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
+}
+
+.turno-chip:hover:not(:disabled):not(.turno-chip--selected) {
+  border-color: var(--color-border-medium);
+  background-color: var(--color-surface);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.turno-chip:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
+
+.turno-chip:focus-visible {
+  outline: 2px solid var(--color-border-strong);
+  outline-offset: 2px;
+}
+
+.turno-chip-hora {
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.turno-chip-cupo {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  font-size: 0.6875rem;
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+}
+
+.turno-chip--selected {
+  border-color: var(--color-border-strong);
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
+}
+
+.turno-chip--selected .turno-chip-cupo {
+  color: var(--color-surface);
+  opacity: 0.85;
+}
+
+.turno-chip--bajo:not(.turno-chip--selected) .turno-chip-cupo {
+  color: var(--status-warning-border);
+  font-weight: 600;
+}
+
+.turno-chip--disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+  background-color: var(--color-bg-subtle);
+}
+
+.turno-chip--disabled .turno-chip-hora {
+  text-decoration: line-through;
+  text-decoration-color: var(--color-text-secondary);
+}
+
+.turno-chip--disabled .turno-chip-cupo {
+  color: var(--color-danger);
+}
+
+/* Skeleton mientras se cargan los turnos disponibles */
+.turno-chip--skeleton {
+  height: 52px;
+  border-color: transparent;
+  background: linear-gradient(90deg, var(--color-bg-subtle) 25%, var(--color-border-light) 50%, var(--color-bg-subtle) 75%);
+  background-size: 200% 100%;
+  animation: turno-skeleton-pulse 1.3s ease-in-out infinite;
+  cursor: default;
+}
+
+@keyframes turno-skeleton-pulse {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .turno-chip, .turno-chip--skeleton {
+    transition: none;
+    animation: none;
+  }
+}
