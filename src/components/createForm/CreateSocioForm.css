@@ -159,7 +159,13 @@ button.csf-overlay {
   align-items: center;
   gap: var(--space-2);
   font-size: 0.875rem;
-  color: var(--color-text-secondary);
+  /* Antes --color-text-secondary (gris azulado, se leía "no tan negro") —
+     se sube a --color-text-primary (casi negro en claro, rosa en oscuro)
+     a pedido explícito para que el título de campo lea más oscuro/negro.
+     Sigue siendo theme-aware (no --input-text fijo) para no perder legibilidad
+     en modo oscuro contra el fondo bordó de la card, que se mantiene con la
+     paleta del club. */
+  color: var(--color-text-primary);
 }
 
 .csf-input {
@@ -169,25 +175,28 @@ button.csf-overlay {
   outline: none;
   font-size: 0.875rem;
   font-family: inherit;
-  color: var(--color-text-primary);
+  /* Fondo blanco y texto negro fijos en ambos temas (decisión de producto
+     explícita) — a diferencia del resto de la paleta de este archivo, que
+     sigue la marca del club (rosa/bordó). Ver --input-* en tokens.css. */
+  color: var(--input-text);
   border: 2px solid transparent;
-  background-color: var(--color-bg);
+  background-color: var(--input-bg);
   transition: background-color var(--transition-normal), border-color var(--transition-normal);
   box-sizing: border-box;
 }
 
 .csf-input:focus {
-  background-color: var(--color-surface);
+  background-color: var(--input-bg);
   border-color: var(--color-border-strong);
 }
 
 .csf-input--error {
   border-color: var(--color-danger);
-  background-color: var(--color-surface);
+  background-color: var(--input-bg);
 }
 
 .csf-input::placeholder {
-  color: var(--color-border-medium);
+  color: var(--input-placeholder);
 }
 
 /* Los selectores de fecha/hora/opciones (DatePicker, TimePicker, StyledSelect)
@@ -208,7 +217,8 @@ button.csf-overlay {
   padding: var(--space-3) var(--space-4);
   font-size: 0.8125rem;
   line-height: 1.6;
-  color: var(--color-text-secondary);
+  /* Mismo criterio que .csf-label: sube de secondary a primary, theme-aware. */
+  color: var(--color-text-primary);
 }
 
 /* Error global en el formulario */

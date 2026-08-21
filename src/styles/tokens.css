@@ -40,6 +40,17 @@
      rojo, no se puede dejar el texto oscuro encima). */
   --color-on-accent: #ffffff;
 
+  /* Campos de formulario (inputs, textareas, selects/pickers): fondo blanco
+     y texto negro fijos, decisión explícita de producto — a diferencia del
+     resto de esta paleta, NO son theme-aware ni de marca, por eso no se
+     redefinen bajo :root[data-theme="dark"] más abajo. */
+  --input-bg: #ffffff;
+  --input-text: #111111;
+  --input-text-secondary: #555555;
+  --input-placeholder: #767676;
+  --input-disabled: #b5b5b5;
+  --input-row-hover: #ececec;
+
   /* Status colors (bg/border pairs used by estado badges, banners) */
   --status-success-bg: #a7daa7;
   --status-success-border: #0D6E0D;
