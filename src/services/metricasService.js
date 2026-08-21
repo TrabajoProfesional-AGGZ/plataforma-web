@@ -1,5 +1,6 @@
 import { fetchTo } from '../utils/utils';
 
+/** Obtiene el ranking de disciplinas con más socios inscriptos. */
 export async function getTopDisciplinas(limite = 5) {
   const res = await fetchTo(`/api/v1/metricas/disciplinas/top?limite=${encodeURIComponent(limite)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
@@ -7,6 +8,7 @@ export async function getTopDisciplinas(limite = 5) {
   return res.json();
 }
 
+/** Obtiene el porcentaje de ocupación de instalaciones en los últimos `dias`. */
 export async function getOcupacionInstalaciones(dias = 30) {
   const res = await fetchTo(`/api/v1/metricas/instalaciones/ocupacion?dias=${encodeURIComponent(dias)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
@@ -14,6 +16,7 @@ export async function getOcupacionInstalaciones(dias = 30) {
   return res.json();
 }
 
+/** Obtiene el ranking de eventos por entradas vendidas y ocupación. */
 export async function getTopEventos(limite = 5) {
   const res = await fetchTo(`/api/v1/metricas/eventos/top?limite=${encodeURIComponent(limite)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
@@ -21,6 +24,7 @@ export async function getTopEventos(limite = 5) {
   return res.json();
 }
 
+/** Obtiene el ranking de productos más vendidos. */
 export async function getTopProductos(limite = 5) {
   const res = await fetchTo(`/api/v1/metricas/productos/top?limite=${encodeURIComponent(limite)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
@@ -28,6 +32,7 @@ export async function getTopProductos(limite = 5) {
   return res.json();
 }
 
+/** Obtiene el desglose de pagos marcados como pagados en caja por tipo (cuota/reserva/entrada/compra). */
 export async function getPagosEnCaja() {
   const res = await fetchTo('/api/v1/metricas/pagos-caja', 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
@@ -35,6 +40,7 @@ export async function getPagosEnCaja() {
   return res.json();
 }
 
+/** Obtiene el dashboard de métricas financieras, opcionalmente filtrado por período. */
 export async function getDashboardFinanzas(periodo=null) {
     let url = ''
     if (periodo) {

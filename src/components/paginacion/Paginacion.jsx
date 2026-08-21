@@ -1,6 +1,10 @@
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import './Paginacion.css';
 
+/**
+ * Controles de paginación (Anterior/Siguiente + indicador). Se auto-oculta
+ * si `totalPaginas` es 1 o menos. Pensado para usarse junto con el hook `usePaginacion`.
+ */
 export function Paginacion({ pagina, totalPaginas, onCambiarPagina }) {
   if (totalPaginas <= 1) return null;
 

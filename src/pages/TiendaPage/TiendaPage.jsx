@@ -19,12 +19,14 @@ import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
 
+/** Traduce un error de servicio a un mensaje amigable, o usa el mensaje por defecto. */
 function mensajeError(err, fallback) {
   return err?.message === 'servicio-no-disponible'
     ? 'El servicio no está disponible. Intentá de nuevo más tarde.'
     : fallback;
 }
 
+/** Página de catálogo y detalle de productos: crear, editar y crear compras para un socio. */
 function TiendaPage() {
   const { logoSocio: logo } = useTheme();
   const puedeCrearCompra = usePermiso('crear_compra');
@@ -86,6 +88,7 @@ function TiendaPage() {
     }
   }
 
+  /** Agrega el producto de forma optimista y lo reemplaza (o revierte) según la respuesta del backend. */
   async function handleProductoCreado(data) {
     setCrearOpen(false);
     const tempId = `temp-${Date.now()}`;

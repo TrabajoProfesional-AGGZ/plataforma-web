@@ -17,6 +17,10 @@ const stepFields = {
   3: ['email', 'phone', 'address'],
 };
 
+/**
+ * Formulario de tres pasos (Personal / Documento / Contacto) para crear un socio.
+ * @param {{ onSuccess: () => void, onCancel: () => void }} props
+ */
 export function CreateSocioForm({ onSuccess, onCancel }) {
   const {
     step, direction, submitted, setSubmitted, navGuard,

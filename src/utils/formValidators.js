@@ -1,3 +1,4 @@
+/** Reglas de `react-hook-form` para un número de documento: 5–20 caracteres alfanuméricos en mayúsculas. */
 export function getDocNumberRules({ required = true } = {}) {
   return {
     ...(required && { required: 'El número es requerido' }),
@@ -9,6 +10,7 @@ export function getDocNumberRules({ required = true } = {}) {
   };
 }
 
+/** Valida que una fecha de nacimiento sea real, no futura y no implique más de 120 años. */
 export function validarFechaNacimiento(v) {
   const d = new Date(v);
   const now = new Date();
@@ -18,11 +20,13 @@ export function validarFechaNacimiento(v) {
   return undefined;
 }
 
+/** Igual que `validarFechaNacimiento`, pero permite el campo vacío. */
 export function validarFechaNacimientoOpcional(v) {
   if (!v) return undefined;
   return validarFechaNacimiento(v);
 }
 
+/** Valida que una URL sea `https://` (rechaza `http://`, `javascript:`, `data:`, etc). */
 export function esUrlHttpsValida(v) {
   if (!v) return undefined;
   try {
@@ -32,6 +36,7 @@ export function esUrlHttpsValida(v) {
   }
 }
 
+/** Reglas de `react-hook-form` para el campo (oculto) de URL de imagen. */
 export function getImagenUrlRules() {
   return {
     validate: esUrlHttpsValida,
@@ -39,6 +44,7 @@ export function getImagenUrlRules() {
   };
 }
 
+/** Límites de longitud centralizados para campos de texto libre. */
 export const MAX_LEN = {
   TITULO_NOTICIA: 150,
   CUERPO_NOTICIA: 5000,
@@ -58,6 +64,10 @@ export const MAX_LEN = {
 // eslint-disable-next-line no-control-regex
 const CARACTERES_DE_CONTROL = /[\x00-\x1F\x7F]/;
 
+/**
+ * Valida un campo de credencial (email/password) de login: rechaza caracteres de control
+ * y strings más largos que `maxLength`. No incluye blocklist de SQL: Firebase parametriza.
+ */
 export function validarCredencialSegura(value, maxLength) {
   if (CARACTERES_DE_CONTROL.test(value)) {
     return 'El valor contiene caracteres no permitidos';
@@ -76,6 +86,11 @@ const EXTENSIONES_PELIGROSAS = new Set([
 ]);
 const TAMANIO_MAXIMO_IMAGEN = 5 * 1024 * 1024;
 
+/**
+ * Valida un archivo de imagen antes de subirlo: tipo MIME, extensión permitida, doble extensión
+ * peligrosa (ej. `foto.php.jpg`) y tamaño máximo. Es solo validación de UX — la validación real
+ * de seguridad (magic bytes del contenido) vive en el backend.
+ */
 export function validarArchivoImagen(file) {
   if (!file) return undefined;
   if (!TIPOS_IMAGEN_PERMITIDOS.has(file.type)) return 'Solo se permiten imágenes JPG, PNG o WEBP';
@@ -92,6 +107,7 @@ export function validarArchivoImagen(file) {
   return undefined;
 }
 
+/** Valida la fortaleza de una contraseña: mín. 10 y máx. `MAX_LEN.PASSWORD` caracteres, con minúscula, mayúscula y número. */
 export function validarFortalezaPassword(v) {
   if (!v || v.length < 10) return 'Mínimo 10 caracteres';
   if (v.length > MAX_LEN.PASSWORD) return `Máximo ${MAX_LEN.PASSWORD} caracteres`;
@@ -101,6 +117,7 @@ export function validarFortalezaPassword(v) {
   return undefined;
 }
 
+/** Reglas de `react-hook-form` para el campo de contraseña: requerido + `validarFortalezaPassword`. */
 export function getPasswordRules() {
   return {
     required: 'La contraseña es requerida',

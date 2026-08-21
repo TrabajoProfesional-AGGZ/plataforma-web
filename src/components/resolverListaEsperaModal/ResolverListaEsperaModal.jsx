@@ -11,6 +11,10 @@ function mensajeError(err) {
   return 'No se pudo procesar la acción. Intentá de nuevo.';
 }
 
+/**
+ * Modal con dos acciones explícitas para resolver a un socio en lista de espera
+ * de una disciplina: pasar su inscripción a activa, o eliminarlo de la lista.
+ */
 export function ResolverListaEsperaModal({ idDisciplina, idSocio, nombreSocio, onSuccess, onCancel }) {
   const [accionEnCurso, setAccionEnCurso] = useState(null);
   const [error, setError] = useState('');

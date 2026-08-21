@@ -22,12 +22,14 @@ import '../../styles/SocioCard.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
 
+/** Traduce un error de servicio a un mensaje amigable, o usa el mensaje por defecto. */
 function mensajeError(err, fallback) {
   return err?.message === 'servicio-no-disponible'
     ? 'El servicio no está disponible. Intentá de nuevo más tarde.'
     : fallback;
 }
 
+/** Página de listado y detalle de instalaciones, con gestión de sus reservas. */
 function InstalacionesPage() {
   const { logoSocio: logo } = useTheme();
   const location = useLocation();
@@ -78,6 +80,7 @@ function InstalacionesPage() {
     cargarInstalaciones();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  /** Carga las reservas activas de la instalación, completando cada socio con sus datos completos. */
   async function cargarReservas(instalacionId) {
     const [reservasData, sociosData] = await Promise.all([getReservasPorInstalacion(instalacionId), getSocios()]);
     const socioMap = Object.fromEntries(sociosData.map((s) => [s.id, s]));
@@ -90,6 +93,7 @@ function InstalacionesPage() {
     resetPaginaReservas();
   }
 
+  /** Busca todas las reservas del socio y filtra solo las de la instalación actual. */
   async function buscarPorSocio(nroSocio) {
     if (!nroSocio.trim()) {
       setReservasBusqueda(null);
@@ -122,6 +126,7 @@ function InstalacionesPage() {
 
   // === Instalaciones ===
 
+  /** Agrega la instalación de forma optimista y la reemplaza (o revierte) según la respuesta del backend. */
   async function handleInstalacionCreada(data) {
     setCrearInstalacionFormOpen(false);
     const tempId = `temp-${Date.now()}`;
@@ -137,6 +142,7 @@ function InstalacionesPage() {
     }
   }
 
+  /** Elimina la instalación (y sus reservas locales) de forma optimista; solo el error se muestra si falla. */
   async function handleEliminarInstalacion() {
     if (guardandoInstalacion) return;
     setGuardandoInstalacion(true);
@@ -206,6 +212,7 @@ function InstalacionesPage() {
     setEliminarReservaOpen(true);
   }
 
+  /** Marca la reserva como cancelada de forma optimista y revierte si falla el backend. */
   async function handleEliminarReserva() {
     if (guardandoReserva) return;
     setGuardandoReserva(true);
@@ -224,6 +231,7 @@ function InstalacionesPage() {
     }
   }
 
+  /** Carga las reservas históricas de la instalación, completando cada socio con sus datos completos. */
   async function cargarReservasHistoricas(instalacionId) {
     const [reservasData, sociosData] = await Promise.all([
       getReservasHistoricasPorInstalacion(instalacionId),

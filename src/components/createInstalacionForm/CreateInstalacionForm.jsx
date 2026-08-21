@@ -19,6 +19,12 @@ const stepFields = {
 // Duraciones de turno (minutos) que dividen exactamente las 12hs disponibles (08:00-20:00)
 const DURACIONES_TURNO = [30, 45, 60, 90, 120];
 
+/**
+ * Formulario de dos pasos (Datos / Configuración) para crear una instalación.
+ * "Usar valor por defecto" deshabilita y exime de validación al tiempo mínimo
+ * de cancelación, enviando `null` (el backend lo interpreta como 60 minutos).
+ * @param {{ onSuccess: (payload: object) => void, onCancel: () => void }} props
+ */
 export function CreateInstalacionForm({ onSuccess, onCancel }) {
   const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
 

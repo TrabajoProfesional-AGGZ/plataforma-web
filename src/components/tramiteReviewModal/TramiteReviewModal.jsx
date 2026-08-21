@@ -14,6 +14,11 @@ function mensajeError(err) {
     : 'Error al revisar el trámite. Intentá de nuevo.';
 }
 
+/**
+ * Modal para aprobar o rechazar un trámite en revisión, con observaciones
+ * opcionales. El dropdown solo ofrece "aprobado"/"rechazado" — un trámite ya
+ * revisado no puede volver a "en_revision".
+ */
 export function TramiteReviewModal({ tramite, onSuccess, onCancel }) {
   const [estado, setEstado] = useState('');
   const [observaciones, setObservaciones] = useState('');

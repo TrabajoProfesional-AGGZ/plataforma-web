@@ -1,5 +1,15 @@
 import { useEffect, useState } from 'react';
 
+/**
+ * Pagina una lista client-side. Si la lista se achica y la página actual
+ * queda fuera de rango (ej. tras aplicar un filtro), se ajusta automáticamente.
+ * @param {Array} lista - Lista completa a paginar.
+ * @param {number} [porPagina=10] - Cantidad de items por página.
+ * @returns {{
+ *   pagina: number, totalPaginas: number, listaPaginada: Array,
+ *   irAPagina: (n: number) => void, resetPagina: () => void
+ * }}
+ */
 export function usePaginacion(lista, porPagina = 10) {
   const [pagina, setPagina] = useState(1);
   const totalPaginas = Math.max(1, Math.ceil(lista.length / porPagina));

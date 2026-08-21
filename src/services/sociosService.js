@@ -3,6 +3,7 @@ import { fetchTo } from '../utils/utils';
 // Fetch de socios en curso, compartido entre llamadores concurrentes (ver getSocios).
 let sociosEnCurso = null;
 
+/** Trae todas las páginas de socios desde el backend, notificando a `listeners` tras cada página. */
 async function fetchTodasLasPaginasDeSocios(listeners) {
   const limite = 100;
   let pagina = 1;
@@ -23,14 +24,9 @@ async function fetchTodasLasPaginasDeSocios(listeners) {
 }
 
 /**
- * Trae todos los socios, paginando contra el backend (tope de 100 por página).
- * `onPage(sociosHastaAhora)` se invoca luego de cada página, para poder renderizar
- * la primera página ya mientras el resto se sigue trayendo en segundo plano.
- *
- * Si ya hay una secuencia de páginas en curso (ej. React StrictMode invoca el mismo
- * efecto dos veces en desarrollo), los llamadores concurrentes se enganchan a esa
- * misma secuencia en vez de disparar cada uno la suya — así el backend nunca recibe
- * más de un pedido de página a la vez, sin importar cuántos componentes lo pidan.
+ * Trae todos los socios paginando contra el backend; `onPage` se invoca tras cada página.
+ * Si ya hay una secuencia en curso (ej. doble invocación de StrictMode), los llamadores
+ * concurrentes se enganchan a ella en vez de disparar un fetch propio.
  */
 export async function getSocios({ onPage } = {}) {
   if (sociosEnCurso) {
@@ -46,6 +42,7 @@ export async function getSocios({ onPage } = {}) {
   return promise;
 }
 
+/** Crea un socio nuevo. */
 export async function createSocio(data) {
   const res = await fetchTo('/api/v1/socios', 'POST', data);
   if (res.status >= 500) throw new Error('servicio-no-disponible');
@@ -54,6 +51,7 @@ export async function createSocio(data) {
   return res.json();
 }
 
+/** Modifica los datos de un socio existente. */
 export async function updateSocio(id, data) {
   const res = await fetchTo(`/api/v1/socios/${encodeURIComponent(id)}`, 'PATCH', data);
   if (res.status >= 500) throw new Error('servicio-no-disponible');
@@ -61,12 +59,14 @@ export async function updateSocio(id, data) {
   return res.json();
 }
 
+/** Elimina un socio por id. */
 export async function deleteSocio(id) {
   const res = await fetchTo(`/api/v1/socios/${encodeURIComponent(id)}`, 'DELETE');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) throw new Error('Error al eliminar socio');
 }
 
+/** Busca un socio por su número de socio. */
 export async function getSocioByNroSocio(nroSocio) {
   const res = await fetchTo(`/api/v1/socios/por-nro-socio/${encodeURIComponent(nroSocio)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
@@ -75,6 +75,7 @@ export async function getSocioByNroSocio(nroSocio) {
   return res.json();
 }
 
+/** Busca un socio por su email. */
 export async function getSocioByEmail(email) {
   const res = await fetchTo(`/api/v1/socios/por-email/${encodeURIComponent(email)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
@@ -83,6 +84,7 @@ export async function getSocioByEmail(email) {
   return res.json();
 }
 
+/** Busca un socio por su UUID. */
 export async function getSocioById(id) {
   const res = await fetchTo(`/api/v1/socios/${encodeURIComponent(id)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');

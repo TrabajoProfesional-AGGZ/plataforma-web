@@ -4,6 +4,7 @@ import { resetPassword } from '../../services/authService';
 import { MAX_LEN, validarCredencialSegura } from '../../utils/formValidators';
 import logoSocio from '../../assets/logo_socio.png';
 
+/** Modal para pedir el email de recuperación de contraseña; el resultado mostrado es siempre el mismo mensaje genérico. */
 export function RecuperarContraseniaModal({ onClose }) {
   const [email, setEmail] = useState('');
   const [error, setError] = useState('');

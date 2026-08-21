@@ -7,6 +7,12 @@ import { SocioTramitesModal } from '../socioTramitesModal/SocioTramitesModal';
 import { SocioPagosPendientesModal } from '../socioPagosPendientesModal/SocioPagosPendientesModal';
 import './SocioAccionesExtra.css';
 
+/**
+ * Botonera de acciones extra en el detalle de un socio (disciplinas, reservas,
+ * trámites, pagos pendientes), cada una gateada por su propio permiso y
+ * abriendo su modal correspondiente. No renderiza nada si el usuario no
+ * tiene ninguno de los cuatro permisos.
+ */
 function SocioAccionesExtra({ idSocio, nroSocio, nombreSocio }) {
   const puedeVerDisciplinas = usePermiso('ver_disciplinas');
   const puedeVerReservas = usePermiso('ver_reservas');

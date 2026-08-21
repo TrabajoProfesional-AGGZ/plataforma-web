@@ -15,12 +15,14 @@ import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
 
+/** Traduce un error de servicio a un mensaje amigable, o usa el mensaje por defecto. */
 function mensajeError(err, fallback) {
   return err?.message === 'servicio-no-disponible'
     ? 'El servicio no está disponible. Intentá de nuevo más tarde.'
     : fallback;
 }
 
+/** Página de listado de eventos vigentes/históricos: crear evento y reservar entradas por socio. */
 function EventosPage() {
   const { logoSocio: logo } = useTheme();
   const puedeVerEventos = usePermiso('ver_eventos');
@@ -45,6 +47,7 @@ function EventosPage() {
       .finally(() => setLoading(false));
   }
 
+  /** Carga los eventos históricos de forma perezosa (recién al pedirlos por primera vez). */
   function verHistoricos() {
     setCargandoHistoricos(true);
     setError('');
@@ -63,6 +66,7 @@ function EventosPage() {
     cargarEventos();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  /** Agrega el evento de forma optimista y lo reemplaza (o revierte) según la respuesta del backend. */
   async function handleEventoCreado(data) {
     setCrearOpen(false);
     const tempId = `temp-${Date.now()}`;
@@ -142,7 +146,7 @@ function EventosPage() {
                         type="button"
                         className="eventos-btn-reservar-entrada"
                         onClick={() => setEventoReserva(e)}
-                        disabled={String(e.id).startsWith('temp-')}
+                        disabled={String(e.id).startsWith('temp-')} /* evento creado optimistamente, aún sin id real del backend */
                       >
                         <Ticket size={14} aria-hidden="true" />
                         Reservar entrada

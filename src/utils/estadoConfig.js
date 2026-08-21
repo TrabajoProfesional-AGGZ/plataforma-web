@@ -12,6 +12,11 @@ export const ESTADO_CONFIG = {
 
 export const ESTADO_DEFAULT = { logo: logoAmarillo, bg: 'var(--status-warning-bg)', border: 'var(--status-warning-border)', variant: 'warning' };
 
+/**
+ * Devuelve la configuración visual (logo, colores, variante) para un estado de socio.
+ * @param {string|{nombre: string}} estado - Nombre del estado o el objeto estado con campo `nombre`.
+ * @returns {{logo: string, bg: string, border: string, variant: string}}
+ */
 export function estadoConfig(estado) {
   const nombre = typeof estado === 'object' ? (estado?.nombre ?? '') : (estado ?? '');
   return ESTADO_CONFIG[nombre] ?? ESTADO_DEFAULT;

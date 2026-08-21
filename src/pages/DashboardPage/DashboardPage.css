@@ -22,7 +22,7 @@
   margin: 0 0 var(--space-10) 0;
 }
 
-/* ── Section cards grid ─────────────────────────────────── */
+/* ── Grilla de tarjetas de sección ─────────────────────────────────── */
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -106,7 +106,7 @@
   transition: color var(--transition-normal);
 }
 
-/* Hover: invert to black */
+/* Hover: invierte a color oscuro */
 .dashboard-card:hover .dashboard-card-icon {
   background-color: rgba(255, 255, 255, 0.15);
   color: var(--color-surface);

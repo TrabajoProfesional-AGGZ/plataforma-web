@@ -7,6 +7,7 @@ const ENDPOINT_POR_TIPO = {
   compra: 'compras',
 };
 
+/** Obtiene el resumen financiero (cuotas, reservas, entradas y compras) de un socio. */
 export async function getResumenFinanciero(idSocio) {
   const res = await fetchTo(`/api/v1/finanzas/${encodeURIComponent(idSocio)}`, 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
@@ -14,6 +15,7 @@ export async function getResumenFinanciero(idSocio) {
   return res.json();
 }
 
+/** Marca un item financiero (`tipo`: cuota/reserva/entrada/compra) como pagado en caja. */
 export async function marcarPagadaCaja(tipo, id) {
   const recurso = ENDPOINT_POR_TIPO[tipo];
   const res = await fetchTo(`/api/v1/internos/${recurso}/${encodeURIComponent(id)}/marcar-pagada`, 'POST', {

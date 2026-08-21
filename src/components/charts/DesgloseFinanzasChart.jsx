@@ -1,14 +1,17 @@
-// src/components/charts/DesgloseFinanzasChart.jsx
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import EmptyState from '../feedback/EmptyState';
 
+/**
+ * Gráfico de barras con el desglose de recaudación por concepto, ordenado
+ * de mayor a menor monto. Muestra un `EmptyState` si no hay datos.
+ * @param {{ datos: Array<{ concepto: string, monto: number }> }} props
+ */
 export function DesgloseFinanzasChart({ datos }) {
   if (!datos || datos.length === 0) {
     return <EmptyState mensaje="No hay datos financieros para este período." />;
   }
 
-  // Ordenamos los datos de mayor a menor recaudación
   const datosOrdenados = [...datos].sort((a, b) => b.monto - a.monto);
 
   return (

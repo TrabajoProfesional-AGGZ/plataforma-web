@@ -22,14 +22,24 @@ const ESTADO_LABEL = {
   rechazado: 'Rechazado',
 };
 
+/** Detecta si una URL de archivo apunta a una imagen renderizable inline. */
 function esImagen(url) {
   return /\.(jpe?g|png|webp)(\?|$)/i.test(url ?? '');
 }
 
+/** Defensa en profundidad: solo permite abrir enlaces `http(s)`. */
 function esUrlSegura(url) {
   return typeof url === 'string' && /^https?:\/\//i.test(url);
 }
 
+/**
+ * Modal lista/detalle de los trámites de un socio: el listado solo trae
+ * tipo/estado/fecha; al hacer click en una fila se pide el detalle completo
+ * (incluyendo el archivo, mostrado inline si es una imagen). Si el trámite
+ * está `en_revision`, permite abrir `TramiteReviewModal` — mientras ese
+ * sub-modal está abierto, el `onClose` de este se anula para que un Escape
+ * ahí no cierre también este modal.
+ */
 function SocioTramitesModal({ idSocio, onClose }) {
   const { logoSocio: logo } = useTheme();
   const [vista, setVista] = useState('lista');

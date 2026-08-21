@@ -16,6 +16,13 @@ const STEP_COLORS = {
   dark: { bubbleActive: '#f5f5f5', bubbleIdle: '#3a3a3a', onBubble: '#1e1e1e', idleIcon: '#b0b0b0', success: '#4ade80' },
 };
 
+/**
+ * Esqueleto compartido por todos los formularios de creación/edición: envuelve
+ * el contenido en `ModalOverlay`, muestra el indicador de pasos y la barra de
+ * progreso (ocultos si `steps` tiene un solo elemento), los botones de
+ * navegación (Atrás/Siguiente/Cancelar/Confirmar según el paso) y, cuando
+ * `submitted` es `true`, una pantalla de éxito animada en su lugar.
+ */
 export function MultiStepFormShell({
   steps,
   step,

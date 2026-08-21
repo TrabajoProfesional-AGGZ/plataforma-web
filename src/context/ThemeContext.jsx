@@ -8,10 +8,19 @@ const THEME_STORAGE_KEY = 'theme';
 
 const ThemeContext = createContext(null);
 
+/**
+ * Lee el tema guardado en `localStorage`; si no hay valor o es inválido, usa claro por defecto.
+ * @returns {'light'|'dark'}
+ */
 function getInitialTheme() {
   return localStorage.getItem(THEME_STORAGE_KEY) === 'dark' ? 'dark' : 'light';
 }
 
+/**
+ * Provider de tema claro/oscuro: persiste la elección en `localStorage`, la refleja
+ * en `document.documentElement.dataset.theme` y expone los logos correspondientes al tema activo.
+ * @param {{ children: import('react').ReactNode }} props
+ */
 export function ThemeProvider({ children }) {
   const [theme, setTheme] = useState(getInitialTheme);
 
@@ -41,6 +50,10 @@ export function ThemeProvider({ children }) {
   );
 }
 
+/**
+ * Hook para consumir el `ThemeContext` (tema activo, toggle y logos theme-aware).
+ * @returns {{ theme: 'light'|'dark', toggleTheme: () => void, logoSocio: string, logoTexto: string }}
+ */
 export function useThemeContext() {
   return useContext(ThemeContext);
 }

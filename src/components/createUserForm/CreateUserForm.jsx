@@ -25,6 +25,12 @@ const stepFields = {
   4: ['rol'],
 };
 
+/**
+ * Formulario de cuatro pasos (Personal / Documento / Credenciales / Rol) para
+ * crear un usuario administrativo. El backend (MS Auth) crea el usuario en
+ * Firebase con el email/contraseña provistos.
+ * @param {{ onSuccess: () => void, onCancel: () => void }} props
+ */
 export function CreateUserForm({ onSuccess, onCancel }) {
   const {
     step, direction, submitted, setSubmitted, navGuard,

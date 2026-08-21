@@ -1,6 +1,6 @@
-/* Shared styles for list pages: SociosPage, UsuariosPage, DisciplinasPage, InstalacionesPage */
+/* Estilos compartidos para páginas de listado: SociosPage, UsuariosPage, DisciplinasPage, InstalacionesPage */
 
-/* ── Page title ──────────────────────────────────────────────── */
+/* ── Título de página ────────────────────────────────────────── */
 .socios-title,
 .usuarios-title {
   font-size: 32px;
@@ -12,7 +12,7 @@
   text-wrap: balance;
 }
 
-/* ── Ver-todos / secondary button ────────────────────────────── */
+/* ── Botón Ver-todos / secundario ─────────────────────────────── */
 .socios-ver-todos-button,
 .usuarios-ver-todos-button {
   background-color: var(--color-surface);
@@ -25,7 +25,7 @@
   background-color: var(--color-bg);
 }
 
-/* ── Filters layout ───────────────────────────────────────────── */
+/* ── Layout de filtros ────────────────────────────────────────── */
 .socios-filtros,
 .usuarios-filtros {
   display: flex;
@@ -49,7 +49,7 @@
   max-width: 180px;
 }
 
-/* ── Table sort ───────────────────────────────────────────────── */
+/* ── Orden de tabla ───────────────────────────────────────────── */
 .socios-th-sort,
 .usuarios-th-sort {
   cursor: pointer;
@@ -61,7 +61,7 @@
   color: var(--color-text-primary);
 }
 
-/* ── Toolbar ─────────────────────────────────────────────────── */
+/* ── Barra de herramientas ─────────────────────────────────────── */
 .socios-toolbar,
 .usuarios-toolbar {
   display: flex;
@@ -88,7 +88,7 @@
   gap: var(--space-2);
 }
 
-/* ── Search ──────────────────────────────────────────────────── */
+/* ── Búsqueda ────────────────────────────────────────────────── */
 .socios-search-container,
 .usuarios-search-container {
   display: flex;
@@ -141,7 +141,7 @@
   padding: var(--space-12) 0;
 }
 
-/* ── Feedback ────────────────────────────────────────────────── */
+/* ── Mensajes de feedback ────────────────────────────────────── */
 .socios-error,
 .usuarios-error {
   color: var(--color-danger);
@@ -160,7 +160,7 @@
   text-align: center;
 }
 
-/* ── Filters ─────────────────────────────────────────────────── */
+/* ── Filtros ─────────────────────────────────────────────────── */
 .socios-filtro-toggle,
 .usuarios-filtro-toggle,
 .instalaciones-btn-toggle {
@@ -203,7 +203,7 @@
   border-color: var(--color-border-strong);
 }
 
-/* ── Table wrapper ───────────────────────────────────────────── */
+/* ── Contenedor de tabla ─────────────────────────────────────── */
 /* .disciplinas-* (wrapper/tabla/tr-clickable) se reutiliza tal cual en
    NoticiasPage y AlertasPage — no renombrar para evitar churn en 3 páginas. */
 .socios-table-wrapper, .usuarios-table-wrapper,
@@ -234,9 +234,9 @@
   }
 }
 
-/* Empty states → src/components/feedback/EmptyState.jsx (.empty-state) */
+/* Estados vacíos → src/components/feedback/EmptyState.jsx (.empty-state) */
 
-/* ── Table base ──────────────────────────────────────────────── */
+/* ── Tabla base ──────────────────────────────────────────────── */
 .socios-table,
 .usuarios-tabla,
 .disciplinas-tabla,
@@ -309,7 +309,7 @@
   border: 1px solid;
 }
 
-/* ── Estado cell ─────────────────────────────────────────────── */
+/* ── Celda de estado ─────────────────────────────────────────── */
 .socios-estado-cell,
 .usuarios-estado-cell {
   display: inline-flex;
@@ -323,7 +323,7 @@
   border: 1px solid;
 }
 
-/* ── Card action buttons base → src/styles/ListDetailShared.css ── */
+/* ── Botones de acción de card, base → src/styles/ListDetailShared.css ── */
 .socios-btn-eliminar, .socios-btn-editar,
 .usuarios-btn-eliminar, .usuarios-btn-editar, .usuarios-btn-cambiar-rol {
   transition: background-color var(--transition-fast), color var(--transition-fast);
