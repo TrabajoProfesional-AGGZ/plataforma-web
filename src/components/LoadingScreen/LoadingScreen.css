@@ -8,6 +8,8 @@
 
 .loading-logo {
   width: 80px;
+  /* Pulso y rotación son animaciones independientes para poder ajustar
+     la velocidad de cada una sin afectar a la otra. */
   animation:
     pulse 1.4s ease-in-out infinite,
     spin  3s   linear        infinite;
