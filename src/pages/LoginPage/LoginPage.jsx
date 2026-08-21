@@ -26,6 +26,7 @@ const CODIGOS_CREDENCIALES_INVALIDAS = [
   'auth/wrong-password',
 ];
 
+/** Solo credenciales inválidas conocidas dan un mensaje específico; cualquier otro error se trata como servicio caído. */
 function resolverMensajeErrorLogin(err) {
   if (err.message === 'unauthorized' || CODIGOS_CREDENCIALES_INVALIDAS.includes(err.code)) {
     return 'Credenciales incorrectas';
@@ -33,6 +34,7 @@ function resolverMensajeErrorLogin(err) {
   return 'Servicio no disponible';
 }
 
+/** Pantalla de login con animación de entrada/salida y recuperación de contraseña. */
 function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -55,6 +57,7 @@ function LoginPage() {
     return () => clearTimeout(timer);
   }, [shouldReduceMotion]);
 
+  /** Evita navegar dos veces si la animación de salida dispara el callback más de una vez. */
   function safeNavigate() {
     if (!navigated.current) {
       navigated.current = true;
