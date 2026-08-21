@@ -38,24 +38,19 @@ describe('DesgloseFinanzasChart', () => {
     ];
 
     render(<DesgloseFinanzasChart datos={datosMock} />);
-    
-    // Verificamos que el contenedor de Recharts esté en el documento
+
     expect(screen.getByTestId('responsive-container')).toBeInTheDocument();
     expect(screen.getByTestId('bar-chart')).toBeInTheDocument();
-    
-    // Verificamos que el mensaje de "no hay datos" no exista
     expect(screen.queryByText('No hay datos financieros para este período.')).not.toBeInTheDocument();
   });
 });
 
 test('ejecuta los formatters del eje Y y el tooltip para formatear la moneda', () => {
     const datosMock = [{ concepto: 'Cuota', monto: 5000 }];
-    
-    // Al renderizar, los mocks de arriba van a disparar las funciones de la línea 28 y 35 automáticamente
+
+    // Renderizar dispara los mocks de YAxis/Tooltip de arriba, que a su vez invocan los formatters
     render(<DesgloseFinanzasChart datos={datosMock} />);
-    
-    // Simplemente verificamos que el componente no haya crasheado y se haya renderizado.
-    // Con esto ya tenés el 100% de coverage sin pelear con los formatos de texto.
+
     expect(screen.getByTestId('y-axis')).toBeInTheDocument();
     expect(screen.getByTestId('tooltip')).toBeInTheDocument();
   });
