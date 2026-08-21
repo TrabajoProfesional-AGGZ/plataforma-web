@@ -4,6 +4,7 @@ import { DesgloseFinanzasChart } from '../../components/charts/DesgloseFinanzasC
 import { useTheme } from '../../hooks/useTheme';
 import './FinanzasTab.css';
 
+/** Pestaña "Finanzas" de Métricas: recaudación total y desglose por concepto para un período elegido. */
 function FinanzasTab() {
   const { logoSocio: logo } = useTheme();
   const [datosFinanzas, setDatosFinanzas] = useState(null);
