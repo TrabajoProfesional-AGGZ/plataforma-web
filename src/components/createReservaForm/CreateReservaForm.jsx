@@ -10,7 +10,7 @@ import { getSocioByNroSocio } from '../../services/sociosService';
 import { useTheme } from '../../hooks/useTheme';
 import '../createForm/CreateSocioForm.css';
 import './TurnoSelector.css';
-import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFields';
+import { Field, StyledInput, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
 import PropTypes from 'prop-types';
@@ -23,7 +23,7 @@ const STEPS = [
 ];
 
 const stepFields = {
-  1: ['id_instalacion'],
+  1: [],
   2: ['fecha_reserva', 'hora_inicio'],
 };
 
@@ -41,15 +41,17 @@ const MENSAJES_ERROR_SUBMIT = {
 };
 
 /**
- * Formulario de dos pasos (Datos / Horario) para crear una reserva a nombre de
- * uno o varios socios. Los turnos disponibles del paso 2 se recargan al cambiar
- * instalación o fecha y traen `cupos_disponibles` por turno (cupo compartido
- * entre reservas, no por-reserva); la cantidad de socios agregados no puede
+ * Formulario de dos pasos (Datos / Horario) para crear una reserva, siempre a
+ * nombre de una instalación ya conocida por el caller (se abre desde el
+ * detalle de esa instalación, así que no hay selector — el nombre se muestra
+ * como dato fijo). Los turnos disponibles del paso 2 se recargan al cambiar
+ * la fecha y traen `cupos_disponibles` por turno (cupo compartido entre
+ * reservas, no por-reserva); la cantidad de socios agregados no puede
  * superar ese cupo, tanto en el paso 1 (bloqueo del botón "Agregar") como al
  * confirmar el envío (revalidado por si el cupo bajó mientras se completaba el form).
- * @param {{ onSuccess: () => void, onCancel: () => void, instalaciones?: Array<object>, instalacionPreseleccionada?: string }} props
+ * @param {{ onSuccess: () => void, onCancel: () => void, instalacion: object }} props
  */
-export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], instalacionPreseleccionada = '' }) {
+export function CreateReservaForm({ onSuccess, onCancel, instalacion }) {
   const { logoSocio: logo } = useTheme();
   const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
   const [nroSocioInput, setNroSocioInput] = useState('');
@@ -70,9 +72,8 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
     watch,
     setValue,
     formState: { errors, isSubmitting },
-  } = useForm({ mode: 'onTouched', defaultValues: { id_instalacion: instalacionPreseleccionada } });
+  } = useForm({ mode: 'onTouched' });
 
-  const idInstalacionSeleccionada = watch('id_instalacion');
   const fechaSeleccionada = watch('fecha_reserva');
   const horaInicioSeleccionada = watch('hora_inicio');
 
@@ -81,14 +82,14 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
   const topeSociosAlcanzado = cuposDisponiblesTurno != null && sociosAgregados.length >= cuposDisponiblesTurno;
 
   useEffect(() => {
-    if (!idInstalacionSeleccionada || !fechaSeleccionada) {
+    if (!fechaSeleccionada) {
       setTurnosDisponibles([]);
       return;
     }
     let cancelled = false;
     setCargandoTurnos(true);
     setErrorTurnos('');
-    getTurnosDisponibles(idInstalacionSeleccionada, fechaSeleccionada)
+    getTurnosDisponibles(instalacion.id, fechaSeleccionada)
       .then((turnos) => {
         if (cancelled) return;
         setTurnosDisponibles(turnos);
@@ -102,7 +103,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
       })
       .finally(() => { if (!cancelled) setCargandoTurnos(false); });
     return () => { cancelled = true; };
-  }, [idInstalacionSeleccionada, fechaSeleccionada, setValue]);
+  }, [instalacion.id, fechaSeleccionada, setValue]);
 
   const previewSocio = async (value) => {
     if (!value?.trim()) return;
@@ -186,7 +187,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
     try {
       await createReserva({
         ids_socios: sociosAgregados.map((s) => s.id),
-        id_instalacion: data.id_instalacion,
+        id_instalacion: instalacion.id,
         fecha_reserva: data.fecha_reserva,
         hora_inicio: data.hora_inicio,
       });
@@ -264,16 +265,8 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
               />
             </Field>
 
-            <Field label="Instalación" icon={Building2} error={errors.id_instalacion?.message}>
-              <StyledSelect
-                {...register('id_instalacion', { required: 'Debe seleccionar una instalación' })}
-                error={!!errors.id_instalacion}
-              >
-                <option value="">Seleccionar instalación...</option>
-                {instalaciones.map((inst) => (
-                  <option key={inst.id} value={inst.id}>{inst.nombre}</option>
-                ))}
-              </StyledSelect>
+            <Field label="Instalación" icon={Building2}>
+              <StyledInput type="text" value={instalacion.nombre} disabled />
             </Field>
           </FormStep>
         )}
@@ -290,7 +283,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
             <Field label="Turno" icon={Clock} error={errors.hora_inicio?.message}>
               <TurnoSelector
                 turnos={turnosDisponibles}
-                capacidadMaxima={instalaciones.find((i) => i.id === idInstalacionSeleccionada)?.capacidad_maxima}
+                capacidadMaxima={instalacion.capacidad_maxima}
                 selected={horaInicioSeleccionada}
                 onSelect={(hora) => setValue('hora_inicio', hora, { shouldValidate: true, shouldDirty: true })}
                 loading={cargandoTurnos}
@@ -325,6 +318,9 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
 CreateReservaForm.propTypes = {
   onSuccess: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-  instalaciones: PropTypes.array,
-  instalacionPreseleccionada: PropTypes.string,
+  instalacion: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    nombre: PropTypes.string.isRequired,
+    capacidad_maxima: PropTypes.number,
+  }).isRequired,
 };

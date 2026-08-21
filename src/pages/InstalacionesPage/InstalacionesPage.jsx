@@ -592,8 +592,7 @@ function InstalacionesPage() {
 
       {crearReservaFormOpen && instalacionActual && (
         <CreateReservaForm
-          instalaciones={[instalacionActual]}
-          instalacionPreseleccionada={instalacionActual.id}
+          instalacion={instalacionActual}
           onSuccess={async () => {
             setCrearReservaFormOpen(false);
             await cargarReservas(instalacionActual.id);
