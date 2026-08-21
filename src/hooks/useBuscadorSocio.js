@@ -1,6 +1,19 @@
 import { useState } from 'react';
 import { getSocioByNroSocio } from '../services/sociosService';
 
+/**
+ * Hook de búsqueda de un socio por número, con preview no bloqueante y
+ * reutilización del preview ya resuelto al confirmar la búsqueda.
+ * @returns {{
+ *   nroSocioInput: string,
+ *   busquedaSocio: boolean,
+ *   errorSocio: string,
+ *   socioSeleccionado: object|null,
+ *   handleNroSocioChange: (value: string) => void,
+ *   previewSocio: (value: string) => Promise<void>,
+ *   buscarSocio: () => Promise<void>
+ * }}
+ */
 export function useBuscadorSocio() {
   const [nroSocioInput, setNroSocioInput] = useState('');
   const [busquedaSocio, setBusquedaSocio] = useState(false);
@@ -21,7 +34,7 @@ export function useBuscadorSocio() {
       const socio = await getSocioByNroSocio(value.trim());
       setSocioPreview(socio);
     } catch {
-      // preview silently fails
+      // el preview falla en silencio, no muestra error al usuario
     }
   };
 
