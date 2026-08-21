@@ -38,6 +38,15 @@ const MENSAJES_ERROR_SUBMIT = {
   'socio-suspendido': AVISOS_ESTADO_SOCIO.Suspendido,
 };
 
+/**
+ * Formulario de dos pasos (Datos / Horario) para crear una reserva a nombre de
+ * uno o varios socios. Los turnos disponibles del paso 2 se recargan al cambiar
+ * instalación o fecha y traen `cupos_disponibles` por turno (cupo compartido
+ * entre reservas, no por-reserva); la cantidad de socios agregados no puede
+ * superar ese cupo, tanto en el paso 1 (bloqueo del botón "Agregar") como al
+ * confirmar el envío (revalidado por si el cupo bajó mientras se completaba el form).
+ * @param {{ onSuccess: () => void, onCancel: () => void, instalaciones?: Array<object>, instalacionPreseleccionada?: string }} props
+ */
 export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], instalacionPreseleccionada = '' }) {
   const { logoSocio: logo } = useTheme();
   const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
@@ -99,7 +108,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
       const socio = await getSocioByNroSocio(value.trim());
       setSocioPreview(socio);
     } catch {
-      // preview silently fails
+      // La previsualización falla en silencio: el error real se muestra recién al intentar agregar el socio
     }
   };
 
