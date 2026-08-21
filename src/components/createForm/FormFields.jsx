@@ -237,6 +237,9 @@ export function StyledSelect({ error, className, children, ref: forwardedRef, ..
   const [currentValue, setCurrentValue] = useState('');
   const [highlighted, setHighlighted] = useState(0);
 
+  // Sin array de deps a propósito: re-lee `el.options`/`el.value` en cada render para
+  // detectar cambios en `children` (options dinámicas) sin depender de identidad de props.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     const el = selectRef.current;
     if (!el) return;

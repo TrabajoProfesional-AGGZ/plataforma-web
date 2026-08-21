@@ -28,6 +28,9 @@ export function TimePicker({ error, className, disabled, placeholder, ref: forwa
   } = usePickerPopover({ width: 172, height: 232 });
   const [value, setValue] = useState('');
 
+  // Sin array de deps a propósito: re-lee `inputRef.current.value` en cada render, ya
+  // que `commit`/`setNativeValue` escriben el input real fuera del ciclo de React.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     setValue(inputRef.current?.value || '');
   });
