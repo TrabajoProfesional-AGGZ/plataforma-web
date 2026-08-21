@@ -3,6 +3,12 @@ import PropTypes from 'prop-types';
 import { Field } from './FormFields';
 import { getImagenUrlRules } from '../../utils/formValidators';
 
+/**
+ * Caja de subida de imagen con estados visuales (`vacio`/`lista`/`subiendo`/`exito`/`error`,
+ * definidos en `estadoImagen` y `textoEstado`). Pensada para usarse junto con el hook
+ * `useImagenUpload`, que provee `fileInputRef`/`estadoImagen`/`imagenPreview`/`onFileChange`.
+ * El input de texto oculto valida la URL final con `getImagenUrlRules()` como defensa en profundidad.
+ */
 export function ImagenUploadField({
   label,
   fieldName,

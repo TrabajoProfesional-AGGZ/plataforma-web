@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import PropTypes from 'prop-types';
 
+/** Par de botones Cancelar/Confirmar para un formulario de un solo paso, con spinner de carga. */
 export function FormFooterActions({
   onCancel,
   onSubmit,

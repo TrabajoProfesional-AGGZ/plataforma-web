@@ -2,6 +2,11 @@ import { CheckCircle2, Hash } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { Field, StyledInput } from './FormFields';
 
+/**
+ * Campo de búsqueda de un socio por N° de socio (input + botón "Buscar" + preview
+ * al hacer blur), pensado para usarse junto con el hook `useBuscadorSocio`.
+ * Muestra el nombre del socio encontrado una vez seleccionado.
+ */
 export function SocioBuscadorField({
   id = 'socio-buscador-input',
   nroSocioInput,

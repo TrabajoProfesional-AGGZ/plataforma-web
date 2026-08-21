@@ -5,6 +5,12 @@ import './CreateSocioForm.css';
 
 const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
 
+/**
+ * Primitivo de modal único del proyecto: overlay con bloqueo de scroll del body,
+ * focus trap (Tab/Shift+Tab dentro del contenido), cierre con ESC o click fuera,
+ * restauración del foco previo al desmontar, y soporte del gesto de "atrás" del
+ * celular vía `useModalHistory`.
+ */
 export function ModalOverlay({ onClose, wrapperClass, children, ariaLabel, ariaLabelledBy }) {
   const wrapperRef = useRef(null);
 
