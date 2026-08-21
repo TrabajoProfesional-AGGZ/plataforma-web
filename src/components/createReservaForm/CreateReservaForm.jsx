@@ -9,11 +9,13 @@ import { createReserva, getTurnosDisponibles } from '../../services/reservasServ
 import { getSocioByNroSocio } from '../../services/sociosService';
 import { useTheme } from '../../hooks/useTheme';
 import '../createForm/CreateSocioForm.css';
+import './TurnoSelector.css';
 import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
 import PropTypes from 'prop-types';
 import { SociosSeleccionados } from '../SociosSeleccionados/SociosSeleccionados';
+import { TurnoSelector } from './TurnoSelector';
 
 const STEPS = [
   { id: 1, label: 'Datos', icon: User },
@@ -284,22 +286,14 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
               />
             </Field>
             <Field label="Turno" icon={Clock} error={errors.hora_inicio?.message}>
-              <StyledSelect
-                {...register('hora_inicio', { required: 'Debe seleccionar un turno' })}
-                error={!!errors.hora_inicio}
-                disabled={cargandoTurnos || turnosDisponibles.length === 0}
-              >
-                <option value="">
-                  {cargandoTurnos ? 'Cargando turnos...' : 'Seleccionar turno...'}
-                </option>
-                {turnosDisponibles.map((turno) => (
-                  <option key={turno.hora_inicio} value={turno.hora_inicio}>
-                    {turno.hora_inicio.slice(0, 5)} ({turno.cupos_disponibles}/{
-                      instalaciones.find((i) => i.id === idInstalacionSeleccionada)?.capacidad_maxima ?? '?'
-                    } lugares)
-                  </option>
-                ))}
-              </StyledSelect>
+              <TurnoSelector
+                turnos={turnosDisponibles}
+                capacidadMaxima={instalaciones.find((i) => i.id === idInstalacionSeleccionada)?.capacidad_maxima}
+                selected={horaInicioSeleccionada}
+                onSelect={(hora) => setValue('hora_inicio', hora, { shouldValidate: true, shouldDirty: true })}
+                loading={cargandoTurnos}
+              />
+              <input type="hidden" {...register('hora_inicio', { required: 'Debe seleccionar un turno' })} />
             </Field>
             {!cargandoTurnos && fechaSeleccionada && !errorTurnos && turnosDisponibles.length === 0 && (
               <p className="csf-error">

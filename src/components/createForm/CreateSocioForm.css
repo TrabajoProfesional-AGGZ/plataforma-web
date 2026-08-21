@@ -193,6 +193,37 @@ button.csf-overlay {
   color: var(--color-border-medium);
 }
 
+.csf-input[type='date'],
+.csf-input[type='time'] {
+  cursor: pointer;
+  font-variant-numeric: tabular-nums;
+}
+
+.csf-input[type='date']:hover,
+.csf-input[type='time']:hover {
+  background-color: var(--color-row-hover);
+}
+
+.csf-input[type='date']::-webkit-calendar-picker-indicator,
+.csf-input[type='time']::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-fast);
+}
+
+.csf-input[type='date']::-webkit-calendar-picker-indicator:hover,
+.csf-input[type='time']::-webkit-calendar-picker-indicator:hover {
+  background-color: var(--color-border-light);
+}
+
+/* El ícono nativo del datepicker es negro fijo — en modo oscuro queda
+   invisible sobre el fondo oscuro del input si no se invierte. */
+:root[data-theme='dark'] .csf-input[type='date']::-webkit-calendar-picker-indicator,
+:root[data-theme='dark'] .csf-input[type='time']::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
 .csf-select {
   cursor: pointer;
   appearance: none;
