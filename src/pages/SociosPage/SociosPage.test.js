@@ -631,6 +631,48 @@ describe('SociosPage', () => {
     expect(screen.queryByRole('button', { name: /editar/i })).not.toBeInTheDocument();
   });
 
+  test('muestra error si falla la recarga de socios de la disciplina tras resolver la lista de espera', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    getDisciplinas.mockResolvedValue([{ id: 'disc-1', nombre: 'Natación' }]);
+    getSociosByDisciplina
+      .mockResolvedValueOnce([{ id: socioMock.id, nro_socio: socioMock.nro_socio, estado_suscripcion: 'en_espera' }])
+      .mockRejectedValueOnce(new Error('falla'));
+    resolverListaEspera.mockResolvedValue({ estado_suscripcion: 'activa' });
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
+    fireEvent.click(await screen.findByText('Quitar de lista de espera'));
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Pasar inscripción a activa' }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/no se pudieron obtener los socios de la disciplina/i)).toBeInTheDocument();
+    });
+  });
+
+  test('cancelar el modal de lista de espera lo cierra sin llamar a resolverListaEspera', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    getDisciplinas.mockResolvedValue([{ id: 'disc-1', nombre: 'Natación' }]);
+    getSociosByDisciplina.mockResolvedValue([
+      { id: socioMock.id, nro_socio: socioMock.nro_socio, estado_suscripcion: 'en_espera' },
+    ]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
+    fireEvent.click(await screen.findByText('Quitar de lista de espera'));
+
+    fireEvent.click(await screen.findByRole('button', { name: /cancelar/i }));
+
+    await waitFor(() => {
+      expect(screen.queryByRole('button', { name: 'Pasar inscripción a activa' })).not.toBeInTheDocument();
+    });
+    expect(resolverListaEspera).not.toHaveBeenCalled();
+  });
+
   test('muestra error en modal al fallar la eliminación', async () => {
     deleteSocio.mockRejectedValueOnce(new Error('Error al eliminar socio'));
     await buscarYAbrirCard();
@@ -857,6 +899,58 @@ describe('SociosPage', () => {
     await waitFor(() => {
       expect(getSocios).toHaveBeenCalledTimes(2);
       expect(screen.getByRole('table')).toBeInTheDocument();
+    });
+  });
+
+  test('Ver todos actualiza la tabla incrementalmente a medida que llegan páginas del reintento', async () => {
+    let onPageCb;
+    let resolveGetSocios;
+    getSocios
+      .mockRejectedValueOnce(new Error('fallo inicial'))
+      .mockImplementationOnce(({ onPage } = {}) => {
+        onPageCb = onPage;
+        return new Promise((resolve) => { resolveGetSocios = resolve; });
+      });
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
+
+    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
+
+    await waitFor(() => expect(onPageCb).toBeDefined());
+    act(() => { onPageCb([socioMock]); });
+    await waitFor(() => expect(screen.getByText('1001')).toBeInTheDocument());
+
+    act(() => { onPageCb([socioMock, socioMock2]); });
+    await waitFor(() => expect(screen.getByText('1002')).toBeInTheDocument());
+
+    await act(async () => { resolveGetSocios([socioMock, socioMock2]); });
+  });
+
+  test('Ver todos muestra error de servicio no disponible cuando falla el reintento', async () => {
+    getSocios
+      .mockRejectedValueOnce(new Error('fallo inicial'))
+      .mockRejectedValueOnce(new Error('servicio-no-disponible'));
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
+
+    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/el servicio no está disponible en este momento/i)).toBeInTheDocument();
+    });
+  });
+
+  test('Ver todos muestra error genérico cuando falla el reintento con un error inesperado', async () => {
+    getSocios
+      .mockRejectedValueOnce(new Error('fallo inicial'))
+      .mockRejectedValueOnce(new Error('otro error'));
+    render(<SociosPage />);
+    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
+
+    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
+
+    await waitFor(() => {
+      expect(screen.getByText(/error al obtener los socios\. intentá de nuevo\./i)).toBeInTheDocument();
     });
   });
 
