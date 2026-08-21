@@ -20,6 +20,12 @@ const TEXTO_ESTADO_IMAGEN = {
   error: { titulo: 'Reintentar', hint: 'No se pudo cargar la imagen' },
 };
 
+/**
+ * Formulario de un paso para crear un evento. La imagen (opcional) se elige
+ * antes pero se sube a Cloudinary recién al confirmar el envío (`useImagenUpload`),
+ * antes de invocar `onSuccess` — si la subida falla, el envío se aborta.
+ * @param {{ onSuccess: (payload: object) => void, onCancel: () => void }} props
+ */
 export function CreateEventoForm({ onSuccess, onCancel }) {
   const { step, direction, submitted, setSubmitted, navGuard } = useMultiStepFormState();
   const {

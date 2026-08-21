@@ -13,6 +13,13 @@ const STEPS = [
   { id: 2, label: 'Configuración', icon: Users },
 ];
 
+/**
+ * Formulario de dos pasos (Datos / Configuración) para crear una disciplina.
+ * "Sin límite de cupo" deshabilita y exime de validación a `cupo_maximo`,
+ * enviando `null` en su lugar; "Arancelada" habilita y exige los campos
+ * de concepto de cobro y arancel mensual, enviados como `''`/`null` si no aplica.
+ * @param {{ onSuccess: (payload: object) => void, onCancel: () => void }} props
+ */
 export function CreateDisciplinaForm({ onSuccess, onCancel }) {
   const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
 
