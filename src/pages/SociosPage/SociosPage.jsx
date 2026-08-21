@@ -53,6 +53,8 @@ function SociosPage() {
 
   const [nroSocio, setNroSocio] = useState('');
   const [modo, setModo] = useState('idle'); // idle | socio | lista | no-encontrado
+  const modoRef = useRef(modo);
+  useEffect(() => { modoRef.current = modo; }, [modo]);
   useBackToRoot(modo, 'lista', () => setModo('lista'));
   const { resultado, setResultado, loading, setLoading, error, setError } = useListState();
   const { orden, setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden, ORDEN_INICIAL);
@@ -84,16 +86,20 @@ function SociosPage() {
           onPage: (parcial) => {
             if (!cancelled) {
               cacheSociosRef.current = parcial;
-              setResultado(parcial);
-              setModo('lista');
+              if (modoRef.current === 'idle' || modoRef.current === 'lista') {
+                setResultado(parcial);
+                setModo('lista');
+              }
               setLoading(false);
             }
           },
         });
         if (!cancelled) {
           cacheSociosRef.current = socios;
-          setResultado(socios);
-          setModo('lista');
+          if (modoRef.current === 'idle' || modoRef.current === 'lista') {
+            setResultado(socios);
+            setModo('lista');
+          }
         }
       } catch (err) {
         if (!cancelled) {
@@ -157,18 +163,24 @@ function SociosPage() {
   async function cargarSocios() {
     setLoading(true);
     setError(null);
+    setModo('lista');
+    modoRef.current = 'lista';
     try {
       const socios = await getSocios({
         onPage: (parcial) => {
           cacheSociosRef.current = parcial;
-          setResultado(parcial);
-          setModo('lista');
+          if (modoRef.current === 'idle' || modoRef.current === 'lista') {
+            setResultado(parcial);
+            setModo('lista');
+          }
           setLoading(false);
         },
       });
       cacheSociosRef.current = socios;
-      setResultado(socios);
-      setModo('lista');
+      if (modoRef.current === 'idle' || modoRef.current === 'lista') {
+        setResultado(socios);
+        setModo('lista');
+      }
     } catch (err) {
       if (err.message === 'servicio-no-disponible') {
         setError('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
