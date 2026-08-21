@@ -2,6 +2,17 @@ import { useState } from 'react';
 
 const ICONOS_ORDEN = { asc: ' ↑', desc: ' ↓', none: ' ↕' };
 
+/**
+ * Ordenamiento click-to-sort de una tabla: cicla asc → desc → sin orden por columna.
+ * @param {(item: object, campo: string) => *} getValorOrden - Extrae el valor de comparación de un item para un campo dado.
+ * @param {{ campo: string|null, dir: 'asc'|'desc' }} [ordenInicial] - Orden inicial.
+ * @returns {{
+ *   orden: { campo: string|null, dir: 'asc'|'desc' }, setOrden: Function,
+ *   toggleOrden: (campo: string) => void,
+ *   iconoOrden: (campo: string) => string,
+ *   aplicarOrden: (lista: Array) => Array
+ * }}
+ */
 export function useSortedList(getValorOrden, ordenInicial = { campo: null, dir: 'asc' }) {
   const [orden, setOrden] = useState(ordenInicial);
 

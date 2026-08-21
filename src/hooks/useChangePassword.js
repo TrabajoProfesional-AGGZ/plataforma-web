@@ -3,6 +3,18 @@ import { useNavigate } from 'react-router-dom';
 import { changePassword, logout } from '../services/authService';
 import { validarFortalezaPassword } from '../utils/formValidators';
 
+/**
+ * Hook del formulario de cambio de contraseña: valida fortaleza y coincidencia,
+ * llama al backend y, al confirmar, cierra sesión y redirige al login.
+ * @returns {{
+ *   actual: string, setActual: (v: string) => void,
+ *   nueva: string, setNueva: (v: string) => void,
+ *   confirmar: string, setConfirmar: (v: string) => void,
+ *   error: string,
+ *   loading: boolean,
+ *   handleSubmit: (e: import('react').FormEvent) => Promise<void>
+ * }}
+ */
 export function useChangePassword() {
   const [actual, setActual] = useState('');
   const [nueva, setNueva] = useState('');
