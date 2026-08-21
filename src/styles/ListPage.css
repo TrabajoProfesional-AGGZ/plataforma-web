@@ -181,8 +181,27 @@
   background-color: var(--color-bg);
 }
 
-.socios-filtro-select, .usuarios-filtro-select,
-.instalaciones-filtro-fecha, .instalaciones-filtro-tipo {
+/* StyledSelect usado como filtro: por defecto usa el mismo fondo que la
+   página (--color-bg), pensado para contrastar contra la tarjeta blanca de
+   los formularios de creación — acá el filtro va directo sobre el fondo de
+   la página, así que necesita fondo blanco propio para distinguirse. */
+.filtros-select-trigger {
+  background-color: var(--color-surface);
+}
+
+.filtros-select-trigger:hover:not(:disabled) {
+  background-color: var(--color-bg);
+}
+
+/* En los forms de creación value="" es un placeholder real ("Seleccionar...")
+   y StyledSelect lo pinta en gris tenue (--color-border-medium). Acá value=""
+   es una opción con significado propio ("Categoría: Todas", etc.), no un
+   placeholder, así que necesita el mismo color de texto que el resto. */
+.filtros-select-trigger .csf-picker-placeholder {
+  color: var(--color-text-primary);
+}
+
+.instalaciones-filtro-fecha {
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
   padding: 6px 10px;
@@ -191,16 +210,6 @@
   background-color: var(--color-surface);
   outline: none;
   cursor: pointer;
-}
-
-.socios-filtro-select,
-.usuarios-filtro-select {
-  width: 100%;
-}
-
-.socios-filtro-select:focus,
-.usuarios-filtro-select:focus {
-  border-color: var(--color-border-strong);
 }
 
 /* ── Contenedor de tabla ─────────────────────────────────────── */

@@ -4,6 +4,7 @@ import { Plus, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { CreateInstalacionForm } from '../../components/createInstalacionForm/CreateInstalacionForm';
 import { DatePicker } from '../../components/createForm/DatePicker';
 import { CreateReservaForm } from '../../components/createReservaForm/CreateReservaForm';
+import { StyledSelect } from '../../components/createForm/FormFields';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { getInstalaciones, createInstalacion, deleteInstalacion } from '../../services/instalacionesService';
 import { getReservasPorInstalacion, getReservasPorSocio, deleteReserva, getReservasHistoricasPorInstalacion } from '../../services/reservasService';
@@ -410,8 +411,8 @@ function InstalacionesPage() {
               <div className="instalaciones-seccion-toolbar">
                 <div>
                   {tiposDisponibles.length > 0 && (
-                    <select
-                      className="instalaciones-filtro-tipo"
+                    <StyledSelect
+                      className="filtros-select-trigger"
                       value={filtroTipo}
                       onChange={(e) => setFiltroTipo(e.target.value)}
                       aria-label="Filtrar por tipo"
@@ -420,7 +421,7 @@ function InstalacionesPage() {
                       {tiposDisponibles.map((tipo) => (
                         <option key={tipo} value={tipo}>{tipo}</option>
                       ))}
-                    </select>
+                    </StyledSelect>
                   )}
                 </div>
                 {puedeCrearInstalacion && (

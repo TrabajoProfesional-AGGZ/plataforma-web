@@ -1,18 +1,7 @@
 /* ── Orden ────────────────────────────────────────────────────── */
-.tienda-orden-select {
+.tienda-orden-select-wrap {
   margin-right: auto;
-  border: 1px solid var(--color-border-medium);
-  border-radius: var(--radius-sm);
-  padding: 6px 10px;
-  font-size: 0.8125rem;
-  color: var(--color-text-primary);
-  background-color: var(--color-surface);
-  outline: none;
-  cursor: pointer;
-}
-
-.tienda-orden-select:focus {
-  border-color: var(--color-border-strong);
+  width: 220px;
 }
 
 /* Miniatura en la tabla */

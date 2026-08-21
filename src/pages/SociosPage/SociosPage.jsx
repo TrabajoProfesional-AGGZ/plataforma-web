@@ -4,6 +4,7 @@ import { getSocios, deleteSocio } from '../../services/sociosService';
 import { getDisciplinas, getSociosByDisciplina, extenderSuscripcionDisciplina } from '../../services/disciplinasService';
 import { CreateSocioForm } from '../../components/createForm/CreateSocioForm';
 import { EditSocioForm } from '../../components/editForm/EditSocioForm';
+import { StyledSelect } from '../../components/createForm/FormFields';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { ResolverListaEsperaModal } from '../../components/resolverListaEsperaModal/ResolverListaEsperaModal';
 import { usePermiso } from '../../hooks/usePermiso';
@@ -473,8 +474,8 @@ function SociosPage() {
               {filtroAbierto && (
                 <div className="socios-filtros-dropdowns">
                   <div className="socios-filtros-grupo">
-                    <select
-                      className="socios-filtro-select"
+                    <StyledSelect
+                      className="filtros-select-trigger"
                       value={filtroCategoria}
                       onChange={(e) => setFiltroCategoria(e.target.value)}
                     >
@@ -482,12 +483,12 @@ function SociosPage() {
                       {categoriasUnicas.map(c => (
                         <option key={c} value={c}>{c}</option>
                       ))}
-                    </select>
+                    </StyledSelect>
                   </div>
                   <div className="socios-filtros-grupo">
-                    <select
+                    <StyledSelect
                       id="filtro-estado"
-                      className="socios-filtro-select"
+                      className="filtros-select-trigger"
                       value={filtroEstado}
                       onChange={(e) => setFiltroEstado(e.target.value)}
                     >
@@ -495,13 +496,13 @@ function SociosPage() {
                       {estadosUnicos.map(e => (
                         <option key={e} value={e}>{e}</option>
                       ))}
-                    </select>
+                    </StyledSelect>
                   </div>
                   {puedeVerDisciplinas && disciplinas.length > 0 && (
                     <div className="socios-filtros-grupo">
-                      <select
+                      <StyledSelect
                         id="filtro-disciplina"
-                        className="socios-filtro-select"
+                        className="filtros-select-trigger"
                         value={filtroDisciplina}
                         onChange={(e) => setFiltroDisciplina(e.target.value)}
                       >
@@ -509,7 +510,7 @@ function SociosPage() {
                         {disciplinas.map(d => (
                           <option key={d.id} value={d.id}>{d.nombre}</option>
                         ))}
-                      </select>
+                      </StyledSelect>
                     </div>
                   )}
                 </div>
