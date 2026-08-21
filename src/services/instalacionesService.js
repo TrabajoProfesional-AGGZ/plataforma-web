@@ -1,5 +1,6 @@
 import { fetchTo } from '../utils/utils';
 
+/** Obtiene el listado completo de instalaciones. */
 export async function getInstalaciones() {
   const res = await fetchTo('/api/v1/instalaciones', 'GET');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
@@ -8,6 +9,7 @@ export async function getInstalaciones() {
   return data.instalaciones ?? data;
 }
 
+/** Crea una instalación nueva. */
 export async function createInstalacion(data) {
   const res = await fetchTo('/api/v1/instalaciones', 'POST', data);
   if (res.status >= 500) throw new Error('servicio-no-disponible');
@@ -15,6 +17,7 @@ export async function createInstalacion(data) {
   return res.json();
 }
 
+/** Elimina una instalación por id. */
 export async function deleteInstalacion(id) {
   const res = await fetchTo(`/api/v1/instalaciones/${encodeURIComponent(id)}`, 'DELETE');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
