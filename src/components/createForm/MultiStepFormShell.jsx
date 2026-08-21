@@ -12,8 +12,8 @@ import './CreateSocioForm.css';
 // mantenerse en sync con --color-text-primary/--color-border-medium/
 // --color-surface/--color-text-secondary/--status-success-border.
 const STEP_COLORS = {
-  light: { bubbleActive: '#0a6b3f', bubbleIdle: '#e4e0d8', onBubble: '#fdfdfc', idleIcon: '#5c7285', success: '#0D6E0D' },
-  dark: { bubbleActive: '#ffd25a', bubbleIdle: '#2c5e49', onBubble: '#163b2c', idleIcon: '#93aabd', success: '#4ade80' },
+  light: { bubbleActive: '#231f20', bubbleIdle: '#e4d8dc', onBubble: '#fdfcfc', idleIcon: '#5c7285', success: '#0D6E0D' },
+  dark: { bubbleActive: '#f7b5cd', bubbleIdle: '#9c2550', onBubble: '#6f1a39', idleIcon: '#decfd4', success: '#4ade80' },
 };
 
 export function MultiStepFormShell({

@@ -3,6 +3,10 @@ import logoSocioLight from '../assets/logo_socio.png';
 import logoSocioDark from '../assets/logo_socio_oscuro.jpeg';
 import logoTextoLight from '../assets/texto.png';
 import logoTextoDark from '../assets/logo_socio_texto_oscuro.jpeg';
+import logoSocioAltLight from '../assets/logo_socio_alt.png';
+import logoSocioAltDark from '../assets/logo_socio_alt_oscuro.png';
+import logoConTextoLight from '../assets/logo_con_texto.png';
+import logoConTextoDark from '../assets/logo_con_texto_oscuro.png';
 
 const THEME_STORAGE_KEY = 'theme';
 
@@ -30,6 +34,8 @@ export function ThemeProvider({ children }) {
       toggleTheme,
       logoSocio: theme === 'dark' ? logoSocioDark : logoSocioLight,
       logoTexto: theme === 'dark' ? logoTextoDark : logoTextoLight,
+      logoSocioAlt: theme === 'dark' ? logoSocioAltDark : logoSocioAltLight,
+      logoConTexto: theme === 'dark' ? logoConTextoDark : logoConTextoLight,
     }),
     [theme, toggleTheme]
   );
