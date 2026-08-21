@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { Plus, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { CreateInstalacionForm } from '../../components/createInstalacionForm/CreateInstalacionForm';
+import { DatePicker } from '../../components/createForm/DatePicker';
 import { CreateReservaForm } from '../../components/createReservaForm/CreateReservaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { getInstalaciones, createInstalacion, deleteInstalacion } from '../../services/instalacionesService';
@@ -494,9 +495,8 @@ function InstalacionesPage() {
             <div className="instalaciones-reservas-controles">
               <div className="instalaciones-reservas-controles-izq">
                 {puedeVerReservas && reservasDeInstalacion.length > 0 && (
-                  <input
-                    type="date"
-                    className="instalaciones-filtro-fecha"
+                  <DatePicker
+                    style={{ width: 172 }}
                     value={filtroFecha}
                     onChange={(e) => { setFiltroFecha(e.target.value); resetPaginaReservas(); }}
                     aria-label="Filtrar por fecha"

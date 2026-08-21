@@ -41,9 +41,11 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
   const [errorListaSocios, setErrorListaSocios] = useState('');
 
   useEffect(() => {
+    let cancelled = false;
     Promise.all([fetchCategoriasSocio(), fetchEstadosSocio()])
-      .then(([categorias, estados]) => setCatalogo({ categorias, estados }))
+      .then(([categorias, estados]) => { if (!cancelled) setCatalogo({ categorias, estados }); })
       .catch(() => {});
+    return () => { cancelled = true; };
   }, []);
 
   const agregarSocio = async () => {

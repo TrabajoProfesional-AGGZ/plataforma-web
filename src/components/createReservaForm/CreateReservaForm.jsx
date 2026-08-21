@@ -69,7 +69,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
     trigger,
     watch,
     setValue,
-    formState: { errors },
+    formState: { errors, isSubmitting },
   } = useForm({ mode: 'onTouched', defaultValues: { id_instalacion: instalacionPreseleccionada } });
 
   const idInstalacionSeleccionada = watch('id_instalacion');
@@ -203,10 +203,12 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      isSubmitting={isSubmitting}
       title="Nueva reserva"
       successTitle="¡Reserva registrada!"
       successMessage="La reserva fue procesada correctamente."
       submitLabel="Registrar reserva"
+      submitLoadingLabel="Registrando..."
       onCancel={onCancel}
       goBack={goBack}
       goNext={goNext}

@@ -75,6 +75,11 @@
   --z-sticky: 200;
   --z-sidebar: 300;
   --z-modal: 400;
+  /* Por encima del modal: los popovers de DatePicker/TimePicker/StyledSelect
+     se montan con un portal a `document.body`, así que quedan como hermanos
+     del `.csf-overlay` del modal (z-index 400) en vez de anidados dentro —
+     necesitan su propio nivel por encima para no quedar tapados. */
+  --z-popover: 450;
   --z-toast: 500;
 
   /* Sidebar widths */
