@@ -19,6 +19,13 @@ const stepFields = {
   3: ['email', 'telefono', 'direccion'],
 };
 
+/**
+ * Formulario de tres pasos para editar un socio existente, pre-rellenado con
+ * `defaultValues` a partir de `socio` (género y dirección no se pre-rellenan,
+ * no vienen en `SocioResponse`). Los campos dejados en "— sin cambiar —" o
+ * vacíos se excluyen del payload de `updateSocio`, enviando solo lo modificado.
+ * @param {{ socio: object, onSuccess: (socioActualizado: object) => void, onCancel: () => void }} props
+ */
 export function EditSocioForm({ socio, onSuccess, onCancel }) {
   const {
     step, direction, submitted, setSubmitted, navGuard,

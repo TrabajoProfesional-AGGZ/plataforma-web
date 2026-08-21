@@ -9,6 +9,11 @@ import { MAX_LEN } from '../../utils/formValidators';
 
 const STEPS = [{ id: 1, label: 'Datos', icon: User }];
 
+/**
+ * Formulario de un paso para editar el nombre y apellido de un usuario
+ * administrativo existente (el rol se cambia por separado, ver `CambiarRolForm`).
+ * @param {{ usuario: object, onSuccess: (usuarioActualizado: object) => void, onCancel: () => void }} props
+ */
 export function EditUserForm({ usuario, onSuccess, onCancel }) {
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
