@@ -3,6 +3,7 @@ import { PERMISO_LABELS } from '../../utils/permisoLabels';
 import { SocioSubModal } from '../socioAccionesExtra/SocioSubModal';
 import './PermisosModal.css';
 
+/** Modal con la lista de permisos de un usuario, traducidos vía `PERMISO_LABELS`. */
 function PermisosModal({ permisos, onClose }) {
   return (
     <SocioSubModal titulo="Permisos" wrapperClass="permisos-modal-wrapper" onClose={onClose}>
