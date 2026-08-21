@@ -10,7 +10,7 @@
 /* .disciplinas-title, .disciplinas-toolbar → src/styles/ListDetailShared.css */
 /* Badges de estado → src/components/badge/EstadoBadge.css (EstadoBadge) */
 
-/* ── Detail view ─────────────────────────────────────────────── */
+/* ── Vista de detalle ─────────────────────────────────────────── */
 .disciplinas-nav {
   display: flex;
   align-items: center;
@@ -24,7 +24,7 @@
   margin-bottom: var(--space-5);
 }
 
-/* ── Socios inscriptos section ───────────────────────────────── */
+/* ── Sección de inscripción de socios ────────────────────────── */
 .disciplinas-socios-section {
   margin-top: 28px;
 }
