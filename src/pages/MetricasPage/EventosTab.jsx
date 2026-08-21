@@ -5,6 +5,7 @@ import { useTheme } from '../../hooks/useTheme';
 import RankingList from './RankingList';
 import './EventosTab.css';
 
+/** Pestaña "Eventos" de Métricas: ranking de eventos por entradas vendidas y % de ocupación. */
 function EventosTab() {
   const { logoSocio: logo } = useTheme();
   const [eventos, setEventos] = useState(null);
