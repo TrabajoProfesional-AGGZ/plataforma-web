@@ -124,11 +124,32 @@
   margin-bottom: var(--space-3);
 }
 
-.csf-calendar-title {
+.csf-calendar-title-selects {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.csf-calendar-select {
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 2px 4px;
+  background: transparent;
+  color: var(--color-text-primary);
   font-size: 13px;
   font-weight: 600;
-  color: var(--color-text-primary);
+  font-family: inherit;
   text-transform: capitalize;
+  cursor: pointer;
+}
+
+.csf-calendar-select:hover {
+  background-color: var(--color-row-hover);
+}
+
+.csf-calendar-select:focus-visible {
+  outline: 2px solid var(--color-border-strong);
+  outline-offset: 1px;
 }
 
 .csf-calendar-nav {

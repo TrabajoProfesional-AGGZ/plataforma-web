@@ -12,6 +12,15 @@ const MESES = [
   'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre',
 ];
 
+function buildYearRange(min, max) {
+  const currentYear = new Date().getFullYear();
+  const maxYear = max ? Number(max.slice(0, 4)) : currentYear;
+  const minYear = min ? Number(min.slice(0, 4)) : currentYear - 100;
+  const years = [];
+  for (let y = maxYear; y >= minYear; y -= 1) years.push(y);
+  return years;
+}
+
 function pad2(n) { return String(n).padStart(2, '0'); }
 function toIso(date) { return `${date.getFullYear()}-${pad2(date.getMonth() + 1)}-${pad2(date.getDate())}`; }
 
@@ -53,12 +62,12 @@ export function DatePicker({ error, className, style, min, max, disabled, placeh
   const [viewDate, setViewDate] = useState(() => parseIso(value) || new Date());
 
   useEffect(() => {
-    setValue(inputRef.current?.value || '');
-  });
+    setValue(props.value || inputRef.current?.value || '');
+  }, [props.value]);
 
   useEffect(() => {
     if (open) setViewDate(parseIso(value) || new Date());
-  }, [open]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [open, value]);
 
   const selectedIso = value || null;
   const label = selectedIso
@@ -79,6 +88,7 @@ export function DatePicker({ error, className, style, min, max, disabled, placeh
 
   const todayIso = toIso(new Date());
   const days = buildGridDays(viewDate);
+  const years = buildYearRange(min, max);
 
   return (
     <div className="csf-picker" style={style}>
@@ -116,7 +126,24 @@ export function DatePicker({ error, className, style, min, max, disabled, placeh
             <button type="button" className="csf-calendar-nav" onClick={() => changeMonth(-1)} aria-label="Mes anterior">
               <ChevronLeft size={16} />
             </button>
-            <span className="csf-calendar-title">{MESES[viewDate.getMonth()]} {viewDate.getFullYear()}</span>
+            <div className="csf-calendar-title-selects">
+              <select
+                className="csf-calendar-select"
+                aria-label="Mes"
+                value={viewDate.getMonth()}
+                onChange={(e) => setViewDate(new Date(viewDate.getFullYear(), Number(e.target.value), 1))}
+              >
+                {MESES.map((m, i) => <option key={m} value={i}>{m}</option>)}
+              </select>
+              <select
+                className="csf-calendar-select"
+                aria-label="Año"
+                value={viewDate.getFullYear()}
+                onChange={(e) => setViewDate(new Date(Number(e.target.value), viewDate.getMonth(), 1))}
+              >
+                {years.map((y) => <option key={y} value={y}>{y}</option>)}
+              </select>
+            </div>
             <button type="button" className="csf-calendar-nav" onClick={() => changeMonth(1)} aria-label="Mes siguiente">
               <ChevronRight size={16} />
             </button>
