@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor, within, act } from '@testing-library/react';
 import SociosPage from './SociosPage';
 
 jest.mock('../../hooks/useTheme', () => ({
@@ -253,6 +253,35 @@ describe('SociosPage', () => {
       expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument();
       expect(screen.getByText('juan@example.com')).toBeInTheDocument();
     });
+  });
+
+  test('entrar al detalle de un socio mientras siguen llegando páginas del fetch en background no vuelve a la lista', async () => {
+    const socioMock3 = { ...socioMock2, id: 'id3', nro_socio: '1003', nombre: 'Pedro', apellido: 'López', estado: { nombre: 'Al día' } };
+    let onPageCb;
+    let resolveGetSocios;
+    getSocios.mockImplementation(({ onPage } = {}) => {
+      onPageCb = onPage;
+      return new Promise((resolve) => { resolveGetSocios = resolve; });
+    });
+
+    render(<SociosPage />);
+
+    await waitFor(() => expect(onPageCb).toBeDefined());
+    act(() => { onPageCb([socioMock, socioMock2]); });
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    fireEvent.click(screen.getByText('1001'));
+    await waitFor(() => {
+      expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument();
+    });
+
+    act(() => { onPageCb([socioMock, socioMock2, socioMock3]); });
+    expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
+
+    await act(async () => { resolveGetSocios([socioMock, socioMock2, socioMock3]); });
+    expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument();
+    expect(screen.queryByRole('table')).not.toBeInTheDocument();
   });
 
   test('muestra mensaje cuando no hay socios registrados', async () => {
