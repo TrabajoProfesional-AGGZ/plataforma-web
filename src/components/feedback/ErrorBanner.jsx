@@ -2,6 +2,7 @@ import { AlertCircle } from 'lucide-react';
 import PropTypes from 'prop-types';
 import './ErrorBanner.css';
 
+/** Banner de error con botón "Reintentar" opcional (se omite si no se pasa `onReintentar`). */
 function ErrorBanner({ mensaje, onReintentar }) {
   return (
     <div className="error-banner" role="alert">
