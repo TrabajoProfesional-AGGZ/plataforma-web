@@ -20,7 +20,7 @@
   gap: var(--space-6);
 }
 
-/* KPI Card */
+/* Tarjeta KPI */
 .caja-tab-kpi-card {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border-medium);
