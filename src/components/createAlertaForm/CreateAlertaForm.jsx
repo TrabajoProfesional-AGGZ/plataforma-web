@@ -119,7 +119,7 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
             placeholder="Redactá el mensaje de la alerta..."
             rows={5}
             className={`csf-input${errors.mensaje ? ' csf-input--error' : ''}`}
-            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: 14 }}
+            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: '0.875rem' }}
           />
         </Field>
 

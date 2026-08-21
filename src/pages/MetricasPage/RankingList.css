@@ -1,6 +1,6 @@
 .ranking-list-empty {
   color: var(--color-text-secondary);
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: center;
 }
 
@@ -26,13 +26,13 @@
   border-radius: 50%;
   background: var(--color-text-primary);
   color: var(--color-surface);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 700;
 }
 
 .ranking-list-info { display: flex; flex-direction: column; }
-.ranking-list-nombre { font-weight: 600; font-size: 14px; color: var(--color-text-primary); }
-.ranking-list-detalle { font-size: 12px; color: var(--color-text-secondary); }
+.ranking-list-nombre { font-weight: 600; font-size: 0.875rem; color: var(--color-text-primary); }
+.ranking-list-detalle { font-size: 0.75rem; color: var(--color-text-secondary); }
 
 .ranking-list-metrica {
   display: flex;

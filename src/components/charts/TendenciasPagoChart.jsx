@@ -37,14 +37,14 @@ export function TendenciasPagoChart({ datos }) {
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border-medium)" />
           <XAxis
             dataKey="mes"
-            tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
+            tick={{ fill: 'var(--color-text-secondary)', fontSize: '0.75rem' }}
             axisLine={{ stroke: 'var(--color-border-medium)' }}
             tickLine={false}
           />
           <YAxis
             domain={[0, 100]}
             tickFormatter={(value) => `${value}%`}
-            tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
+            tick={{ fill: 'var(--color-text-secondary)', fontSize: '0.75rem' }}
             axisLine={false}
             tickLine={false}
             width={50}

@@ -29,7 +29,7 @@
 }
 
 .login-tagline {
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-style: italic;
   color: var(--color-text-secondary);
   text-align: center;
@@ -53,7 +53,7 @@
 }
 
 .login-field label {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--color-text-secondary);
 }
@@ -62,7 +62,7 @@
   padding: 10px 12px;
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
-  font-size: 17px;
+  font-size: 1.0625rem;
   color: var(--color-text-primary);
   background-color: var(--color-surface);
   outline: none;
@@ -103,7 +103,7 @@
 .login-success {
   background-color: var(--surface-success-bg);
   color: var(--status-success-border);
-  font-size: 14px;
+  font-size: 0.875rem;
   padding: 10px 14px;
   border-radius: var(--radius-sm);
   margin: 0;
@@ -114,7 +114,7 @@
 .login-error {
   background-color: var(--status-error-surface-bg);
   color: var(--color-danger);
-  font-size: 14px;
+  font-size: 0.875rem;
   padding: 10px 14px;
   border-radius: var(--radius-sm);
   margin: 0;
@@ -127,7 +127,7 @@
   border: none;
   border-radius: var(--radius-sm);
   padding: 12px;
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 500;
   cursor: pointer;
   transition: opacity var(--transition-fast);
