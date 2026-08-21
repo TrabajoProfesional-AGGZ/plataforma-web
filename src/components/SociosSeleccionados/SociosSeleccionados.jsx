@@ -1,7 +1,12 @@
 import PropTypes from 'prop-types';
 import { X, AlertCircle } from 'lucide-react';
 
-export function SociosSeleccionados({ 
+/**
+ * Lista de chips con los socios agregados a un formulario multi-socio (ej.
+ * `CreateReservaForm`, `CreateAlertaForm`), cada uno removible, más el
+ * indicador de búsqueda en curso y el error de la lista.
+ */
+export function SociosSeleccionados({
   buscando, 
   logo, 
   sociosAgregados, 
