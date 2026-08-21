@@ -18,12 +18,14 @@ import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
 
+/** Traduce un error de servicio a un mensaje amigable, o usa el mensaje por defecto. */
 function mensajeError(err, fallback) {
   return err?.message === 'servicio-no-disponible'
     ? 'El servicio no está disponible. Intentá de nuevo más tarde.'
     : fallback;
 }
 
+/** Página de listado y detalle de disciplinas: crear, pausar e inscribir socios. */
 function DisciplinasPage() {
   const { logoSocio: logo } = useTheme();
   const location = useLocation();
@@ -74,6 +76,7 @@ function DisciplinasPage() {
     setInscribiendoExito(false);
   }, [disciplinaActual]);
 
+  /** Resuelve el socio por número e intenta inscribirlo en la disciplina actual. */
   async function handleInscribirSocio(e) {
     e.preventDefault();
     const nro = nroSocioInscribir.trim();
@@ -97,6 +100,7 @@ function DisciplinasPage() {
     }
   }
 
+  /** Agrega la disciplina de forma optimista y la reemplaza (o revierte) según la respuesta del backend. */
   async function handleDisciplinaCreada(data) {
     setCrearOpen(false);
     const tempId = `temp-${Date.now()}`;
@@ -112,6 +116,7 @@ function DisciplinasPage() {
     }
   }
 
+  /** Pausa la disciplina actual de forma optimista y revierte el estado si falla el backend. */
   async function handlePausar() {
     if (guardando) return;
     setGuardando(true);

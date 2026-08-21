@@ -6,7 +6,7 @@
 }
 
 .dashboard-title {
-  font-size: 36px;
+  font-size: 2.25rem;
   font-weight: 700;
   color: var(--color-text-primary);
   margin: 0 0 var(--space-2) 0;
@@ -17,12 +17,12 @@
 
 .dashboard-subtitle {
   color: var(--color-text-secondary);
-  font-size: 15px;
+  font-size: 0.9375rem;
   text-align: center;
   margin: 0 0 var(--space-10) 0;
 }
 
-/* ── Section cards grid ─────────────────────────────────── */
+/* ── Grilla de tarjetas de sección ─────────────────────────────────── */
 .dashboard-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -40,7 +40,7 @@
 
 @media (max-width: 480px) {
   .dashboard-title {
-    font-size: 26px;
+    font-size: 1.625rem;
   }
 }
 
@@ -93,20 +93,20 @@
 }
 
 .dashboard-card-titulo {
-  font-size: 17px;
+  font-size: 1.0625rem;
   font-weight: 600;
   color: var(--color-text-primary);
   transition: color var(--transition-normal);
 }
 
 .dashboard-card-descripcion {
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-text-secondary);
   line-height: 1.5;
   transition: color var(--transition-normal);
 }
 
-/* Hover: invert to black */
+/* Hover: invierte a color oscuro */
 .dashboard-card:hover .dashboard-card-icon {
   background-color: rgba(255, 255, 255, 0.15);
   color: var(--color-surface);

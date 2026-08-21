@@ -4,7 +4,7 @@
 }
 
 .metricas-title {
-  font-size: 32px;
+  font-size: 2rem;
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0 0 var(--space-2) 0;
@@ -14,7 +14,7 @@
 
 .metricas-subtitle {
   color: var(--color-text-secondary);
-  font-size: 15px;
+  font-size: 0.9375rem;
   text-align: center;
   margin: 0 0 var(--space-6) 0;
 }
@@ -22,14 +22,14 @@
 .metricas-error {
   text-align: center;
   color: var(--color-danger);
-  font-size: 14px;
+  font-size: 0.875rem;
   background-color: var(--status-error-surface-bg);
   border: 1px solid var(--status-error-surface-border);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
 }
 
-/* ── Tabs ─────────────────────────────────────────────────────── */
+/* ── Pestañas ─────────────────────────────────────────────────── */
 .metricas-tablist {
   display: flex;
   gap: var(--space-2);
@@ -46,7 +46,7 @@
   margin-bottom: -1px;
   padding: var(--space-3) var(--space-4);
   font-family: inherit;
-  font-size: 15px;
+  font-size: 0.9375rem;
   font-weight: 500;
   color: var(--color-text-secondary);
   cursor: pointer;
@@ -73,6 +73,6 @@
 /* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
 @media (max-width: 480px) {
   .metricas-title {
-    font-size: 24px;
+    font-size: 1.5rem;
   }
 }

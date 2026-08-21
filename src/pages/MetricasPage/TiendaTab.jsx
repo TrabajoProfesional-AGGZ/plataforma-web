@@ -5,6 +5,7 @@ import { useTheme } from '../../hooks/useTheme';
 import RankingList from './RankingList';
 import './TiendaTab.css';
 
+/** Pestaña "Tienda" de Métricas: ranking de productos más vendidos y su facturación. */
 function TiendaTab() {
   const { logoSocio: logo } = useTheme();
   const [productos, setProductos] = useState(null);

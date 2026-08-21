@@ -6,6 +6,12 @@ import { ModalOverlay } from '../createForm/ModalOverlay';
 import '../../styles/SocioCard.css';
 import '../../styles/ListDetailShared.css';
 
+/**
+ * Modal de detalle de un socio (misma card que la vista inline de `SociosPage`).
+ * Muestra la foto de perfil si `foto_url` está presente, o si no el logo de
+ * estado (`cfg.logo`); cada dato opcional (documento, nacimiento, email,
+ * teléfono, categoría) se omite si no viene en `socio`.
+ */
 function VerSocioModal({ socio, onClose }) {
   const cfg = estadoConfig(socio.estado);
   const estadoNombre = typeof socio.estado === 'object' ? (socio.estado?.nombre ?? '') : (socio.estado ?? '');

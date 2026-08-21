@@ -68,7 +68,7 @@ function mockUnaReserva() {
   ]));
 }
 
-// Helpers
+// Funciones auxiliares
 async function renderPage() {
   render(<MemoryRouter><InstalacionesPage /></MemoryRouter>);
   await waitFor(() =>

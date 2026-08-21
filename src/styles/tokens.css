@@ -6,6 +6,11 @@
 :root {
   color-scheme: light;
 
+  /* Tamaño base para el cálculo de rem (16px default del navegador).
+     110% = fuentes ~10% más grandes en toda la app sin tocar cada
+     declaración individual — todo font-size del proyecto está en rem. */
+  font-size: 115%;
+
   /* Colors */
   /* Paleta de club (rama demo): Inter Miami CF — #231F20 / #F7B5CD / #FFFFFF.
      Ver nota "Colores por club (rama demo)" más abajo en este CLAUDE.md. Solo
@@ -84,6 +89,11 @@
   --z-sticky: 200;
   --z-sidebar: 300;
   --z-modal: 400;
+  /* Por encima del modal: los popovers de DatePicker/TimePicker/StyledSelect
+     se montan con un portal a `document.body`, así que quedan como hermanos
+     del `.csf-overlay` del modal (z-index 400) en vez de anidados dentro —
+     necesitan su propio nivel por encima para no quedar tapados. */
+  --z-popover: 450;
   --z-toast: 500;
 
   /* Sidebar widths */

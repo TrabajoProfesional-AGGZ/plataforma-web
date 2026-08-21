@@ -19,6 +19,12 @@ const TEXTO_ESTADO_IMAGEN = {
   error: { titulo: 'Reintentar', hint: 'No se pudo cargar la imagen' },
 };
 
+/**
+ * Formulario de un paso para crear un producto de la tienda. La foto (opcional)
+ * se elige antes pero se sube a Cloudinary recién al confirmar el envío
+ * (`useImagenUpload`) — si la subida falla, el envío se aborta.
+ * @param {{ onSuccess: (payload: object) => void, onCancel: () => void }} props
+ */
 export function CreateProductoForm({ onSuccess, onCancel }) {
   const { step, direction, submitted, setSubmitted, navGuard } = useMultiStepFormState();
   const {
@@ -88,7 +94,7 @@ export function CreateProductoForm({ onSuccess, onCancel }) {
             placeholder="Describí el producto..."
             rows={4}
             className={`csf-input${errors.descripcion ? ' csf-input--error' : ''}`}
-            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: 14 }}
+            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: '0.875rem' }}
           />
         </Field>
         <Field label="Precio ($)" icon={DollarSign} error={errors.precio?.message}>

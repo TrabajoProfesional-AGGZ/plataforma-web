@@ -16,6 +16,12 @@ import AppLayout from './components/AppLayout/AppLayout';
 import MetricasPage from './pages/MetricasPage/MetricasPage';
 import TiendaPage from './pages/TiendaPage/TiendaPage';
 
+/**
+ * Componente raíz de la aplicación. Define el árbol de rutas: login público,
+ * rutas comunes a cualquier usuario autenticado (dashboard, perfil, cambiar
+ * contraseña, tienda) y rutas gateadas por permiso específico mediante
+ * `PrivateRoute`. Cualquier ruta no reconocida redirige a `/dashboard`.
+ */
 function App() {
   return (
     <MotionConfig reducedMotion="user">

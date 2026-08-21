@@ -4,6 +4,7 @@ import { getProductos, getProducto } from '../../services/productosService';
 import { CreateProductoForm } from '../../components/createProductoForm/CreateProductoForm';
 import { EditProductoForm } from '../../components/editProductoForm/EditProductoForm';
 import { CrearCompraForm } from '../../components/crearCompraForm/CrearCompraForm';
+import { StyledSelect } from '../../components/createForm/FormFields';
 import { createProducto } from '../../services/productosService';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
@@ -19,12 +20,14 @@ import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
 
+/** Traduce un error de servicio a un mensaje amigable, o usa el mensaje por defecto. */
 function mensajeError(err, fallback) {
   return err?.message === 'servicio-no-disponible'
     ? 'El servicio no está disponible. Intentá de nuevo más tarde.'
     : fallback;
 }
 
+/** Página de catálogo y detalle de productos: crear, editar y crear compras para un socio. */
 function TiendaPage() {
   const { logoSocio: logo } = useTheme();
   const puedeCrearCompra = usePermiso('crear_compra');
@@ -86,6 +89,7 @@ function TiendaPage() {
     }
   }
 
+  /** Agrega el producto de forma optimista y lo reemplaza (o revierte) según la respuesta del backend. */
   async function handleProductoCreado(data) {
     setCrearOpen(false);
     const tempId = `temp-${Date.now()}`;
@@ -193,16 +197,18 @@ function TiendaPage() {
         <>
           <h1 className="noticias-title">Tienda</h1>
           <div className="noticias-toolbar">
-            <select
-              className="tienda-orden-select"
-              value={ordenTienda}
-              onChange={handleCambiarOrden}
-              aria-label="Ordenar por"
-            >
-              <option value="nombre_asc">Nombre (A-Z)</option>
-              <option value="precio_asc">Precio: menor a mayor</option>
-              <option value="precio_desc">Precio: mayor a menor</option>
-            </select>
+            <div className="tienda-orden-select-wrap">
+              <StyledSelect
+                className="filtros-select-trigger"
+                value={ordenTienda}
+                onChange={handleCambiarOrden}
+                aria-label="Ordenar por"
+              >
+                <option value="nombre_asc">Nombre (A-Z)</option>
+                <option value="precio_asc">Precio: menor a mayor</option>
+                <option value="precio_desc">Precio: mayor a menor</option>
+              </StyledSelect>
+            </div>
             <button className="noticias-btn-crear" onClick={() => setCrearOpen(true)}>
               <Plus size={15} aria-hidden="true" />
               Nuevo producto

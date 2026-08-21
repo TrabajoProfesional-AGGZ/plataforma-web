@@ -1,9 +1,9 @@
-/* Shared styles for list pages: SociosPage, UsuariosPage, DisciplinasPage, InstalacionesPage */
+/* Estilos compartidos para páginas de listado: SociosPage, UsuariosPage, DisciplinasPage, InstalacionesPage */
 
-/* ── Page title ──────────────────────────────────────────────── */
+/* ── Título de página ────────────────────────────────────────── */
 .socios-title,
 .usuarios-title {
-  font-size: 32px;
+  font-size: 2rem;
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0 0 var(--space-6) 0;
@@ -12,7 +12,7 @@
   text-wrap: balance;
 }
 
-/* ── Ver-todos / secondary button ────────────────────────────── */
+/* ── Botón Ver-todos / secundario ─────────────────────────────── */
 .socios-ver-todos-button,
 .usuarios-ver-todos-button {
   background-color: var(--color-surface);
@@ -25,7 +25,7 @@
   background-color: var(--color-bg);
 }
 
-/* ── Filters layout ───────────────────────────────────────────── */
+/* ── Layout de filtros ────────────────────────────────────────── */
 .socios-filtros,
 .usuarios-filtros {
   display: flex;
@@ -49,7 +49,7 @@
   max-width: 180px;
 }
 
-/* ── Table sort ───────────────────────────────────────────────── */
+/* ── Orden de tabla ───────────────────────────────────────────── */
 .socios-th-sort,
 .usuarios-th-sort {
   cursor: pointer;
@@ -61,7 +61,7 @@
   color: var(--color-text-primary);
 }
 
-/* ── Toolbar ─────────────────────────────────────────────────── */
+/* ── Barra de herramientas ─────────────────────────────────────── */
 .socios-toolbar,
 .usuarios-toolbar {
   display: flex;
@@ -88,7 +88,7 @@
   gap: var(--space-2);
 }
 
-/* ── Search ──────────────────────────────────────────────────── */
+/* ── Búsqueda ────────────────────────────────────────────────── */
 .socios-search-container,
 .usuarios-search-container {
   display: flex;
@@ -120,14 +120,14 @@
   background: transparent;
   color: var(--color-text-primary);
   width: 100%;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .socios-search-button, .socios-ver-todos-button,
 .usuarios-search-button, .usuarios-ver-todos-button {
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
@@ -141,11 +141,11 @@
   padding: var(--space-12) 0;
 }
 
-/* ── Feedback ────────────────────────────────────────────────── */
+/* ── Mensajes de feedback ────────────────────────────────────── */
 .socios-error,
 .usuarios-error {
   color: var(--color-danger);
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: center;
   background-color: var(--status-error-surface-bg);
   border: 1px solid var(--status-error-surface-border);
@@ -156,11 +156,11 @@
 .socios-no-encontrado,
 .usuarios-no-encontrado {
   color: var(--color-text-secondary);
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: center;
 }
 
-/* ── Filters ─────────────────────────────────────────────────── */
+/* ── Filtros ─────────────────────────────────────────────────── */
 .socios-filtro-toggle,
 .usuarios-filtro-toggle,
 .instalaciones-btn-toggle {
@@ -168,7 +168,7 @@
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--color-text-primary);
   cursor: pointer;
@@ -181,29 +181,38 @@
   background-color: var(--color-bg);
 }
 
-.socios-filtro-select, .usuarios-filtro-select,
-.instalaciones-filtro-fecha, .instalaciones-filtro-tipo {
+/* StyledSelect usado como filtro: por defecto usa el mismo fondo que la
+   página (--color-bg), pensado para contrastar contra la tarjeta blanca de
+   los formularios de creación — acá el filtro va directo sobre el fondo de
+   la página, así que necesita fondo blanco propio para distinguirse. */
+.filtros-select-trigger {
+  background-color: var(--color-surface);
+}
+
+.filtros-select-trigger:hover:not(:disabled) {
+  background-color: var(--color-bg);
+}
+
+/* En los forms de creación value="" es un placeholder real ("Seleccionar...")
+   y StyledSelect lo pinta en gris tenue (--color-border-medium). Acá value=""
+   es una opción con significado propio ("Categoría: Todas", etc.), no un
+   placeholder, así que necesita el mismo color de texto que el resto. */
+.filtros-select-trigger .csf-picker-placeholder {
+  color: var(--color-text-primary);
+}
+
+.instalaciones-filtro-fecha {
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
   padding: 6px 10px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-text-primary);
   background-color: var(--color-surface);
   outline: none;
   cursor: pointer;
 }
 
-.socios-filtro-select,
-.usuarios-filtro-select {
-  width: 100%;
-}
-
-.socios-filtro-select:focus,
-.usuarios-filtro-select:focus {
-  border-color: var(--color-border-strong);
-}
-
-/* ── Table wrapper ───────────────────────────────────────────── */
+/* ── Contenedor de tabla ─────────────────────────────────────── */
 /* .disciplinas-* (wrapper/tabla/tr-clickable) se reutiliza tal cual en
    NoticiasPage y AlertasPage — no renombrar para evitar churn en 3 páginas. */
 .socios-table-wrapper, .usuarios-table-wrapper,
@@ -234,16 +243,16 @@
   }
 }
 
-/* Empty states → src/components/feedback/EmptyState.jsx (.empty-state) */
+/* Estados vacíos → src/components/feedback/EmptyState.jsx (.empty-state) */
 
-/* ── Table base ──────────────────────────────────────────────── */
+/* ── Tabla base ──────────────────────────────────────────────── */
 .socios-table,
 .usuarios-tabla,
 .disciplinas-tabla,
 .instalaciones-tabla {
   width: 100%;
   border-collapse: collapse;
-  font-size: 14px;
+  font-size: 0.875rem;
 }
 
 .socios-table td,
@@ -304,18 +313,18 @@
   display: inline-block;
   padding: 3px 10px;
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   border: 1px solid;
 }
 
-/* ── Estado cell ─────────────────────────────────────────────── */
+/* ── Celda de estado ─────────────────────────────────────────── */
 .socios-estado-cell,
 .usuarios-estado-cell {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   color: var(--color-text-primary);
   padding: 4px 10px 4px 6px;
@@ -323,7 +332,7 @@
   border: 1px solid;
 }
 
-/* ── Card action buttons base → src/styles/ListDetailShared.css ── */
+/* ── Botones de acción de card, base → src/styles/ListDetailShared.css ── */
 .socios-btn-eliminar, .socios-btn-editar,
 .usuarios-btn-eliminar, .usuarios-btn-editar, .usuarios-btn-cambiar-rol {
   transition: background-color var(--transition-fast), color var(--transition-fast);
@@ -333,6 +342,6 @@
 @media (max-width: 480px) {
   .socios-title,
   .usuarios-title {
-    font-size: 24px;
+    font-size: 1.5rem;
   }
 }

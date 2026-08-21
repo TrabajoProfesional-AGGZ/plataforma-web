@@ -90,7 +90,7 @@
 }
 
 .sidebar-link-label {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   overflow: hidden;
   white-space: nowrap;
@@ -105,7 +105,7 @@
 
 .sidebar-footer p {
   color: var(--color-text-secondary);
-  font-size: 12px;
+  font-size: 0.75rem;
   margin: 0;
 }
 
@@ -206,7 +206,7 @@
 
 .app-email-text {
   color: var(--color-text-secondary);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   white-space: nowrap;
   overflow: hidden;
@@ -219,7 +219,7 @@
   border: none;
   border-radius: var(--radius-sm);
   color: var(--color-surface);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   padding: 6px 14px;
   cursor: pointer;

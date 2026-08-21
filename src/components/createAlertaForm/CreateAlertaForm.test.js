@@ -80,7 +80,7 @@ describe('CreateAlertaForm', () => {
       expect(fetchCategoriasSocio).toHaveBeenCalledTimes(1);
     });
     expect(screen.getByText('Nueva alerta')).toBeInTheDocument();
-    expect(screen.getByText('Todas')).toBeInTheDocument();
+    expect(screen.getAllByText('Todas').length).toBeGreaterThan(0);
   });
 
   test('carga las opciones de categoría y estado desde el catálogo', async () => {

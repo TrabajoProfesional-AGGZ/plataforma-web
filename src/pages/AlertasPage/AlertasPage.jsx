@@ -14,17 +14,20 @@ import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
 
+/** Formatea una fecha ISO a fecha y hora local, o '—' si no hay valor. */
 function formatearFecha(fecha) {
   if (!fecha) return '—';
   return new Date(fecha).toLocaleString();
 }
 
+/** Traduce un error de servicio a un mensaje amigable, o usa el mensaje por defecto. */
 function mensajeError(err, fallback) {
   return err?.message === 'servicio-no-disponible'
     ? 'El servicio no está disponible. Intentá de nuevo más tarde.'
     : fallback;
 }
 
+/** Página de listado de alertas: crear, ver destinatarios y eliminar. */
 function AlertasPage() {
   const { logoSocio: logo } = useTheme();
   const puedeVerAlertas = usePermiso('ver_alertas');
@@ -57,6 +60,7 @@ function AlertasPage() {
     cargarAlertas();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  /** Agrega la alerta de forma optimista y la reemplaza (o revierte) según la respuesta del backend. */
   async function handleAlertaCreada(data) {
     setCrearOpen(false);
     const tempId = `temp-${Date.now()}`;
@@ -70,6 +74,7 @@ function AlertasPage() {
     }
   }
 
+  /** Elimina la alerta de la lista de forma optimista y restaura si falla el backend. */
   async function handleEliminar() {
     if (guardando) return;
     setGuardando(true);

@@ -14,6 +14,14 @@ import { SociosSeleccionados } from '../SociosSeleccionados/SociosSeleccionados'
 
 const STEPS = [{ id: 1, label: 'Datos', icon: MessageSquare }];
 
+/**
+ * Formulario de un paso para crear una alerta. El destinatario se elige por
+ * uno de dos modos mutuamente excluyentes: por categoría/estado financiero
+ * (filtros, con opción "Todas"/"Todos") o por una lista de socios puntuales
+ * buscados por N° de socio, email o ID — el payload enviado a `onSuccess`
+ * cambia de forma según el modo elegido.
+ * @param {{ onSuccess: (payload: object) => void, onCancel: () => void }} props
+ */
 export function CreateAlertaForm({ onSuccess, onCancel }) {
   const { logoSocio: logo } = useTheme();
   const { step, direction, submitted, setSubmitted, navGuard } = useMultiStepFormState();
@@ -33,9 +41,11 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
   const [errorListaSocios, setErrorListaSocios] = useState('');
 
   useEffect(() => {
+    let cancelled = false;
     Promise.all([fetchCategoriasSocio(), fetchEstadosSocio()])
-      .then(([categorias, estados]) => setCatalogo({ categorias, estados }))
+      .then(([categorias, estados]) => { if (!cancelled) setCatalogo({ categorias, estados }); })
       .catch(() => {});
+    return () => { cancelled = true; };
   }, []);
 
   const agregarSocio = async () => {
@@ -109,7 +119,7 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
             placeholder="Redactá el mensaje de la alerta..."
             rows={5}
             className={`csf-input${errors.mensaje ? ' csf-input--error' : ''}`}
-            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: 14 }}
+            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: '0.875rem' }}
           />
         </Field>
 

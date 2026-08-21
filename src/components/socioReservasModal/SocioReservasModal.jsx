@@ -7,6 +7,11 @@ import { SocioSubModal } from '../socioAccionesExtra/SocioSubModal';
 import { useTheme } from '../../hooks/useTheme';
 import './SocioReservasModal.css';
 
+/**
+ * Modal con las reservas activas de un socio. Resuelve el nombre de cada
+ * instalación con un mapa `id -> nombre` armado a partir de `getInstalaciones`,
+ * en vez de traerlo embebido en cada reserva.
+ */
 function SocioReservasModal({ nroSocio, onClose }) {
   const { logoSocio: logo } = useTheme();
   const navigate = useNavigate();

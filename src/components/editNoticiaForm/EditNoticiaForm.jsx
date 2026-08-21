@@ -9,6 +9,11 @@ import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 
 const STEPS = [{ id: 1, label: 'Datos', icon: FileText }];
 
+/**
+ * Formulario de un paso para editar el título y cuerpo de una noticia existente
+ * (la imagen no es editable desde acá).
+ * @param {{ noticia: object, onSuccess: (noticiaActualizada: object) => void, onCancel: () => void }} props
+ */
 export function EditNoticiaForm({ noticia, onSuccess, onCancel }) {
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
@@ -81,7 +86,7 @@ export function EditNoticiaForm({ noticia, onSuccess, onCancel }) {
             })}
             rows={5}
             className={`csf-input${errors.cuerpo ? ' csf-input--error' : ''}`}
-            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: 14 }}
+            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: '0.875rem' }}
           />
         </Field>
         {formError && (

@@ -17,10 +17,7 @@ jest.mock('../../services/sociosService', () => ({
 }));
 import { getSocioByNroSocio } from '../../services/sociosService';
 
-const INSTALACIONES_TEST = [
-  { id: 'inst-uuid-1', nombre: 'Cancha de fútbol', capacidad_maxima: 6 },
-  { id: 'inst-uuid-2', nombre: 'Pileta', capacidad_maxima: 10 },
-];
+const INSTALACION_TEST = { id: 'inst-uuid-1', nombre: 'Cancha de fútbol', capacidad_maxima: 6 };
 
 const SOCIO_TEST = { id: 'socio-uuid-1', nro_socio: '1234', nombre: 'Juan', apellido: 'García' };
 const SOCIO_TEST_2 = { id: 'socio-uuid-2', nro_socio: '5678', nombre: 'Maria', apellido: 'Perez' };
@@ -28,9 +25,9 @@ const SOCIO_TEST_2 = { id: 'socio-uuid-2', nro_socio: '5678', nombre: 'Maria', a
 const onSuccess = jest.fn();
 const onCancel = jest.fn();
 
-function renderForm(instalaciones = INSTALACIONES_TEST) {
+function renderForm(instalacion = INSTALACION_TEST) {
   return render(
-    <CreateReservaForm onSuccess={onSuccess} onCancel={onCancel} instalaciones={instalaciones} />
+    <CreateReservaForm onSuccess={onSuccess} onCancel={onCancel} instalacion={instalacion} />
   );
 }
 
@@ -45,7 +42,6 @@ async function agregarSocioAlForm(nroSocio = '1234') {
 
 async function avanzarAlPaso2() {
   await agregarSocioAlForm('1234');
-  fireEvent.change(screen.getByRole('combobox'), { target: { value: 'inst-uuid-1' } });
   await act(async () => {
     fireEvent.click(screen.getByRole('button', { name: /siguiente/i }));
   });
@@ -60,8 +56,10 @@ async function llenarYEnviarPaso2(turno = '09:00:00') {
   await act(async () => {
     fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
   });
-  await waitFor(() => expect(screen.getByRole('option', { name: new RegExp(`^${turno.slice(0, 5)} `) })).toBeInTheDocument());
-  fireEvent.change(screen.getByRole('combobox'), { target: { value: turno } });
+  const turnoBtn = await screen.findByRole('radio', { name: new RegExp(`^${turno.slice(0, 5)} `) });
+  await act(async () => {
+    fireEvent.click(turnoBtn);
+  });
   await act(async () => {
     fireEvent.click(screen.getByRole('button', { name: /registrar reserva/i }));
   });
@@ -84,18 +82,19 @@ afterEach(() => {
 });
 
 describe('CreateReservaForm', () => {
-  test('renderiza el paso 1 con los campos de número de socio e instalación', () => {
+  test('renderiza el paso 1 con el campo de número de socio y el nombre de la instalación', () => {
     renderForm();
     expect(screen.getByText('Nueva reserva')).toBeInTheDocument();
     expect(screen.getByText(/paso 1 de 2/i)).toBeInTheDocument();
     expect(screen.getByPlaceholderText(/ej\. 1234/i)).toBeInTheDocument();
-    expect(screen.getByRole('combobox')).toBeInTheDocument();
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument();
   });
 
-  test('muestra las instalaciones en el select con sus nombres', () => {
+  test('muestra el nombre de la instalación como dato fijo, sin selector', () => {
     renderForm();
-    expect(screen.getByRole('option', { name: 'Cancha de fútbol' })).toBeInTheDocument();
-    expect(screen.getByRole('option', { name: 'Pileta' })).toBeInTheDocument();
+    const campoInstalacion = screen.getByDisplayValue('Cancha de fútbol');
+    expect(campoInstalacion).toBeInTheDocument();
+    expect(campoInstalacion).toBeDisabled();
   });
 
   test('muestra el botón Cancelar en el paso 1', () => {
@@ -123,24 +122,11 @@ describe('CreateReservaForm', () => {
 
   test('no avanza al paso 2 si no se agregó ningún socio', async () => {
     renderForm();
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'inst-uuid-1' } });
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /siguiente/i }));
     });
     await waitFor(() => {
       expect(screen.getByText('Debe agregar al menos un socio.')).toBeInTheDocument();
-    });
-    expect(screen.getByText(/paso 1 de 2/i)).toBeInTheDocument();
-  });
-
-  test('no avanza al paso 2 si no se seleccionó una instalación', async () => {
-    renderForm();
-    await agregarSocioAlForm('1234');
-    await act(async () => {
-      fireEvent.click(screen.getByRole('button', { name: /siguiente/i }));
-    });
-    await waitFor(() => {
-      expect(screen.getByText('Debe seleccionar una instalación')).toBeInTheDocument();
     });
     expect(screen.getByText(/paso 1 de 2/i)).toBeInTheDocument();
   });
@@ -196,7 +182,7 @@ describe('CreateReservaForm', () => {
     expect(onSuccess).toHaveBeenCalledTimes(1);
   });
 
-  test('llama a createReserva con la lista de IDs de socios', async () => {
+  test('llama a createReserva con el id de la instalación fija y la lista de IDs de socios', async () => {
     await llenarYEnviarPaso2('11:00:00');
 
     expect(createReserva).toHaveBeenCalledWith({
@@ -211,13 +197,6 @@ describe('CreateReservaForm', () => {
     renderForm();
     expect(screen.getByText('Datos')).toBeInTheDocument();
     expect(screen.getByText('Horario')).toBeInTheDocument();
-  });
-
-  test('funciona con lista de instalaciones vacía', () => {
-    renderForm([]);
-    const select = screen.getByRole('combobox');
-    expect(select).toBeInTheDocument();
-    expect(screen.queryByRole('option', { name: 'Cancha de fútbol' })).not.toBeInTheDocument();
   });
 
   test('muestra el spinner mientras busca el socio al agregar', async () => {
@@ -279,14 +258,6 @@ describe('CreateReservaForm', () => {
       expect(screen.getByText('La instalación está siendo actualizada por otra reserva. Probá de nuevo en unos segundos.')).toBeInTheDocument();
     });
     expect(onSuccess).not.toHaveBeenCalled();
-  });
-
-  test('el select de instalación aplica focus y blur', () => {
-    renderForm();
-    const select = screen.getByRole('combobox');
-    fireEvent.focus(select);
-    fireEvent.blur(select);
-    expect(select).toBeInTheDocument();
   });
 
   // ── Tests del preview inline al perder el foco ──
@@ -407,7 +378,6 @@ describe('CreateReservaForm', () => {
     });
     await waitFor(() => expect(screen.getByText('5678 — Perez Maria')).toBeInTheDocument());
 
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'inst-uuid-1' } });
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /siguiente/i }));
     });
@@ -418,8 +388,10 @@ describe('CreateReservaForm', () => {
     await act(async () => {
       fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
     });
-    expect(await screen.findByRole('option', { name: /^11:00 / })).toBeInTheDocument();
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: '11:00:00' } });
+    const turnoBtn = await screen.findByRole('radio', { name: /^11:00 / });
+    await act(async () => {
+      fireEvent.click(turnoBtn);
+    });
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /registrar reserva/i }));
     });
@@ -503,7 +475,7 @@ describe('CreateReservaForm', () => {
     expect(screen.queryByText('Cargando turnos...')).not.toBeInTheDocument();
   });
 
-  test('muestra los turnos disponibles con sus cupos como opciones del select', async () => {
+  test('muestra los turnos disponibles con sus cupos como botones seleccionables', async () => {
     renderForm();
     await avanzarAlPaso2();
 
@@ -511,10 +483,41 @@ describe('CreateReservaForm', () => {
     fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
 
     await waitFor(() => {
-      expect(screen.getByRole('option', { name: '09:00 (6/6 lugares)' })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: '10:00 (3/6 lugares)' })).toBeInTheDocument();
-      expect(screen.getByRole('option', { name: '11:00 (6/6 lugares)' })).toBeInTheDocument();
+      expect(screen.getByRole('radio', { name: '09:00 (6/6 lugares)' })).toBeInTheDocument();
+      expect(screen.getByRole('radio', { name: '10:00 (3/6 lugares)' })).toBeInTheDocument();
+      expect(screen.getByRole('radio', { name: '11:00 (6/6 lugares)' })).toBeInTheDocument();
     });
+  });
+
+  test('un turno sin cupo se muestra deshabilitado y no puede seleccionarse', async () => {
+    getTurnosDisponibles.mockResolvedValue([
+      { hora_inicio: '09:00:00', cupos_disponibles: 6 },
+      { hora_inicio: '10:00:00', cupos_disponibles: 0 },
+    ]);
+    renderForm();
+    await avanzarAlPaso2();
+
+    const fechaInput = document.querySelector('input[type="date"]');
+    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+
+    const turnoLleno = await screen.findByRole('radio', { name: '10:00 (sin cupo)' });
+    expect(turnoLleno).toBeDisabled();
+    fireEvent.click(turnoLleno);
+    expect(screen.queryByText('Debe seleccionar un turno')).not.toBeInTheDocument();
+  });
+
+  test('un turno con cupo bajo respecto de la capacidad muestra el aviso visual', async () => {
+    getTurnosDisponibles.mockResolvedValue([
+      { hora_inicio: '09:00:00', cupos_disponibles: 1 },
+    ]);
+    renderForm();
+    await avanzarAlPaso2();
+
+    const fechaInput = document.querySelector('input[type="date"]');
+    fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
+
+    const turnoBajo = await screen.findByRole('radio', { name: '09:00 (1/6 lugares)' });
+    expect(turnoBajo.className).toContain('turno-chip--bajo');
   });
 
   test('muestra un aviso cuando no hay turnos disponibles para la fecha elegida', async () => {
@@ -545,8 +548,7 @@ describe('CreateReservaForm', () => {
     const fechaInput = document.querySelector('input[type="date"]');
     fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
     // Turno 10:00 tiene cupo=3 (ver mock de getTurnosDisponibles en beforeEach)
-    expect(await screen.findByRole('option', { name: '10:00 (3/6 lugares)' })).toBeInTheDocument();
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: '10:00:00' } });
+    fireEvent.click(await screen.findByRole('radio', { name: '10:00 (3/6 lugares)' }));
 
     fireEvent.click(screen.getByRole('button', { name: /atrás/i }));
     expect(await screen.findByText(/paso 1 de 2/i)).toBeInTheDocument();
@@ -593,8 +595,7 @@ describe('CreateReservaForm', () => {
     const fechaInput = document.querySelector('input[type="date"]');
     fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
     // Turno 10:00 tiene cupo=3 (ver mock de getTurnosDisponibles en beforeEach)
-    expect(await screen.findByRole('option', { name: '10:00 (3/6 lugares)' })).toBeInTheDocument();
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: '10:00:00' } });
+    fireEvent.click(await screen.findByRole('radio', { name: '10:00 (3/6 lugares)' }));
 
     fireEvent.click(screen.getByRole('button', { name: /atrás/i }));
     expect(await screen.findByText(/paso 1 de 2/i)).toBeInTheDocument();
@@ -650,7 +651,6 @@ describe('CreateReservaForm', () => {
       expect(await screen.findByText(new RegExp(nro))).toBeInTheDocument();
     }
 
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'inst-uuid-1' } });
     fireEvent.click(screen.getByRole('button', { name: /siguiente/i }));
     expect(await screen.findByText(/paso 2 de 2/i)).toBeInTheDocument();
     act(() => jest.advanceTimersByTime(300));
@@ -658,11 +658,10 @@ describe('CreateReservaForm', () => {
     const fechaInput = document.querySelector('input[type="date"]');
     fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
     // Turno 09:00 tiene cupo=6, alcanza para los 4 socios agregados.
-    expect(await screen.findByRole('option', { name: '09:00 (6/6 lugares)' })).toBeInTheDocument();
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: '09:00:00' } });
+    fireEvent.click(await screen.findByRole('radio', { name: '09:00 (6/6 lugares)' }));
 
     // Cambia a un turno con menos cupo (10:00, cupo=3) que la cantidad de socios (4).
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: '10:00:00' } });
+    fireEvent.click(screen.getByRole('radio', { name: '10:00 (3/6 lugares)' }));
     fireEvent.click(screen.getByRole('button', { name: /registrar reserva/i }));
 
     await waitFor(() => {
@@ -676,7 +675,7 @@ describe('CreateReservaForm', () => {
     await avanzarAlPaso2();
     const fechaInput = document.querySelector('input[type="date"]');
     fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
-    expect(await screen.findByRole('option', { name: /^09:00 /  })).toBeInTheDocument();
+    expect(await screen.findByRole('radio', { name: /^09:00 / })).toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: /registrar reserva/i }));
 
@@ -684,11 +683,6 @@ describe('CreateReservaForm', () => {
       expect(screen.getByText('Debe seleccionar un turno')).toBeInTheDocument();
     });
     expect(onSuccess).not.toHaveBeenCalled();
-  });
-
-  test('funciona sin la prop instalaciones (usa el default)', () => {
-    render(<CreateReservaForm onSuccess={onSuccess} onCancel={onCancel} />);
-    expect(screen.getByRole('combobox')).toBeInTheDocument();
   });
 
   test('presionar una tecla distinta de Enter no agrega el socio', async () => {
@@ -706,18 +700,14 @@ describe('CreateReservaForm', () => {
     expect(getSocioByNroSocio).not.toHaveBeenCalled();
   });
 
-  test('usa "?" como capacidad si la instalación seleccionada no tiene capacidad_maxima', async () => {
+  test('usa "?" como capacidad si la instalación no tiene capacidad_maxima', async () => {
     const INSTALACION_SIN_CAPACIDAD = { id: 'inst-uuid-3', nombre: 'Cancha sin capacidad definida' };
-    renderForm([...INSTALACIONES_TEST, INSTALACION_SIN_CAPACIDAD]);
-    await agregarSocioAlForm('1234');
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'inst-uuid-3' } });
-    fireEvent.click(screen.getByRole('button', { name: /siguiente/i }));
-    expect(await screen.findByText(/paso 2 de 2/i)).toBeInTheDocument();
-    act(() => jest.advanceTimersByTime(300));
+    renderForm(INSTALACION_SIN_CAPACIDAD);
+    await avanzarAlPaso2();
 
     const fechaInput = document.querySelector('input[type="date"]');
     fireEvent.change(fechaInput, { target: { value: '2026-08-10' } });
-    expect(await screen.findByRole('option', { name: '09:00 (6/? lugares)' })).toBeInTheDocument();
+    expect(await screen.findByRole('radio', { name: '09:00 (6/? lugares)' })).toBeInTheDocument();
   });
 
   test('no actualiza los turnos si el componente se desmonta mientras la petición está pendiente (resuelve)', async () => {

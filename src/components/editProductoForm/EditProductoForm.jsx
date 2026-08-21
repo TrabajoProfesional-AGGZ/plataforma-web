@@ -19,6 +19,13 @@ const TEXTO_ESTADO_IMAGEN = {
   error: { titulo: 'Reintentar', hint: 'No se pudo cargar la imagen' },
 };
 
+/**
+ * Formulario de un paso para editar un producto existente, pre-rellenado con
+ * `defaultValues` a partir de `producto`. Solo sube una imagen nueva a
+ * Cloudinary si el usuario eligió un archivo (`useImagenUpload`); si no,
+ * mantiene la `imagen_url` existente como preview y no la reenvía en el payload.
+ * @param {{ producto: object, onSuccess: (productoActualizado: object) => void, onCancel: () => void }} props
+ */
 export function EditProductoForm({ producto, onSuccess, onCancel }) {
   const { step, direction, submitted, setSubmitted, navGuard } = useMultiStepFormState();
   const {
@@ -61,7 +68,8 @@ export function EditProductoForm({ producto, onSuccess, onCancel }) {
       await new Promise((r) => setTimeout(r, 1200));
       onSuccess(actualizado);
     } catch {
-      // Error handled by form
+      // No hay mensaje de error visible para este caso: el formulario simplemente
+      // no avanza a la pantalla de éxito y el usuario puede reintentar.
     }
   };
 
@@ -100,7 +108,7 @@ export function EditProductoForm({ producto, onSuccess, onCancel }) {
             })}
             rows={4}
             className={`csf-input${errors.descripcion ? ' csf-input--error' : ''}`}
-            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: 14 }}
+            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: '0.875rem' }}
           />
         </Field>
         <Field label="Precio ($)" icon={DollarSign} error={errors.precio?.message}>

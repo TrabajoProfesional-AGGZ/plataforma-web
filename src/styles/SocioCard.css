@@ -47,13 +47,13 @@
   font-weight: 500;
   color: var(--color-text-secondary);
   min-width: 90px;
-  font-size: 14px;
+  font-size: 0.875rem;
   flex-shrink: 0;
 }
 
 .socios-card-row span:last-child {
   color: var(--color-text-primary);
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
@@ -78,7 +78,7 @@
   color: var(--color-surface);
   border: none;
   border-radius: 50%;
-  font-size: 18px;
+  font-size: 1.125rem;
   cursor: pointer;
   display: flex;
   align-items: center;

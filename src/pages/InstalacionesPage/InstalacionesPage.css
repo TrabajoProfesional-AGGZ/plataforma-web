@@ -10,7 +10,7 @@
 /* .instalaciones-title, .instalaciones-toolbar → src/styles/ListDetailShared.css */
 /* Badges de estado → src/components/badge/EstadoBadge.css (EstadoBadge) */
 
-/* ── Toggle: flex layout on top of shared btn-toggle base ─────── */
+/* ── Toggle: layout flex sobre la base compartida btn-toggle ──── */
 .instalaciones-btn-toggle {
   display: flex;
   align-items: center;
@@ -18,7 +18,7 @@
   white-space: nowrap;
 }
 
-/* ── Detail view ─────────────────────────────────────────────── */
+/* ── Vista de detalle ─────────────────────────────────────────── */
 .instalaciones-nav {
   display: flex;
   align-items: center;
@@ -32,7 +32,7 @@
   margin-bottom: var(--space-5);
 }
 
-/* ── Reservas section ─────────────────────────────────────────── */
+/* ── Sección de reservas ───────────────────────────────────────── */
 .instalaciones-reservas-section {
   margin-top: var(--space-2);
 }
@@ -55,7 +55,7 @@
 
 .instalaciones-reservas-title,
 .instalaciones-seccion-title {
-  font-size: 20px;
+  font-size: 1.25rem;
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0 0 var(--space-3) 0;
@@ -76,7 +76,7 @@
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
   padding: 6px 14px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
   color: var(--color-text-primary);
@@ -93,7 +93,7 @@
 .instalaciones-btn-reserva-eliminar {
   padding: 5px var(--space-3);
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
   transition: background-color var(--transition-fast);
@@ -134,7 +134,7 @@
   margin-bottom: var(--space-4);
 }
 
-/* .instalaciones-seccion-title — shared with .instalaciones-reservas-title above */
+/* .instalaciones-seccion-title — compartido con .instalaciones-reservas-title arriba */
 
 .instalaciones-seccion-toolbar {
   display: flex;
@@ -175,7 +175,7 @@
   justify-content: flex-end;
 }
 
-/* ── Checkbox field modifier ──────────────────────────────────── */
+/* ── Modificador de campo checkbox ────────────────────────────── */
 .modal-field.modal-field-checkbox {
   flex-direction: row;
   align-items: center;

@@ -40,7 +40,7 @@ async function fillStep1() {
 }
 
 async function fillStep2() {
-  fireEvent.change(screen.getByText('Seleccionar...').closest('select'), { target: { value: 'DNI' } });
+  fireEvent.change(screen.getAllByText('Seleccionar...')[0].closest('select'), { target: { value: 'DNI' } });
   fireEvent.change(screen.getByPlaceholderText('Ej. 12345678'), { target: { value: '12345678' } });
 }
 
@@ -179,7 +179,7 @@ describe('CreateUserForm', () => {
     const onCancel = jest.fn();
     await navigateToStep4(onSuccess, onCancel);
 
-    fireEvent.change(screen.getByText('Seleccionar...').closest('select'), { target: { value: 'ADMIN' } });
+    fireEvent.change(screen.getAllByText('Seleccionar...')[0].closest('select'), { target: { value: 'ADMIN' } });
     userEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
 
     await waitFor(() => expect(screen.getByText('¡Usuario creado!')).toBeInTheDocument());
@@ -190,7 +190,7 @@ describe('CreateUserForm', () => {
     const onCancel = jest.fn();
     await navigateToStep4(onSuccess, onCancel);
 
-    fireEvent.change(screen.getByText('Seleccionar...').closest('select'), { target: { value: 'ADMIN' } });
+    fireEvent.change(screen.getAllByText('Seleccionar...')[0].closest('select'), { target: { value: 'ADMIN' } });
     userEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
 
     await waitFor(() => expect(screen.getByText('¡Usuario creado!')).toBeInTheDocument());
@@ -204,7 +204,7 @@ describe('CreateUserForm', () => {
     const onCancel = jest.fn();
     await navigateToStep4(onSuccess, onCancel);
 
-    fireEvent.change(screen.getByText('Seleccionar...').closest('select'), { target: { value: 'ADMIN' } });
+    fireEvent.change(screen.getAllByText('Seleccionar...')[0].closest('select'), { target: { value: 'ADMIN' } });
     userEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
 
     await waitFor(() => expect(screen.getByText(/ya existe un usuario/i)).toBeInTheDocument());
@@ -216,7 +216,7 @@ describe('CreateUserForm', () => {
     const onCancel = jest.fn();
     await navigateToStep4(onSuccess, onCancel);
 
-    fireEvent.change(screen.getByText('Seleccionar...').closest('select'), { target: { value: 'ADMIN' } });
+    fireEvent.change(screen.getAllByText('Seleccionar...')[0].closest('select'), { target: { value: 'ADMIN' } });
     userEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
 
     await waitFor(() => expect(screen.getByText(/servicio no está disponible/i)).toBeInTheDocument());
@@ -228,7 +228,7 @@ describe('CreateUserForm', () => {
     const onCancel = jest.fn();
     await navigateToStep4(onSuccess, onCancel);
 
-    fireEvent.change(screen.getByText('Seleccionar...').closest('select'), { target: { value: 'ADMIN' } });
+    fireEvent.change(screen.getAllByText('Seleccionar...')[0].closest('select'), { target: { value: 'ADMIN' } });
     userEvent.click(screen.getByRole('button', { name: /crear usuario/i }));
 
     await waitFor(() => expect(screen.getByText(/error al crear el usuario/i)).toBeInTheDocument());

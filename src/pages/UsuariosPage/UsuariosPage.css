@@ -1,6 +1,6 @@
-/* Toolbar, search, filters, table base, estado-cell, btn base → src/styles/ListPage.css
+/* Barra de herramientas, búsqueda, filtros, tabla base, estado-cell, btn base → src/styles/ListPage.css
    btn-crear → src/styles/ListDetailShared.css
-   th styles → src/styles/PageTableHeader.css
+   estilos de th → src/styles/PageTableHeader.css
    usuarios-title, usuarios-ver-todos-button, usuarios-filtros*, usuarios-th-sort → src/styles/ListPage.css */
 
 .usuarios-page {
@@ -8,7 +8,7 @@
   margin: 0 auto;
 }
 
-/* ── Search form ──────────────────────────────────────────────── */
+/* ── Formulario de búsqueda ───────────────────────────────────── */
 .usuarios-search-form {
   display: flex;
   align-items: center;
@@ -17,7 +17,7 @@
   max-width: 460px;
 }
 
-/* ── Button color variants ────────────────────────────────────── */
+/* ── Variantes de color de botón ──────────────────────────────── */
 .usuarios-search-button {
   background-color: var(--color-text-primary);
   color: var(--color-surface);
@@ -39,19 +39,19 @@
   background-color: var(--color-text-secondary);
 }
 
-/* ── Rol badge ────────────────────────────────────────────────── */
+/* ── Badge de rol ─────────────────────────────────────────────── */
 .usuarios-rol-badge {
   display: inline-block;
   padding: 3px 10px;
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   background-color: var(--color-bg);
   color: var(--color-text-primary);
   border: 1px solid var(--color-border-medium);
 }
 
-/* ── Estado logo ──────────────────────────────────────────────── */
+/* ── Logo de estado ───────────────────────────────────────────── */
 .usuarios-estado-logo {
   width: 22px;
   height: auto;
@@ -96,13 +96,13 @@
   font-weight: 500;
   color: var(--color-text-secondary);
   min-width: 120px;
-  font-size: 14px;
+  font-size: 0.875rem;
   flex-shrink: 0;
 }
 
 .usuarios-card-row span:last-child {
   color: var(--color-text-primary);
-  font-size: 14px;
+  font-size: 0.875rem;
   text-align: right;
 }
 
@@ -112,7 +112,7 @@
   border: 1px solid var(--color-border-medium);
   padding: 5px var(--space-3);
   border-radius: var(--radius-sm);
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
   transition: background-color var(--transition-fast), border-color var(--transition-fast);
@@ -137,7 +137,7 @@
   gap: 10px;
 }
 
-/* ── Card action button colors ────────────────────────────────── */
+/* ── Colores de botones de acción de la card ──────────────────── */
 .usuarios-btn-editar {
   background-color: var(--color-text-primary);
   color: var(--color-surface);

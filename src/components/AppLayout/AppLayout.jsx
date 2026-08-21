@@ -9,6 +9,9 @@ import { ShoppingBag } from 'lucide-react';
 import './AppLayout.css';
 
 
+// Ítems de navegación de la sidebar. `permiso: null` (o vacío) significa
+// visible para cualquier usuario autenticado; si no, se filtra según los
+// permisos devueltos por el login (ver `navItems` más abajo).
 const NAV_ITEMS_BASE = [
   { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard, permiso: null },
   { to: '/socios', label: 'Socios', Icon: Users, permiso: 'ver_socios' },
@@ -23,6 +26,11 @@ const NAV_ITEMS_BASE = [
   { to: '/tienda', label: 'Tienda', Icon: ShoppingBag, permiso: null },
 ];
 
+/**
+ * Layout principal de la aplicación autenticada: sidebar de navegación
+ * (drawer off-canvas en mobile), header con logo/usuario/logout, y el
+ * `Outlet` de react-router donde se renderiza la página activa.
+ */
 function AppLayout() {
   const { user, permisos } = useAuth();
   const { theme, toggleTheme, logoSocio, logoTexto } = useTheme();
@@ -36,6 +44,12 @@ function AppLayout() {
 
   useBackToRoot(drawerOpen, false, () => setDrawerOpen(false));
 
+  // Anima el fondo del ítem activo (`.sidebar-active-bg`) para que se
+  // deslice de un link al siguiente en vez de saltar directo. En la
+  // primera carga (no hay posición previa) se ubica sin animar ("snap");
+  // al navegar entre links no adyacentes, avanza de a un ítem por vez
+  // cada 50ms hasta llegar al destino, en lugar de animar directo de
+  // origen a destino, para que el desplazamiento se sienta continuo.
   useLayoutEffect(() => {
     if (!navRef.current || !indicatorRef.current) return;
 
@@ -87,10 +101,15 @@ function AppLayout() {
     doStep();
   }, [location.pathname]);
 
+  // Limpia los timeouts de la animación por pasos si el componente se
+  // desmonta a mitad de una animación en curso.
   useEffect(() => {
     return () => { animTimersRef.current.forEach(clearTimeout); };
   }, []);
 
+  // Reposiciona el indicador activo sin animar al redimensionar la ventana
+  // (o hacer zoom), ya que `offsetTop`/`offsetHeight` de los links cambian
+  // con el layout y la posición calculada en el último render queda obsoleta.
   useEffect(() => {
     function handleResize() {
       if (!navRef.current || !indicatorRef.current) return;
@@ -107,10 +126,12 @@ function AppLayout() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Cierra el drawer mobile automáticamente al navegar a otra ruta.
   useEffect(() => {
     setDrawerOpen(false);
   }, [location.pathname]);
 
+  // Cierra el drawer con la tecla Escape mientras está abierto.
   useEffect(() => {
     if (!drawerOpen) return;
     function handleKeyDown(e) {
@@ -125,6 +146,7 @@ function AppLayout() {
     navigate('/');
   }
 
+  // Filtra los ítems de la sidebar según los permisos del usuario logueado.
   const navItems = NAV_ITEMS_BASE.filter(n => !n.permiso || permisos.includes(n.permiso));
 
   return (

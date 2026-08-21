@@ -1,4 +1,4 @@
-/* ── Toolbar & Filtros ────────────────────────────────────────── */
+/* ── Barra de herramientas y filtros ─────────────────────────────── */
 .finanzas-toolbar {
   display: flex;
   justify-content: flex-end;
@@ -16,7 +16,7 @@
 }
 
 .finanzas-filter-label {
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--color-text-secondary);
 }
@@ -24,14 +24,14 @@
 .finanzas-input-month {
   border: none;
   font-family: inherit;
-  font-size: 14px;
+  font-size: 0.875rem;
   color: var(--color-text-primary);
   background: transparent;
   outline: none;
   cursor: pointer;
 }
 
-/* ── Loading & Error ──────────────────────────────────────────── */
+/* ── Carga y error ────────────────────────────────────────────── */
 .finanzas-loading {
   display: flex;
   justify-content: center;
@@ -41,21 +41,21 @@
 .finanzas-error {
   text-align: center;
   color: var(--color-danger);
-  font-size: 14px;
+  font-size: 0.875rem;
   background-color: var(--status-error-surface-bg);
   border: 1px solid var(--status-error-surface-border);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
 }
 
-/* ── Dashboard Layout ─────────────────────────────────────────── */
+/* ── Layout del dashboard ─────────────────────────────────────── */
 .finanzas-dashboard {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
 }
 
-/* KPI Card */
+/* Tarjeta KPI */
 .finanzas-kpi-card {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border-medium);
@@ -66,7 +66,7 @@
 }
 
 .finanzas-kpi-title {
-  font-size: 14px;
+  font-size: 0.875rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
   color: var(--color-text-secondary);
@@ -75,7 +75,7 @@
 }
 
 .finanzas-kpi-value {
-  font-size: 48px;
+  font-size: 3rem;
   font-weight: 700;
   color: var(--color-text-primary);
   margin: 0;
@@ -85,12 +85,12 @@
 
 .finanzas-kpi-subtitle {
   display: block;
-  font-size: 13px;
+  font-size: 0.8125rem;
   color: var(--color-text-secondary);
   margin-top: var(--space-2);
 }
 
-/* Chart Container */
+/* Contenedor del gráfico */
 .finanzas-chart-container {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border-medium);
@@ -100,7 +100,7 @@
 }
 
 .finanzas-chart-title {
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0 0 var(--space-3) 0;
@@ -112,10 +112,10 @@
   margin-bottom: var(--space-5);
 }
 
-/* ── Responsive ───────────────────────────────────────────────── */
+/* ── Responsivo ───────────────────────────────────────────────── */
 @media (max-width: 480px) {
   .finanzas-kpi-value {
-    font-size: 36px;
+    font-size: 2.25rem;
   }
 
   .finanzas-toolbar {

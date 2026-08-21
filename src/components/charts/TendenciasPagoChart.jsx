@@ -1,6 +1,10 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
+/**
+ * Convierte cada mes de `{ mes, a_termino, fuera_de_termino }` (valores absolutos)
+ * a porcentajes sobre el total del mes, para graficar barras 100% apiladas.
+ */
 function calcularPorcentajes(datos) {
   return datos.map((t) => {
     const total = (t.a_termino ?? 0) + (t.fuera_de_termino ?? 0);
@@ -10,6 +14,11 @@ function calcularPorcentajes(datos) {
   });
 }
 
+/**
+ * Gráfico de barras 100% apiladas con la proporción mensual de pagos a término
+ * vs. fuera de término. Muestra un mensaje si no hay datos en el rango.
+ * @param {{ datos: Array<{ mes: string, a_termino: number, fuera_de_termino: number }> }} props
+ */
 export function TendenciasPagoChart({ datos }) {
   if (!datos || datos.length === 0) {
     return (
@@ -28,14 +37,14 @@ export function TendenciasPagoChart({ datos }) {
           <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border-medium)" />
           <XAxis
             dataKey="mes"
-            tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
+            tick={{ fill: 'var(--color-text-secondary)', fontSize: '0.75rem' }}
             axisLine={{ stroke: 'var(--color-border-medium)' }}
             tickLine={false}
           />
           <YAxis
             domain={[0, 100]}
             tickFormatter={(value) => `${value}%`}
-            tick={{ fill: 'var(--color-text-secondary)', fontSize: 12 }}
+            tick={{ fill: 'var(--color-text-secondary)', fontSize: '0.75rem' }}
             axisLine={false}
             tickLine={false}
             width={50}

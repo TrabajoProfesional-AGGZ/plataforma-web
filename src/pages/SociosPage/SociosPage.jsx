@@ -4,6 +4,7 @@ import { getSocios, deleteSocio } from '../../services/sociosService';
 import { getDisciplinas, getSociosByDisciplina, extenderSuscripcionDisciplina } from '../../services/disciplinasService';
 import { CreateSocioForm } from '../../components/createForm/CreateSocioForm';
 import { EditSocioForm } from '../../components/editForm/EditSocioForm';
+import { StyledSelect } from '../../components/createForm/FormFields';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { ResolverListaEsperaModal } from '../../components/resolverListaEsperaModal/ResolverListaEsperaModal';
 import { usePermiso } from '../../hooks/usePermiso';
@@ -27,6 +28,7 @@ import '../../styles/PageTableHeader.css';
 
 const ORDEN_INICIAL = { campo: 'nro_socio', dir: 'asc' };
 
+/** Normaliza el valor de una columna para ordenar: objetos anidados (categoría/estado) por su nombre, nro_socio como número. */
 function getValorOrden(socio, campo) {
   const val = socio[campo];
   if (val && typeof val === 'object') return String(val.nombre ?? '').toLowerCase();
@@ -34,6 +36,7 @@ function getValorOrden(socio, campo) {
   return String(val ?? '').toLowerCase();
 }
 
+/** Traduce el estado de orden de una columna al valor `aria-sort` correspondiente. */
 function ariaSortDe(orden, campo) {
   if (orden.campo !== campo) return 'none';
   return orden.dir === 'asc' ? 'ascending' : 'descending';
@@ -41,6 +44,7 @@ function ariaSortDe(orden, campo) {
 
 
 
+/** Página de búsqueda/listado y detalle de socios: crear, editar, eliminar y filtrar por disciplina. */
 function SociosPage() {
   const { logoSocio: logo } = useTheme();
   const puedeCrear = usePermiso('crear_socio');
@@ -53,6 +57,9 @@ function SociosPage() {
 
   const [nroSocio, setNroSocio] = useState('');
   const [modo, setModo] = useState('idle'); // idle | socio | lista | no-encontrado
+  // modoRef evita que el callback onPage (asíncrono, con closure sobre modo) actúe con un valor de modo desactualizado.
+  const modoRef = useRef(modo);
+  useEffect(() => { modoRef.current = modo; }, [modo]);
   useBackToRoot(modo, 'lista', () => setModo('lista'));
   const { resultado, setResultado, loading, setLoading, error, setError } = useListState();
   const { orden, setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden, ORDEN_INICIAL);
@@ -84,16 +91,20 @@ function SociosPage() {
           onPage: (parcial) => {
             if (!cancelled) {
               cacheSociosRef.current = parcial;
-              setResultado(parcial);
-              setModo('lista');
+              if (modoRef.current === 'idle' || modoRef.current === 'lista') {
+                setResultado(parcial);
+                setModo('lista');
+              }
               setLoading(false);
             }
           },
         });
         if (!cancelled) {
           cacheSociosRef.current = socios;
-          setResultado(socios);
-          setModo('lista');
+          if (modoRef.current === 'idle' || modoRef.current === 'lista') {
+            setResultado(socios);
+            setModo('lista');
+          }
         }
       } catch (err) {
         if (!cancelled) {
@@ -154,21 +165,28 @@ function SociosPage() {
     return () => { cancelled = true; };
   }, [filtroDisciplina]);
 
+  /** Carga los socios de forma paginada (actualiza la vista con cada página vía onPage) y cachea el resultado completo. */
   async function cargarSocios() {
     setLoading(true);
     setError(null);
+    setModo('lista');
+    modoRef.current = 'lista';
     try {
       const socios = await getSocios({
         onPage: (parcial) => {
           cacheSociosRef.current = parcial;
-          setResultado(parcial);
-          setModo('lista');
+          if (modoRef.current === 'idle' || modoRef.current === 'lista') {
+            setResultado(parcial);
+            setModo('lista');
+          }
           setLoading(false);
         },
       });
       cacheSociosRef.current = socios;
-      setResultado(socios);
-      setModo('lista');
+      if (modoRef.current === 'idle' || modoRef.current === 'lista') {
+        setResultado(socios);
+        setModo('lista');
+      }
     } catch (err) {
       if (err.message === 'servicio-no-disponible') {
         setError('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
@@ -192,6 +210,7 @@ function SociosPage() {
     await cargarSocios();
   }
 
+  /** Busca por N° de socio usando la caché local si ya está disponible, para no reconsultar todo el listado. */
   async function handleBuscar(e) {
     e.preventDefault();
     if (!nroSocio.trim()) return;
@@ -455,8 +474,8 @@ function SociosPage() {
               {filtroAbierto && (
                 <div className="socios-filtros-dropdowns">
                   <div className="socios-filtros-grupo">
-                    <select
-                      className="socios-filtro-select"
+                    <StyledSelect
+                      className="filtros-select-trigger"
                       value={filtroCategoria}
                       onChange={(e) => setFiltroCategoria(e.target.value)}
                     >
@@ -464,12 +483,12 @@ function SociosPage() {
                       {categoriasUnicas.map(c => (
                         <option key={c} value={c}>{c}</option>
                       ))}
-                    </select>
+                    </StyledSelect>
                   </div>
                   <div className="socios-filtros-grupo">
-                    <select
+                    <StyledSelect
                       id="filtro-estado"
-                      className="socios-filtro-select"
+                      className="filtros-select-trigger"
                       value={filtroEstado}
                       onChange={(e) => setFiltroEstado(e.target.value)}
                     >
@@ -477,13 +496,13 @@ function SociosPage() {
                       {estadosUnicos.map(e => (
                         <option key={e} value={e}>{e}</option>
                       ))}
-                    </select>
+                    </StyledSelect>
                   </div>
                   {puedeVerDisciplinas && disciplinas.length > 0 && (
                     <div className="socios-filtros-grupo">
-                      <select
+                      <StyledSelect
                         id="filtro-disciplina"
-                        className="socios-filtro-select"
+                        className="filtros-select-trigger"
                         value={filtroDisciplina}
                         onChange={(e) => setFiltroDisciplina(e.target.value)}
                       >
@@ -491,7 +510,7 @@ function SociosPage() {
                         {disciplinas.map(d => (
                           <option key={d.id} value={d.id}>{d.nombre}</option>
                         ))}
-                      </select>
+                      </StyledSelect>
                     </div>
                   )}
                 </div>

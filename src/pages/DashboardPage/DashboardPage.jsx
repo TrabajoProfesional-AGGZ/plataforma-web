@@ -56,6 +56,7 @@ const SECCIONES = [
 ];
 
 
+/** Panel principal: grilla de accesos rápidos a las secciones habilitadas por permiso. */
 function DashboardPage() {
   const navigate = useNavigate();
   const { user, permisos } = useAuth();

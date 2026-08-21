@@ -1,6 +1,19 @@
 import { useRef, useState } from 'react';
 import { validarArchivoImagen } from '../utils/formValidators';
 
+/**
+ * Hook compartido para la caja de subida de imagen (`ImagenUploadField`): valida
+ * el archivo elegido, arma un preview local y difiere la subida real (vía la
+ * función `subirFn` que recibe) hasta que se invoca explícitamente.
+ * @returns {{
+ *   fileInputRef: import('react').RefObject<HTMLInputElement>,
+ *   imagenPreview: string|null,
+ *   estadoImagen: 'vacio'|'lista'|'subiendo'|'exito'|'error',
+ *   errorImagen: string,
+ *   handleArchivoSeleccionado: (e: import('react').ChangeEvent<HTMLInputElement>) => void,
+ *   subirSiCorresponde: (subirFn: (dataUrl: string) => Promise<{url: string}>) => Promise<string|null>
+ * }}
+ */
 export function useImagenUpload() {
   const fileInputRef = useRef(null);
   const [imagenPreview, setImagenPreview] = useState(null);

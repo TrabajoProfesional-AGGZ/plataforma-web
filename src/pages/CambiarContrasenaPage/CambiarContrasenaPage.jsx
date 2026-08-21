@@ -3,6 +3,7 @@ import { useChangePassword } from '../../hooks/useChangePassword';
 import './CambiarContrasenaPage.css';
 import '../../styles/shared.css';
 
+/** Input de contraseña con botón para mostrar/ocultar el valor. */
 function PasswordField({ id, label, value, onChange, autoComplete }) {
   const [show, setShow] = useState(false);
   return (
@@ -30,6 +31,7 @@ function PasswordField({ id, label, value, onChange, autoComplete }) {
   );
 }
 
+/** Formulario para cambiar la contraseña del usuario autenticado. */
 function CambiarContrasenaPage() {
   const { actual, setActual, nueva, setNueva, confirmar, setConfirmar, error, loading, handleSubmit } = useChangePassword();
 

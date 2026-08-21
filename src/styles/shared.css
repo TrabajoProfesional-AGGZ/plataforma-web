@@ -1,6 +1,6 @@
-/* Shared styles used across multiple pages */
+/* Estilos compartidos entre varias páginas */
 
-/* ── Primary action button (shared across pages) ─────────────── */
+/* ── Botón de acción primaria (compartido entre páginas) ─────── */
 .cambiar-contrasena-button,
 .perfil-cambiar-button {
   padding: 10px var(--space-5);
@@ -8,13 +8,13 @@
   color: var(--color-surface);
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   transition: background-color var(--transition-fast);
 }
 
-/* ── Toggle show/hide password button ────────────────────────── */
+/* ── Botón mostrar/ocultar contraseña ─────────────────────────── */
 .toggle-password,
 .login-toggle-password,
 .perfil-toggle-password {
@@ -23,7 +23,7 @@
   background: none;
   border: none;
   color: var(--color-text-secondary);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   padding: 0;

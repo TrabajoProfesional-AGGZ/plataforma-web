@@ -4,6 +4,23 @@ import { AlertTriangle } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { ModalOverlay } from '../createForm/ModalOverlay';
 
+/**
+ * Modal de confirmación con paso intermedio antes de ejecutar una acción
+ * irreversible. Pese al nombre, es genérico: se usa también para confirmar
+ * acciones que no son borrados (ej. marcar un pago como realizado en caja),
+ * ajustando `labelConfirmar`/`labelGuardando`/`mensaje` según el caso.
+ * @param {object} props
+ * @param {boolean} props.open - Si es `false`, el modal no renderiza nada.
+ * @param {string} props.titulo
+ * @param {string} [props.subtitulo]
+ * @param {string} props.mensaje - Texto de advertencia sobre la acción a confirmar.
+ * @param {() => void} props.onConfirm
+ * @param {() => void} props.onCancel
+ * @param {boolean} [props.guardando] - Deshabilita el botón de confirmar y cambia su label.
+ * @param {string} [props.errorModal] - Mensaje de error a mostrar si la acción falló.
+ * @param {string} [props.labelConfirmar]
+ * @param {string} [props.labelGuardando]
+ */
 function ConfirmDeleteModal({
   open,
   titulo,
@@ -42,7 +59,7 @@ function ConfirmDeleteModal({
               alignItems: 'flex-start',
             }}>
               <AlertTriangle size={20} color="var(--color-danger)" strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }} />
-              <p style={{ margin: 0, fontSize: 14, color: 'var(--color-danger)', lineHeight: 1.5 }}>
+              <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--color-danger)', lineHeight: 1.5 }}>
                 {mensaje}
               </p>
             </div>

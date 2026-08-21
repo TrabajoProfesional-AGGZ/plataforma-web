@@ -4,6 +4,7 @@ import { getTopDisciplinas, getOcupacionInstalaciones } from '../../services/met
 import { useTheme } from '../../hooks/useTheme';
 import './ResumenTab.css';
 
+/** Pestaña "Instalaciones" de Métricas: ranking de disciplinas por inscriptos y ocupación de instalaciones. */
 function ResumenTab() {
   const { logoSocio: logo } = useTheme();
   const [disciplinas, setDisciplinas] = useState(null);

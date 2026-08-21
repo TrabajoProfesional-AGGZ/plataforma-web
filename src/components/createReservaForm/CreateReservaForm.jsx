@@ -9,11 +9,13 @@ import { createReserva, getTurnosDisponibles } from '../../services/reservasServ
 import { getSocioByNroSocio } from '../../services/sociosService';
 import { useTheme } from '../../hooks/useTheme';
 import '../createForm/CreateSocioForm.css';
-import { Field, StyledInput, StyledSelect, FormStep } from '../createForm/FormFields';
+import './TurnoSelector.css';
+import { Field, StyledInput, FormStep } from '../createForm/FormFields';
 import { MultiStepFormShell } from '../createForm/MultiStepFormShell';
 import { useMultiStepFormState } from '../../hooks/useMultiStepFormState';
 import PropTypes from 'prop-types';
 import { SociosSeleccionados } from '../SociosSeleccionados/SociosSeleccionados';
+import { TurnoSelector } from './TurnoSelector';
 
 const STEPS = [
   { id: 1, label: 'Datos', icon: User },
@@ -21,7 +23,7 @@ const STEPS = [
 ];
 
 const stepFields = {
-  1: ['id_instalacion'],
+  1: [],
   2: ['fecha_reserva', 'hora_inicio'],
 };
 
@@ -38,7 +40,18 @@ const MENSAJES_ERROR_SUBMIT = {
   'socio-suspendido': AVISOS_ESTADO_SOCIO.Suspendido,
 };
 
-export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], instalacionPreseleccionada = '' }) {
+/**
+ * Formulario de dos pasos (Datos / Horario) para crear una reserva, siempre a
+ * nombre de una instalación ya conocida por el caller (se abre desde el
+ * detalle de esa instalación, así que no hay selector — el nombre se muestra
+ * como dato fijo). Los turnos disponibles del paso 2 se recargan al cambiar
+ * la fecha y traen `cupos_disponibles` por turno (cupo compartido entre
+ * reservas, no por-reserva); la cantidad de socios agregados no puede
+ * superar ese cupo, tanto en el paso 1 (bloqueo del botón "Agregar") como al
+ * confirmar el envío (revalidado por si el cupo bajó mientras se completaba el form).
+ * @param {{ onSuccess: () => void, onCancel: () => void, instalacion: object }} props
+ */
+export function CreateReservaForm({ onSuccess, onCancel, instalacion }) {
   const { logoSocio: logo } = useTheme();
   const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
   const [nroSocioInput, setNroSocioInput] = useState('');
@@ -58,10 +71,9 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
     trigger,
     watch,
     setValue,
-    formState: { errors },
-  } = useForm({ mode: 'onTouched', defaultValues: { id_instalacion: instalacionPreseleccionada } });
+    formState: { errors, isSubmitting },
+  } = useForm({ mode: 'onTouched' });
 
-  const idInstalacionSeleccionada = watch('id_instalacion');
   const fechaSeleccionada = watch('fecha_reserva');
   const horaInicioSeleccionada = watch('hora_inicio');
 
@@ -70,14 +82,14 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
   const topeSociosAlcanzado = cuposDisponiblesTurno != null && sociosAgregados.length >= cuposDisponiblesTurno;
 
   useEffect(() => {
-    if (!idInstalacionSeleccionada || !fechaSeleccionada) {
+    if (!fechaSeleccionada) {
       setTurnosDisponibles([]);
       return;
     }
     let cancelled = false;
     setCargandoTurnos(true);
     setErrorTurnos('');
-    getTurnosDisponibles(idInstalacionSeleccionada, fechaSeleccionada)
+    getTurnosDisponibles(instalacion.id, fechaSeleccionada)
       .then((turnos) => {
         if (cancelled) return;
         setTurnosDisponibles(turnos);
@@ -91,7 +103,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
       })
       .finally(() => { if (!cancelled) setCargandoTurnos(false); });
     return () => { cancelled = true; };
-  }, [idInstalacionSeleccionada, fechaSeleccionada, setValue]);
+  }, [instalacion.id, fechaSeleccionada, setValue]);
 
   const previewSocio = async (value) => {
     if (!value?.trim()) return;
@@ -99,7 +111,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
       const socio = await getSocioByNroSocio(value.trim());
       setSocioPreview(socio);
     } catch {
-      // preview silently fails
+      // La previsualización falla en silencio: el error real se muestra recién al intentar agregar el socio
     }
   };
 
@@ -175,7 +187,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
     try {
       await createReserva({
         ids_socios: sociosAgregados.map((s) => s.id),
-        id_instalacion: data.id_instalacion,
+        id_instalacion: instalacion.id,
         fecha_reserva: data.fecha_reserva,
         hora_inicio: data.hora_inicio,
       });
@@ -192,10 +204,12 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      isSubmitting={isSubmitting}
       title="Nueva reserva"
       successTitle="¡Reserva registrada!"
       successMessage="La reserva fue procesada correctamente."
       submitLabel="Registrar reserva"
+      submitLoadingLabel="Registrando..."
       onCancel={onCancel}
       goBack={goBack}
       goNext={goNext}
@@ -251,16 +265,8 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
               />
             </Field>
 
-            <Field label="Instalación" icon={Building2} error={errors.id_instalacion?.message}>
-              <StyledSelect
-                {...register('id_instalacion', { required: 'Debe seleccionar una instalación' })}
-                error={!!errors.id_instalacion}
-              >
-                <option value="">Seleccionar instalación...</option>
-                {instalaciones.map((inst) => (
-                  <option key={inst.id} value={inst.id}>{inst.nombre}</option>
-                ))}
-              </StyledSelect>
+            <Field label="Instalación" icon={Building2}>
+              <StyledInput type="text" value={instalacion.nombre} disabled />
             </Field>
           </FormStep>
         )}
@@ -275,22 +281,14 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
               />
             </Field>
             <Field label="Turno" icon={Clock} error={errors.hora_inicio?.message}>
-              <StyledSelect
-                {...register('hora_inicio', { required: 'Debe seleccionar un turno' })}
-                error={!!errors.hora_inicio}
-                disabled={cargandoTurnos || turnosDisponibles.length === 0}
-              >
-                <option value="">
-                  {cargandoTurnos ? 'Cargando turnos...' : 'Seleccionar turno...'}
-                </option>
-                {turnosDisponibles.map((turno) => (
-                  <option key={turno.hora_inicio} value={turno.hora_inicio}>
-                    {turno.hora_inicio.slice(0, 5)} ({turno.cupos_disponibles}/{
-                      instalaciones.find((i) => i.id === idInstalacionSeleccionada)?.capacidad_maxima ?? '?'
-                    } lugares)
-                  </option>
-                ))}
-              </StyledSelect>
+              <TurnoSelector
+                turnos={turnosDisponibles}
+                capacidadMaxima={instalacion.capacidad_maxima}
+                selected={horaInicioSeleccionada}
+                onSelect={(hora) => setValue('hora_inicio', hora, { shouldValidate: true, shouldDirty: true })}
+                loading={cargandoTurnos}
+              />
+              <input type="hidden" {...register('hora_inicio', { required: 'Debe seleccionar un turno' })} />
             </Field>
             {!cargandoTurnos && fechaSeleccionada && !errorTurnos && turnosDisponibles.length === 0 && (
               <p className="csf-error">
@@ -320,6 +318,9 @@ export function CreateReservaForm({ onSuccess, onCancel, instalaciones = [], ins
 CreateReservaForm.propTypes = {
   onSuccess: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
-  instalaciones: PropTypes.array,
-  instalacionPreseleccionada: PropTypes.string,
+  instalacion: PropTypes.shape({
+    id: PropTypes.string.isRequired,
+    nombre: PropTypes.string.isRequired,
+    capacidad_maxima: PropTypes.number,
+  }).isRequired,
 };

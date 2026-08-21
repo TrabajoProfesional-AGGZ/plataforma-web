@@ -10,11 +10,13 @@ import './MorosidadTab.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
 
+/** Formatea una fracción 0-1 como porcentaje redondeado, o '—' si no hay valor. */
 function formatearPorcentaje(valor) {
   if (valor == null) return '—';
   return `${Math.round(valor * 100)}%`;
 }
 
+/** Select de mes reutilizado por los filtros "Desde"/"Hasta" de tendencias de pago. */
 function SelectorMes({ id, label, value, onChange, opciones }) {
   return (
     <div className="morosidad-filter-group">
@@ -28,6 +30,7 @@ function SelectorMes({ id, label, value, onChange, opciones }) {
   );
 }
 
+/** Pestaña "Morosidad" de Métricas: predicción de atraso por socio y gráfico de tendencias de pago filtrable por rango de mes. */
 function MorosidadTab() {
   const { logoSocio: logo } = useTheme();
   const { resultado: datos, setResultado: setDatos, loading, setLoading, error, setError } = useListState();

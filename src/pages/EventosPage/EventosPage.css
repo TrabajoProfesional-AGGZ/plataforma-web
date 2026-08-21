@@ -4,7 +4,7 @@
 }
 
 .eventos-title {
-  font-size: 32px;
+  font-size: 2rem;
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0 0 var(--space-5) 0;
@@ -27,7 +27,7 @@
   padding: var(--space-2) var(--space-4);
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 14px;
+  font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
   background-color: var(--color-text-primary);
@@ -54,7 +54,7 @@
   padding: 5px var(--space-3);
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 12px;
+  font-size: 0.75rem;
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
@@ -72,8 +72,8 @@
   cursor: not-allowed;
 }
 
-/* Table styles → src/styles/ListPage.css (.disciplinas-table-wrapper, .disciplinas-tabla)
-   Empty state → .disciplinas-empty en src/styles/ListPage.css */
+/* Estilos de tabla → src/styles/ListPage.css (.disciplinas-table-wrapper, .disciplinas-tabla)
+   Estado vacío → .disciplinas-empty en src/styles/ListPage.css */
 
 .eventos-vista-toggle {
   display: flex;
@@ -86,7 +86,7 @@
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
   padding: 6px 14px;
-  font-size: 13px;
+  font-size: 0.8125rem;
   font-weight: 500;
   cursor: pointer;
   color: var(--color-text-primary);
@@ -94,6 +94,6 @@
 
 @media (max-width: 480px) {
   .eventos-title {
-    font-size: 24px;
+    font-size: 1.5rem;
   }
 }
