@@ -18,6 +18,7 @@ const LABEL_POR_TIPO = {
   compra: 'Compras',
 };
 
+/** Pestaña "Caja" de Métricas: total y desglose por tipo de los pagos marcados como pagados en caja. */
 function CajaTab() {
   const { logoSocio: logo } = useTheme();
   const [datos, setDatos] = useState(null);

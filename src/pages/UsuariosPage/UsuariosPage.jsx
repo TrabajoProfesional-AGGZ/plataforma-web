@@ -24,17 +24,20 @@ import '../../styles/PageTableHeader.css';
 
 const ORDEN_INICIAL = { campo: 'apellido', dir: 'asc' };
 
+/** Normaliza el valor de una columna para ordenar: rol/estado por su nombre anidado, el resto como string. */
 function getValorOrden(usuario, campo) {
   if (campo === 'rol') return String(usuario.rol?.nombre ?? '').toLowerCase();
   if (campo === 'estado') return String(usuario.estado?.nombre ?? '').toLowerCase();
   return String(usuario[campo] ?? '').toLowerCase();
 }
 
+/** Traduce el estado de orden de una columna al valor `aria-sort` correspondiente. */
 function ariaSortDe(orden, campo) {
   if (orden.campo !== campo) return 'none';
   return orden.dir === 'asc' ? 'ascending' : 'descending';
 }
 
+/** Página de búsqueda/listado y detalle de usuarios administrativos: crear, editar, eliminar y cambiar rol. */
 function UsuariosPage() {
   const { logoSocio: logo } = useTheme();
   const puedeCrear = usePermiso('crear_usuario');
@@ -130,6 +133,7 @@ function UsuariosPage() {
     await fetchYActualizarUsuarios();
   }
 
+  /** Filtra la lista local con un debounce de 400ms para no re-renderizar en cada tecla. */
   function handleBuscar(e) {
     e.preventDefault();
     if (buscarTimeoutRef.current) clearTimeout(buscarTimeoutRef.current);

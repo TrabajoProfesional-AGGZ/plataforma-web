@@ -1,4 +1,4 @@
-/* ── Page title (shared between Disciplinas and Instalaciones) ─── */
+/* ── Título de página (compartido entre Disciplinas e Instalaciones) ─── */
 .disciplinas-title,
 .instalaciones-title {
   font-size: 32px;
@@ -10,7 +10,7 @@
   text-wrap: balance;
 }
 
-/* ── Toolbar (shared between Disciplinas and Instalaciones) ────── */
+/* ── Barra de herramientas (compartida entre Disciplinas e Instalaciones) ── */
 .disciplinas-toolbar,
 .instalaciones-toolbar {
   display: flex;
@@ -132,7 +132,7 @@
   cursor: pointer;
 }
 
-/* Filled/borderless variants */
+/* Variantes rellenas/sin borde */
 .disciplinas-btn-eliminar,
 .instalaciones-btn-eliminar-inst,
 .socios-btn-editar,
@@ -160,7 +160,7 @@
   margin-bottom: 0;
 }
 
-/* ── Shared detail card components (socios + usuarios) ──────── */
+/* ── Componentes de card de detalle compartidos (socios + usuarios) ── */
 .detalle-logo-circle {
   width: 84px;
   height: 84px;

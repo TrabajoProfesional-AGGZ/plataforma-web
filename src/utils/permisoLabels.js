@@ -1,3 +1,8 @@
+/**
+ * Mapa de clave de permiso (tal como llega en el array de permisos del login) a su etiqueta
+ * legible en español. Fuente de verdad del frontend: los permisos se cargan manualmente en la
+ * base de datos, sin seed automático.
+ */
 export const PERMISO_LABELS = {
   'ver_socios':        'Ver socios',
   'crear_socio':       'Crear socio',

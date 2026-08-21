@@ -26,6 +26,7 @@ jest.mock('./pages/NoticiasPage/NoticiasPage', () => () => <div>Noticias Page</d
 jest.mock('./pages/AlertasPage/AlertasPage', () => () => <div>Alertas Page</div>);
 jest.mock('./pages/MetricasPage/MetricasPage', () => () => <div>Métricas Page</div>);
 
+/** Renderiza `App` con un usuario autenticado en la ruta dada, con los permisos indicados. */
 function renderAt(path, permisos = []) {
   useAuth.mockReturnValue({ user: { uid: '1' }, loading: false, permisos });
   window.history.pushState({}, '', path);

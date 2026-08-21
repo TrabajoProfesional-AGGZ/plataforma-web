@@ -26,6 +26,7 @@ code {
     monospace;
 }
 
+/* Efecto de click en botones; excluye el logo del header, que tiene su propia animación. */
 button:active:not(:disabled):not(.app-header-logo-btn) {
   transform: scale(0.98);
   transition-duration: 0.08s;

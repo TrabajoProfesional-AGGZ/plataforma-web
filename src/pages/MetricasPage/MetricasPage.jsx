@@ -17,11 +17,13 @@ const TABS = [
   { id: 'caja', label: 'Caja', Component: CajaTab },
 ];
 
+/** Página de métricas con navegación por pestañas (patrón ARIA tablist) accesible por teclado. */
 function MetricasPage() {
   const puedeVerMetricas = usePermiso('ver_metricas');
   const [activeTab, setActiveTab] = useState(TABS[0].id);
   const tabRefs = useRef({});
 
+  /** Navega entre pestañas con flechas/Home/End y mueve el foco a la pestaña activa. */
   function handleKeyDown(e) {
     const idx = TABS.findIndex((t) => t.id === activeTab);
     let nextIdx = null;

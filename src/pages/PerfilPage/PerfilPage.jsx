@@ -8,6 +8,7 @@ import '../../components/createForm/CreateSocioForm.css';
 import './PerfilPage.css';
 import '../../styles/shared.css';
 
+/** Input de contraseña con botón para mostrar/ocultar el valor. */
 function PasswordInput({ id, value, onChange, autoComplete, required }) {
   const [show, setShow] = useState(false);
   const [focused, setFocused] = useState(false);
@@ -53,6 +54,7 @@ function PasswordInput({ id, value, onChange, autoComplete, required }) {
   );
 }
 
+/** Modal para cambiar la contraseña del usuario autenticado. */
 function CambiarContrasenaModal({ onClose }) {
   const { actual, setActual, nueva, setNueva, confirmar, setConfirmar, error, loading, handleSubmit } = useChangePassword();
   useEscapeKey(onClose);
@@ -126,6 +128,7 @@ function CambiarContrasenaModal({ onClose }) {
   );
 }
 
+/** Página de perfil del usuario: datos, rol, permisos y cambio de contraseña. */
 function PerfilPage() {
   const { user, role, permisos } = useAuth();
   const [modalOpen, setModalOpen] = useState(false);

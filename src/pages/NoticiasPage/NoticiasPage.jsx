@@ -18,12 +18,14 @@ import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
 
+/** Traduce un error de servicio a un mensaje amigable, o usa el mensaje por defecto. */
 function mensajeError(err, fallback) {
   return err?.message === 'servicio-no-disponible'
     ? 'El servicio no está disponible. Intentá de nuevo más tarde.'
     : fallback;
 }
 
+/** Página de listado (vigentes/históricas) y detalle de noticias: crear, editar y eliminar. */
 function NoticiasPage() {
   const { logoSocio: logo } = useTheme();
   const puedeVerNoticias = usePermiso('ver_noticias');
@@ -94,6 +96,7 @@ function NoticiasPage() {
     }
   }
 
+  /** Agrega la noticia de forma optimista y la reemplaza (o revierte) según la respuesta del backend. */
   async function handleNoticiaCreada(data) {
     setCrearOpen(false);
     const tempId = `temp-${Date.now()}`;
@@ -109,6 +112,7 @@ function NoticiasPage() {
     }
   }
 
+  /** Elimina la noticia de la lista de forma optimista y restaura si falla el backend. */
   async function handleEliminar() {
     if (guardando) return;
     setGuardando(true);

@@ -13,7 +13,7 @@
   text-wrap: balance;
 }
 
-/* ── Toolbar ──────────────────────────────────────────────────── */
+/* ── Barra de herramientas ────────────────────────────────────── */
 .noticias-toolbar {
   display: flex;
   justify-content: flex-end;
@@ -56,12 +56,12 @@
   background-color: var(--color-bg);
 }
 
-/* Table styles → src/styles/ListPage.css (.disciplinas-table-wrapper, .disciplinas-tabla, .disciplinas-tr-clickable)
-   Table header styles → src/styles/PageTableHeader.css
-   Empty state → .disciplinas-empty in src/styles/ListPage.css
+/* Estilos de tabla → src/styles/ListPage.css (.disciplinas-table-wrapper, .disciplinas-tabla, .disciplinas-tr-clickable)
+   Estilos de encabezado → src/styles/PageTableHeader.css
+   Estado vacío → .disciplinas-empty en src/styles/ListPage.css
    Badges de estado → src/components/badge/EstadoBadge.css (EstadoBadge) */
 
-/* ── Nav / back ───────────────────────────────────────────────── */
+/* ── Navegación / volver ──────────────────────────────────────── */
 .noticias-nav {
   display: flex;
   align-items: center;
@@ -87,7 +87,7 @@
   background-color: var(--color-bg);
 }
 
-/* ── Loading & error ──────────────────────────────────────────── */
+/* ── Carga y error ────────────────────────────────────────────── */
 /* Loading wrapper → .list-loading en src/styles/ListPage.css */
 
 .noticias-error {
@@ -100,7 +100,7 @@
   padding: 10px 14px;
 }
 
-/* ── Vista diario (newspaper article) ─────────────────────────── */
+/* ── Vista diario (artículo tipo periódico) ───────────────────── */
 .noticias-diario {
   max-width: 680px;
   margin: 0 auto;
@@ -187,7 +187,7 @@
   color: var(--color-text-primary);
 }
 
-/* ── Detail action buttons ────────────────────────────────────── */
+/* ── Botones de acción del detalle ────────────────────────────── */
 .noticias-detalle-actions {
   display: flex;
   justify-content: flex-end;

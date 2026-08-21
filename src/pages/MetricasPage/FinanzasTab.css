@@ -1,4 +1,4 @@
-/* ── Toolbar & Filtros ────────────────────────────────────────── */
+/* ── Barra de herramientas y filtros ─────────────────────────────── */
 .finanzas-toolbar {
   display: flex;
   justify-content: flex-end;
@@ -31,7 +31,7 @@
   cursor: pointer;
 }
 
-/* ── Loading & Error ──────────────────────────────────────────── */
+/* ── Carga y error ────────────────────────────────────────────── */
 .finanzas-loading {
   display: flex;
   justify-content: center;
@@ -48,14 +48,14 @@
   padding: 10px 14px;
 }
 
-/* ── Dashboard Layout ─────────────────────────────────────────── */
+/* ── Layout del dashboard ─────────────────────────────────────── */
 .finanzas-dashboard {
   display: flex;
   flex-direction: column;
   gap: var(--space-6);
 }
 
-/* KPI Card */
+/* Tarjeta KPI */
 .finanzas-kpi-card {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border-medium);
@@ -90,7 +90,7 @@
   margin-top: var(--space-2);
 }
 
-/* Chart Container */
+/* Contenedor del gráfico */
 .finanzas-chart-container {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border-medium);
@@ -112,7 +112,7 @@
   margin-bottom: var(--space-5);
 }
 
-/* ── Responsive ───────────────────────────────────────────────── */
+/* ── Responsivo ───────────────────────────────────────────────── */
 @media (max-width: 480px) {
   .finanzas-kpi-value {
     font-size: 36px;

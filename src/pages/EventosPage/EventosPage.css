@@ -72,8 +72,8 @@
   cursor: not-allowed;
 }
 
-/* Table styles → src/styles/ListPage.css (.disciplinas-table-wrapper, .disciplinas-tabla)
-   Empty state → .disciplinas-empty en src/styles/ListPage.css */
+/* Estilos de tabla → src/styles/ListPage.css (.disciplinas-table-wrapper, .disciplinas-tabla)
+   Estado vacío → .disciplinas-empty en src/styles/ListPage.css */
 
 .eventos-vista-toggle {
   display: flex;
