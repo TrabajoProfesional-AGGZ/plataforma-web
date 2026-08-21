@@ -22,6 +22,12 @@ const MENSAJES_ERROR_SUBMIT = {
   sin_cupo: 'No quedan entradas disponibles para este evento.',
 };
 
+/**
+ * Modal para que un admin reserve una entrada de un evento a nombre de un
+ * socio y la cobre en caja en el mismo flujo (crea la entrada y luego la
+ * marca pagada).
+ * @param {{ evento: { id: string, nombre: string }, onSuccess: () => void, onCancel: () => void }} props
+ */
 export function ReservarEntradaForm({ evento, onSuccess, onCancel }) {
   const buscador = useBuscadorSocio();
   const [guardando, setGuardando] = useState(false);

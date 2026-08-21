@@ -9,6 +9,7 @@ export const slideVariants = {
   exit: (dir) => ({ x: dir > 0 ? -52 : 52, opacity: 0 }),
 };
 
+/** Mensaje de error de un campo, con aparición/desaparición animada. */
 export function FieldError({ message, id }) {
   return (
     <AnimatePresence>
@@ -35,6 +36,7 @@ FieldError.propTypes = {
   id: PropTypes.string,
 };
 
+/** Convierte un texto a un slug apto para usar como `id` de HTML. */
 function slugify(text) {
   return text
     .toString()
@@ -45,6 +47,11 @@ function slugify(text) {
     .replace(/(^-|-$)/g, '');
 }
 
+/**
+ * Envoltorio de campo de formulario: label con ícono + error animado.
+ * Si recibe un único hijo, le clona `id`/`aria-invalid`/`aria-describedby`
+ * automáticamente para asociarlo con el label y el mensaje de error.
+ */
 export function Field({ id, label, icon: Icon, error, children }) {
   const fieldId = id ?? `field-${slugify(label)}`;
   const errorId = `${fieldId}-error`;
@@ -77,6 +84,7 @@ Field.propTypes = {
   children: PropTypes.node.isRequired,
 };
 
+/** Input con el estilo estándar de los formularios, con estado de error opcional. */
 export function StyledInput({ error, ...props }) {
   return (
     <input
@@ -90,6 +98,7 @@ StyledInput.propTypes = {
   error: PropTypes.bool,
 };
 
+/** Contenedor de un paso de un formulario multi-paso, con animación de deslizamiento según `direction`. */
 export function FormStep({ direction, children }) {
   return (
     <motion.div
@@ -117,6 +126,7 @@ export const SOCIOS_STEPS = [
   { id: 3, label: 'Contacto', icon: Phone },
 ];
 
+/** Opciones de `<select>` para los tipos de documento soportados. */
 export function DocTypeOptions() {
   return (
     <>
@@ -128,6 +138,7 @@ export function DocTypeOptions() {
   );
 }
 
+/** Texto de ayuda para el campo de número de documento. */
 export function DocHint() {
   return (
     <div className="csf-hint">
@@ -141,6 +152,7 @@ const EMAIL_PATTERN = {
   message: 'Ingresá un correo válido'
 };
 
+/** Campo de número de documento: fuerza mayúsculas al tipear y muestra el `DocHint`. */
 export function DocNumberField({ docNumberRegister, errors, fieldKey, label = 'Número de documento', placeholder = 'Ej. 12345678' }) {
   return (
     <>
@@ -166,6 +178,7 @@ DocNumberField.propTypes = {
   placeholder: PropTypes.string,
 };
 
+/** Campo de email con validación de formato, requerido opcionalmente. */
 export function EmailField({ register, errors, required = false, placeholder = 'maria@ejemplo.com' }) {
   const rules = { pattern: EMAIL_PATTERN, ...(required && { required: 'El correo es requerido' }) };
   return (
@@ -187,6 +200,7 @@ EmailField.propTypes = {
   placeholder: PropTypes.string,
 };
 
+/** Select con el estilo estándar de los formularios, con estado de error opcional. */
 export function StyledSelect({ error, children, ...props }) {
   return (
     <select

@@ -24,6 +24,14 @@ function mensajeError(err, fallback) {
     : fallback;
 }
 
+/**
+ * Modal con los pagos pendientes de un socio (cuotas, reservas y entradas —
+ * el campo `cuotas` de la respuesta de `getResumenFinanciero` incluye los tres
+ * tipos, distinguidos por `item.tipo`). Filtra client-side los ítems ya pagados,
+ * porque el backend devuelve todas las cuotas del socio, pagadas incluidas.
+ * "Marcar como pagada" pasa por `ConfirmDeleteModal` antes de confirmar el pago,
+ * que es una acción irreversible.
+ */
 function SocioPagosPendientesModal({ idSocio, onClose }) {
   const { logoSocio: logo } = useTheme();
   const [items, setItems] = useState([]);

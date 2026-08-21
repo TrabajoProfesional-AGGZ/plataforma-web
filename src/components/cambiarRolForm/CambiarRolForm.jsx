@@ -6,6 +6,7 @@ import '../createForm/CreateSocioForm.css';
 import { StyledSelect } from '../createForm/FormFields';
 import { ModalOverlay } from '../createForm/ModalOverlay';
 
+// Props de animación (framer-motion) compartidas por ambos pasos del form.
 const STEP_SHARED_PROPS = {
   animate: { x: 0, opacity: 1 },
   exit: { x: -52, opacity: 0 },
@@ -13,6 +14,12 @@ const STEP_SHARED_PROPS = {
   className: 'csf-fields',
 };
 
+/**
+ * Modal de dos pasos para cambiar el rol de un usuario administrativo:
+ * selección de rol nuevo y confirmación (advirtiendo que cambia también
+ * sus permisos). Al confirmar, llama a `cambiarRolUsuario` y notifica el
+ * resultado vía `onSuccess`.
+ */
 export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
   const [fase, setFase] = useState('seleccion');
   const [rolSeleccionado, setRolSeleccionado] = useState(usuario.rol?.nombre ?? '');

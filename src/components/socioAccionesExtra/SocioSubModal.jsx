@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types';
 import { ModalOverlay } from '../createForm/ModalOverlay';
 
+/** Esqueleto compartido (header + card) por los sub-modales del detalle de un socio (disciplinas, reservas, trámites, pagos pendientes). */
 function SocioSubModal({ titulo, wrapperClass, onClose, children }) {
   return (
     <ModalOverlay onClose={onClose} wrapperClass={wrapperClass}>

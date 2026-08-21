@@ -7,6 +7,12 @@ import { SocioSubModal } from '../socioAccionesExtra/SocioSubModal';
 import { useTheme } from '../../hooks/useTheme';
 import './SocioDisciplinasModal.css';
 
+/**
+ * Modal con las disciplinas en las que está inscripto un socio. Una disciplina
+ * `en_espera` muestra un botón "Revisar" que abre `ResolverListaEsperaModal`
+ * en vez de "Ver disciplina" — mientras ese sub-modal está abierto, el `onClose`
+ * de este modal se anula (no-op) para que un Escape ahí no cierre también este.
+ */
 function SocioDisciplinasModal({ idSocio, nombreSocio, onClose }) {
   const { logoSocio: logo } = useTheme();
   const navigate = useNavigate();

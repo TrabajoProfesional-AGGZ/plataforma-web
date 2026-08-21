@@ -23,6 +23,11 @@ const MENSAJES_ERROR_SUBMIT = {
   producto_inactivo: 'Este producto ya no está disponible.',
 };
 
+/**
+ * Modal para que un admin cree una compra de un producto a nombre de un socio
+ * y la cobre en caja en el mismo flujo (crea la compra y luego la marca pagada).
+ * @param {{ producto: { id: string, nombre: string, stock: number }, onSuccess: () => void, onCancel: () => void }} props
+ */
 export function CrearCompraForm({ producto, onSuccess, onCancel }) {
   const buscador = useBuscadorSocio();
   const [cantidad, setCantidad] = useState(1);
