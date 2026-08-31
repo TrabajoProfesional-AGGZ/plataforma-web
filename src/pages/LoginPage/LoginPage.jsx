@@ -3,8 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { login } from '../../services/authService';
 import { RecuperarContraseniaModal } from './RecuperarContraseniaModal';
-import logoSocioAlt from '../../assets/logo_socio_alt.png';
-import logoConTexto from '../../assets/logo_con_texto.png';
+import { useTheme } from '../../hooks/useTheme';
 import './LoginPage.css';
 import '../../styles/shared.css';
 
@@ -45,6 +44,7 @@ function LoginPage() {
   const [mostrarRecuperar, setMostrarRecuperar] = useState(false);
   const [logoFadingOut, setLogoFadingOut] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  const { logoSocioAlt, logoLoginEntrada, logoConTexto } = useTheme();
   const [animStarted, setAnimStarted] = useState(false);
   const navigate = useNavigate();
   const navigated = useRef(false);
@@ -93,7 +93,7 @@ function LoginPage() {
           transition={{ duration: 0.75, ease: [0.76, 0, 0.24, 1] }}
           aria-hidden="true"
         >
-          <img src={logoSocioAlt} alt="" className="login-intro-logo" />
+          <img src={logoLoginEntrada} alt="" className="login-intro-logo" />
         </motion.div>
       )}
       {!shouldReduceMotion && exiting && (
