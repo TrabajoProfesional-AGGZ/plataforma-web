@@ -3,6 +3,12 @@ import logoSocioLight from '../assets/logo_socio.png';
 import logoSocioDark from '../assets/logo_socio_oscuro.jpeg';
 import logoTextoLight from '../assets/texto.png';
 import logoTextoDark from '../assets/logo_socio_texto_oscuro.jpeg';
+import logoSocioAltLight from '../assets/logo_socio_alt.png';
+import logoSocioAltDark from '../assets/logo_socio_oscuro_entrada.png';
+import logoLoginEntradaLight from '../assets/logo_socio_alt.png';
+import logoLoginEntradaDark from '../assets/logo_socio_oscuro.png';
+import logoConTextoLight from '../assets/logo_con_texto.png';
+import logoConTextoDark from '../assets/logo_socio_oscuro_entrada.png';
 
 const THEME_STORAGE_KEY = 'theme';
 
@@ -39,6 +45,9 @@ export function ThemeProvider({ children }) {
       toggleTheme,
       logoSocio: theme === 'dark' ? logoSocioDark : logoSocioLight,
       logoTexto: theme === 'dark' ? logoTextoDark : logoTextoLight,
+      logoSocioAlt: theme === 'dark' ? logoSocioAltDark : logoSocioAltLight,
+      logoLoginEntrada: theme === 'dark' ? logoLoginEntradaDark : logoLoginEntradaLight,
+      logoConTexto: theme === 'dark' ? logoConTextoDark : logoConTextoLight,
     }),
     [theme, toggleTheme]
   );
@@ -52,7 +61,7 @@ export function ThemeProvider({ children }) {
 
 /**
  * Hook para consumir el `ThemeContext` (tema activo, toggle y logos theme-aware).
- * @returns {{ theme: 'light'|'dark', toggleTheme: () => void, logoSocio: string, logoTexto: string }}
+ * @returns {{ theme: 'light'|'dark', toggleTheme: () => void, logoSocio: string, logoTexto: string, logoSocioAlt: string, logoLoginEntrada: string, logoConTexto: string }}
  */
 export function useThemeContext() {
   return useContext(ThemeContext);

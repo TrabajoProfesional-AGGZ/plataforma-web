@@ -5,6 +5,17 @@ import * as authService from '../../services/authService';
 
 jest.mock('../../firebase', () => ({ auth: {} }));
 jest.mock('../../services/authService');
+jest.mock('../../hooks/useTheme', () => ({
+  useTheme: () => ({
+    theme: 'light',
+    toggleTheme: jest.fn(),
+    logoSocio: 'logo.png',
+    logoTexto: 'texto.png',
+    logoSocioAlt: 'logo_socio_alt.png',
+    logoLoginEntrada: 'logo_socio_alt.png',
+    logoConTexto: 'logo_con_texto.png',
+  }),
+}));
 
 let mockReducedMotion = false;
 jest.mock('framer-motion', () => {
