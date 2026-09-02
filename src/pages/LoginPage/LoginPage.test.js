@@ -12,6 +12,7 @@ jest.mock('../../hooks/useTheme', () => ({
     logoSocio: 'logo.png',
     logoTexto: 'texto.png',
     logoSocioAlt: 'logo_socio_alt.png',
+    logoLoginEntrada: 'logo_socio_alt.png',
     logoConTexto: 'logo_con_texto.png',
   }),
 }));

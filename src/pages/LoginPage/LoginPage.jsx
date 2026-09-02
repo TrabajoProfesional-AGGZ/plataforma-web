@@ -44,8 +44,8 @@ function LoginPage() {
   const [mostrarRecuperar, setMostrarRecuperar] = useState(false);
   const [logoFadingOut, setLogoFadingOut] = useState(false);
   const shouldReduceMotion = useReducedMotion();
+  const { logoSocioAlt, logoLoginEntrada, logoConTexto } = useTheme();
   const [animStarted, setAnimStarted] = useState(false);
-  const { logoSocioAlt, logoConTexto } = useTheme();
   const navigate = useNavigate();
   const navigated = useRef(false);
   const location = useLocation();
@@ -93,7 +93,7 @@ function LoginPage() {
           transition={{ duration: 0.75, ease: [0.76, 0, 0.24, 1] }}
           aria-hidden="true"
         >
-          <img src={logoSocioAlt} alt="" className="login-intro-logo" />
+          <img src={logoLoginEntrada} alt="" className="login-intro-logo" />
         </motion.div>
       )}
       {!shouldReduceMotion && exiting && (
