@@ -1,6 +1,17 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { DatePicker } from './DatePicker';
 
+// El calendario se renderiza vía createPortal a document.body, fuera del
+// `container` del render de RTL, así que hay que buscar en todo el documento.
+// Además la grilla muestra días de relleno del mes anterior/siguiente, así
+// que un mismo número (ej. "10") puede aparecer duplicado: solo el botón del
+// mes en curso (sin la clase --muted) es el que corresponde clickear.
+function clickDayInMonth(day) {
+  const button = [...document.querySelectorAll('.csf-calendar-day:not(.csf-calendar-day--muted)')]
+    .find((b) => b.textContent === String(day));
+  fireEvent.click(button);
+}
+
 describe('DatePicker', () => {
   test('clickear un día en la grilla selecciona esa fecha y cierra el popover', () => {
     const { container } = render(<DatePicker name="fecha" min="2020-01-01" max="2030-12-31" />);
@@ -8,7 +19,7 @@ describe('DatePicker', () => {
     fireEvent.click(screen.getByRole('button', { name: /seleccionar fecha/i }));
     expect(screen.getByRole('dialog', { name: /elegir fecha/i })).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: '15' }));
+    clickDayInMonth(15);
 
     const hiddenInput = container.querySelector('input[type="date"]');
     expect(hiddenInput.value).toMatch(/-15$/);
@@ -65,13 +76,24 @@ describe('DatePicker', () => {
 
   test('reabrir el picker luego de elegir un día vuelve a mostrar la grilla', () => {
     const { container } = render(<DatePicker name="fecha" />);
-    fireEvent.click(screen.getByRole('button', { name: /seleccionar fecha/i }));
-    fireEvent.click(screen.getByRole('button', { name: '10' }));
+    const trigger = container.querySelector('.csf-picker-trigger');
+    fireEvent.click(trigger);
+    clickDayInMonth(10);
 
     const hiddenInput = container.querySelector('input[type="date"]');
     expect(hiddenInput.value).toMatch(/-10$/);
 
-    fireEvent.click(screen.getByRole('button', { name: /seleccionar fecha/i }));
+    fireEvent.click(trigger);
     expect(screen.getByRole('dialog', { name: /elegir fecha/i })).toBeInTheDocument();
+  });
+
+  test('al elegir un día se actualiza el texto del botón con la fecha formateada', () => {
+    const { container } = render(<DatePicker name="fecha" />);
+    fireEvent.click(screen.getByRole('button', { name: /seleccionar fecha/i }));
+    clickDayInMonth(15);
+
+    const trigger = container.querySelector('.csf-picker-trigger');
+    expect(trigger).not.toHaveTextContent(/seleccionar fecha/i);
+    expect(trigger.textContent).toMatch(/15 de/);
   });
 });
