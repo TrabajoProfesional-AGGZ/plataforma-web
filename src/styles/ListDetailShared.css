@@ -10,9 +10,8 @@
   text-wrap: balance;
 }
 
-/* ── Barra de herramientas (compartida entre Disciplinas e Instalaciones) ── */
-.disciplinas-toolbar,
-.instalaciones-toolbar {
+/* ── Barra de herramientas ────────────────────────────────────── */
+.disciplinas-toolbar {
   display: flex;
   justify-content: flex-end;
   margin-bottom: var(--space-4);

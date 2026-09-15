@@ -411,16 +411,6 @@ button.csf-overlay {
   white-space: nowrap;
 }
 
-.csf-socio-encontrado {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  font-size: 0.8125rem;
-  color: var(--status-success-border);
-  font-weight: 500;
-  margin-top: 6px;
-}
-
 .csf-socio-buscando {
   display: flex;
   align-items: center;

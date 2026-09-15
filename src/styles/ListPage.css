@@ -320,8 +320,7 @@
 }
 
 /* ── Badge base ──────────────────────────────────────────────── */
-.disciplinas-badge,
-.instalaciones-badge {
+.disciplinas-badge {
   display: inline-block;
   padding: 3px 10px;
   border-radius: var(--radius-sm);

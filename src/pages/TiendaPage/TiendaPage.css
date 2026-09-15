@@ -1,3 +1,8 @@
+.tienda-admin-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
 /* ── Orden ────────────────────────────────────────────────────── */
 .tienda-orden-select-wrap {
   margin-right: auto;

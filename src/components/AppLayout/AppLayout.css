@@ -255,14 +255,6 @@
   background: var(--color-bg);
 }
 
-.app-page-loading {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  min-height: 300px;
-}
-
 /* ── Responsive (breakpoints: 768px tablet/drawer, 480px celular — ver tokens.css) ── */
 @media (max-width: 768px) {
   .app-sidebar {

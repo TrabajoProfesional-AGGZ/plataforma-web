@@ -90,7 +90,7 @@ function FinanzasTab() {
   }
 
   return (
-    <div className="finanzas-tab">
+    <div>
       <div className="finanzas-toolbar">
         <div className="finanzas-filter-group">
           <label htmlFor="periodo" className="finanzas-filter-label">Período a consultar:</label>

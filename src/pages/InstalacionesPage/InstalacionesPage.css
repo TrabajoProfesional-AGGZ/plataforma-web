@@ -7,7 +7,6 @@
   margin: 0 auto;
 }
 
-/* .instalaciones-title, .instalaciones-toolbar → src/styles/ListDetailShared.css */
 /* Badges de estado → src/components/badge/EstadoBadge.css (EstadoBadge) */
 
 /* ── Toggle: layout flex sobre la base compartida btn-toggle ──── */
@@ -53,8 +52,7 @@
   flex-wrap: wrap;
 }
 
-.instalaciones-reservas-title,
-.instalaciones-seccion-title {
+.instalaciones-reservas-title {
   font-size: 1.25rem;
   font-weight: 600;
   color: var(--color-text-primary);
@@ -89,7 +87,6 @@
   gap: 6px;
 }
 
-.instalaciones-btn-reserva-editar,
 .instalaciones-btn-reserva-eliminar {
   padding: 5px var(--space-3);
   border-radius: var(--radius-sm);
@@ -97,21 +94,6 @@
   font-weight: 500;
   cursor: pointer;
   transition: background-color var(--transition-fast);
-}
-
-.instalaciones-btn-reserva-editar {
-  background-color: var(--color-surface);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border-medium);
-}
-
-@media (hover: hover) {
-  .instalaciones-btn-reserva-editar:hover {
-    background-color: var(--color-bg);
-  }
-}
-
-.instalaciones-btn-reserva-eliminar {
   background-color: var(--color-danger-fill);
   color: var(--color-on-accent);
   border: none;
@@ -138,61 +120,10 @@
   margin-bottom: var(--space-4);
 }
 
-/* .instalaciones-seccion-title — compartido con .instalaciones-reservas-title arriba */
-
 .instalaciones-seccion-toolbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-
-.instalaciones-placeholder {
-  padding: var(--space-6) 0;
-  font-style: italic;
-}
-
-/* ── Formulario inline de reserva ─────────────────────────────── */
-.instalaciones-reserva-form {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border-medium);
-  border-radius: var(--radius-md);
-  padding: var(--space-5);
-  margin-bottom: var(--space-5);
-}
-
-.instalaciones-reserva-form-fields {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: var(--space-3);
-  align-items: start;
-  margin-bottom: var(--space-3);
-}
-
-.instalaciones-reserva-horas {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-2);
-}
-
-.instalaciones-reserva-form-actions {
-  display: flex;
-  justify-content: flex-end;
-}
-
-/* ── Modificador de campo checkbox ────────────────────────────── */
-.modal-field.modal-field-checkbox {
-  flex-direction: row;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: var(--space-4);
-}
-
-.modal-field.modal-field-checkbox input[type="checkbox"] {
-  width: 16px;
-  height: 16px;
-  cursor: pointer;
-  accent-color: var(--color-text-primary);
-  flex-shrink: 0;
 }
 
 /* Loading wrapper → .list-loading en src/styles/ListPage.css */
@@ -202,21 +133,4 @@
   display: flex;
   flex-direction: column;
   gap: 4px;
-}
-
-/* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
-@media (max-width: 768px) {
-  .instalaciones-reserva-form-fields {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-
-@media (max-width: 480px) {
-  .instalaciones-reserva-form-fields {
-    grid-template-columns: 1fr;
-  }
-
-  .instalaciones-reserva-horas {
-    grid-template-columns: 1fr;
-  }
 }

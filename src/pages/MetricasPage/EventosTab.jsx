@@ -54,7 +54,7 @@ function EventosTab() {
   }
 
   return (
-    <div className="eventos-tab">
+    <div>
       <div className="eventos-tab-card">
         <div className="eventos-tab-card-header">
           <Ticket size={20} />

@@ -85,7 +85,6 @@
   --transition-slow: 0.3s ease;
 
   /* Z-index scale */
-  --z-dropdown: 100;
   --z-sticky: 200;
   --z-sidebar: 300;
   --z-modal: 400;
@@ -94,17 +93,12 @@
      del `.csf-overlay` del modal (z-index 400) en vez de anidados dentro —
      necesitan su propio nivel por encima para no quedar tapados. */
   --z-popover: 450;
-  --z-toast: 500;
 
   /* Sidebar widths */
   --sidebar-width: 245px;
-  --sidebar-width-collapsed: 80px;
 
   /* Typography */
   --font-sans: 'Archivo Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  /* Misma familia que --font-sans; los contextos numéricos (montos, tablas)
-     además agregan font-variant-numeric: tabular-nums en su propio selector. */
-  --font-numeric: 'Archivo Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 /* Modo oscuro — activado por ThemeContext seteando data-theme en <html>.

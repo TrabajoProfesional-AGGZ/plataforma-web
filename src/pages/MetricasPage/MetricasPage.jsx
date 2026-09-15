@@ -77,7 +77,6 @@ function MetricasPage() {
           </div>
 
           <div
-            className="metricas-panel"
             role="tabpanel"
             id={`metricas-panel-${activeTab}`}
             aria-labelledby={`metricas-tab-${activeTab}`}

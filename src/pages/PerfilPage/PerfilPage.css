@@ -131,18 +131,6 @@
   transform: translateY(-50%);
 }
 
-.perfil-password-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.perfil-password-input {
-  width: 100%;
-  padding-right: 80px;
-  box-sizing: border-box;
-}
-
 /* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
 @media (max-width: 480px) {
   .perfil-card {

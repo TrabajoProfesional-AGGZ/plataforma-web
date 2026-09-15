@@ -155,7 +155,7 @@ function SocioTramitesModal({ idSocio, onClose }) {
       )}
 
       {vista === 'detalle' && (
-        <div className="socio-tramites-detalle">
+        <div>
           <button type="button" className="socio-tramites-btn-volver" onClick={handleVolver}>
             <ChevronLeft size={16} aria-hidden="true" />
             Volver

@@ -59,17 +59,6 @@
   padding: var(--space-2) var(--space-3);
 }
 
-.cambiar-contrasena-exito {
-  color: var(--status-success-border);
-  font-size: 0.8125rem;
-  margin: 0;
-  background-color: var(--surface-success-bg);
-  border: 1px solid var(--surface-success-border);
-  border-radius: var(--radius-sm);
-  padding: var(--space-2) var(--space-3);
-  align-items: center;
-}
-
 /* .cambiar-contrasena-button base → src/styles/shared.css */
 .cambiar-contrasena-button {
   align-self: flex-start;

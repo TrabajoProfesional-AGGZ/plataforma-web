@@ -54,7 +54,7 @@ function TiendaTab() {
   }
 
   return (
-    <div className="tienda-tab">
+    <div>
       <div className="tienda-tab-card">
         <div className="tienda-tab-card-header">
           <ShoppingBag size={20} />
