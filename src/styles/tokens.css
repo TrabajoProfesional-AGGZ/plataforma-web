@@ -149,3 +149,14 @@
   --surface-success-bg: #16241c;
   --surface-success-border: #2f5d43;
 }
+
+/* Preferencias de accesibilidad del sistema operativo. */
+@media (prefers-reduced-transparency: reduce) {
+  :root, :root[data-theme="dark"] { --scrim-blur: none; }
+  :root { --color-scrim: rgba(0, 0, 0, 0.55); }
+  :root[data-theme="dark"] { --color-scrim: rgba(0, 0, 0, 0.75); }
+}
+@media (prefers-contrast: more) {
+  :root { --color-border: #9a9a9a; --color-border-medium: #7a7a7a; --color-border-light: #b0b0b0; --color-text-secondary: #2e2e2e; --color-text-placeholder: #4a4a4a; }
+  :root[data-theme="dark"] { --color-border: #6a6a6a; --color-border-medium: #8a8a8a; --color-border-light: #555555; --color-text-secondary: #d8d8d8; --color-text-placeholder: #b8b8b8; }
+}
