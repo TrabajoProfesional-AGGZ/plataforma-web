@@ -323,7 +323,7 @@ function DisciplinasPage() {
           {puedeBorrarDisciplina && (
             <div className="disciplinas-detalle-actions">
               <button className="disciplinas-btn-eliminar" onClick={() => setPausarOpen(true)}>
-                Eliminar
+                Pausar
               </button>
             </div>
           )}
@@ -346,6 +346,7 @@ function DisciplinasPage() {
         guardando={guardando}
         onCancel={() => setPausarOpen(false)}
         labelConfirmar="Pausar"
+        variant="primary"
       />
     </div>
   );

@@ -222,6 +222,44 @@ button.csf-overlay {
   text-align: center;
 }
 
+/* ── Aviso de confirmación (ConfirmDeleteModal) ───────────────── */
+.confirm-aviso {
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.confirm-aviso-icono {
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.confirm-aviso-texto {
+  margin: 0;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.confirm-aviso--danger {
+  background-color: var(--status-error-surface-bg);
+  border: 1px solid var(--status-error-surface-border);
+}
+
+.confirm-aviso--danger .confirm-aviso-texto {
+  color: var(--color-danger);
+}
+
+.confirm-aviso--warning {
+  background-color: var(--status-warning-bg);
+  border: 1px solid var(--status-warning-border);
+}
+
+.confirm-aviso--warning .confirm-aviso-texto {
+  color: var(--status-warning-border);
+}
+
 /* Navigation */
 .csf-nav {
   display: flex;

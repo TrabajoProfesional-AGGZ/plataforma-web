@@ -183,18 +183,18 @@ describe('DisciplinasPage', () => {
     expect(screen.getAllByText('Activa').length).toBeGreaterThan(0);
   });
 
-  test('el botón "Eliminar" está visible en el detalle con permiso borrar_disciplina', async () => {
+  test('el botón "Pausar" está visible en el detalle con permiso borrar_disciplina', async () => {
     await renderPage();
     crearDisciplinaHelper();
     irAlDetalle();
-    expect(screen.getByRole('button', { name: 'Eliminar' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Pausar' })).toBeInTheDocument();
   });
 
-  test('abre el modal de pausar al hacer clic en Eliminar', async () => {
+  test('abre el modal de pausar al hacer clic en Pausar', async () => {
     await renderPage();
     crearDisciplinaHelper();
     irAlDetalle();
-    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pausar' }));
     expect(screen.getByText(/pausar disciplina/i)).toBeInTheDocument();
   });
 
@@ -202,7 +202,7 @@ describe('DisciplinasPage', () => {
     await renderPage();
     crearDisciplinaHelper();
     irAlDetalle();
-    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pausar' }));
     fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
     expect(screen.queryByText(/pausar disciplina/i)).not.toBeInTheDocument();
   });
@@ -211,7 +211,7 @@ describe('DisciplinasPage', () => {
     await renderPage();
     crearDisciplinaHelper();
     irAlDetalle();
-    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pausar' }));
     expect(screen.getByText(/pausar disciplina/i)).toBeInTheDocument();
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByText(/pausar disciplina/i)).not.toBeInTheDocument();
@@ -221,7 +221,7 @@ describe('DisciplinasPage', () => {
     await renderPage();
     crearDisciplinaHelper();
     irAlDetalle();
-    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pausar' }));
     expect(screen.getByText(/pausar disciplina/i)).toBeInTheDocument();
     fireEvent.click(document.querySelector('.csf-overlay'));
     expect(screen.queryByText(/pausar disciplina/i)).not.toBeInTheDocument();
@@ -231,7 +231,7 @@ describe('DisciplinasPage', () => {
     await renderPage();
     crearDisciplinaHelper();
     irAlDetalle();
-    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pausar' }));
     fireEvent.click(ultimoBoton('Pausar'));
     expect(screen.getByText('Disciplinas')).toBeInTheDocument();
     expect(screen.getByText('Pausada')).toBeInTheDocument();
@@ -509,7 +509,7 @@ describe('DisciplinasPage', () => {
     crearDisciplinaHelper();
     irAlDetalle();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pausar' }));
     fireEvent.click(ultimoBoton('Pausar'));
 
     await waitFor(() => {

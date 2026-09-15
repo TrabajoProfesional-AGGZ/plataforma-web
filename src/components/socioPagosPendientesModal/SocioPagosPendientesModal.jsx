@@ -128,6 +128,7 @@ function SocioPagosPendientesModal({ idSocio, onClose }) {
         errorModal={errorConfirmar}
         labelConfirmar="Marcar como pagada"
         labelGuardando="Guardando..."
+        variant="primary"
       />
     </SocioSubModal>
   );
