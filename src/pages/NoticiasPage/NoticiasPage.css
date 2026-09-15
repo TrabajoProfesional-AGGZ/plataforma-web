@@ -93,24 +93,6 @@
   color: var(--color-text-secondary);
 }
 
-.noticias-diario-titulo {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: var(--text-display);
-  font-weight: 700;
-  line-height: var(--leading-display);
-  letter-spacing: var(--tracking-display);
-  color: var(--color-text-primary);
-  text-align: left;
-  margin: 0 0 var(--space-3) 0;
-}
-
-
-.noticias-diario-rule {
-  border: none;
-  border-top: 1px solid var(--color-text-primary);
-  margin: var(--space-4) 0;
-}
-
 .noticias-diario-figura {
   margin: 0 0 var(--space-6) 0;
 }
@@ -144,57 +126,9 @@
   color: var(--color-text-primary);
 }
 
-/* ── Botones de acción del detalle ────────────────────────────── */
-.noticias-detalle-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-3);
-  margin-top: var(--space-4);
-}
-
-.noticias-btn-editar {
-  padding: var(--space-2) var(--space-5);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-secondary);
-  font-weight: 500;
-  cursor: pointer;
-  border: 1px solid var(--color-border-medium);
-  background-color: var(--color-surface);
-  color: var(--color-text-primary);
-  transition: background-color var(--transition-fast);
-}
-
-@media (hover: hover) {
-  .noticias-btn-editar:hover {
-    background-color: var(--color-bg);
-  }
-}
-
-.noticias-btn-eliminar {
-  padding: var(--space-2) var(--space-5);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-secondary);
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  background-color: var(--color-danger-fill);
-  color: var(--color-on-accent);
-  transition: background-color var(--transition-fast);
-}
-
-@media (hover: hover) {
-  .noticias-btn-eliminar:hover {
-    background-color: var(--color-danger-fill-hover);
-  }
-}
+/* Botones de acción del detalle → .btn-outline / .btn-outline-danger en src/components/DetailHeader/DetailHeader.css */
 
 /* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
-@media (max-width: 768px) {
-  .noticias-diario-titulo {
-    font-size: var(--text-title);
-  }
-}
-
 @media (max-width: 480px) {
   .noticias-diario-masthead {
     flex-wrap: wrap;
@@ -203,9 +137,5 @@
 
   .noticias-diario-masthead-right {
     align-items: flex-start;
-  }
-
-  .noticias-diario-titulo {
-    font-size: var(--text-title);
   }
 }

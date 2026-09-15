@@ -1,5 +1,6 @@
 /* empty, table-wrapper, tabla, td, tr-clickable, badge base → src/styles/ListPage.css
-   btn-crear, btn-volver, detalle-* → src/styles/ListDetailShared.css
+   btn-crear, detalle-* → src/styles/ListDetailShared.css
+   encabezado del detalle (volver, título, badge, acciones) → src/components/DetailHeader/DetailHeader.css
    th styles → src/styles/PageTableHeader.css */
 
 .disciplinas-page {
@@ -9,14 +10,6 @@
 
 /* .disciplinas-toolbar → src/styles/ListDetailShared.css; título de página → .page-title en src/styles/shared.css */
 /* Badges de estado → src/components/badge/EstadoBadge.css (EstadoBadge) */
-
-/* ── Vista de detalle ─────────────────────────────────────────── */
-.disciplinas-detalle-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-3);
-  margin-bottom: var(--space-5);
-}
 
 /* ── Sección de inscripción de socios ────────────────────────── */
 .disciplinas-socios-section {

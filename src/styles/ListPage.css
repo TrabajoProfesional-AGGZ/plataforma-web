@@ -314,9 +314,3 @@
   border: 1px solid;
 }
 
-/* ── Botones de acción de card, base → src/styles/ListDetailShared.css ── */
-.socios-btn-eliminar, .socios-btn-editar,
-.usuarios-btn-eliminar, .usuarios-btn-editar, .usuarios-btn-cambiar-rol {
-  transition: background-color var(--transition-fast), color var(--transition-fast);
-}
-

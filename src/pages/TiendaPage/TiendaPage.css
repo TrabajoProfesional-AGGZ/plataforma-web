@@ -80,25 +80,6 @@
     flex-direction: column;
   }
 
-  .tienda-detalle-eyebrow {
-    font-size: var(--text-caption);
-    font-weight: 600;
-    letter-spacing: var(--tracking-caption);
-    text-transform: uppercase;
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-2);
-  }
-
-  .tienda-detalle-nombre {
-    margin: 0 0 var(--space-4);
-    font-size: var(--text-title);
-    font-weight: 700;
-    letter-spacing: var(--tracking-title);
-    line-height: var(--leading-title);
-    color: var(--color-text-primary);
-    text-wrap: balance;
-  }
-
   .tienda-detalle-price-row {
     display: flex;
     align-items: center;
@@ -160,36 +141,7 @@
     white-space: pre-wrap;
   }
 
-  .tienda-detalle-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--space-3);
-    margin-top: var(--space-8);
-    padding-top: var(--space-6);
-    border-top: 1px solid var(--color-border);
-  }
-
-  .tienda-btn-editar {
-    padding: var(--space-3) var(--space-6);
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: var(--text-secondary);
-    font-weight: 600;
-    color: var(--color-surface);
-    background-color: var(--color-text-primary);
-    cursor: pointer;
-    transition: background-color var(--transition-fast), transform var(--transition-fast);
-  }
-
-  @media (hover: hover) {
-    .tienda-btn-editar:hover {
-      background-color: var(--color-text-secondary);
-    }
-  }
-
-  .tienda-btn-editar:active {
-    transform: scale(0.98);
-  }
+  /* Acciones del detalle → .btn-outline en src/components/DetailHeader/DetailHeader.css */
 
   @media (max-width: 768px) {
     .tienda-detalle-card {

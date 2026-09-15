@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Search, Plus } from 'lucide-react';
-import { BackButton } from '../../components/BackButton/BackButton';
+import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
+import EstadoBadge from '../../components/badge/EstadoBadge';
 import { getSocios, deleteSocio } from '../../services/sociosService';
 import { getDisciplinas, getSociosByDisciplina, extenderSuscripcionDisciplina } from '../../services/disciplinasService';
 import { CreateSocioForm } from '../../components/createForm/CreateSocioForm';
@@ -386,7 +387,25 @@ function SociosPage() {
         const fotoSegura = urlImagenSegura(resultado.foto_url);
         return (
           <>
-            <BackButton onClick={() => { setResultado(cacheSociosRef.current); setModo('lista'); }} />
+            <DetailHeader
+              onBack={() => { setResultado(cacheSociosRef.current); setModo('lista'); }}
+              titulo={`${resultado.apellido} ${resultado.nombre}`}
+              estado={<EstadoBadge estado={resultado.estado} />}
+              acciones={(puedeEditar || puedeBorrar) && (
+                <>
+                  {puedeEditar && (
+                    <button type="button" className="btn-outline" onClick={abrirEditar}>
+                      Editar
+                    </button>
+                  )}
+                  {puedeBorrar && (
+                    <button type="button" className="btn-outline-danger" onClick={abrirEliminar}>
+                      Eliminar
+                    </button>
+                  )}
+                </>
+              )}
+            />
             <div className="socios-card">
               <div className="socios-card-inner">
                 <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
@@ -395,12 +414,6 @@ function SociosPage() {
                     : <img src={cfg.logo} alt="" className="detalle-logo-img" />}
                 </div>
                 <div className="socios-card-data">
-                  <div className="detalle-card-data-header">
-                    <span className="detalle-full-name">{resultado.apellido} {resultado.nombre}</span>
-                    <span className="detalle-estado-badge" style={{ backgroundColor: cfg.bg, color: cfg.border, borderColor: cfg.border }}>
-                      {resultado.estado.nombre}
-                    </span>
-                  </div>
                   <div className="socios-card-row">
                     <span className="socios-card-label">N° Socio</span>
                     <span>{resultado.nro_socio}</span>
@@ -433,18 +446,6 @@ function SociosPage() {
                     nombreSocio={`${resultado.apellido} ${resultado.nombre}`}
                   />
                 </div>
-              </div>
-              <div className="socios-card-actions">
-                {puedeBorrar && (
-                  <button className="socios-btn-eliminar" onClick={abrirEliminar}>
-                    Eliminar
-                  </button>
-                )}
-                {puedeEditar && (
-                  <button className="socios-btn-editar" onClick={abrirEditar}>
-                    Editar
-                  </button>
-                )}
               </div>
             </div>
           </>

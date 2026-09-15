@@ -1,0 +1,106 @@
+.detail-header {
+  margin-bottom: var(--space-6);
+}
+
+.detail-header .back-button {
+  margin-bottom: var(--space-3);
+}
+
+.detail-header__row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.detail-header__texto {
+  flex: 1;
+  min-width: 0;
+}
+
+.detail-header__titulo-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.detail-header__titulo {
+  margin: 0;
+  font-size: var(--text-title);
+  line-height: var(--leading-title);
+  letter-spacing: var(--tracking-title);
+  font-weight: 700;
+  color: var(--color-text-primary);
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+
+.detail-header__subtitulo {
+  margin: var(--space-1) 0 0;
+  font-size: var(--text-secondary);
+  line-height: var(--leading-secondary);
+  color: var(--color-text-secondary);
+}
+
+.detail-header__acciones {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  flex-shrink: 0;
+}
+
+/* ── Botones de acción del detalle (compartidos por todas las vistas) ── */
+.btn-outline,
+.btn-outline-danger {
+  min-height: 36px;
+  padding: 0 var(--space-4);
+  border-radius: var(--radius-sm);
+  font-size: var(--text-secondary);
+  font-weight: 500;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.btn-outline {
+  border: 1px solid var(--color-border-medium);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+}
+
+.btn-outline-danger {
+  border: 1.5px solid var(--color-danger);
+  background-color: transparent;
+  color: var(--color-danger);
+}
+
+@media (hover: hover) {
+  .btn-outline:hover:not(:disabled) {
+    background-color: var(--color-bg-subtle);
+    border-color: var(--color-border-strong);
+  }
+
+  .btn-outline-danger:hover:not(:disabled) {
+    background-color: var(--color-danger-fill);
+    color: var(--color-on-accent);
+  }
+}
+
+.btn-outline:disabled,
+.btn-outline-danger:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
+@media (max-width: 480px) {
+  .detail-header__acciones {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

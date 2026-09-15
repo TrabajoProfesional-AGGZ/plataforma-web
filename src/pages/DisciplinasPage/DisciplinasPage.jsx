@@ -4,7 +4,7 @@ import { useLocation } from 'react-router-dom';
 import { Plus } from 'lucide-react';
 import { CreateDisciplinaForm } from '../../components/createDisciplinaForm/CreateDisciplinaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
-import { BackButton } from '../../components/BackButton/BackButton';
+import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
 import { getDisciplinas, createDisciplina, pausarDisciplina, inscribirSocioADisciplina } from '../../services/disciplinasService';
 import { getSocioByNroSocio } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
@@ -241,11 +241,22 @@ function DisciplinasPage() {
       {/* ── Vista: Detalle ── */}
       {vista === 'detalle' && disciplinaActual && (
         <>
-          <BackButton onClick={() => setVista('lista')} />
+          <DetailHeader
+            onBack={() => setVista('lista')}
+            titulo={disciplinaActual.nombre}
+            estado={
+              <EstadoBadge variant={disciplinaActual.estado?.nombre === 'Pausada' ? 'warning' : 'success'}>
+                {disciplinaActual.estado?.nombre ?? 'Activa'}
+              </EstadoBadge>
+            }
+            acciones={puedeBorrarDisciplina && (
+              <button type="button" className="btn-outline-danger" onClick={() => setPausarOpen(true)}>
+                Pausar
+              </button>
+            )}
+          />
 
           <div className="disciplinas-detalle-content">
-            <h1 className="disciplinas-detalle-nombre">{disciplinaActual.nombre}</h1>
-
             <div className="disciplinas-detalle-card">
               {[
                 { label: 'Categoría de socio', value: disciplinaActual.categoria_socio?.nombre ?? '—' },
@@ -258,11 +269,6 @@ function DisciplinasPage() {
                 ...(disciplinaActual.arancelada
                   ? [{ label: 'Concepto de cobro', value: disciplinaActual.concepto_cobro }]
                   : []),
-                {
-                  label: 'Estado',
-                  value: disciplinaActual.estado?.nombre ?? 'Activa',
-                  color: disciplinaActual.estado?.nombre === 'Pausada' ? 'var(--status-warning-border)' : 'var(--status-success-border)',
-                },
               ].map((field, i, arr) => (
                 <div
                   key={field.label}
@@ -270,12 +276,7 @@ function DisciplinasPage() {
                   style={{ borderBottom: i < arr.length - 1 ? '1px solid var(--color-bg)' : 'none' }}
                 >
                   <span className="disciplinas-detalle-row-label">{field.label}</span>
-                  <span
-                    className="disciplinas-detalle-row-value"
-                    style={{ color: field.color ?? 'var(--color-text-primary)' }}
-                  >
-                    {field.value}
-                  </span>
+                  <span className="disciplinas-detalle-row-value">{field.value}</span>
                 </div>
               ))}
             </div>
@@ -309,14 +310,6 @@ function DisciplinasPage() {
               </form>
               {inscribiendoError && <p className="disciplinas-inscribir-error">{inscribiendoError}</p>}
               {inscribiendoExito && <p className="disciplinas-inscribir-exito">Socio inscripto correctamente.</p>}
-            </div>
-          )}
-
-          {puedeBorrarDisciplina && (
-            <div className="disciplinas-detalle-actions">
-              <button className="disciplinas-btn-eliminar" onClick={() => setPausarOpen(true)}>
-                Pausar
-              </button>
             </div>
           )}
         </>

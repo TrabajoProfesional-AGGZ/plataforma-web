@@ -5,7 +5,7 @@ import { getProductos, getProducto } from '../../services/productosService';
 import { CreateProductoForm } from '../../components/createProductoForm/CreateProductoForm';
 import { EditProductoForm } from '../../components/editProductoForm/EditProductoForm';
 import { CrearCompraForm } from '../../components/crearCompraForm/CrearCompraForm';
-import { BackButton } from '../../components/BackButton/BackButton';
+import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
 import { StyledSelect } from '../../components/createForm/FormFields';
 import { createProducto } from '../../services/productosService';
 import EstadoBadge from '../../components/badge/EstadoBadge';
@@ -46,6 +46,7 @@ function TiendaPage() {
   const [ordenTienda, setOrdenTienda] = useState('nombre_asc');
 
   const imagenSegura = urlImagenSegura(productoActual?.imagen_url);
+  const detalleListo = !loadingDetalle && !errorDetalle && !!productoActual;
 
   const productosOrdenados = [...productos].sort((a, b) => {
     if (ordenTienda === 'precio_asc') return Number(a.precio) - Number(b.precio);
@@ -218,13 +219,38 @@ function TiendaPage() {
 
       {vista === 'detalle' && (
         <div className="tienda-detalle-view">
-          <BackButton onClick={() => { setVista('lista'); setProductoActual(null); setErrorDetalle(''); }} />
+          <DetailHeader
+            onBack={() => { setVista('lista'); setProductoActual(null); setErrorDetalle(''); }}
+            titulo={detalleListo ? productoActual.nombre : null}
+            estado={detalleListo && (
+              <EstadoBadge variant={productoActual.activo ? 'success' : 'warning'}>
+                {productoActual.activo ? 'Activo' : 'Inactivo'}
+              </EstadoBadge>
+            )}
+            acciones={detalleListo && (
+              <>
+                <button type="button" className="btn-outline" onClick={() => setEditarOpen(true)}>
+                  Editar producto
+                </button>
+                {puedeCrearCompra && (
+                  <button
+                    type="button"
+                    className="btn-outline"
+                    onClick={() => setCrearCompraOpen(true)}
+                    disabled={productoActual.stock <= 0}
+                  >
+                    Crear compra
+                  </button>
+                )}
+              </>
+            )}
+          />
 
           {loadingDetalle && <SkeletonRows n={4} />}
 
           {errorDetalle && !loadingDetalle && <ErrorBanner mensaje={errorDetalle} />}
 
-          {!loadingDetalle && !errorDetalle && productoActual && (
+          {detalleListo && (
             <article className="tienda-detalle-card">
               <div className="tienda-detalle-media">
                 {imagenSegura ? (
@@ -243,16 +269,10 @@ function TiendaPage() {
               </div>
 
               <div className="tienda-detalle-info">
-                <span className="tienda-detalle-eyebrow">Artículo de tienda</span>
-                <h2 className="tienda-detalle-nombre">{productoActual.nombre}</h2>
-
                 <div className="tienda-detalle-price-row">
                   <span className="tienda-detalle-precio">
                     ${Number(productoActual.precio).toLocaleString('es-AR')}
                   </span>
-                  <EstadoBadge variant={productoActual.activo ? 'success' : 'warning'}>
-                    {productoActual.activo ? 'Activo' : 'Inactivo'}
-                  </EstadoBadge>
                 </div>
 
                 <div
@@ -273,26 +293,6 @@ function TiendaPage() {
                     <p className="tienda-detalle-desc">{productoActual.descripcion}</p>
                   </>
                 )}
-
-                <div className="tienda-detalle-actions">
-                  <button
-                    type="button"
-                    className="tienda-btn-editar"
-                    onClick={() => setEditarOpen(true)}
-                  >
-                    Editar producto
-                  </button>
-                  {puedeCrearCompra && (
-                    <button
-                      type="button"
-                      className="tienda-btn-editar"
-                      onClick={() => setCrearCompraOpen(true)}
-                      disabled={productoActual.stock <= 0}
-                    >
-                      Crear compra
-                    </button>
-                  )}
-                </div>
               </div>
             </article>
           )}

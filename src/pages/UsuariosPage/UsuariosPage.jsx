@@ -1,7 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Search, Plus } from 'lucide-react';
-import { BackButton } from '../../components/BackButton/BackButton';
+import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
+import EstadoBadge from '../../components/badge/EstadoBadge';
 import { fetchUsuarios, eliminarUsuario } from '../../services/usuariosService';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { fetchRoles } from '../../services/rolesService';
@@ -359,19 +360,36 @@ function UsuariosPage() {
         const esMismoUsuario = resultado.id === userData?.usuario_id;
         return (
           <>
-            <BackButton onClick={() => { setResultado(cacheUsuariosRef.current); setModo('lista'); }} />
+            <DetailHeader
+              onBack={() => { setResultado(cacheUsuariosRef.current); setModo('lista'); }}
+              titulo={`${resultado.apellido} ${resultado.nombre}`}
+              estado={<EstadoBadge estado={resultado.estado} />}
+              acciones={(puedeEditar || puedeBorrar) && (
+                <>
+                  {puedeEditar && (
+                    <button type="button" className="btn-outline" onClick={abrirEditar}>
+                      Editar
+                    </button>
+                  )}
+                  {puedeEditar && !esMismoUsuario && (
+                    <button type="button" className="btn-outline" onClick={abrirCambiarRol}>
+                      Cambiar rol
+                    </button>
+                  )}
+                  {puedeBorrar && (
+                    <button type="button" className="btn-outline-danger" onClick={abrirEliminar}>
+                      Eliminar
+                    </button>
+                  )}
+                </>
+              )}
+            />
             <div className="usuarios-card">
               <div className="usuarios-card-inner">
                 <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
                   <img src={cfg.logo} alt="" className="detalle-logo-img" />
                 </div>
                 <div className="usuarios-card-data">
-                  <div className="detalle-card-data-header">
-                    <span className="detalle-full-name">{resultado.apellido} {resultado.nombre}</span>
-                    <span className="detalle-estado-badge" style={{ backgroundColor: cfg.bg, color: cfg.border, borderColor: cfg.border }}>
-                      {resultado.estado?.nombre}
-                    </span>
-                  </div>
                   <div className="usuarios-card-row">
                     <span className="usuarios-card-label">Email</span>
                     <span>{resultado.email}</span>
@@ -393,25 +411,6 @@ function UsuariosPage() {
                         Ver permisos
                       </button>
                     </div>
-                  )}
-                </div>
-              </div>
-              <div className="usuarios-card-actions">
-                {puedeBorrar && (
-                  <button className="usuarios-btn-eliminar" onClick={abrirEliminar}>
-                    Eliminar
-                  </button>
-                )}
-                <div className="usuarios-card-actions-right">
-                  {puedeEditar && !esMismoUsuario && (
-                    <button className="usuarios-btn-cambiar-rol" onClick={abrirCambiarRol}>
-                      Cambiar rol
-                    </button>
-                  )}
-                  {puedeEditar && (
-                    <button className="usuarios-btn-editar" onClick={abrirEditar}>
-                      Editar
-                    </button>
                   )}
                 </div>
               </div>

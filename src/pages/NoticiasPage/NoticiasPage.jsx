@@ -7,7 +7,7 @@ import { usePaginacion } from '../../hooks/usePaginacion';
 import { CreateNoticiaForm } from '../../components/createNoticiaForm/CreateNoticiaForm';
 import { EditNoticiaForm } from '../../components/editNoticiaForm/EditNoticiaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
-import { BackButton } from '../../components/BackButton/BackButton';
+import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
@@ -218,9 +218,33 @@ function NoticiasPage() {
         </>
       )}
 
-      {vista === 'detalle' && (
+      {vista === 'detalle' && (() => {
+        const detalleListo = !loadingDetalle && !errorDetalle && !!noticiaActual;
+        return (
         <>
-          <BackButton onClick={() => { setVista('lista'); setNoticiaActual(null); setErrorDetalle(''); }} />
+          <DetailHeader
+            onBack={() => { setVista('lista'); setNoticiaActual(null); setErrorDetalle(''); }}
+            titulo={detalleListo ? noticiaActual.titulo : null}
+            estado={detalleListo && (
+              <EstadoBadge variant={estadoBadgeVariant(noticiaActual.estado)}>
+                {noticiaActual.estado ?? '—'}
+              </EstadoBadge>
+            )}
+            acciones={detalleListo && (puedeEditarNoticia || puedeBorrarNoticia) && (
+              <>
+                {puedeEditarNoticia && (
+                  <button type="button" className="btn-outline" onClick={() => setEditarOpen(true)}>
+                    Editar
+                  </button>
+                )}
+                {puedeBorrarNoticia && (
+                  <button type="button" className="btn-outline-danger" onClick={() => setEliminarOpen(true)}>
+                    Eliminar
+                  </button>
+                )}
+              </>
+            )}
+          />
 
           {loadingDetalle && <SkeletonRows n={4} />}
 
@@ -228,7 +252,7 @@ function NoticiasPage() {
             <ErrorBanner mensaje={errorDetalle} />
           )}
 
-          {!loadingDetalle && !errorDetalle && noticiaActual && (
+          {detalleListo && (
             <article className="noticias-diario">
               <header className="noticias-diario-masthead">
                 <span className="noticias-diario-seccion">Noticias del Club</span>
@@ -239,10 +263,6 @@ function NoticiasPage() {
                   )}
                 </div>
               </header>
-
-              <h1 className="noticias-diario-titulo">{noticiaActual.titulo}</h1>
-
-              <hr className="noticias-diario-rule" />
 
               {imagenSegura && (
                 <figure className="noticias-diario-figura">
@@ -264,23 +284,11 @@ function NoticiasPage() {
                   </p>
                 ))}
               </div>
-
-              <div className="noticias-detalle-actions">
-                {puedeEditarNoticia && (
-                  <button className="noticias-btn-editar" onClick={() => setEditarOpen(true)}>
-                    Editar
-                  </button>
-                )}
-                {puedeBorrarNoticia && (
-                  <button className="noticias-btn-eliminar" onClick={() => setEliminarOpen(true)}>
-                    Eliminar
-                  </button>
-                )}
-              </div>
             </article>
           )}
         </>
-      )}
+        );
+      })()}
 
       <AnimatePresence>
         {crearOpen && (

@@ -50,42 +50,7 @@
   height: auto;
 }
 
-/* ── Acciones de la card ──────────────────────────────────────── */
-.socios-card-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: var(--space-4);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--color-border);
-}
-
-/* ── Colores de botones de acción de la card ──────────────────── */
-.socios-btn-editar {
-  background-color: var(--color-text-primary);
-  color: var(--color-surface);
-  transition: background-color var(--transition-fast);
-}
-
-@media (hover: hover) {
-  .socios-btn-editar:hover {
-    background-color: var(--color-text-secondary);
-  }
-}
-
-.socios-btn-eliminar {
-  background: transparent;
-  color: var(--color-danger);
-  border: 1.5px solid var(--color-danger);
-  transition: background-color var(--transition-fast), color var(--transition-fast);
-}
-
-@media (hover: hover) {
-  .socios-btn-eliminar:hover {
-    background-color: var(--color-danger-fill);
-    color: var(--color-on-accent);
-  }
-}
+/* Acciones del detalle (Editar/Eliminar) → DetailHeader (src/components/DetailHeader/) */
 
 /* ── Extender suscripción (columna, visible al filtrar por disciplina) ── */
 .socios-btn-extender {

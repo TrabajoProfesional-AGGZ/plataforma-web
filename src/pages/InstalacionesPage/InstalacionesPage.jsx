@@ -7,7 +7,7 @@ import { DatePicker } from '../../components/createForm/DatePicker';
 import { CreateReservaForm } from '../../components/createReservaForm/CreateReservaForm';
 import { StyledSelect } from '../../components/createForm/FormFields';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
-import { BackButton } from '../../components/BackButton/BackButton';
+import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
 import { getInstalaciones, createInstalacion, deleteInstalacion } from '../../services/instalacionesService';
 import { getReservasPorInstalacion, getReservasPorSocio, deleteReserva, getReservasHistoricasPorInstalacion } from '../../services/reservasService';
 import { getSocios } from '../../services/sociosService';
@@ -450,11 +450,22 @@ function InstalacionesPage() {
       {/* ── Vista: Detalle ── */}
       {vista === 'detalle' && instalacionActual && (
         <>
-          <BackButton onClick={() => setVista('lista')} />
+          <DetailHeader
+            onBack={() => setVista('lista')}
+            titulo={instalacionActual.nombre}
+            estado={
+              <EstadoBadge variant={instalacionActual.activa ? 'success' : 'neutral'}>
+                {instalacionActual.activa ? 'Activa' : 'Inactiva'}
+              </EstadoBadge>
+            }
+            acciones={puedeBorrarInstalacion && (
+              <button type="button" className="btn-outline-danger" onClick={() => setEliminarInstalacionOpen(true)}>
+                Eliminar
+              </button>
+            )}
+          />
 
           <div className="instalaciones-detalle-content">
-            <h1 className="instalaciones-detalle-nombre">{instalacionActual.nombre}</h1>
-
             <div className="instalaciones-detalle-card">
               {[
                 { label: 'Tipo', value: instalacionActual.tipo },
@@ -462,11 +473,6 @@ function InstalacionesPage() {
                 { label: 'Valor por turno', value: `$${instalacionActual.valor_turno}/turno` },
                 { label: 'Duración del turno', value: `${instalacionActual.duracion_turno} minutos` },
                 { label: 'Cancelación', value: `Hasta ${instalacionActual.tiempo_minimo_cancelacion ?? 60} minutos antes del turno`},
-                {
-                  label: 'Estado',
-                  value: instalacionActual.activa ? 'Activa' : 'Inactiva',
-                  color: instalacionActual.activa ? 'var(--status-success-border)' : 'var(--color-text-secondary)',
-                },
               ].map((field, i, arr) => (
                 <div
                   key={field.label}
@@ -474,25 +480,12 @@ function InstalacionesPage() {
                   style={{ borderBottom: i < arr.length - 1 ? '1px solid var(--color-bg)' : 'none' }}
                 >
                   <span className="instalaciones-detalle-row-label">{field.label}</span>
-                  <span
-                    className="instalaciones-detalle-row-value"
-                    style={{ color: field.color ?? 'var(--color-text-primary)' }}
-                  >
-                    {field.value}
-                  </span>
+                  <span className="instalaciones-detalle-row-value">{field.value}</span>
                 </div>
               ))}
             </div>
             <p className="detalle-id">ID: {instalacionActual.id}</p>
           </div>
-
-          {puedeBorrarInstalacion && (
-            <div className="instalaciones-agregar-reserva">
-              <button className="instalaciones-btn-eliminar-inst" onClick={() => setEliminarInstalacionOpen(true)}>
-                Eliminar
-              </button>
-            </div>
-          )}
 
           <div className="instalaciones-reservas-section">
             <h3 className="instalaciones-reservas-title">Reservas</h3>

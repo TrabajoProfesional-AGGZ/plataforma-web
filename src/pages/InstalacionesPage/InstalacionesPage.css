@@ -1,5 +1,6 @@
 /* empty, table-wrapper, tabla, td, tr-clickable, badge base, filtro-fecha/tipo, btn-toggle base → src/styles/ListPage.css
-   btn-crear, btn-volver, detalle-*, btn-eliminar-inst → src/styles/ListDetailShared.css
+   btn-crear, detalle-* → src/styles/ListDetailShared.css
+   encabezado del detalle (volver, título, badge, acciones) → src/components/DetailHeader/DetailHeader.css
    th styles → src/styles/PageTableHeader.css */
 
 .instalaciones-page {
@@ -15,13 +16,6 @@
   align-items: center;
   gap: 5px;
   white-space: nowrap;
-}
-
-/* ── Vista de detalle ─────────────────────────────────────────── */
-.instalaciones-agregar-reserva {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: var(--space-5);
 }
 
 /* ── Sección de reservas ───────────────────────────────────────── */
