@@ -1,30 +1,13 @@
 import { useRef, useEffect, useLayoutEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, ShieldCheck, Building2, Trophy, Newspaper, Ticket, Settings, BarChart3, Bell, Menu, Moon, Sun } from 'lucide-react';
+import { Menu, Moon, Sun } from 'lucide-react';
 import { logout } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
-import { ShoppingBag } from 'lucide-react';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
+import { SECCIONES, seccionPorRuta } from '../../navigation';
 import './AppLayout.css';
-
-
-// Ítems de navegación de la sidebar. `permiso: null` (o vacío) significa
-// visible para cualquier usuario autenticado; si no, se filtra según los
-// permisos devueltos por el login (ver `navItems` más abajo).
-const NAV_ITEMS_BASE = [
-  { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard, permiso: null },
-  { to: '/socios', label: 'Socios', Icon: Users, permiso: 'ver_socios' },
-  { to: '/usuarios', label: 'Usuarios', Icon: ShieldCheck, permiso: 'ver_usuarios' },
-  { to: '/instalaciones', label: 'Reservas e Instalaciones', Icon: Building2, permiso: 'ver_instalaciones' },
-  { to: '/disciplinas', label: 'Disciplinas', Icon: Trophy, permiso: 'ver_disciplinas' },
-  { to: '/noticias', label: 'Noticias', Icon: Newspaper, permiso: 'ver_noticias' },
-  { to: '/eventos', label: 'Eventos', Icon: Ticket, permiso: 'ver_eventos' },
-  { to: '/metricas', label: 'Métricas', Icon: BarChart3, permiso: 'ver_metricas' },
-  { to: '/alertas', label: 'Alertas', Icon: Bell, permiso: 'ver_alertas' },
-  { to: '/perfil', label: 'Perfil', Icon: Settings, permiso: ''},
-  { to: '/tienda', label: 'Tienda', Icon: ShoppingBag, permiso: null },
-];
 
 /**
  * Layout principal de la aplicación autenticada: sidebar de navegación
@@ -43,6 +26,7 @@ function AppLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false);
 
   useBackToRoot(drawerOpen, false, () => setDrawerOpen(false));
+  useDocumentTitle(seccionPorRuta(location.pathname)?.label);
 
   // Anima el fondo del ítem activo (`.sidebar-active-bg`) para que se
   // deslice de un link al siguiente en vez de saltar directo. En la
@@ -147,7 +131,7 @@ function AppLayout() {
   }
 
   // Filtra los ítems de la sidebar según los permisos del usuario logueado.
-  const navItems = NAV_ITEMS_BASE.filter(n => !n.permiso || permisos.includes(n.permiso));
+  const navItems = SECCIONES.filter(n => !n.permiso || permisos.includes(n.permiso));
 
   return (
     <div className="app-layout">

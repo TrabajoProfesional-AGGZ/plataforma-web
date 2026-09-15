@@ -4,6 +4,7 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { login } from '../../services/authService';
 import { RecuperarContraseniaModal } from './RecuperarContraseniaModal';
 import { useTheme } from '../../hooks/useTheme';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
 import { EASE } from '../../styles/motion';
 import './LoginPage.css';
 
@@ -35,6 +36,7 @@ function resolverMensajeErrorLogin(err) {
 
 /** Pantalla de login con animación de entrada/salida y recuperación de contraseña. */
 function LoginPage() {
+  useDocumentTitle('Ingresar');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
