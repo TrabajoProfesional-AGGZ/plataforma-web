@@ -8,6 +8,7 @@ import { CreateNoticiaForm } from '../../components/createNoticiaForm/CreateNoti
 import { EditNoticiaForm } from '../../components/editNoticiaForm/EditNoticiaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
+import { ViewTransition, scrollAlInicio } from '../../components/ViewTransition/ViewTransition';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
@@ -83,6 +84,7 @@ function NoticiasPage() {
     setLoadingDetalle(true);
     setErrorDetalle('');
     setVista('detalle');
+    scrollAlInicio();
     try {
       const detalle = await getNoticia(n.id);
       setNoticiaActual(detalle);
@@ -201,96 +203,98 @@ function NoticiasPage() {
 
   return (
     <div className="noticias-page">
-      {vista === 'lista' && (
-        <>
-          <h1 className="page-title">Noticias</h1>
-          <div className="noticias-toolbar">
-            <button className="noticias-btn-historicas" onClick={handleToggleHistoricas}>
-              {verHistoricas ? 'Ver vigentes' : 'Ver históricas'}
-            </button>
-            {puedeCrearNoticia && (
-              <button className="noticias-btn-crear" onClick={() => setCrearOpen(true)}>
-                <Plus size={15} aria-hidden="true" />
-                Nueva noticia
+      <ViewTransition screenKey={vista}>
+        {vista === 'lista' && (
+          <>
+            <h1 className="page-title">Noticias</h1>
+            <div className="noticias-toolbar">
+              <button className="noticias-btn-historicas" onClick={handleToggleHistoricas}>
+                {verHistoricas ? 'Ver vigentes' : 'Ver históricas'}
               </button>
-            )}
-          </div>
-          {error && noticias.length > 0 && <ErrorBanner mensaje={error} />}
-          {renderLista()}
-        </>
-      )}
-
-      {vista === 'detalle' && (() => {
-        const detalleListo = !loadingDetalle && !errorDetalle && !!noticiaActual;
-        return (
-        <>
-          <DetailHeader
-            onBack={() => { setVista('lista'); setNoticiaActual(null); setErrorDetalle(''); }}
-            titulo={detalleListo ? noticiaActual.titulo : null}
-            estado={detalleListo && (
-              <EstadoBadge variant={estadoBadgeVariant(noticiaActual.estado)}>
-                {noticiaActual.estado ?? '—'}
-              </EstadoBadge>
-            )}
-            acciones={detalleListo && (puedeEditarNoticia || puedeBorrarNoticia) && (
-              <>
-                {puedeEditarNoticia && (
-                  <button type="button" className="btn-outline" onClick={() => setEditarOpen(true)}>
-                    Editar
-                  </button>
-                )}
-                {puedeBorrarNoticia && (
-                  <button type="button" className="btn-outline-danger" onClick={() => setEliminarOpen(true)}>
-                    Eliminar
-                  </button>
-                )}
-              </>
-            )}
-          />
-
-          {loadingDetalle && <SkeletonRows n={4} />}
-
-          {errorDetalle && !loadingDetalle && (
-            <ErrorBanner mensaje={errorDetalle} />
-          )}
-
-          {detalleListo && (
-            <article className="noticias-diario">
-              <header className="noticias-diario-masthead">
-                <span className="noticias-diario-seccion">Noticias del Club</span>
-                <div className="noticias-diario-masthead-right">
-                  <span className="noticias-diario-fecha">Fecha de publicación: {noticiaActual.fecha_publicacion}</span>
-                  {noticiaActual.fecha_expiracion && (
-                    <span className="noticias-diario-fecha">Fecha de vencimiento: {noticiaActual.fecha_expiracion}</span>
-                  )}
-                </div>
-              </header>
-
-              {imagenSegura && (
-                <figure className="noticias-diario-figura">
-                  <img
-                    src={imagenSegura}
-                    alt="Imagen de la noticia"
-                    className="noticias-diario-imagen"
-                    referrerPolicy="no-referrer"
-                  />
-                </figure>
+              {puedeCrearNoticia && (
+                <button className="noticias-btn-crear" onClick={() => setCrearOpen(true)}>
+                  <Plus size={15} aria-hidden="true" />
+                  Nueva noticia
+                </button>
               )}
+            </div>
+            {error && noticias.length > 0 && <ErrorBanner mensaje={error} />}
+            {renderLista()}
+          </>
+        )}
 
-              <div className="noticias-diario-cuerpo">
-                {(noticiaActual.cuerpo || '').split(/\n\n+/).map((parrafo, i) => (
-                  <p key={i}>
-                    {parrafo.split('\n').map((linea, j, arr) =>
-                      j < arr.length - 1 ? [linea, <br key={j} />] : linea
+        {vista === 'detalle' && (() => {
+          const detalleListo = !loadingDetalle && !errorDetalle && !!noticiaActual;
+          return (
+          <>
+            <DetailHeader
+              onBack={() => { setVista('lista'); setNoticiaActual(null); setErrorDetalle(''); }}
+              titulo={detalleListo ? noticiaActual.titulo : null}
+              estado={detalleListo && (
+                <EstadoBadge variant={estadoBadgeVariant(noticiaActual.estado)}>
+                  {noticiaActual.estado ?? '—'}
+                </EstadoBadge>
+              )}
+              acciones={detalleListo && (puedeEditarNoticia || puedeBorrarNoticia) && (
+                <>
+                  {puedeEditarNoticia && (
+                    <button type="button" className="btn-outline" onClick={() => setEditarOpen(true)}>
+                      Editar
+                    </button>
+                  )}
+                  {puedeBorrarNoticia && (
+                    <button type="button" className="btn-outline-danger" onClick={() => setEliminarOpen(true)}>
+                      Eliminar
+                    </button>
+                  )}
+                </>
+              )}
+            />
+
+            {loadingDetalle && <SkeletonRows n={4} />}
+
+            {errorDetalle && !loadingDetalle && (
+              <ErrorBanner mensaje={errorDetalle} />
+            )}
+
+            {detalleListo && (
+              <article className="noticias-diario">
+                <header className="noticias-diario-masthead">
+                  <span className="noticias-diario-seccion">Noticias del Club</span>
+                  <div className="noticias-diario-masthead-right">
+                    <span className="noticias-diario-fecha">Fecha de publicación: {noticiaActual.fecha_publicacion}</span>
+                    {noticiaActual.fecha_expiracion && (
+                      <span className="noticias-diario-fecha">Fecha de vencimiento: {noticiaActual.fecha_expiracion}</span>
                     )}
-                  </p>
-                ))}
-              </div>
-            </article>
-          )}
-        </>
-        );
-      })()}
+                  </div>
+                </header>
+
+                {imagenSegura && (
+                  <figure className="noticias-diario-figura">
+                    <img
+                      src={imagenSegura}
+                      alt="Imagen de la noticia"
+                      className="noticias-diario-imagen"
+                      referrerPolicy="no-referrer"
+                    />
+                  </figure>
+                )}
+
+                <div className="noticias-diario-cuerpo">
+                  {(noticiaActual.cuerpo || '').split(/\n\n+/).map((parrafo, i) => (
+                    <p key={i}>
+                      {parrafo.split('\n').map((linea, j, arr) =>
+                        j < arr.length - 1 ? [linea, <br key={j} />] : linea
+                      )}
+                    </p>
+                  ))}
+                </div>
+              </article>
+            )}
+          </>
+          );
+        })()}
+      </ViewTransition>
 
       <AnimatePresence>
         {crearOpen && (

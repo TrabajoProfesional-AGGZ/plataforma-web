@@ -5,6 +5,7 @@ import { Plus, ChevronRight } from 'lucide-react';
 import { CreateDisciplinaForm } from '../../components/createDisciplinaForm/CreateDisciplinaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
+import { ViewTransition, scrollAlInicio } from '../../components/ViewTransition/ViewTransition';
 import { getDisciplinas, createDisciplina, pausarDisciplina, inscribirSocioADisciplina } from '../../services/disciplinasService';
 import { getSocioByNroSocio } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
@@ -86,7 +87,7 @@ function DisciplinasPage() {
   useEffect(() => {
     if (!location.state?.disciplinaId || disciplinas.length === 0) return;
     const found = disciplinas.find((d) => d.id === location.state.disciplinaId);
-    if (found) { setDisciplinaActual(found); setVista('detalle'); }
+    if (found) { setDisciplinaActual(found); setVista('detalle'); scrollAlInicio(); }
   }, [disciplinas]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -183,7 +184,7 @@ function DisciplinasPage() {
           </thead>
           <tbody>
             {listaPaginada.map((d) => {
-              const verDetalle = () => { setDisciplinaActual(d); setVista('detalle'); };
+              const verDetalle = () => { setDisciplinaActual(d); setVista('detalle'); scrollAlInicio(); };
               return (
               <tr
                 key={d.id}
@@ -221,101 +222,103 @@ function DisciplinasPage() {
 
   return (
     <div className="disciplinas-page">
-      {/* ── Vista: Lista ── */}
-      {vista === 'lista' && (
-        <>
-          <h1 className="page-title">Disciplinas</h1>
+      <ViewTransition screenKey={vista}>
+        {/* ── Vista: Lista ── */}
+        {vista === 'lista' && (
+          <>
+            <h1 className="page-title">Disciplinas</h1>
 
-          <div className="disciplinas-toolbar">
-            {puedeCrearDisciplina && (
-              <button className="disciplinas-btn-crear" onClick={() => setCrearOpen(true)}>
-                <Plus size={15} aria-hidden="true" />
-                Nueva disciplina
-              </button>
-            )}
-          </div>
-
-          {error && disciplinas.length > 0 && <ErrorBanner mensaje={error} />}
-          {renderListaContenido()}
-        </>
-      )}
-
-      {/* ── Vista: Detalle ── */}
-      {vista === 'detalle' && disciplinaActual && (
-        <>
-          <DetailHeader
-            onBack={() => setVista('lista')}
-            titulo={disciplinaActual.nombre}
-            estado={
-              <EstadoBadge variant={disciplinaActual.estado?.nombre === 'Pausada' ? 'warning' : 'success'}>
-                {disciplinaActual.estado?.nombre ?? 'Activa'}
-              </EstadoBadge>
-            }
-            acciones={puedeBorrarDisciplina && (
-              <button type="button" className="btn-outline-danger" onClick={() => setPausarOpen(true)}>
-                Pausar
-              </button>
-            )}
-          />
-
-          <div className="disciplinas-detalle-content">
-            <div className="disciplinas-detalle-card">
-              {[
-                { label: 'Categoría de socio', value: disciplinaActual.categoria_socio?.nombre ?? '—' },
-                { label: 'Sede', value: disciplinaActual.sede?.nombre ?? '—' },
-                {
-                  label: 'Cupo máximo',
-                  value: disciplinaActual.cupo_maximo != null ? `${disciplinaActual.cupo_maximo} personas` : 'Sin límite',
-                },
-                { label: 'Arancelada', value: disciplinaActual.arancelada ? 'Sí' : 'No' },
-                ...(disciplinaActual.arancelada
-                  ? [{ label: 'Concepto de cobro', value: disciplinaActual.concepto_cobro }]
-                  : []),
-              ].map((field, i, arr) => (
-                <div
-                  key={field.label}
-                  className="disciplinas-detalle-row"
-                  style={{ borderBottom: i < arr.length - 1 ? '1px solid var(--color-bg)' : 'none' }}
-                >
-                  <span className="disciplinas-detalle-row-label">{field.label}</span>
-                  <span className="disciplinas-detalle-row-value">{field.value}</span>
-                </div>
-              ))}
-            </div>
-            <p className="detalle-id">ID: {disciplinaActual.id}</p>
-          </div>
-
-          {puedeCrearDisciplina && (
-            <div className="disciplinas-socios-section">
-              <h3 className="disciplinas-socios-title">Inscribir socio</h3>
-              <p className="disciplinas-socios-hint">
-                Para ver los socios inscriptos en esta disciplina, andá a la sección Socios y filtrá por disciplina.
-              </p>
-
-              <form className="disciplinas-inscribir-form" onSubmit={handleInscribirSocio}>
-                <input
-                  type="text"
-                  className="disciplinas-filtro-socio"
-                  placeholder="N° de socio a inscribir"
-                  value={nroSocioInscribir}
-                  onChange={(e) => setNroSocioInscribir(e.target.value)}
-                  aria-label="Número de socio a inscribir"
-                  disabled={inscribiendoLoading}
-                />
-                <button
-                  type="submit"
-                  className="disciplinas-btn-inscribir"
-                  disabled={inscribiendoLoading || !nroSocioInscribir.trim()}
-                >
-                  {inscribiendoLoading ? 'Inscribiendo…' : 'Inscribir socio'}
+            <div className="disciplinas-toolbar">
+              {puedeCrearDisciplina && (
+                <button className="disciplinas-btn-crear" onClick={() => setCrearOpen(true)}>
+                  <Plus size={15} aria-hidden="true" />
+                  Nueva disciplina
                 </button>
-              </form>
-              {inscribiendoError && <p className="disciplinas-inscribir-error">{inscribiendoError}</p>}
-              {inscribiendoExito && <p className="disciplinas-inscribir-exito">Socio inscripto correctamente.</p>}
+              )}
             </div>
-          )}
-        </>
-      )}
+
+            {error && disciplinas.length > 0 && <ErrorBanner mensaje={error} />}
+            {renderListaContenido()}
+          </>
+        )}
+
+        {/* ── Vista: Detalle ── */}
+        {vista === 'detalle' && disciplinaActual && (
+          <>
+            <DetailHeader
+              onBack={() => setVista('lista')}
+              titulo={disciplinaActual.nombre}
+              estado={
+                <EstadoBadge variant={disciplinaActual.estado?.nombre === 'Pausada' ? 'warning' : 'success'}>
+                  {disciplinaActual.estado?.nombre ?? 'Activa'}
+                </EstadoBadge>
+              }
+              acciones={puedeBorrarDisciplina && (
+                <button type="button" className="btn-outline-danger" onClick={() => setPausarOpen(true)}>
+                  Pausar
+                </button>
+              )}
+            />
+
+            <div className="disciplinas-detalle-content">
+              <div className="disciplinas-detalle-card">
+                {[
+                  { label: 'Categoría de socio', value: disciplinaActual.categoria_socio?.nombre ?? '—' },
+                  { label: 'Sede', value: disciplinaActual.sede?.nombre ?? '—' },
+                  {
+                    label: 'Cupo máximo',
+                    value: disciplinaActual.cupo_maximo != null ? `${disciplinaActual.cupo_maximo} personas` : 'Sin límite',
+                  },
+                  { label: 'Arancelada', value: disciplinaActual.arancelada ? 'Sí' : 'No' },
+                  ...(disciplinaActual.arancelada
+                    ? [{ label: 'Concepto de cobro', value: disciplinaActual.concepto_cobro }]
+                    : []),
+                ].map((field, i, arr) => (
+                  <div
+                    key={field.label}
+                    className="disciplinas-detalle-row"
+                    style={{ borderBottom: i < arr.length - 1 ? '1px solid var(--color-bg)' : 'none' }}
+                  >
+                    <span className="disciplinas-detalle-row-label">{field.label}</span>
+                    <span className="disciplinas-detalle-row-value">{field.value}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="detalle-id">ID: {disciplinaActual.id}</p>
+            </div>
+
+            {puedeCrearDisciplina && (
+              <div className="disciplinas-socios-section">
+                <h3 className="disciplinas-socios-title">Inscribir socio</h3>
+                <p className="disciplinas-socios-hint">
+                  Para ver los socios inscriptos en esta disciplina, andá a la sección Socios y filtrá por disciplina.
+                </p>
+
+                <form className="disciplinas-inscribir-form" onSubmit={handleInscribirSocio}>
+                  <input
+                    type="text"
+                    className="disciplinas-filtro-socio"
+                    placeholder="N° de socio a inscribir"
+                    value={nroSocioInscribir}
+                    onChange={(e) => setNroSocioInscribir(e.target.value)}
+                    aria-label="Número de socio a inscribir"
+                    disabled={inscribiendoLoading}
+                  />
+                  <button
+                    type="submit"
+                    className="disciplinas-btn-inscribir"
+                    disabled={inscribiendoLoading || !nroSocioInscribir.trim()}
+                  >
+                    {inscribiendoLoading ? 'Inscribiendo…' : 'Inscribir socio'}
+                  </button>
+                </form>
+                {inscribiendoError && <p className="disciplinas-inscribir-error">{inscribiendoError}</p>}
+                {inscribiendoExito && <p className="disciplinas-inscribir-exito">Socio inscripto correctamente.</p>}
+              </div>
+            )}
+          </>
+        )}
+      </ViewTransition>
 
       {/* ── Formulario: Crear disciplina ── */}
       <AnimatePresence>

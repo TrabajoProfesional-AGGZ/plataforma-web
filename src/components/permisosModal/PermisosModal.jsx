@@ -72,7 +72,7 @@ function PermisosModal({ permisos, onClose }) {
               {/* Acordeón de altura variable (cantidad de permisos por módulo, desconocida
                   de antemano): a diferencia de las barras de B5, no hay un ancho/alto fijo
                   al que reducir con scale, así que anima `height` como excepción documentada
-                  (ver PLAN_UX.md, sección B5). */}
+                  */}
               <AnimatePresence initial={false}>
                 {abierto && (
                   <motion.ul

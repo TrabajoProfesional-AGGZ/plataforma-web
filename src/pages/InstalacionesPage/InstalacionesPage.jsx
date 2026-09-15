@@ -8,6 +8,7 @@ import { CreateReservaForm } from '../../components/createReservaForm/CreateRese
 import { StyledSelect } from '../../components/createForm/FormFields';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
+import { ViewTransition, scrollAlInicio } from '../../components/ViewTransition/ViewTransition';
 import { getInstalaciones, createInstalacion, deleteInstalacion } from '../../services/instalacionesService';
 import { getReservasPorInstalacion, getReservasPorSocio, deleteReserva, getReservasHistoricasPorInstalacion } from '../../services/reservasService';
 import { getSocios } from '../../services/sociosService';
@@ -130,7 +131,7 @@ function InstalacionesPage() {
   useEffect(() => {
     if (!location.state?.instalacionId || instalaciones.length === 0) return;
     const found = instalaciones.find((i) => i.id === location.state.instalacionId);
-    if (found) { setInstalacionActual(found); setVista('detalle'); }
+    if (found) { setInstalacionActual(found); setVista('detalle'); scrollAlInicio(); }
   }, [instalaciones]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // === Instalaciones ===
@@ -295,7 +296,7 @@ function InstalacionesPage() {
           </thead>
           <tbody>
             {instalacionesPaginadas.map((inst) => {
-              const verDetalle = () => { setInstalacionActual(inst); setVista('detalle'); };
+              const verDetalle = () => { setInstalacionActual(inst); setVista('detalle'); scrollAlInicio(); };
               return (
               <tr
                 key={inst.id}
@@ -409,176 +410,178 @@ function InstalacionesPage() {
 
   return (
     <div className="instalaciones-page">
-      {/* ── Vista: Lista ── */}
-      {vista === 'lista' && (
-        <>
-          <h1 className="page-title">Reservas e Instalaciones</h1>
+      <ViewTransition screenKey={vista}>
+        {/* ── Vista: Lista ── */}
+        {vista === 'lista' && (
+          <>
+            <h1 className="page-title">Reservas e Instalaciones</h1>
 
-          <div className="instalaciones-seccion-separator">
-            <div className="instalaciones-seccion-header">
-              <div className="instalaciones-seccion-toolbar">
-                <div>
-                  {tiposDisponibles.length > 0 && (
-                    <StyledSelect
-                      className="filtros-select-trigger"
-                      value={filtroTipo}
-                      onChange={(e) => setFiltroTipo(e.target.value)}
-                      aria-label="Filtrar por tipo"
-                    >
-                      <option value="">Todos los tipos</option>
-                      {tiposDisponibles.map((tipo) => (
-                        <option key={tipo} value={tipo}>{tipo}</option>
-                      ))}
-                    </StyledSelect>
+            <div className="instalaciones-seccion-separator">
+              <div className="instalaciones-seccion-header">
+                <div className="instalaciones-seccion-toolbar">
+                  <div>
+                    {tiposDisponibles.length > 0 && (
+                      <StyledSelect
+                        className="filtros-select-trigger"
+                        value={filtroTipo}
+                        onChange={(e) => setFiltroTipo(e.target.value)}
+                        aria-label="Filtrar por tipo"
+                      >
+                        <option value="">Todos los tipos</option>
+                        {tiposDisponibles.map((tipo) => (
+                          <option key={tipo} value={tipo}>{tipo}</option>
+                        ))}
+                      </StyledSelect>
+                    )}
+                  </div>
+                  {puedeCrearInstalacion && (
+                    <button className="instalaciones-btn-crear" onClick={() => setCrearInstalacionFormOpen(true)}>
+                      <Plus size={15} aria-hidden="true" />
+                      Nueva instalación
+                    </button>
                   )}
                 </div>
-                {puedeCrearInstalacion && (
-                  <button className="instalaciones-btn-crear" onClick={() => setCrearInstalacionFormOpen(true)}>
+              </div>
+
+              {error && instalaciones.length > 0 && <ErrorBanner mensaje={error} />}
+              {renderContenidoInstalaciones()}
+            </div>
+          </>
+        )}
+
+        {/* ── Vista: Detalle ── */}
+        {vista === 'detalle' && instalacionActual && (
+          <>
+            <DetailHeader
+              onBack={() => setVista('lista')}
+              titulo={instalacionActual.nombre}
+              estado={
+                <EstadoBadge variant={instalacionActual.activa ? 'success' : 'neutral'}>
+                  {instalacionActual.activa ? 'Activa' : 'Inactiva'}
+                </EstadoBadge>
+              }
+              acciones={puedeBorrarInstalacion && (
+                <button type="button" className="btn-outline-danger" onClick={() => setEliminarInstalacionOpen(true)}>
+                  Eliminar
+                </button>
+              )}
+            />
+
+            <div className="instalaciones-detalle-content">
+              <div className="instalaciones-detalle-card">
+                {[
+                  { label: 'Tipo', value: instalacionActual.tipo },
+                  { label: 'Capacidad máxima', value: `${instalacionActual.capacidad_maxima} personas` },
+                  { label: 'Valor por turno', value: `$${instalacionActual.valor_turno}/turno` },
+                  { label: 'Duración del turno', value: `${instalacionActual.duracion_turno} minutos` },
+                  { label: 'Cancelación', value: `Hasta ${instalacionActual.tiempo_minimo_cancelacion ?? 60} minutos antes del turno`},
+                ].map((field, i, arr) => (
+                  <div
+                    key={field.label}
+                    className="instalaciones-detalle-row"
+                    style={{ borderBottom: i < arr.length - 1 ? '1px solid var(--color-bg)' : 'none' }}
+                  >
+                    <span className="instalaciones-detalle-row-label">{field.label}</span>
+                    <span className="instalaciones-detalle-row-value">{field.value}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="detalle-id">ID: {instalacionActual.id}</p>
+            </div>
+
+            <div className="instalaciones-reservas-section">
+              <h3 className="instalaciones-reservas-title">Reservas</h3>
+              <div className="instalaciones-reservas-controles">
+                <div className="instalaciones-reservas-controles-izq">
+                  {puedeVerReservas && reservasDeInstalacion.length > 0 && (
+                    <DatePicker
+                      style={{ width: 172 }}
+                      value={filtroFecha}
+                      onChange={(e) => { setFiltroFecha(e.target.value); resetPaginaReservas(); }}
+                      aria-label="Filtrar por fecha"
+                    />
+                  )}
+                  {puedeVerReservas && (
+                    <input
+                      type="text"
+                      className="instalaciones-filtro-fecha"
+                      placeholder="Filtrar por N° de socio"
+                      value={filtroNroSocio}
+                      aria-label="Filtrar por número de socio"
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        setFiltroNroSocio(val);
+                        if (!val.trim()) setReservasBusqueda(null);
+                        resetPaginaReservas();
+                      }}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter' && vistaReservas === 'activas') {
+                          buscarPorSocio(filtroNroSocio).catch(() => {});
+                        }
+                      }}
+                    />
+                  )}
+                  <button
+                    className="instalaciones-btn-toggle"
+                    onClick={() => setReservasVisible((v) => !v)}
+                    aria-label={reservasVisible ? 'Ocultar reservas' : 'Mostrar reservas'}
+                  >
+                    {reservasVisible ? (
+                      <><ChevronUp size={15} aria-hidden="true" /> Ocultar reservas</>
+                    ) : (
+                      <><ChevronDown size={15} aria-hidden="true" /> Mostrar reservas</>
+                    )}
+                  </button>
+                </div>
+                {puedeCrearReserva && (
+                  <button className="instalaciones-btn-crear" onClick={() => setCrearReservaFormOpen(true)}>
                     <Plus size={15} aria-hidden="true" />
-                    Nueva instalación
+                    Agregar reserva
                   </button>
                 )}
               </div>
-            </div>
 
-            {error && instalaciones.length > 0 && <ErrorBanner mensaje={error} />}
-            {renderContenidoInstalaciones()}
-          </div>
-        </>
-      )}
-
-      {/* ── Vista: Detalle ── */}
-      {vista === 'detalle' && instalacionActual && (
-        <>
-          <DetailHeader
-            onBack={() => setVista('lista')}
-            titulo={instalacionActual.nombre}
-            estado={
-              <EstadoBadge variant={instalacionActual.activa ? 'success' : 'neutral'}>
-                {instalacionActual.activa ? 'Activa' : 'Inactiva'}
-              </EstadoBadge>
-            }
-            acciones={puedeBorrarInstalacion && (
-              <button type="button" className="btn-outline-danger" onClick={() => setEliminarInstalacionOpen(true)}>
-                Eliminar
-              </button>
-            )}
-          />
-
-          <div className="instalaciones-detalle-content">
-            <div className="instalaciones-detalle-card">
-              {[
-                { label: 'Tipo', value: instalacionActual.tipo },
-                { label: 'Capacidad máxima', value: `${instalacionActual.capacidad_maxima} personas` },
-                { label: 'Valor por turno', value: `$${instalacionActual.valor_turno}/turno` },
-                { label: 'Duración del turno', value: `${instalacionActual.duracion_turno} minutos` },
-                { label: 'Cancelación', value: `Hasta ${instalacionActual.tiempo_minimo_cancelacion ?? 60} minutos antes del turno`},
-              ].map((field, i, arr) => (
-                <div
-                  key={field.label}
-                  className="instalaciones-detalle-row"
-                  style={{ borderBottom: i < arr.length - 1 ? '1px solid var(--color-bg)' : 'none' }}
-                >
-                  <span className="instalaciones-detalle-row-label">{field.label}</span>
-                  <span className="instalaciones-detalle-row-value">{field.value}</span>
-                </div>
-              ))}
-            </div>
-            <p className="detalle-id">ID: {instalacionActual.id}</p>
-          </div>
-
-          <div className="instalaciones-reservas-section">
-            <h3 className="instalaciones-reservas-title">Reservas</h3>
-            <div className="instalaciones-reservas-controles">
-              <div className="instalaciones-reservas-controles-izq">
-                {puedeVerReservas && reservasDeInstalacion.length > 0 && (
-                  <DatePicker
-                    style={{ width: 172 }}
-                    value={filtroFecha}
-                    onChange={(e) => { setFiltroFecha(e.target.value); resetPaginaReservas(); }}
-                    aria-label="Filtrar por fecha"
-                  />
-                )}
-                {puedeVerReservas && (
-                  <input
-                    type="text"
-                    className="instalaciones-filtro-fecha"
-                    placeholder="Filtrar por N° de socio"
-                    value={filtroNroSocio}
-                    aria-label="Filtrar por número de socio"
-                    onChange={(e) => {
-                      const val = e.target.value;
-                      setFiltroNroSocio(val);
-                      if (!val.trim()) setReservasBusqueda(null);
-                      resetPaginaReservas();
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter' && vistaReservas === 'activas') {
-                        buscarPorSocio(filtroNroSocio).catch(() => {});
-                      }
-                    }}
-                  />
-                )}
-                <button
-                  className="instalaciones-btn-toggle"
-                  onClick={() => setReservasVisible((v) => !v)}
-                  aria-label={reservasVisible ? 'Ocultar reservas' : 'Mostrar reservas'}
-                >
-                  {reservasVisible ? (
-                    <><ChevronUp size={15} aria-hidden="true" /> Ocultar reservas</>
-                  ) : (
-                    <><ChevronDown size={15} aria-hidden="true" /> Mostrar reservas</>
+              {reservasVisible && (
+                <>
+                  {loadingReservas ? (
+                    <SkeletonRows n={4} />
+                  ) : vistaReservas === 'activas'
+                    ? renderTablaReservas(reservasFiltradas, { mostrarEstado: true, mostrarAcciones: true })
+                    : renderTablaReservas(reservasHistoricasFiltradas, { mostrarEstado: true, mensajeVacio: 'No hay reservas históricas para esta instalación.' })}
+                  {puedeVerReservas && (
+                    <div className="instalaciones-vista-toggle">
+                      {vistaReservas === 'activas' ? (
+                        <button
+                          className="instalaciones-btn-vista-toggle"
+                          onClick={() => {
+                            setFiltroNroSocio('');
+                            setReservasBusqueda(null);
+                            cargarReservasHistoricas(instalacionActual.id).then(() => setVistaReservas('historicas')).catch(() => {});
+                          }}
+                        >
+                          Ver reservas históricas
+                        </button>
+                      ) : (
+                        <button
+                          className="instalaciones-btn-vista-toggle"
+                          onClick={() => {
+                            setFiltroNroSocio('');
+                            setReservasBusqueda(null);
+                            setVistaReservas('activas');
+                            resetPaginaReservas();
+                          }}
+                        >
+                          Ver reservas activas
+                        </button>
+                      )}
+                    </div>
                   )}
-                </button>
-              </div>
-              {puedeCrearReserva && (
-                <button className="instalaciones-btn-crear" onClick={() => setCrearReservaFormOpen(true)}>
-                  <Plus size={15} aria-hidden="true" />
-                  Agregar reserva
-                </button>
+                </>
               )}
             </div>
-
-            {reservasVisible && (
-              <>
-                {loadingReservas ? (
-                  <SkeletonRows n={4} />
-                ) : vistaReservas === 'activas'
-                  ? renderTablaReservas(reservasFiltradas, { mostrarEstado: true, mostrarAcciones: true })
-                  : renderTablaReservas(reservasHistoricasFiltradas, { mostrarEstado: true, mensajeVacio: 'No hay reservas históricas para esta instalación.' })}
-                {puedeVerReservas && (
-                  <div className="instalaciones-vista-toggle">
-                    {vistaReservas === 'activas' ? (
-                      <button
-                        className="instalaciones-btn-vista-toggle"
-                        onClick={() => {
-                          setFiltroNroSocio('');
-                          setReservasBusqueda(null);
-                          cargarReservasHistoricas(instalacionActual.id).then(() => setVistaReservas('historicas')).catch(() => {});
-                        }}
-                      >
-                        Ver reservas históricas
-                      </button>
-                    ) : (
-                      <button
-                        className="instalaciones-btn-vista-toggle"
-                        onClick={() => {
-                          setFiltroNroSocio('');
-                          setReservasBusqueda(null);
-                          setVistaReservas('activas');
-                          resetPaginaReservas();
-                        }}
-                      >
-                        Ver reservas activas
-                      </button>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        </>
-      )}
+          </>
+        )}
+      </ViewTransition>
 
       {/* ── Formularios multi-paso (overlay) ── */}
       <AnimatePresence>

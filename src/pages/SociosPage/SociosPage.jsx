@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Plus, ChevronRight } from 'lucide-react';
 import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
+import { ViewTransition, scrollAlInicio } from '../../components/ViewTransition/ViewTransition';
 import { FiltrosActivos } from '../../components/FiltrosActivos/FiltrosActivos';
 import { BuscadorColapsable } from '../../components/BuscadorColapsable/BuscadorColapsable';
 import EstadoBadge from '../../components/badge/EstadoBadge';
@@ -423,192 +424,194 @@ function SociosPage() {
       {loading && <SkeletonRows n={6} />}
       {error && <ErrorBanner mensaje={error} onReintentar={cargarSocios} />}
 
-      {!loading && modo === 'no-encontrado' && (
-        <EmptyState mensaje="No se encontró ningún socio con ese N° de socio." />
-      )}
+      <ViewTransition screenKey={modo}>
+        {!loading && modo === 'no-encontrado' && (
+          <EmptyState mensaje="No se encontró ningún socio con ese N° de socio." />
+        )}
 
-      {!loading && modo === 'socio' && resultado && (() => {
-        const cfg = estadoConfig(resultado.estado.nombre);
-        const fotoSegura = urlImagenSegura(resultado.foto_url);
-        return (
-          <>
-            <DetailHeader
-              onBack={() => { setResultado(cacheSociosRef.current); setModo('lista'); }}
-              titulo={`${resultado.apellido} ${resultado.nombre}`}
-              estado={<EstadoBadge estado={resultado.estado} />}
-              acciones={(puedeEditar || puedeBorrar) && (
-                <>
-                  {puedeEditar && (
-                    <button type="button" className="btn-outline" onClick={abrirEditar}>
-                      Editar
-                    </button>
-                  )}
-                  {puedeBorrar && (
-                    <button type="button" className="btn-outline-danger" onClick={abrirEliminar}>
-                      Eliminar
-                    </button>
-                  )}
-                </>
-              )}
-            />
-            <div className="socios-card">
-              <div className="socios-card-inner">
-                <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
-                  {fotoSegura
-                    ? <img src={fotoSegura} alt="" className="detalle-logo-img" referrerPolicy="no-referrer" />
-                    : <img src={cfg.logo} alt="" className="detalle-logo-img" />}
-                </div>
-                <div className="socios-card-data">
-                  <div className="socios-card-row">
-                    <span className="socios-card-label">N° Socio</span>
-                    <span>{resultado.nro_socio}</span>
+        {!loading && modo === 'socio' && resultado && (() => {
+          const cfg = estadoConfig(resultado.estado.nombre);
+          const fotoSegura = urlImagenSegura(resultado.foto_url);
+          return (
+            <>
+              <DetailHeader
+                onBack={() => { setResultado(cacheSociosRef.current); setModo('lista'); }}
+                titulo={`${resultado.apellido} ${resultado.nombre}`}
+                estado={<EstadoBadge estado={resultado.estado} />}
+                acciones={(puedeEditar || puedeBorrar) && (
+                  <>
+                    {puedeEditar && (
+                      <button type="button" className="btn-outline" onClick={abrirEditar}>
+                        Editar
+                      </button>
+                    )}
+                    {puedeBorrar && (
+                      <button type="button" className="btn-outline-danger" onClick={abrirEliminar}>
+                        Eliminar
+                      </button>
+                    )}
+                  </>
+                )}
+              />
+              <div className="socios-card">
+                <div className="socios-card-inner">
+                  <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
+                    {fotoSegura
+                      ? <img src={fotoSegura} alt="" className="detalle-logo-img" referrerPolicy="no-referrer" />
+                      : <img src={cfg.logo} alt="" className="detalle-logo-img" />}
                   </div>
-                  <div className="socios-card-row">
-                    <span className="socios-card-label">DNI</span>
-                    <span>{resultado.nro_documento}</span>
-                  </div>
-                  <div className="socios-card-row">
-                    <span className="socios-card-label">Nacimiento</span>
-                    <span>{resultado.fecha_nacimiento}</span>
-                  </div>
-                  <div className="socios-card-row">
-                    <span className="socios-card-label">Email</span>
-                    <span>{resultado.email}</span>
-                  </div>
-                  {resultado.telefono && (
+                  <div className="socios-card-data">
                     <div className="socios-card-row">
-                      <span className="socios-card-label">Teléfono</span>
-                      <span>{resultado.telefono}</span>
+                      <span className="socios-card-label">N° Socio</span>
+                      <span>{resultado.nro_socio}</span>
                     </div>
-                  )}
-                  <div className="socios-card-row">
-                    <span className="socios-card-label">Categoría</span>
-                    <span>{resultado.categoria.nombre}</span>
+                    <div className="socios-card-row">
+                      <span className="socios-card-label">DNI</span>
+                      <span>{resultado.nro_documento}</span>
+                    </div>
+                    <div className="socios-card-row">
+                      <span className="socios-card-label">Nacimiento</span>
+                      <span>{resultado.fecha_nacimiento}</span>
+                    </div>
+                    <div className="socios-card-row">
+                      <span className="socios-card-label">Email</span>
+                      <span>{resultado.email}</span>
+                    </div>
+                    {resultado.telefono && (
+                      <div className="socios-card-row">
+                        <span className="socios-card-label">Teléfono</span>
+                        <span>{resultado.telefono}</span>
+                      </div>
+                    )}
+                    <div className="socios-card-row">
+                      <span className="socios-card-label">Categoría</span>
+                      <span>{resultado.categoria.nombre}</span>
+                    </div>
+                    <SocioAccionesExtra
+                      idSocio={resultado.id}
+                      nroSocio={resultado.nro_socio}
+                      nombreSocio={`${resultado.apellido} ${resultado.nombre}`}
+                    />
                   </div>
-                  <SocioAccionesExtra
-                    idSocio={resultado.id}
-                    nroSocio={resultado.nro_socio}
-                    nombreSocio={`${resultado.apellido} ${resultado.nombre}`}
-                  />
                 </div>
               </div>
-            </div>
-          </>
-        );
-      })()}
-
-      {!loading && modo === 'lista' && Array.isArray(resultado) && (() => {
-        if (resultado.length === 0) {
-          return (
-            <div className="socios-table-wrapper">
-              <EmptyState mensaje="No hay socios registrados." />
-            </div>
+            </>
           );
-        }
-        const mostrarColumnaSuscripcion = !!filtroDisciplina && puedeCrearDisciplina;
-        return (
-          <>
-            {errorDisciplinaFiltro && <ErrorBanner mensaje={errorDisciplinaFiltro} onReintentar={recargarSociosDeDisciplina} />}
-            <div className="socios-table-wrapper">
-              {listaFiltrada.length === 0 ? (
-                <EmptyState mensaje="No hay socios con los filtros seleccionados." />
-              ) : (
-                <table className="socios-table">
-                  {filtroDisciplina && nombreDisciplinaFiltro && (
-                    <caption className="tabla-caption">Mostrando inscriptos en {nombreDisciplinaFiltro}</caption>
-                  )}
-                  <thead>
-                    <tr>
-                      <th className="socios-th-sort td-num" aria-sort={ariaSortDe(orden, 'nro_socio')}>
-                        <button type="button" className="th-sort-btn" onClick={() => toggleOrden('nro_socio')}>
-                          N° Socio{iconoOrden('nro_socio')}
-                        </button>
-                      </th>
-                      <th className="socios-th-sort" aria-sort={ariaSortDe(orden, 'apellido')}>
-                        <button type="button" className="th-sort-btn" onClick={() => toggleOrden('apellido')}>
-                          Apellido{iconoOrden('apellido')}
-                        </button>
-                      </th>
-                      <th className="socios-th-sort" aria-sort={ariaSortDe(orden, 'nombre')}>
-                        <button type="button" className="th-sort-btn" onClick={() => toggleOrden('nombre')}>
-                          Nombre{iconoOrden('nombre')}
-                        </button>
-                      </th>
-                      <th className="socios-th-sort" aria-sort={ariaSortDe(orden, 'categoria')}>
-                        <button type="button" className="th-sort-btn" onClick={() => toggleOrden('categoria')}>
-                          Categoría{iconoOrden('categoria')}
-                        </button>
-                      </th>
-                      <th className="socios-th-sort td-center" aria-sort={ariaSortDe(orden, 'estado')}>
-                        <button type="button" className="th-sort-btn" onClick={() => toggleOrden('estado')}>
-                          Estado{iconoOrden('estado')}
-                        </button>
-                      </th>
-                      {mostrarColumnaSuscripcion && <th className="td-center">Suscripción</th>}
-                      <th className="td-chevron" aria-hidden="true"></th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {listaPaginada.map((s) => {
-                      const cfg = estadoConfig(s.estado.nombre);
-                      const verDetalle = () => { setResultado(s); setModo('socio'); };
-                      return (
-                        <tr
-                          key={s.id}
-                          className="socios-tr-clickable"
-                          tabIndex={0}
-                          role="button"
-                          aria-label={`Ver detalle de ${s.apellido} ${s.nombre}`}
-                          onClick={verDetalle}
-                          onKeyDown={handleActivateKey(verDetalle)}
-                        >
-                          <td className="td-num">{s.nro_socio}</td>
-                          <td>{s.apellido}</td>
-                          <td>{s.nombre}</td>
-                          <td>{s.categoria.nombre}</td>
-                          <td className="td-center">
-                            <span
-                              className="socios-estado-cell"
-                              style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}
-                            >
-                              <img src={cfg.logo} alt="" className="socios-estado-logo" />
-                              {s.estado.nombre}
-                            </span>
-                          </td>
-                          {mostrarColumnaSuscripcion && (
+        })()}
+
+        {!loading && modo === 'lista' && Array.isArray(resultado) && (() => {
+          if (resultado.length === 0) {
+            return (
+              <div className="socios-table-wrapper">
+                <EmptyState mensaje="No hay socios registrados." />
+              </div>
+            );
+          }
+          const mostrarColumnaSuscripcion = !!filtroDisciplina && puedeCrearDisciplina;
+          return (
+            <>
+              {errorDisciplinaFiltro && <ErrorBanner mensaje={errorDisciplinaFiltro} onReintentar={recargarSociosDeDisciplina} />}
+              <div className="socios-table-wrapper">
+                {listaFiltrada.length === 0 ? (
+                  <EmptyState mensaje="No hay socios con los filtros seleccionados." />
+                ) : (
+                  <table className="socios-table">
+                    {filtroDisciplina && nombreDisciplinaFiltro && (
+                      <caption className="tabla-caption">Mostrando inscriptos en {nombreDisciplinaFiltro}</caption>
+                    )}
+                    <thead>
+                      <tr>
+                        <th className="socios-th-sort td-num" aria-sort={ariaSortDe(orden, 'nro_socio')}>
+                          <button type="button" className="th-sort-btn" onClick={() => toggleOrden('nro_socio')}>
+                            N° Socio{iconoOrden('nro_socio')}
+                          </button>
+                        </th>
+                        <th className="socios-th-sort" aria-sort={ariaSortDe(orden, 'apellido')}>
+                          <button type="button" className="th-sort-btn" onClick={() => toggleOrden('apellido')}>
+                            Apellido{iconoOrden('apellido')}
+                          </button>
+                        </th>
+                        <th className="socios-th-sort" aria-sort={ariaSortDe(orden, 'nombre')}>
+                          <button type="button" className="th-sort-btn" onClick={() => toggleOrden('nombre')}>
+                            Nombre{iconoOrden('nombre')}
+                          </button>
+                        </th>
+                        <th className="socios-th-sort" aria-sort={ariaSortDe(orden, 'categoria')}>
+                          <button type="button" className="th-sort-btn" onClick={() => toggleOrden('categoria')}>
+                            Categoría{iconoOrden('categoria')}
+                          </button>
+                        </th>
+                        <th className="socios-th-sort td-center" aria-sort={ariaSortDe(orden, 'estado')}>
+                          <button type="button" className="th-sort-btn" onClick={() => toggleOrden('estado')}>
+                            Estado{iconoOrden('estado')}
+                          </button>
+                        </th>
+                        {mostrarColumnaSuscripcion && <th className="td-center">Suscripción</th>}
+                        <th className="td-chevron" aria-hidden="true"></th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {listaPaginada.map((s) => {
+                        const cfg = estadoConfig(s.estado.nombre);
+                        const verDetalle = () => { setResultado(s); setModo('socio'); scrollAlInicio(); };
+                        return (
+                          <tr
+                            key={s.id}
+                            className="socios-tr-clickable"
+                            tabIndex={0}
+                            role="button"
+                            aria-label={`Ver detalle de ${s.apellido} ${s.nombre}`}
+                            onClick={verDetalle}
+                            onKeyDown={handleActivateKey(verDetalle)}
+                          >
+                            <td className="td-num">{s.nro_socio}</td>
+                            <td>{s.apellido}</td>
+                            <td>{s.nombre}</td>
+                            <td>{s.categoria.nombre}</td>
                             <td className="td-center">
-                              {estadoSuscripcionPorSocio?.get(s.id) === 'en_espera' ? (
-                                <button
-                                  type="button"
-                                  className="socios-btn-extender"
-                                  onClick={(e) => abrirListaEsperaModal(e, s)}
-                                >
-                                  Quitar de lista de espera
-                                </button>
-                              ) : (
-                                <button
-                                  type="button"
-                                  className="socios-btn-extender"
-                                  disabled={estadoExtension[s.id] === 'loading'}
-                                  onClick={(e) => handleExtenderSuscripcion(e, s.id)}
-                                >
-                                  {labelExtenderSuscripcion(s.id)}
-                                </button>
-                              )}
+                              <span
+                                className="socios-estado-cell"
+                                style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}
+                              >
+                                <img src={cfg.logo} alt="" className="socios-estado-logo" />
+                                {s.estado.nombre}
+                              </span>
                             </td>
-                          )}
-                          <td className="td-chevron"><ChevronRight size={16} aria-hidden="true" /></td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              )}
-            </div>
-            <Paginacion pagina={pagina} totalPaginas={totalPaginas} onCambiarPagina={irAPagina} />
-          </>
-        );
-      })()}
+                            {mostrarColumnaSuscripcion && (
+                              <td className="td-center">
+                                {estadoSuscripcionPorSocio?.get(s.id) === 'en_espera' ? (
+                                  <button
+                                    type="button"
+                                    className="socios-btn-extender"
+                                    onClick={(e) => abrirListaEsperaModal(e, s)}
+                                  >
+                                    Quitar de lista de espera
+                                  </button>
+                                ) : (
+                                  <button
+                                    type="button"
+                                    className="socios-btn-extender"
+                                    disabled={estadoExtension[s.id] === 'loading'}
+                                    onClick={(e) => handleExtenderSuscripcion(e, s.id)}
+                                  >
+                                    {labelExtenderSuscripcion(s.id)}
+                                  </button>
+                                )}
+                              </td>
+                            )}
+                            <td className="td-chevron"><ChevronRight size={16} aria-hidden="true" /></td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                )}
+              </div>
+              <Paginacion pagina={pagina} totalPaginas={totalPaginas} onCambiarPagina={irAPagina} />
+            </>
+          );
+        })()}
+      </ViewTransition>
 
       {/* Modal crear socio */}
       <AnimatePresence>

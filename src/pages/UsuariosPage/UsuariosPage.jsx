@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Plus, ChevronRight } from 'lucide-react';
 import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
+import { ViewTransition, scrollAlInicio } from '../../components/ViewTransition/ViewTransition';
 import { FiltrosActivos } from '../../components/FiltrosActivos/FiltrosActivos';
 import { BuscadorColapsable } from '../../components/BuscadorColapsable/BuscadorColapsable';
 import EstadoBadge from '../../components/badge/EstadoBadge';
@@ -259,153 +260,156 @@ function UsuariosPage() {
       {loading && <SkeletonRows n={6} />}
       {error && <ErrorBanner mensaje={error} onReintentar={fetchYActualizarUsuarios} />}
 
-      {!loading && modo === 'lista' && (
-        <>
-          <div className="usuarios-table-wrapper">
-            {listaBase.length === 0 ? (
-              <EmptyState mensaje="No hay usuarios registrados." />
-            ) : listaFiltrada.length === 0 ? (
-              <EmptyState mensaje="No hay usuarios con los filtros seleccionados." />
-            ) : (
-              <table className="usuarios-tabla">
-                <thead>
-                  <tr>
-                    <th className="usuarios-th-sort" aria-sort={ariaSortDe(orden, 'apellido')}>
-                      <button type="button" className="th-sort-btn" onClick={() => toggleOrden('apellido')}>
-                        Apellido{iconoOrden('apellido')}
-                      </button>
-                    </th>
-                    <th className="usuarios-th-sort" aria-sort={ariaSortDe(orden, 'nombre')}>
-                      <button type="button" className="th-sort-btn" onClick={() => toggleOrden('nombre')}>
-                        Nombre{iconoOrden('nombre')}
-                      </button>
-                    </th>
-                    <th className="usuarios-th-sort" aria-sort={ariaSortDe(orden, 'email')}>
-                      <button type="button" className="th-sort-btn" onClick={() => toggleOrden('email')}>
-                        Email{iconoOrden('email')}
-                      </button>
-                    </th>
-                    <th className="usuarios-th-sort td-center" aria-sort={ariaSortDe(orden, 'rol')}>
-                      <button type="button" className="th-sort-btn" onClick={() => toggleOrden('rol')}>
-                        Rol{iconoOrden('rol')}
-                      </button>
-                    </th>
-                    <th className="usuarios-th-sort td-center" aria-sort={ariaSortDe(orden, 'estado')}>
-                      <button type="button" className="th-sort-btn" onClick={() => toggleOrden('estado')}>
-                        Estado{iconoOrden('estado')}
-                      </button>
-                    </th>
-                    <th className="td-chevron" aria-hidden="true"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {listaPaginada.map((u) => {
-                    const cfg = estadoConfig(u.estado?.nombre);
-                    const verDetalle = () => {
-                      setResultado(u);
-                      setModo('usuario');
-                    };
-                    return (
-                      <tr
-                        key={u.id}
-                        className="usuarios-tr-clickable"
-                        tabIndex={0}
-                        role="button"
-                        aria-label={`Ver detalle de ${u.apellido} ${u.nombre}`}
-                        onClick={verDetalle}
-                        onKeyDown={handleActivateKey(verDetalle)}
-                      >
-                        <td>{u.apellido}</td>
-                        <td>{u.nombre}</td>
-                        <td className="td-truncate" title={u.email}>{u.email}</td>
-                        <td className="td-center">
-                          <span className="usuarios-rol-badge">{u.rol?.nombre}</span>
-                        </td>
-                        <td className="td-center">
-                          <span
-                            className="usuarios-estado-cell"
-                            style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}
-                          >
-                            <img src={cfg.logo} alt="" className="usuarios-estado-logo" />
-                            {u.estado?.nombre}
-                          </span>
-                        </td>
-                        <td className="td-chevron"><ChevronRight size={16} aria-hidden="true" /></td>
-                      </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            )}
-          </div>
-          <Paginacion pagina={pagina} totalPaginas={totalPaginas} onCambiarPagina={irAPagina} />
-        </>
-      )}
-
-      {!loading && modo === 'usuario' && resultado && !Array.isArray(resultado) && (() => {
-        const cfg = estadoConfig(resultado.estado?.nombre);
-        const permisos = resultado.rol?.permisos ?? [];
-        const esMismoUsuario = resultado.id === userData?.usuario_id;
-        return (
+      <ViewTransition screenKey={modo}>
+        {!loading && modo === 'lista' && (
           <>
-            <DetailHeader
-              onBack={() => { setResultado(cacheUsuariosRef.current); setModo('lista'); }}
-              titulo={`${resultado.apellido} ${resultado.nombre}`}
-              estado={<EstadoBadge estado={resultado.estado} />}
-              acciones={(puedeEditar || puedeBorrar) && (
-                <>
-                  {puedeEditar && (
-                    <button type="button" className="btn-outline" onClick={abrirEditar}>
-                      Editar
-                    </button>
-                  )}
-                  {puedeEditar && !esMismoUsuario && (
-                    <button type="button" className="btn-outline" onClick={abrirCambiarRol}>
-                      Cambiar rol
-                    </button>
-                  )}
-                  {puedeBorrar && (
-                    <button type="button" className="btn-outline-danger" onClick={abrirEliminar}>
-                      Eliminar
-                    </button>
-                  )}
-                </>
+            <div className="usuarios-table-wrapper">
+              {listaBase.length === 0 ? (
+                <EmptyState mensaje="No hay usuarios registrados." />
+              ) : listaFiltrada.length === 0 ? (
+                <EmptyState mensaje="No hay usuarios con los filtros seleccionados." />
+              ) : (
+                <table className="usuarios-tabla">
+                  <thead>
+                    <tr>
+                      <th className="usuarios-th-sort" aria-sort={ariaSortDe(orden, 'apellido')}>
+                        <button type="button" className="th-sort-btn" onClick={() => toggleOrden('apellido')}>
+                          Apellido{iconoOrden('apellido')}
+                        </button>
+                      </th>
+                      <th className="usuarios-th-sort" aria-sort={ariaSortDe(orden, 'nombre')}>
+                        <button type="button" className="th-sort-btn" onClick={() => toggleOrden('nombre')}>
+                          Nombre{iconoOrden('nombre')}
+                        </button>
+                      </th>
+                      <th className="usuarios-th-sort" aria-sort={ariaSortDe(orden, 'email')}>
+                        <button type="button" className="th-sort-btn" onClick={() => toggleOrden('email')}>
+                          Email{iconoOrden('email')}
+                        </button>
+                      </th>
+                      <th className="usuarios-th-sort td-center" aria-sort={ariaSortDe(orden, 'rol')}>
+                        <button type="button" className="th-sort-btn" onClick={() => toggleOrden('rol')}>
+                          Rol{iconoOrden('rol')}
+                        </button>
+                      </th>
+                      <th className="usuarios-th-sort td-center" aria-sort={ariaSortDe(orden, 'estado')}>
+                        <button type="button" className="th-sort-btn" onClick={() => toggleOrden('estado')}>
+                          Estado{iconoOrden('estado')}
+                        </button>
+                      </th>
+                      <th className="td-chevron" aria-hidden="true"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {listaPaginada.map((u) => {
+                      const cfg = estadoConfig(u.estado?.nombre);
+                      const verDetalle = () => {
+                        setResultado(u);
+                        setModo('usuario');
+                        scrollAlInicio();
+                      };
+                      return (
+                        <tr
+                          key={u.id}
+                          className="usuarios-tr-clickable"
+                          tabIndex={0}
+                          role="button"
+                          aria-label={`Ver detalle de ${u.apellido} ${u.nombre}`}
+                          onClick={verDetalle}
+                          onKeyDown={handleActivateKey(verDetalle)}
+                        >
+                          <td>{u.apellido}</td>
+                          <td>{u.nombre}</td>
+                          <td className="td-truncate" title={u.email}>{u.email}</td>
+                          <td className="td-center">
+                            <span className="usuarios-rol-badge">{u.rol?.nombre}</span>
+                          </td>
+                          <td className="td-center">
+                            <span
+                              className="usuarios-estado-cell"
+                              style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}
+                            >
+                              <img src={cfg.logo} alt="" className="usuarios-estado-logo" />
+                              {u.estado?.nombre}
+                            </span>
+                          </td>
+                          <td className="td-chevron"><ChevronRight size={16} aria-hidden="true" /></td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
               )}
-            />
-            <div className="usuarios-card">
-              <div className="usuarios-card-inner">
-                <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
-                  <img src={cfg.logo} alt="" className="detalle-logo-img" />
-                </div>
-                <div className="usuarios-card-data">
-                  <div className="usuarios-card-row">
-                    <span className="usuarios-card-label">Email</span>
-                    <span>{resultado.email}</span>
-                  </div>
-                  <div className="usuarios-card-row">
-                    <span className="usuarios-card-label">Nacimiento</span>
-                    <span>{resultado.fecha_nacimiento}</span>
-                  </div>
-                  <div className="usuarios-card-row">
-                    <span className="usuarios-card-label">Rol</span>
-                    <span>{resultado.rol?.nombre}</span>
-                  </div>
-                  {permisos.length > 0 && (
-                    <div className="usuarios-card-row">
-                      <button
-                        className="usuarios-btn-ver-permisos"
-                        onClick={() => setPermisosModalOpen(true)}
-                      >
-                        Ver permisos
+            </div>
+            <Paginacion pagina={pagina} totalPaginas={totalPaginas} onCambiarPagina={irAPagina} />
+          </>
+        )}
+
+        {!loading && modo === 'usuario' && resultado && !Array.isArray(resultado) && (() => {
+          const cfg = estadoConfig(resultado.estado?.nombre);
+          const permisos = resultado.rol?.permisos ?? [];
+          const esMismoUsuario = resultado.id === userData?.usuario_id;
+          return (
+            <>
+              <DetailHeader
+                onBack={() => { setResultado(cacheUsuariosRef.current); setModo('lista'); }}
+                titulo={`${resultado.apellido} ${resultado.nombre}`}
+                estado={<EstadoBadge estado={resultado.estado} />}
+                acciones={(puedeEditar || puedeBorrar) && (
+                  <>
+                    {puedeEditar && (
+                      <button type="button" className="btn-outline" onClick={abrirEditar}>
+                        Editar
                       </button>
+                    )}
+                    {puedeEditar && !esMismoUsuario && (
+                      <button type="button" className="btn-outline" onClick={abrirCambiarRol}>
+                        Cambiar rol
+                      </button>
+                    )}
+                    {puedeBorrar && (
+                      <button type="button" className="btn-outline-danger" onClick={abrirEliminar}>
+                        Eliminar
+                      </button>
+                    )}
+                  </>
+                )}
+              />
+              <div className="usuarios-card">
+                <div className="usuarios-card-inner">
+                  <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
+                    <img src={cfg.logo} alt="" className="detalle-logo-img" />
+                  </div>
+                  <div className="usuarios-card-data">
+                    <div className="usuarios-card-row">
+                      <span className="usuarios-card-label">Email</span>
+                      <span>{resultado.email}</span>
                     </div>
-                  )}
+                    <div className="usuarios-card-row">
+                      <span className="usuarios-card-label">Nacimiento</span>
+                      <span>{resultado.fecha_nacimiento}</span>
+                    </div>
+                    <div className="usuarios-card-row">
+                      <span className="usuarios-card-label">Rol</span>
+                      <span>{resultado.rol?.nombre}</span>
+                    </div>
+                    {permisos.length > 0 && (
+                      <div className="usuarios-card-row">
+                        <button
+                          className="usuarios-btn-ver-permisos"
+                          onClick={() => setPermisosModalOpen(true)}
+                        >
+                          Ver permisos
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
-            </div>
-          </>
-        );
-      })()}
+            </>
+          );
+        })()}
+      </ViewTransition>
 
       <AnimatePresence>
         {crearModalOpen && (

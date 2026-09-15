@@ -6,6 +6,7 @@ import { CreateProductoForm } from '../../components/createProductoForm/CreatePr
 import { EditProductoForm } from '../../components/editProductoForm/EditProductoForm';
 import { CrearCompraForm } from '../../components/crearCompraForm/CrearCompraForm';
 import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
+import { ViewTransition, scrollAlInicio } from '../../components/ViewTransition/ViewTransition';
 import { StyledSelect } from '../../components/createForm/FormFields';
 import { createProducto } from '../../services/productosService';
 import EstadoBadge from '../../components/badge/EstadoBadge';
@@ -82,6 +83,7 @@ function TiendaPage() {
     setLoadingDetalle(true);
     setErrorDetalle('');
     setVista('detalle');
+    scrollAlInicio();
     try {
       setProductoActual(await getProducto(p.id));
     } catch (err) {
@@ -193,113 +195,115 @@ function TiendaPage() {
 
   return (
     <div className="tienda-admin-page">
-      {vista === 'lista' && (
-        <>
-          <h1 className="page-title">Tienda</h1>
-          <div className="noticias-toolbar">
-            <div className="tienda-orden-select-wrap">
-              <StyledSelect
-                className="filtros-select-trigger"
-                value={ordenTienda}
-                onChange={handleCambiarOrden}
-                aria-label="Ordenar por"
-              >
-                <option value="nombre_asc">Nombre (A-Z)</option>
-                <option value="precio_asc">Precio: menor a mayor</option>
-                <option value="precio_desc">Precio: mayor a menor</option>
-              </StyledSelect>
-            </div>
-            <button className="noticias-btn-crear" onClick={() => setCrearOpen(true)}>
-              <Plus size={15} aria-hidden="true" />
-              Nuevo producto
-            </button>
-          </div>
-          {error && productos.length > 0 && <ErrorBanner mensaje={error} />}
-          {renderLista()}
-        </>
-      )}
-
-      {vista === 'detalle' && (
-        <div className="tienda-detalle-view">
-          <DetailHeader
-            onBack={() => { setVista('lista'); setProductoActual(null); setErrorDetalle(''); }}
-            titulo={detalleListo ? productoActual.nombre : null}
-            estado={detalleListo && (
-              <EstadoBadge variant={productoActual.activo ? 'success' : 'warning'}>
-                {productoActual.activo ? 'Activo' : 'Inactivo'}
-              </EstadoBadge>
-            )}
-            acciones={detalleListo && (
-              <>
-                <button type="button" className="btn-outline" onClick={() => setEditarOpen(true)}>
-                  Editar producto
-                </button>
-                {puedeCrearCompra && (
-                  <button
-                    type="button"
-                    className="btn-outline"
-                    onClick={() => setCrearCompraOpen(true)}
-                    disabled={productoActual.stock <= 0}
-                  >
-                    Crear compra
-                  </button>
-                )}
-              </>
-            )}
-          />
-
-          {loadingDetalle && <SkeletonRows n={4} />}
-
-          {errorDetalle && !loadingDetalle && <ErrorBanner mensaje={errorDetalle} />}
-
-          {detalleListo && (
-            <article className="tienda-detalle-card">
-              <div className="tienda-detalle-media">
-                {imagenSegura ? (
-                  <img
-                    src={imagenSegura}
-                    alt={productoActual.nombre}
-                    className="tienda-detalle-img"
-                    referrerPolicy="no-referrer"
-                  />
-                ) : (
-                  <div className="tienda-detalle-img-placeholder" aria-hidden="true">
-                    <PackageSearch size={36} strokeWidth={1.5} />
-                    <span>Sin foto</span>
-                  </div>
-                )}
-              </div>
-
-              <div className="tienda-detalle-info">
-                <div className="tienda-detalle-price-row">
-                  <span className="tienda-detalle-precio">
-                    ${Number(productoActual.precio).toLocaleString('es-AR')}
-                  </span>
-                </div>
-
-                <div
-                  className={`tienda-detalle-stock ${
-                    productoActual.stock > 0 ? 'tienda-detalle-stock--ok' : 'tienda-detalle-stock--agotado'
-                  }`}
+      <ViewTransition screenKey={vista}>
+        {vista === 'lista' && (
+          <>
+            <h1 className="page-title">Tienda</h1>
+            <div className="noticias-toolbar">
+              <div className="tienda-orden-select-wrap">
+                <StyledSelect
+                  className="filtros-select-trigger"
+                  value={ordenTienda}
+                  onChange={handleCambiarOrden}
+                  aria-label="Ordenar por"
                 >
-                  <span className="tienda-detalle-stock-dot" aria-hidden="true" />
-                  {productoActual.stock > 0
-                    ? `${productoActual.stock} unidades disponibles`
-                    : 'Sin stock disponible'}
+                  <option value="nombre_asc">Nombre (A-Z)</option>
+                  <option value="precio_asc">Precio: menor a mayor</option>
+                  <option value="precio_desc">Precio: mayor a menor</option>
+                </StyledSelect>
+              </div>
+              <button className="noticias-btn-crear" onClick={() => setCrearOpen(true)}>
+                <Plus size={15} aria-hidden="true" />
+                Nuevo producto
+              </button>
+            </div>
+            {error && productos.length > 0 && <ErrorBanner mensaje={error} />}
+            {renderLista()}
+          </>
+        )}
+
+        {vista === 'detalle' && (
+          <div className="tienda-detalle-view">
+            <DetailHeader
+              onBack={() => { setVista('lista'); setProductoActual(null); setErrorDetalle(''); }}
+              titulo={detalleListo ? productoActual.nombre : null}
+              estado={detalleListo && (
+                <EstadoBadge variant={productoActual.activo ? 'success' : 'warning'}>
+                  {productoActual.activo ? 'Activo' : 'Inactivo'}
+                </EstadoBadge>
+              )}
+              acciones={detalleListo && (
+                <>
+                  <button type="button" className="btn-outline" onClick={() => setEditarOpen(true)}>
+                    Editar producto
+                  </button>
+                  {puedeCrearCompra && (
+                    <button
+                      type="button"
+                      className="btn-outline"
+                      onClick={() => setCrearCompraOpen(true)}
+                      disabled={productoActual.stock <= 0}
+                    >
+                      Crear compra
+                    </button>
+                  )}
+                </>
+              )}
+            />
+
+            {loadingDetalle && <SkeletonRows n={4} />}
+
+            {errorDetalle && !loadingDetalle && <ErrorBanner mensaje={errorDetalle} />}
+
+            {detalleListo && (
+              <article className="tienda-detalle-card">
+                <div className="tienda-detalle-media">
+                  {imagenSegura ? (
+                    <img
+                      src={imagenSegura}
+                      alt={productoActual.nombre}
+                      className="tienda-detalle-img"
+                      referrerPolicy="no-referrer"
+                    />
+                  ) : (
+                    <div className="tienda-detalle-img-placeholder" aria-hidden="true">
+                      <PackageSearch size={36} strokeWidth={1.5} />
+                      <span>Sin foto</span>
+                    </div>
+                  )}
                 </div>
 
-                {productoActual.descripcion && (
-                  <>
-                    <div className="tienda-detalle-divider" />
-                    <p className="tienda-detalle-desc-label">Descripción</p>
-                    <p className="tienda-detalle-desc">{productoActual.descripcion}</p>
-                  </>
-                )}
-              </div>
-            </article>
-          )}
-        </div>
-      )}
+                <div className="tienda-detalle-info">
+                  <div className="tienda-detalle-price-row">
+                    <span className="tienda-detalle-precio">
+                      ${Number(productoActual.precio).toLocaleString('es-AR')}
+                    </span>
+                  </div>
+
+                  <div
+                    className={`tienda-detalle-stock ${
+                      productoActual.stock > 0 ? 'tienda-detalle-stock--ok' : 'tienda-detalle-stock--agotado'
+                    }`}
+                  >
+                    <span className="tienda-detalle-stock-dot" aria-hidden="true" />
+                    {productoActual.stock > 0
+                      ? `${productoActual.stock} unidades disponibles`
+                      : 'Sin stock disponible'}
+                  </div>
+
+                  {productoActual.descripcion && (
+                    <>
+                      <div className="tienda-detalle-divider" />
+                      <p className="tienda-detalle-desc-label">Descripción</p>
+                      <p className="tienda-detalle-desc">{productoActual.descripcion}</p>
+                    </>
+                  )}
+                </div>
+              </article>
+            )}
+          </div>
+        )}
+      </ViewTransition>
 
       <AnimatePresence>
         {crearOpen && (
