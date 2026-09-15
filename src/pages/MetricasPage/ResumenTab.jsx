@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { TrendingUp, BarChart3 } from 'lucide-react';
 import { getTopDisciplinas, getOcupacionInstalaciones } from '../../services/metricasService';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
+import EmptyState from '../../components/feedback/EmptyState';
 import { useTheme } from '../../hooks/useTheme';
 import './ResumenTab.css';
 
@@ -12,7 +14,7 @@ function ResumenTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  const cargar = useCallback(() => {
     let cancelled = false;
 
     setLoading(true);
@@ -39,6 +41,8 @@ function ResumenTab() {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => cargar(), [cargar]);
+
   if (loading) {
     return (
       <div className="resumen-loading">
@@ -48,7 +52,7 @@ function ResumenTab() {
   }
 
   if (error) {
-    return <p className="resumen-error">{error}</p>;
+    return <ErrorBanner mensaje={error} onReintentar={cargar} />;
   }
 
   return (
@@ -90,7 +94,7 @@ function ResumenTab() {
             ))}
           </div>
         ) : (
-          <p className="resumen-empty">No hay disciplinas con inscriptos activos.</p>
+          <EmptyState mensaje="No hay disciplinas con inscriptos activos." />
         )}
       </section>
 
@@ -132,7 +136,7 @@ function ResumenTab() {
             ))}
           </div>
         ) : (
-          <p className="resumen-empty">No hay instalaciones activas.</p>
+          <EmptyState mensaje="No hay instalaciones activas." />
         )}
       </section>
 

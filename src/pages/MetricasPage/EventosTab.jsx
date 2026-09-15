@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Ticket } from 'lucide-react';
 import { getTopEventos } from '../../services/metricasService';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
 import { useTheme } from '../../hooks/useTheme';
 import RankingList from './RankingList';
 import './EventosTab.css';
@@ -12,7 +13,7 @@ function EventosTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  const cargar = useCallback(() => {
     let cancelled = false;
 
     setLoading(true);
@@ -38,6 +39,8 @@ function EventosTab() {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => cargar(), [cargar]);
+
   if (loading) {
     return (
       <div className="eventos-tab-loading">
@@ -47,7 +50,7 @@ function EventosTab() {
   }
 
   if (error) {
-    return <p className="eventos-tab-error">{error}</p>;
+    return <ErrorBanner mensaje={error} onReintentar={cargar} />;
   }
 
   return (

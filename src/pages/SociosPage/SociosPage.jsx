@@ -17,6 +17,7 @@ import { urlImagenSegura } from '../../utils/utils';
 import { MAX_LEN } from '../../utils/formValidators';
 import { handleActivateKey } from '../../utils/a11y';
 import EmptyState from '../../components/feedback/EmptyState';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
 import { SocioAccionesExtra } from '../../components/socioAccionesExtra/SocioAccionesExtra';
 import { Paginacion } from '../../components/paginacion/Paginacion';
 import { useTheme } from '../../hooks/useTheme';
@@ -377,10 +378,10 @@ function SociosPage() {
           <img src={logo} alt="" className="loading-logo" />
         </div>
       )}
-      {error && <p className="socios-error">{error}</p>}
+      {error && <ErrorBanner mensaje={error} onReintentar={cargarSocios} />}
 
       {!loading && modo === 'no-encontrado' && (
-        <p className="socios-no-encontrado">No se encontró ningún socio con ese N° de socio.</p>
+        <EmptyState mensaje="No se encontró ningún socio con ese N° de socio." />
       )}
 
       {!loading && modo === 'socio' && resultado && (() => {
@@ -516,7 +517,7 @@ function SociosPage() {
                 </div>
               )}
             </div>
-            {errorDisciplinaFiltro && <p className="socios-error">{errorDisciplinaFiltro}</p>}
+            {errorDisciplinaFiltro && <ErrorBanner mensaje={errorDisciplinaFiltro} onReintentar={recargarSociosDeDisciplina} />}
             <div className="socios-table-wrapper">
               {listaFiltrada.length === 0 ? (
                 <EmptyState mensaje="No hay socios con los filtros seleccionados." />

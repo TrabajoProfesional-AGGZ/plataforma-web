@@ -43,11 +43,6 @@
   }
 }
 
-/* ── Ajuste de error (agrega margin-bottom) ──────────────────── */
-.socios-error {
-  margin-bottom: var(--space-3);
-}
-
 /* ── Logo de estado ───────────────────────────────────────────── */
 .socios-estado-logo {
   width: 20px;

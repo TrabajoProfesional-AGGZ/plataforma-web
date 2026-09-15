@@ -16,6 +16,7 @@ import { useAuthContext } from '../../context/AuthContext';
 import { estadoConfig } from '../../utils/estadoConfig';
 import { handleActivateKey } from '../../utils/a11y';
 import EmptyState from '../../components/feedback/EmptyState';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
 import { Paginacion } from '../../components/paginacion/Paginacion';
 import { useTheme } from '../../hooks/useTheme';
 import './UsuariosPage.css';
@@ -246,7 +247,7 @@ function UsuariosPage() {
           <img src={logo} alt="" className="loading-logo" />
         </div>
       )}
-      {error && <p className="usuarios-error">{error}</p>}
+      {error && <ErrorBanner mensaje={error} onReintentar={fetchYActualizarUsuarios} />}
 
       {!loading && modo === 'lista' && (
         <>

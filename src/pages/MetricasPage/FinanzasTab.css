@@ -38,15 +38,6 @@
   padding: var(--space-12) 0;
 }
 
-.finanzas-error {
-  text-align: center;
-  color: var(--color-danger);
-  font-size: 0.875rem;
-  background-color: var(--status-error-surface-bg);
-  border: 1px solid var(--status-error-surface-border);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-}
 
 /* ── Layout del dashboard ─────────────────────────────────────── */
 .finanzas-dashboard {

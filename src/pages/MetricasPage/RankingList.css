@@ -1,9 +1,3 @@
-.ranking-list-empty {
-  color: var(--color-text-secondary);
-  font-size: 0.875rem;
-  text-align: center;
-}
-
 .ranking-list-list {
   display: flex;
   flex-direction: column;

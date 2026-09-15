@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getDashboardFidelizacion } from '../../services/fidelizacionService';
 import { useListState } from '../../hooks/useListState';
 import { usePaginacion } from '../../hooks/usePaginacion';
 import { Paginacion } from '../../components/paginacion/Paginacion';
 import { TendenciasPagoChart } from '../../components/charts/TendenciasPagoChart';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
+import EmptyState from '../../components/feedback/EmptyState';
 import { riesgoConfig } from '../../utils/riesgoConfig';
 import { useTheme } from '../../hooks/useTheme';
 import './MorosidadTab.css';
@@ -48,7 +50,7 @@ function MorosidadTab() {
     resetPagina: resetPaginaPrediccion,
   } = usePaginacion(prediccionOrdenada, 10);
 
-  useEffect(() => {
+  const cargar = useCallback(() => {
     let cancelled = false;
 
     setLoading(true);
@@ -81,6 +83,8 @@ function MorosidadTab() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => cargar(), [cargar]);
+
   const mesesDisponibles = (datos?.tendencias_pago ?? []).map((t) => t.mes);
 
   const tendenciasFiltradas = (datos?.tendencias_pago ?? []).filter((t) => {
@@ -100,7 +104,7 @@ function MorosidadTab() {
   }
 
   if (error) {
-    return <p className="morosidad-error">{error}</p>;
+    return <ErrorBanner mensaje={error} onReintentar={cargar} />;
   }
 
   if (!datos) {
@@ -116,7 +120,7 @@ function MorosidadTab() {
       <div className="morosidad-section">
         <h2 className="morosidad-section-title">Predicción de morosidad</h2>
         {prediccionOrdenada.length === 0 ? (
-          <p className="disciplinas-empty">No hay predicciones de morosidad disponibles.</p>
+          <EmptyState mensaje="No hay predicciones de morosidad disponibles." />
         ) : (
           <div className="disciplinas-table-wrapper">
             <table className="disciplinas-tabla">

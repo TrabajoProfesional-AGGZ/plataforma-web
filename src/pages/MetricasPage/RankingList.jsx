@@ -1,9 +1,10 @@
+import EmptyState from '../../components/feedback/EmptyState';
 import './RankingList.css';
 
 /** Lista de ranking genérica (posición + nombre + detalle + métrica), compartida por EventosTab y TiendaTab. */
 function RankingList({ items, renderDetalle, renderMetrica, emptyMessage }) {
   if (!items || items.length === 0) {
-    return <p className="ranking-list-empty">{emptyMessage}</p>;
+    return <EmptyState mensaje={emptyMessage} />;
   }
 
   return (

@@ -49,10 +49,6 @@
     }
   }
 
-  .tienda-detalle-error {
-    color: var(--color-danger);
-  }
-
   .tienda-detalle-card {
     display: flex;
     gap: var(--space-8);

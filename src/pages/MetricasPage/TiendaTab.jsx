@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ShoppingBag } from 'lucide-react';
 import { getTopProductos } from '../../services/metricasService';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
 import { useTheme } from '../../hooks/useTheme';
 import RankingList from './RankingList';
 import './TiendaTab.css';
@@ -12,7 +13,7 @@ function TiendaTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  const cargar = useCallback(() => {
     let cancelled = false;
 
     setLoading(true);
@@ -38,6 +39,8 @@ function TiendaTab() {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => cargar(), [cargar]);
+
   if (loading) {
     return (
       <div className="tienda-tab-loading">
@@ -47,7 +50,7 @@ function TiendaTab() {
   }
 
   if (error) {
-    return <p className="tienda-tab-error">{error}</p>;
+    return <ErrorBanner mensaje={error} onReintentar={cargar} />;
   }
 
   return (

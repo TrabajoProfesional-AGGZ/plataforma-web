@@ -1,6 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getDashboardFinanzas } from '../../services/metricasService';
 import { DesgloseFinanzasChart } from '../../components/charts/DesgloseFinanzasChart';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
 import { useTheme } from '../../hooks/useTheme';
 import './FinanzasTab.css';
 
@@ -17,7 +18,7 @@ function FinanzasTab() {
     return `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}`;
   });
 
-  useEffect(() => {
+  const cargar = useCallback(() => {
     let cancelled = false;
 
     setLoading(true);
@@ -48,6 +49,8 @@ function FinanzasTab() {
     return () => { cancelled = true; };
   }, [periodoSeleccionado]);
 
+  useEffect(() => cargar(), [cargar]);
+
   function renderContenido() {
     if (loading) {
       return (
@@ -58,7 +61,7 @@ function FinanzasTab() {
     }
 
     if (error) {
-      return <p className="finanzas-error">{error}</p>;
+      return <ErrorBanner mensaje={error} onReintentar={cargar} />;
     }
 
     if (!datosFinanzas) {

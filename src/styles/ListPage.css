@@ -145,24 +145,6 @@
   padding: var(--space-12) 0;
 }
 
-/* ── Mensajes de feedback ────────────────────────────────────── */
-.socios-error,
-.usuarios-error {
-  color: var(--color-danger);
-  font-size: 0.875rem;
-  text-align: center;
-  background-color: var(--status-error-surface-bg);
-  border: 1px solid var(--status-error-surface-border);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-}
-
-.socios-no-encontrado,
-.usuarios-no-encontrado {
-  color: var(--color-text-secondary);
-  font-size: 0.875rem;
-  text-align: center;
-}
 
 /* ── Filtros ─────────────────────────────────────────────────── */
 .socios-filtro-toggle,

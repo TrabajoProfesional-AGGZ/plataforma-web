@@ -240,7 +240,7 @@ function NoticiasPage() {
           )}
 
           {errorDetalle && !loadingDetalle && (
-            <p className="noticias-error">{errorDetalle}</p>
+            <ErrorBanner mensaje={errorDetalle} />
           )}
 
           {!loadingDetalle && !errorDetalle && noticiaActual && (

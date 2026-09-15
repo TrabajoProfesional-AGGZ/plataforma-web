@@ -1,6 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Wallet, Receipt, CalendarCheck, Ticket, ShoppingBag } from 'lucide-react';
 import { getPagosEnCaja } from '../../services/metricasService';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
+import EmptyState from '../../components/feedback/EmptyState';
 import { useTheme } from '../../hooks/useTheme';
 import './CajaTab.css';
 
@@ -25,7 +27,7 @@ function CajaTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  const cargar = useCallback(() => {
     let cancelled = false;
 
     setLoading(true);
@@ -51,6 +53,8 @@ function CajaTab() {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => cargar(), [cargar]);
+
   if (loading) {
     return (
       <div className="caja-tab-loading">
@@ -60,7 +64,7 @@ function CajaTab() {
   }
 
   if (error) {
-    return <p className="caja-tab-error">{error}</p>;
+    return <ErrorBanner mensaje={error} onReintentar={cargar} />;
   }
 
   const desglose = datos?.desglose ?? [];
@@ -99,7 +103,7 @@ function CajaTab() {
             })}
           </div>
         ) : (
-          <p className="caja-tab-empty">Todavía no se registraron pagos en caja.</p>
+          <EmptyState mensaje="Todavía no se registraron pagos en caja." />
         )}
       </div>
     </div>

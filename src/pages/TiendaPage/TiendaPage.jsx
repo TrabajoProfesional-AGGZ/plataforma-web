@@ -234,7 +234,7 @@ function TiendaPage() {
             <div className="list-loading"><img src={logo} alt="" className="loading-logo" /></div>
           )}
 
-          {errorDetalle && !loadingDetalle && <p className="tienda-detalle-error">{errorDetalle}</p>}
+          {errorDetalle && !loadingDetalle && <ErrorBanner mensaje={errorDetalle} />}
 
           {!loadingDetalle && !errorDetalle && productoActual && (
             <article className="tienda-detalle-card">

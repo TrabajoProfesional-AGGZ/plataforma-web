@@ -1,6 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { chartTheme } from './chartTheme';
+import EmptyState from '../feedback/EmptyState';
 
 /**
  * Convierte cada mes de `{ mes, a_termino, fuera_de_termino }` (valores absolutos)
@@ -22,11 +23,7 @@ function calcularPorcentajes(datos) {
  */
 export function TendenciasPagoChart({ datos }) {
   if (!datos || datos.length === 0) {
-    return (
-      <p style={{ color: 'var(--color-text-secondary)', textAlign: 'center', padding: 'var(--space-8) 0' }}>
-        No hay datos de tendencias de pago para este rango.
-      </p>
-    );
+    return <EmptyState mensaje="No hay datos de tendencias de pago para este rango." />;
   }
 
   const datosPorcentaje = calcularPorcentajes(datos);
