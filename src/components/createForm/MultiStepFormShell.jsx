@@ -12,7 +12,7 @@ import './CreateSocioForm.css';
 // mantenerse en sync con --color-text-primary/--color-border-medium/
 // --color-surface/--color-text-secondary/--status-success-border.
 const STEP_COLORS = {
-  light: { bubbleActive: '#111111', bubbleIdle: '#e0e0e0', onBubble: '#ffffff', idleIcon: '#4a4a4a', success: '#0D6E0D' },
+  light: { bubbleActive: '#111111', bubbleIdle: '#e0e0e0', onBubble: '#ffffff', idleIcon: '#4a4a4a', success: '#0b640b' },
   dark: { bubbleActive: '#f5f5f5', bubbleIdle: '#3a3a3a', onBubble: '#1e1e1e', idleIcon: '#b0b0b0', success: '#4ade80' },
 };
 
