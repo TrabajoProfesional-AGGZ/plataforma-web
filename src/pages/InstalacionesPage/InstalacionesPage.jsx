@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
-import { Plus, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, ChevronDown, ChevronUp } from 'lucide-react';
 import { CreateInstalacionForm } from '../../components/createInstalacionForm/CreateInstalacionForm';
 import { DatePicker } from '../../components/createForm/DatePicker';
 import { CreateReservaForm } from '../../components/createReservaForm/CreateReservaForm';
 import { StyledSelect } from '../../components/createForm/FormFields';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
+import { BackButton } from '../../components/BackButton/BackButton';
 import { getInstalaciones, createInstalacion, deleteInstalacion } from '../../services/instalacionesService';
 import { getReservasPorInstalacion, getReservasPorSocio, deleteReserva, getReservasHistoricasPorInstalacion } from '../../services/reservasService';
 import { getSocios } from '../../services/sociosService';
@@ -449,12 +450,7 @@ function InstalacionesPage() {
       {/* ── Vista: Detalle ── */}
       {vista === 'detalle' && instalacionActual && (
         <>
-          <div className="instalaciones-nav">
-            <button className="instalaciones-btn-volver" onClick={() => setVista('lista')}>
-              <ChevronLeft size={16} aria-hidden="true" />
-              Volver
-            </button>
-          </div>
+          <BackButton onClick={() => setVista('lista')} />
 
           <div className="instalaciones-detalle-content">
             <h1 className="instalaciones-detalle-nombre">{instalacionActual.nombre}</h1>

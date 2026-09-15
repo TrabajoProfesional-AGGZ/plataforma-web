@@ -1,10 +1,11 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Plus, ChevronLeft, PackageSearch } from 'lucide-react';
+import { Plus, PackageSearch } from 'lucide-react';
 import { getProductos, getProducto } from '../../services/productosService';
 import { CreateProductoForm } from '../../components/createProductoForm/CreateProductoForm';
 import { EditProductoForm } from '../../components/editProductoForm/EditProductoForm';
 import { CrearCompraForm } from '../../components/crearCompraForm/CrearCompraForm';
+import { BackButton } from '../../components/BackButton/BackButton';
 import { StyledSelect } from '../../components/createForm/FormFields';
 import { createProducto } from '../../services/productosService';
 import EstadoBadge from '../../components/badge/EstadoBadge';
@@ -217,14 +218,7 @@ function TiendaPage() {
 
       {vista === 'detalle' && (
         <div className="tienda-detalle-view">
-          <button
-            type="button"
-            className="tienda-btn-volver"
-            onClick={() => { setVista('lista'); setProductoActual(null); setErrorDetalle(''); }}
-          >
-            <ChevronLeft size={16} aria-hidden="true" />
-            Volver a la tienda
-          </button>
+          <BackButton onClick={() => { setVista('lista'); setProductoActual(null); setErrorDetalle(''); }} />
 
           {loadingDetalle && <SkeletonRows n={4} />}
 

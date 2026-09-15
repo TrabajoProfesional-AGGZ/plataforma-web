@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Search, Plus } from 'lucide-react';
+import { BackButton } from '../../components/BackButton/BackButton';
 import { fetchUsuarios, eliminarUsuario } from '../../services/usuariosService';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { fetchRoles } from '../../services/rolesService';
@@ -357,62 +358,65 @@ function UsuariosPage() {
         const permisos = resultado.rol?.permisos ?? [];
         const esMismoUsuario = resultado.id === userData?.usuario_id;
         return (
-          <div className="usuarios-card">
-            <div className="usuarios-card-inner">
-              <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
-                <img src={cfg.logo} alt="" className="detalle-logo-img" />
-              </div>
-              <div className="usuarios-card-data">
-                <div className="detalle-card-data-header">
-                  <span className="detalle-full-name">{resultado.apellido} {resultado.nombre}</span>
-                  <span className="detalle-estado-badge" style={{ backgroundColor: cfg.bg, color: cfg.border, borderColor: cfg.border }}>
-                    {resultado.estado?.nombre}
-                  </span>
+          <>
+            <BackButton onClick={() => { setResultado(cacheUsuariosRef.current); setModo('lista'); }} />
+            <div className="usuarios-card">
+              <div className="usuarios-card-inner">
+                <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
+                  <img src={cfg.logo} alt="" className="detalle-logo-img" />
                 </div>
-                <div className="usuarios-card-row">
-                  <span className="usuarios-card-label">Email</span>
-                  <span>{resultado.email}</span>
-                </div>
-                <div className="usuarios-card-row">
-                  <span className="usuarios-card-label">Nacimiento</span>
-                  <span>{resultado.fecha_nacimiento}</span>
-                </div>
-                <div className="usuarios-card-row">
-                  <span className="usuarios-card-label">Rol</span>
-                  <span>{resultado.rol?.nombre}</span>
-                </div>
-                {permisos.length > 0 && (
-                  <div className="usuarios-card-row">
-                    <button
-                      className="usuarios-btn-ver-permisos"
-                      onClick={() => setPermisosModalOpen(true)}
-                    >
-                      Ver permisos
-                    </button>
+                <div className="usuarios-card-data">
+                  <div className="detalle-card-data-header">
+                    <span className="detalle-full-name">{resultado.apellido} {resultado.nombre}</span>
+                    <span className="detalle-estado-badge" style={{ backgroundColor: cfg.bg, color: cfg.border, borderColor: cfg.border }}>
+                      {resultado.estado?.nombre}
+                    </span>
                   </div>
-                )}
+                  <div className="usuarios-card-row">
+                    <span className="usuarios-card-label">Email</span>
+                    <span>{resultado.email}</span>
+                  </div>
+                  <div className="usuarios-card-row">
+                    <span className="usuarios-card-label">Nacimiento</span>
+                    <span>{resultado.fecha_nacimiento}</span>
+                  </div>
+                  <div className="usuarios-card-row">
+                    <span className="usuarios-card-label">Rol</span>
+                    <span>{resultado.rol?.nombre}</span>
+                  </div>
+                  {permisos.length > 0 && (
+                    <div className="usuarios-card-row">
+                      <button
+                        className="usuarios-btn-ver-permisos"
+                        onClick={() => setPermisosModalOpen(true)}
+                      >
+                        Ver permisos
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
-            <div className="usuarios-card-actions">
-              {puedeBorrar && (
-                <button className="usuarios-btn-eliminar" onClick={abrirEliminar}>
-                  Eliminar
-                </button>
-              )}
-              <div className="usuarios-card-actions-right">
-                {puedeEditar && !esMismoUsuario && (
-                  <button className="usuarios-btn-cambiar-rol" onClick={abrirCambiarRol}>
-                    Cambiar rol
+              <div className="usuarios-card-actions">
+                {puedeBorrar && (
+                  <button className="usuarios-btn-eliminar" onClick={abrirEliminar}>
+                    Eliminar
                   </button>
                 )}
-                {puedeEditar && (
-                  <button className="usuarios-btn-editar" onClick={abrirEditar}>
-                    Editar
-                  </button>
-                )}
+                <div className="usuarios-card-actions-right">
+                  {puedeEditar && !esMismoUsuario && (
+                    <button className="usuarios-btn-cambiar-rol" onClick={abrirCambiarRol}>
+                      Cambiar rol
+                    </button>
+                  )}
+                  {puedeEditar && (
+                    <button className="usuarios-btn-editar" onClick={abrirEditar}>
+                      Editar
+                    </button>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
+          </>
         );
       })()}
 

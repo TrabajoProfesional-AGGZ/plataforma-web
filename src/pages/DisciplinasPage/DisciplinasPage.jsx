@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
-import { Plus, ChevronLeft } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { CreateDisciplinaForm } from '../../components/createDisciplinaForm/CreateDisciplinaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
+import { BackButton } from '../../components/BackButton/BackButton';
 import { getDisciplinas, createDisciplina, pausarDisciplina, inscribirSocioADisciplina } from '../../services/disciplinasService';
 import { getSocioByNroSocio } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
@@ -240,12 +241,7 @@ function DisciplinasPage() {
       {/* ── Vista: Detalle ── */}
       {vista === 'detalle' && disciplinaActual && (
         <>
-          <div className="disciplinas-nav">
-            <button className="disciplinas-btn-volver" onClick={() => setVista('lista')}>
-              <ChevronLeft size={16} aria-hidden="true" />
-              Volver
-            </button>
-          </div>
+          <BackButton onClick={() => setVista('lista')} />
 
           <div className="disciplinas-detalle-content">
             <h1 className="disciplinas-detalle-nombre">{disciplinaActual.nombre}</h1>

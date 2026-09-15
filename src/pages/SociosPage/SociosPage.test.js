@@ -156,6 +156,16 @@ describe('SociosPage', () => {
     });
   });
 
+  test('Volver desde el detalle muestra la lista', async () => {
+    await buscarYAbrirCard();
+    await waitFor(() => expect(screen.getByRole('button', { name: /volver/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /volver/i }));
+
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: /volver/i })).not.toBeInTheDocument();
+  });
+
   test('muestra la foto de perfil del socio en la card cuando foto_url está presente', async () => {
     const socioConFoto = { ...socioMock, foto_url: 'https://res.cloudinary.com/foto.jpg' };
     getSocios.mockResolvedValue([socioConFoto]);

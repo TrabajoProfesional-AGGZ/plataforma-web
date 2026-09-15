@@ -179,6 +179,15 @@ describe('UsuariosPage', () => {
     });
   });
 
+  test('Volver desde el detalle muestra la lista', async () => {
+    await renderYAbrirCardUsuario();
+
+    fireEvent.click(screen.getByRole('button', { name: /volver/i }));
+
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: /volver/i })).not.toBeInTheDocument();
+  });
+
   // --- Búsqueda client-side ---
 
   test('filtra usuarios por texto de búsqueda', async () => {

@@ -11,12 +11,6 @@
 /* Badges de estado → src/components/badge/EstadoBadge.css (EstadoBadge) */
 
 /* ── Vista de detalle ─────────────────────────────────────────── */
-.disciplinas-nav {
-  display: flex;
-  align-items: center;
-  margin-bottom: var(--space-5);
-}
-
 .disciplinas-detalle-actions {
   display: flex;
   justify-content: flex-end;

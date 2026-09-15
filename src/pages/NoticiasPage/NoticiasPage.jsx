@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Plus, ChevronLeft } from 'lucide-react';
+import { Plus } from 'lucide-react';
 import { getNoticias, getNoticiasHistoricas, getNoticia, createNoticia, borrarNoticia } from '../../services/noticiasService';
 import { usePermiso } from '../../hooks/usePermiso';
 import { usePaginacion } from '../../hooks/usePaginacion';
 import { CreateNoticiaForm } from '../../components/createNoticiaForm/CreateNoticiaForm';
 import { EditNoticiaForm } from '../../components/editNoticiaForm/EditNoticiaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
+import { BackButton } from '../../components/BackButton/BackButton';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
@@ -219,15 +220,7 @@ function NoticiasPage() {
 
       {vista === 'detalle' && (
         <>
-          <div className="noticias-nav">
-            <button
-              className="noticias-btn-volver"
-              onClick={() => { setVista('lista'); setNoticiaActual(null); setErrorDetalle(''); }}
-            >
-              <ChevronLeft size={16} aria-hidden="true" />
-              Volver
-            </button>
-          </div>
+          <BackButton onClick={() => { setVista('lista'); setNoticiaActual(null); setErrorDetalle(''); }} />
 
           {loadingDetalle && <SkeletonRows n={4} />}
 

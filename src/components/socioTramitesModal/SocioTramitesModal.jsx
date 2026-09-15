@@ -1,10 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { ChevronLeft } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { getTramitesPorSocio, getTramite } from '../../services/tramitesService';
 import { TramiteReviewModal } from '../tramiteReviewModal/TramiteReviewModal';
 import { SocioSubModal } from '../socioAccionesExtra/SocioSubModal';
+import { BackButton } from '../BackButton/BackButton';
 import EstadoBadge from '../badge/EstadoBadge';
 import { urlImagenSegura } from '../../utils/utils';
 import { handleActivateKey } from '../../utils/a11y';
@@ -157,10 +157,7 @@ function SocioTramitesModal({ idSocio, onClose }) {
 
       {vista === 'detalle' && (
         <div>
-          <button type="button" className="socio-tramites-btn-volver" onClick={handleVolver}>
-            <ChevronLeft size={16} aria-hidden="true" />
-            Volver
-          </button>
+          <BackButton onClick={handleVolver} compacto />
 
           {loadingDetalle && (
             <div className="socio-modal-loading" role="status" aria-label="Cargando">

@@ -18,13 +18,6 @@
 }
 
 /* ── Vista de detalle ─────────────────────────────────────────── */
-.instalaciones-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: var(--space-5);
-}
-
 .instalaciones-agregar-reserva {
   display: flex;
   justify-content: flex-end;

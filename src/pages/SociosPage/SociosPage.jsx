@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { Search, Plus } from 'lucide-react';
+import { BackButton } from '../../components/BackButton/BackButton';
 import { getSocios, deleteSocio } from '../../services/sociosService';
 import { getDisciplinas, getSociosByDisciplina, extenderSuscripcionDisciplina } from '../../services/disciplinasService';
 import { CreateSocioForm } from '../../components/createForm/CreateSocioForm';
@@ -384,66 +385,69 @@ function SociosPage() {
         const cfg = estadoConfig(resultado.estado.nombre);
         const fotoSegura = urlImagenSegura(resultado.foto_url);
         return (
-          <div className="socios-card">
-            <div className="socios-card-inner">
-              <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
-                {fotoSegura
-                  ? <img src={fotoSegura} alt="" className="detalle-logo-img" referrerPolicy="no-referrer" />
-                  : <img src={cfg.logo} alt="" className="detalle-logo-img" />}
-              </div>
-              <div className="socios-card-data">
-                <div className="detalle-card-data-header">
-                  <span className="detalle-full-name">{resultado.apellido} {resultado.nombre}</span>
-                  <span className="detalle-estado-badge" style={{ backgroundColor: cfg.bg, color: cfg.border, borderColor: cfg.border }}>
-                    {resultado.estado.nombre}
-                  </span>
+          <>
+            <BackButton onClick={() => { setResultado(cacheSociosRef.current); setModo('lista'); }} />
+            <div className="socios-card">
+              <div className="socios-card-inner">
+                <div className="detalle-logo-circle" style={{ '--estado-color': cfg.border }}>
+                  {fotoSegura
+                    ? <img src={fotoSegura} alt="" className="detalle-logo-img" referrerPolicy="no-referrer" />
+                    : <img src={cfg.logo} alt="" className="detalle-logo-img" />}
                 </div>
-                <div className="socios-card-row">
-                  <span className="socios-card-label">N° Socio</span>
-                  <span>{resultado.nro_socio}</span>
-                </div>
-                <div className="socios-card-row">
-                  <span className="socios-card-label">DNI</span>
-                  <span>{resultado.nro_documento}</span>
-                </div>
-                <div className="socios-card-row">
-                  <span className="socios-card-label">Nacimiento</span>
-                  <span>{resultado.fecha_nacimiento}</span>
-                </div>
-                <div className="socios-card-row">
-                  <span className="socios-card-label">Email</span>
-                  <span>{resultado.email}</span>
-                </div>
-                {resultado.telefono && (
-                  <div className="socios-card-row">
-                    <span className="socios-card-label">Teléfono</span>
-                    <span>{resultado.telefono}</span>
+                <div className="socios-card-data">
+                  <div className="detalle-card-data-header">
+                    <span className="detalle-full-name">{resultado.apellido} {resultado.nombre}</span>
+                    <span className="detalle-estado-badge" style={{ backgroundColor: cfg.bg, color: cfg.border, borderColor: cfg.border }}>
+                      {resultado.estado.nombre}
+                    </span>
                   </div>
-                )}
-                <div className="socios-card-row">
-                  <span className="socios-card-label">Categoría</span>
-                  <span>{resultado.categoria.nombre}</span>
+                  <div className="socios-card-row">
+                    <span className="socios-card-label">N° Socio</span>
+                    <span>{resultado.nro_socio}</span>
+                  </div>
+                  <div className="socios-card-row">
+                    <span className="socios-card-label">DNI</span>
+                    <span>{resultado.nro_documento}</span>
+                  </div>
+                  <div className="socios-card-row">
+                    <span className="socios-card-label">Nacimiento</span>
+                    <span>{resultado.fecha_nacimiento}</span>
+                  </div>
+                  <div className="socios-card-row">
+                    <span className="socios-card-label">Email</span>
+                    <span>{resultado.email}</span>
+                  </div>
+                  {resultado.telefono && (
+                    <div className="socios-card-row">
+                      <span className="socios-card-label">Teléfono</span>
+                      <span>{resultado.telefono}</span>
+                    </div>
+                  )}
+                  <div className="socios-card-row">
+                    <span className="socios-card-label">Categoría</span>
+                    <span>{resultado.categoria.nombre}</span>
+                  </div>
+                  <SocioAccionesExtra
+                    idSocio={resultado.id}
+                    nroSocio={resultado.nro_socio}
+                    nombreSocio={`${resultado.apellido} ${resultado.nombre}`}
+                  />
                 </div>
-                <SocioAccionesExtra
-                  idSocio={resultado.id}
-                  nroSocio={resultado.nro_socio}
-                  nombreSocio={`${resultado.apellido} ${resultado.nombre}`}
-                />
+              </div>
+              <div className="socios-card-actions">
+                {puedeBorrar && (
+                  <button className="socios-btn-eliminar" onClick={abrirEliminar}>
+                    Eliminar
+                  </button>
+                )}
+                {puedeEditar && (
+                  <button className="socios-btn-editar" onClick={abrirEditar}>
+                    Editar
+                  </button>
+                )}
               </div>
             </div>
-            <div className="socios-card-actions">
-              {puedeBorrar && (
-                <button className="socios-btn-eliminar" onClick={abrirEliminar}>
-                  Eliminar
-                </button>
-              )}
-              {puedeEditar && (
-                <button className="socios-btn-editar" onClick={abrirEditar}>
-                  Editar
-                </button>
-              )}
-            </div>
-          </div>
+          </>
         );
       })()}
 

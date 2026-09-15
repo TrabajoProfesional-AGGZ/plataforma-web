@@ -31,29 +31,6 @@
   }
 }
 
-.disciplinas-btn-volver,
-.instalaciones-btn-volver {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border-medium);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  font-size: var(--text-secondary);
-  font-weight: 500;
-  color: var(--color-text-primary);
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
-}
-
-@media (hover: hover) {
-  .disciplinas-btn-volver:hover,
-  .instalaciones-btn-volver:hover {
-    background-color: var(--color-bg);
-  }
-}
-
 .disciplinas-detalle-content,
 .instalaciones-detalle-content {
   display: flex;

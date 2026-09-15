@@ -157,21 +157,21 @@ describe('TiendaPage', () => {
       fireEvent.keyDown(fila, { key: 'Enter' });
     });
     await waitFor(() => {
-      expect(screen.getByText('Volver a la tienda')).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /volver/i })).toBeInTheDocument();
     });
   });
 
-  test('el botón Volver a la tienda regresa al listado', async () => {
+  test('el botón Volver regresa al listado', async () => {
     getProductos.mockResolvedValue(PRODUCTOS);
     getProducto.mockResolvedValue(PRODUCTOS[0]);
     await renderPage();
     await act(async () => {
       fireEvent.click(screen.getByText('Remera oficial'));
     });
-    await waitFor(() => screen.getByText('Volver a la tienda'));
-    fireEvent.click(screen.getByText('Volver a la tienda'));
+    await waitFor(() => screen.getByRole('button', { name: /volver/i }));
+    fireEvent.click(screen.getByRole('button', { name: /volver/i }));
     expect(screen.getByText('Tienda')).toBeInTheDocument();
-    expect(screen.queryByText('Volver a la tienda')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /volver/i })).not.toBeInTheDocument();
   });
 
   test('crea un producto y lo agrega a la lista', async () => {
