@@ -1,11 +1,13 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getDashboardFidelizacion } from '../../services/fidelizacionService';
 import { useListState } from '../../hooks/useListState';
 import { usePaginacion } from '../../hooks/usePaginacion';
 import { Paginacion } from '../../components/paginacion/Paginacion';
 import { TendenciasPagoChart } from '../../components/charts/TendenciasPagoChart';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
+import EmptyState from '../../components/feedback/EmptyState';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import { riesgoConfig } from '../../utils/riesgoConfig';
-import { useTheme } from '../../hooks/useTheme';
 import './MorosidadTab.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
@@ -32,7 +34,6 @@ function SelectorMes({ id, label, value, onChange, opciones }) {
 
 /** Pestaña "Morosidad" de Métricas: predicción de atraso por socio y gráfico de tendencias de pago filtrable por rango de mes. */
 function MorosidadTab() {
-  const { logoSocio: logo } = useTheme();
   const { resultado: datos, setResultado: setDatos, loading, setLoading, error, setError } = useListState();
   const [mesDesde, setMesDesde] = useState('');
   const [mesHasta, setMesHasta] = useState('');
@@ -48,7 +49,7 @@ function MorosidadTab() {
     resetPagina: resetPaginaPrediccion,
   } = usePaginacion(prediccionOrdenada, 10);
 
-  useEffect(() => {
+  const cargar = useCallback(() => {
     let cancelled = false;
 
     setLoading(true);
@@ -81,6 +82,8 @@ function MorosidadTab() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => cargar(), [cargar]);
+
   const mesesDisponibles = (datos?.tendencias_pago ?? []).map((t) => t.mes);
 
   const tendenciasFiltradas = (datos?.tendencias_pago ?? []).filter((t) => {
@@ -92,15 +95,11 @@ function MorosidadTab() {
   });
 
   if (loading) {
-    return (
-      <div className="morosidad-loading">
-        <img src={logo} alt="" className="loading-logo" />
-      </div>
-    );
+    return <SkeletonRows n={6} />;
   }
 
   if (error) {
-    return <p className="morosidad-error">{error}</p>;
+    return <ErrorBanner mensaje={error} onReintentar={cargar} />;
   }
 
   if (!datos) {
@@ -116,16 +115,16 @@ function MorosidadTab() {
       <div className="morosidad-section">
         <h2 className="morosidad-section-title">Predicción de morosidad</h2>
         {prediccionOrdenada.length === 0 ? (
-          <p className="disciplinas-empty">No hay predicciones de morosidad disponibles.</p>
+          <EmptyState mensaje="No hay predicciones de morosidad disponibles." />
         ) : (
           <div className="disciplinas-table-wrapper">
             <table className="disciplinas-tabla">
               <thead>
                 <tr>
                   <th>Socio</th>
-                  <th>Probabilidad de atraso</th>
-                  <th>Días promedio histórico</th>
-                  <th>Nivel de riesgo</th>
+                  <th className="td-num">Probabilidad de atraso</th>
+                  <th className="td-num">Días promedio histórico</th>
+                  <th className="td-center">Nivel de riesgo</th>
                 </tr>
               </thead>
               <tbody>
@@ -134,9 +133,9 @@ function MorosidadTab() {
                   return (
                     <tr key={p.socio_id}>
                       <td>{p.nombre_completo}</td>
-                      <td>{formatearPorcentaje(p.probabilidad_atraso)}</td>
-                      <td>{p.dias_promedio_historico} días</td>
-                      <td>
+                      <td className="td-num">{formatearPorcentaje(p.probabilidad_atraso)}</td>
+                      <td className="td-num">{p.dias_promedio_historico} días</td>
+                      <td className="td-center">
                         <span
                           className="disciplinas-badge"
                           style={{ backgroundColor: bg, borderColor: border, color: border }}

@@ -105,7 +105,6 @@ describe('CreateAlertaForm', () => {
       expect(screen.getByText('¡Alerta enviada!')).toBeInTheDocument();
     });
 
-    await act(async () => { jest.advanceTimersByTime(1800); });
     expect(onSuccess).toHaveBeenCalledWith({
       mensaje: 'Mensaje de prueba',
       filtro_categoria: null,
@@ -125,7 +124,6 @@ describe('CreateAlertaForm', () => {
       fireEvent.click(screen.getByRole('button', { name: /enviar alerta/i }));
     });
 
-    await act(async () => { jest.advanceTimersByTime(1800); });
     expect(onSuccess).toHaveBeenCalledWith({
       mensaje: 'Con filtros',
       filtro_categoria: 'Juvenil',
@@ -227,7 +225,6 @@ describe('CreateAlertaForm', () => {
       await act(async () => {
         fireEvent.click(screen.getByRole('button', { name: /enviar alerta/i }));
       });
-      await act(async () => { jest.advanceTimersByTime(1800); });
 
       expect(onSuccess).toHaveBeenCalledWith({ mensaje: 'Para vos', ids_socios: ['uuid-1'] });
     });

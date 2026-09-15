@@ -27,7 +27,7 @@ const TEXTO_ESTADO_IMAGEN = {
  * @param {{ producto: object, onSuccess: (productoActualizado: object) => void, onCancel: () => void }} props
  */
 export function EditProductoForm({ producto, onSuccess, onCancel }) {
-  const { step, direction, submitted, setSubmitted, navGuard } = useMultiStepFormState();
+  const { step, direction, submitted, setSubmitted, navGuard, finNavGuard } = useMultiStepFormState();
   const {
     fileInputRef, imagenPreview, estadoImagen, errorImagen,
     handleArchivoSeleccionado, subirSiCorresponde,
@@ -65,7 +65,6 @@ export function EditProductoForm({ producto, onSuccess, onCancel }) {
     try {
       const actualizado = await editarProducto(producto.id, payload);
       setSubmitted(true);
-      await new Promise((r) => setTimeout(r, 1200));
       onSuccess(actualizado);
     } catch {
       // No hay mensaje de error visible para este caso: el formulario simplemente
@@ -79,6 +78,7 @@ export function EditProductoForm({ producto, onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Editar producto"
       successTitle="¡Producto actualizado!"
@@ -107,8 +107,7 @@ export function EditProductoForm({ producto, onSuccess, onCancel }) {
               maxLength: { value: 2000, message: 'Máximo 2000 caracteres' },
             })}
             rows={4}
-            className={`csf-input${errors.descripcion ? ' csf-input--error' : ''}`}
-            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: '0.875rem' }}
+            className={`csf-input csf-textarea${errors.descripcion ? ' csf-input--error' : ''}`}
           />
         </Field>
         <Field label="Precio ($)" icon={DollarSign} error={errors.precio?.message}>

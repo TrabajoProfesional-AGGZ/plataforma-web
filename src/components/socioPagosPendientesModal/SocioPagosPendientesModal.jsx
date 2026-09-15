@@ -73,7 +73,7 @@ function SocioPagosPendientesModal({ idSocio, onClose }) {
   let contenido;
   if (loading) {
     contenido = (
-      <div className="socio-modal-loading">
+      <div className="socio-modal-loading" role="status" aria-label="Cargando">
         <img src={logo} alt="" className="loading-logo" />
       </div>
     );
@@ -85,7 +85,7 @@ function SocioPagosPendientesModal({ idSocio, onClose }) {
     contenido = (
       <ul className="socio-modal-lista">
         {items.map((item) => (
-          <li key={`${item.tipo}-${item.id}`} className="socio-modal-item socio-pagos-pendientes-item">
+          <li key={`${item.tipo}-${item.id}`} className="socio-modal-item">
             <div className="socio-modal-item-info socio-pagos-pendientes-info">
               <span className="socio-modal-item-nombre">{item.concepto}</span>
               <span className="socio-pagos-pendientes-detalle">
@@ -128,6 +128,7 @@ function SocioPagosPendientesModal({ idSocio, onClose }) {
         errorModal={errorConfirmar}
         labelConfirmar="Marcar como pagada"
         labelGuardando="Guardando..."
+        variant="primary"
       />
     </SocioSubModal>
   );

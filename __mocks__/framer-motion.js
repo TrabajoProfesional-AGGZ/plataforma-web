@@ -6,7 +6,7 @@ const motion = new Proxy({}, {
     if (!motionCache[tag]) {
       motionCache[tag] = ({ children, whileHover, whileTap, initial, animate, exit, transition, variants, custom, layoutId, layout, onAnimationComplete, ...props }) => {
         React.useEffect(() => {
-          if (onAnimationComplete) onAnimationComplete();
+          if (onAnimationComplete) onAnimationComplete(animate);
         }, [onAnimationComplete]);
         return React.createElement(tag, props, children);
       };

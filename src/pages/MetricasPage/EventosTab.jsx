@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Ticket } from 'lucide-react';
 import { getTopEventos } from '../../services/metricasService';
-import { useTheme } from '../../hooks/useTheme';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import RankingList from './RankingList';
 import './EventosTab.css';
 
 /** Pestaña "Eventos" de Métricas: ranking de eventos por entradas vendidas y % de ocupación. */
 function EventosTab() {
-  const { logoSocio: logo } = useTheme();
   const [eventos, setEventos] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  const cargar = useCallback(() => {
     let cancelled = false;
 
     setLoading(true);
@@ -38,20 +38,18 @@ function EventosTab() {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => cargar(), [cargar]);
+
   if (loading) {
-    return (
-      <div className="eventos-tab-loading">
-        <img src={logo} alt="" className="loading-logo" />
-      </div>
-    );
+    return <SkeletonRows n={5} />;
   }
 
   if (error) {
-    return <p className="eventos-tab-error">{error}</p>;
+    return <ErrorBanner mensaje={error} onReintentar={cargar} />;
   }
 
   return (
-    <div className="eventos-tab">
+    <div>
       <div className="eventos-tab-card">
         <div className="eventos-tab-card-header">
           <Ticket size={20} />
@@ -66,7 +64,7 @@ function EventosTab() {
             <div className="eventos-tab-bar-container">
               <div
                 className="eventos-tab-bar"
-                style={{ width: `${Math.min(e.porcentaje_ocupacion, 100)}%` }}
+                style={{ transform: `scaleX(${Math.min(e.porcentaje_ocupacion, 100) / 100})` }}
               />
               <span className="eventos-tab-porcentaje">{e.porcentaje_ocupacion}%</span>
             </div>

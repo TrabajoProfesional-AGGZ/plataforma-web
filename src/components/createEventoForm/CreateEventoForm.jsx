@@ -27,7 +27,7 @@ const TEXTO_ESTADO_IMAGEN = {
  * @param {{ onSuccess: (payload: object) => void, onCancel: () => void }} props
  */
 export function CreateEventoForm({ onSuccess, onCancel }) {
-  const { step, direction, submitted, setSubmitted, navGuard } = useMultiStepFormState();
+  const { step, direction, submitted, setSubmitted, navGuard, finNavGuard } = useMultiStepFormState();
   const {
     fileInputRef,
     imagenPreview,
@@ -54,7 +54,6 @@ export function CreateEventoForm({ onSuccess, onCancel }) {
     if (fotoUrl) setValue('foto_url', fotoUrl, { shouldValidate: true });
 
     setSubmitted(true);
-    await new Promise((resolve) => setTimeout(resolve, 1800));
     onSuccess({
       nombre: data.nombre.trim(),
       descripcion: data.descripcion.trim(),
@@ -73,6 +72,7 @@ export function CreateEventoForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Nuevo evento"
       successTitle="¡Evento creado!"
@@ -104,8 +104,7 @@ export function CreateEventoForm({ onSuccess, onCancel }) {
             })}
             placeholder="Contale a los socios de qué se trata el evento..."
             rows={4}
-            className={`csf-input${errors.descripcion ? ' csf-input--error' : ''}`}
-            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: '0.875rem' }}
+            className={`csf-input csf-textarea${errors.descripcion ? ' csf-input--error' : ''}`}
           />
         </Field>
         <Field label="Día" icon={Calendar} error={errors.dia?.message}>

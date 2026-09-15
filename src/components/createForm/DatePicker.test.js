@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { DatePicker } from './DatePicker';
 
 // El calendario se renderiza vía createPortal a document.body, fuera del
@@ -13,7 +13,7 @@ function clickDayInMonth(day) {
 }
 
 describe('DatePicker', () => {
-  test('clickear un día en la grilla selecciona esa fecha y cierra el popover', () => {
+  test('clickear un día en la grilla selecciona esa fecha y cierra el popover', async () => {
     const { container } = render(<DatePicker name="fecha" min="2020-01-01" max="2030-12-31" />);
 
     fireEvent.click(screen.getByRole('button', { name: /seleccionar fecha/i }));
@@ -23,7 +23,19 @@ describe('DatePicker', () => {
 
     const hiddenInput = container.querySelector('input[type="date"]');
     expect(hiddenInput.value).toMatch(/-15$/);
-    expect(screen.queryByRole('dialog', { name: /elegir fecha/i })).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: /elegir fecha/i })).not.toBeInTheDocument();
+    });
+  });
+
+  test('clickear un día en la grilla muestra la fecha seleccionada en el trigger', () => {
+    render(<DatePicker name="fecha" />);
+
+    fireEvent.click(screen.getByRole('button', { name: /seleccionar fecha/i }));
+    fireEvent.click(screen.getByRole('button', { name: '15' }));
+
+    expect(screen.queryByText(/seleccionar fecha/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /15 de/i })).toBeInTheDocument();
   });
 
   test('los botones de mes anterior/siguiente cambian el mes mostrado en los selects', () => {
@@ -76,13 +88,15 @@ describe('DatePicker', () => {
 
   test('reabrir el picker luego de elegir un día vuelve a mostrar la grilla', () => {
     const { container } = render(<DatePicker name="fecha" />);
-    const trigger = container.querySelector('.csf-picker-trigger');
-    fireEvent.click(trigger);
-    clickDayInMonth(10);
+    fireEvent.click(screen.getByRole('button', { name: /seleccionar fecha/i }));
+    const dias = screen.getAllByRole('button', { name: '10' });
+    const diaEnMes = dias.find((d) => !d.className.includes('muted'));
+    fireEvent.click(diaEnMes);
 
     const hiddenInput = container.querySelector('input[type="date"]');
     expect(hiddenInput.value).toMatch(/-10$/);
 
+    const trigger = container.querySelector('.csf-picker-trigger');
     fireEvent.click(trigger);
     expect(screen.getByRole('dialog', { name: /elegir fecha/i })).toBeInTheDocument();
   });

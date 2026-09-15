@@ -1,6 +1,6 @@
 .loading-screen {
-  min-height: 100vh;
-  background-color: var(--color-surface);
+  min-height: 100dvh;
+  background-color: var(--color-bg);
   display: flex;
   align-items: center;
   justify-content: center;

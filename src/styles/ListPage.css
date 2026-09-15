@@ -1,52 +1,37 @@
 /* Estilos compartidos para páginas de listado: SociosPage, UsuariosPage, DisciplinasPage, InstalacionesPage */
 
-/* ── Título de página ────────────────────────────────────────── */
-.socios-title,
-.usuarios-title {
-  font-size: 2rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0 0 var(--space-6) 0;
-  text-align: center;
-  letter-spacing: -0.02em;
-  text-wrap: balance;
+/* ── Barra de filtros: segunda fila debajo del toolbar (selects a la izquierda,
+   "N filtros activos · Limpiar" a la derecha) ── */
+.filtros-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
 }
 
-/* ── Botón Ver-todos / secundario ─────────────────────────────── */
-.socios-ver-todos-button,
-.usuarios-ver-todos-button {
-  background-color: var(--color-surface);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border-medium);
-}
-
-.socios-ver-todos-button:hover:not(:disabled),
-.usuarios-ver-todos-button:hover:not(:disabled) {
-  background-color: var(--color-bg);
-}
-
-/* ── Layout de filtros ────────────────────────────────────────── */
 .socios-filtros,
 .usuarios-filtros {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-3);
+  gap: var(--space-2);
   flex-wrap: wrap;
 }
 
-.socios-filtros-dropdowns,
-.usuarios-filtros-dropdowns {
-  display: flex;
-  flex-direction: row;
-  gap: var(--space-2);
+.socios-filtros .csf-picker,
+.usuarios-filtros .csf-picker {
+  width: 170px;
 }
 
-.socios-filtros-grupo,
-.usuarios-filtros-grupo {
-  width: 100%;
-  max-width: 180px;
+/* Caption de tabla: contexto del listado cuando hay un filtro que cambia el universo (ej. disciplina) */
+.tabla-caption {
+  caption-side: top;
+  text-align: left;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-caption);
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
 }
 
 /* ── Orden de tabla ───────────────────────────────────────────── */
@@ -56,9 +41,11 @@
   user-select: none;
 }
 
-.socios-th-sort:hover,
-.usuarios-th-sort:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .socios-th-sort:hover,
+  .usuarios-th-sort:hover {
+    color: var(--color-text-primary);
+  }
 }
 
 /* ── Barra de herramientas ─────────────────────────────────────── */
@@ -88,110 +75,35 @@
   gap: var(--space-2);
 }
 
-/* ── Búsqueda ────────────────────────────────────────────────── */
-.socios-search-container,
-.usuarios-search-container {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border-medium);
-  border-radius: var(--radius-sm);
-  padding: var(--space-2) var(--space-3);
-  flex: 1;
-  transition: border-color var(--transition-fast);
-}
-
-.socios-search-container:focus-within,
-.usuarios-search-container:focus-within {
-  border-color: var(--color-border-strong);
-}
-
-.socios-search-container svg,
-.usuarios-search-container svg {
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-}
-
-.socios-search-input,
-.usuarios-search-input {
-  border: none;
-  outline: none;
-  background: transparent;
-  color: var(--color-text-primary);
-  width: 100%;
-  font-size: 0.875rem;
-}
-
-.socios-search-button, .socios-ver-todos-button,
-.usuarios-search-button, .usuarios-ver-todos-button {
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-sm);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color var(--transition-fast), color var(--transition-fast);
-}
-
-/* Wrapper del spinner de carga, compartido por todas las list pages */
-.list-loading {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-12) 0;
-}
-
-/* ── Mensajes de feedback ────────────────────────────────────── */
-.socios-error,
-.usuarios-error {
-  color: var(--color-danger);
-  font-size: 0.875rem;
-  text-align: center;
-  background-color: var(--status-error-surface-bg);
-  border: 1px solid var(--status-error-surface-border);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-}
-
-.socios-no-encontrado,
-.usuarios-no-encontrado {
-  color: var(--color-text-secondary);
-  font-size: 0.875rem;
-  text-align: center;
-}
+/* Búsqueda → src/components/BuscadorColapsable/BuscadorColapsable.css */
 
 /* ── Filtros ─────────────────────────────────────────────────── */
-.socios-filtro-toggle,
-.usuarios-filtro-toggle,
 .instalaciones-btn-toggle {
   padding: 6px var(--space-3);
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
   background: var(--color-surface);
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   font-weight: 500;
   color: var(--color-text-primary);
   cursor: pointer;
   transition: background-color var(--transition-fast);
 }
 
-.socios-filtro-toggle:hover,
-.usuarios-filtro-toggle:hover,
-.instalaciones-btn-toggle:hover {
+@media (hover: hover) {
+  .instalaciones-btn-toggle:hover {
+    background-color: var(--color-bg);
+  }
+}
+
+.instalaciones-btn-toggle:active {
   background-color: var(--color-bg);
 }
 
-/* StyledSelect usado como filtro: por defecto usa el mismo fondo que la
-   página (--color-bg), pensado para contrastar contra la tarjeta blanca de
-   los formularios de creación — acá el filtro va directo sobre el fondo de
-   la página, así que necesita fondo blanco propio para distinguirse. */
-.filtros-select-trigger {
-  background-color: var(--color-surface);
-}
-
-.filtros-select-trigger:hover:not(:disabled) {
-  background-color: var(--color-bg);
-}
+/* Antes .filtros-select-trigger pisaba el fondo del trigger a blanco para
+   distinguirse del fondo de la página (--color-bg) — con C4 el trigger pasó
+   a tener borde de 1px (--color-border-medium) por defecto, que ya lo separa
+   del fondo sin necesitar un fondo propio; se borró el override. */
 
 /* En los forms de creación value="" es un placeholder real ("Seleccionar...")
    y StyledSelect lo pinta en gris tenue (--color-border-medium). Acá value=""
@@ -205,7 +117,7 @@
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
   padding: 6px 10px;
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   color: var(--color-text-primary);
   background-color: var(--color-surface);
   outline: none;
@@ -221,9 +133,7 @@
   background-color: var(--color-surface);
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-md);
-  max-height: calc(100vh - 260px);
   overflow-x: auto;
-  overflow-y: auto;
   box-shadow: var(--shadow-sm);
 }
 
@@ -252,19 +162,40 @@
 .instalaciones-tabla {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
 }
 
 .socios-table td,
 .usuarios-tabla td,
 .disciplinas-tabla td,
 .instalaciones-tabla td {
-  padding: var(--space-3) var(--space-5);
+  /* padding en `em` (hereda --text-secondary = 15.4px):
+     0.78em ≈ 12px, 1.3em ≈ 20px — equivale a --space-3/--space-5. */
+  padding: 0.78em 1.3em;
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text-primary);
   vertical-align: middle;
   font-variant-numeric: tabular-nums;
+  text-align: left;
+}
+
+.td-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.td-center {
   text-align: center;
+}
+
+/* Última columna de las filas navegables: chevron que señala "hay detalle" */
+.td-chevron {
+  width: 32px;
+  color: var(--color-text-secondary);
+}
+
+.td-chevron svg {
+  display: block;
 }
 
 .socios-table tr:last-child td,
@@ -300,20 +231,28 @@
   box-shadow: inset 0 0 0 2px var(--color-text-primary);
 }
 
-.socios-tr-clickable:hover td,
-.usuarios-tr-clickable:hover td,
-.disciplinas-tr-clickable:hover td,
-.instalaciones-tr-clickable:hover td {
+@media (hover: hover) {
+  .socios-tr-clickable:hover td,
+  .usuarios-tr-clickable:hover td,
+  .disciplinas-tr-clickable:hover td,
+  .instalaciones-tr-clickable:hover td {
+    background-color: var(--color-row-hover);
+  }
+}
+
+.socios-tr-clickable:active td,
+.usuarios-tr-clickable:active td,
+.disciplinas-tr-clickable:active td,
+.instalaciones-tr-clickable:active td {
   background-color: var(--color-row-hover);
 }
 
 /* ── Badge base ──────────────────────────────────────────────── */
-.disciplinas-badge,
-.instalaciones-badge {
+.disciplinas-badge {
   display: inline-block;
   padding: 3px 10px;
   border-radius: var(--radius-sm);
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   font-weight: 500;
   border: 1px solid;
 }
@@ -324,7 +263,7 @@
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   font-weight: 500;
   color: var(--color-text-primary);
   padding: 4px 10px 4px 6px;
@@ -332,16 +271,3 @@
   border: 1px solid;
 }
 
-/* ── Botones de acción de card, base → src/styles/ListDetailShared.css ── */
-.socios-btn-eliminar, .socios-btn-editar,
-.usuarios-btn-eliminar, .usuarios-btn-editar, .usuarios-btn-cambiar-rol {
-  transition: background-color var(--transition-fast), color var(--transition-fast);
-}
-
-/* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
-@media (max-width: 480px) {
-  .socios-title,
-  .usuarios-title {
-    font-size: 1.5rem;
-  }
-}

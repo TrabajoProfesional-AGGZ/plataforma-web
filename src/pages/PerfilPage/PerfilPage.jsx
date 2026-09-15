@@ -1,12 +1,12 @@
 import { useState, useCallback } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../hooks/useAuth';
 import { useChangePassword } from '../../hooks/useChangePassword';
-import { useEscapeKey } from '../../hooks/useEscapeKey';
+import { ModalOverlay } from '../../components/createForm/ModalOverlay';
 import { PermisosModal } from '../../components/permisosModal/PermisosModal';
 import { Lock, Eye, EyeOff } from 'lucide-react';
 import '../../components/createForm/CreateSocioForm.css';
 import './PerfilPage.css';
-import '../../styles/shared.css';
 
 /** Input de contraseña con botón para mostrar/ocultar el valor. */
 function PasswordInput({ id, value, onChange, autoComplete, required }) {
@@ -32,21 +32,9 @@ function PasswordInput({ id, value, onChange, autoComplete, required }) {
       />
       <button
         type="button"
+        className="icon-btn perfil-toggle-password"
         onClick={() => setShow((v) => !v)}
         aria-label={show ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-        style={{
-          position: 'absolute',
-          right: 12,
-          top: '50%',
-          transform: 'translateY(-50%)',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          color: 'var(--color-text-secondary)',
-          padding: 0,
-          display: 'flex',
-          alignItems: 'center',
-        }}
       >
         {show ? <EyeOff size={16} /> : <Eye size={16} />}
       </button>
@@ -57,74 +45,71 @@ function PasswordInput({ id, value, onChange, autoComplete, required }) {
 /** Modal para cambiar la contraseña del usuario autenticado. */
 function CambiarContrasenaModal({ onClose }) {
   const { actual, setActual, nueva, setNueva, confirmar, setConfirmar, error, loading, handleSubmit } = useChangePassword();
-  useEscapeKey(onClose);
 
   return (
-    <div className="csf-overlay" onClick={onClose}>
-      <div className="csf-wrapper" onClick={(e) => e.stopPropagation()}>
-        <div className="csf-outer-card">
-          <div className="csf-header">
-            <h1>Cambiar contraseña</h1>
-          </div>
-          <div className="csf-card">
-            <form onSubmit={handleSubmit}>
-              <div className="csf-fields">
-                <div className="csf-field">
-                  <label className="csf-label" htmlFor="actual">
-                    <Lock size={13} strokeWidth={2} />
-                    Contraseña actual
-                  </label>
-                  <PasswordInput
-                    id="actual"
-                    value={actual}
-                    onChange={(e) => setActual(e.target.value)}
-                    autoComplete="current-password"
-                    required
-                  />
-                </div>
-                <div className="csf-field">
-                  <label className="csf-label" htmlFor="nueva">
-                    <Lock size={13} strokeWidth={2} />
-                    Nueva contraseña
-                  </label>
-                  <PasswordInput
-                    id="nueva"
-                    value={nueva}
-                    onChange={(e) => setNueva(e.target.value)}
-                    autoComplete="new-password"
-                    required
-                  />
-                </div>
-                <div className="csf-field">
-                  <label className="csf-label" htmlFor="confirmar">
-                    <Lock size={13} strokeWidth={2} />
-                    Confirmar nueva contraseña
-                  </label>
-                  <PasswordInput
-                    id="confirmar"
-                    value={confirmar}
-                    onChange={(e) => setConfirmar(e.target.value)}
-                    autoComplete="new-password"
-                    required
-                  />
-                </div>
-                {error && (
-                  <p className="csf-form-error" role="alert">{error}</p>
-                )}
+    <ModalOverlay onClose={onClose} ariaLabel="Cambiar contraseña">
+      <div className="csf-outer-card">
+        <div className="csf-header">
+          <h1>Cambiar contraseña</h1>
+        </div>
+        <div className="csf-card">
+          <form onSubmit={handleSubmit}>
+            <div className="csf-fields">
+              <div className="csf-field">
+                <label className="csf-label" htmlFor="actual">
+                  <Lock size={13} strokeWidth={2} />
+                  Contraseña actual
+                </label>
+                <PasswordInput
+                  id="actual"
+                  value={actual}
+                  onChange={(e) => setActual(e.target.value)}
+                  autoComplete="current-password"
+                  required
+                />
               </div>
-              <div className="csf-nav csf-nav--between">
-                <button type="button" className="csf-btn-back" onClick={onClose}>
-                  Cancelar
-                </button>
-                <button type="submit" className="csf-btn-submit" disabled={loading}>
-                  {loading ? 'Guardando...' : 'Cambiar contraseña'}
-                </button>
+              <div className="csf-field">
+                <label className="csf-label" htmlFor="nueva">
+                  <Lock size={13} strokeWidth={2} />
+                  Nueva contraseña
+                </label>
+                <PasswordInput
+                  id="nueva"
+                  value={nueva}
+                  onChange={(e) => setNueva(e.target.value)}
+                  autoComplete="new-password"
+                  required
+                />
               </div>
-            </form>
-          </div>
+              <div className="csf-field">
+                <label className="csf-label" htmlFor="confirmar">
+                  <Lock size={13} strokeWidth={2} />
+                  Confirmar nueva contraseña
+                </label>
+                <PasswordInput
+                  id="confirmar"
+                  value={confirmar}
+                  onChange={(e) => setConfirmar(e.target.value)}
+                  autoComplete="new-password"
+                  required
+                />
+              </div>
+              {error && (
+                <p className="csf-form-error" role="alert">{error}</p>
+              )}
+            </div>
+            <div className="csf-nav csf-nav--between">
+              <button type="button" className="csf-btn-back" onClick={onClose}>
+                Cancelar
+              </button>
+              <button type="submit" className="csf-btn-submit" disabled={loading}>
+                {loading ? 'Guardando...' : 'Cambiar contraseña'}
+              </button>
+            </div>
+          </form>
         </div>
       </div>
-    </div>
+    </ModalOverlay>
   );
 }
 
@@ -138,7 +123,7 @@ function PerfilPage() {
 
   return (
     <div className="perfil-page">
-      <h1 className="perfil-title">Mi perfil</h1>
+      <h1 className="page-title">Mi perfil</h1>
       <div className="perfil-card">
         <div className="perfil-avatar" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="currentColor">
@@ -152,7 +137,7 @@ function PerfilPage() {
           </div>
           <div className="perfil-field">
             <span className="perfil-label">Rol</span>
-            <span className={`perfil-rol-badge perfil-rol-${role}`}>{role}</span>
+            <span className="perfil-rol-badge">{role}</span>
           </div>
         </div>
       </div>
@@ -166,10 +151,14 @@ function PerfilPage() {
           Cambiar contraseña
         </button>
       </div>
-      {modalOpen && <CambiarContrasenaModal onClose={cerrarModal} />}
-      {permisosModalOpen && (
-        <PermisosModal permisos={permisos} onClose={() => setPermisosModalOpen(false)} />
-      )}
+      <AnimatePresence>
+        {modalOpen && <CambiarContrasenaModal key="cambiar-contrasena" onClose={cerrarModal} />}
+      </AnimatePresence>
+      <AnimatePresence>
+        {permisosModalOpen && (
+          <PermisosModal key="permisos" permisos={permisos} onClose={() => setPermisosModalOpen(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

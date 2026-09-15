@@ -1,4 +1,4 @@
-import { Children, cloneElement, isValidElement, useEffect, useRef, useState } from 'react';
+import { Children, cloneElement, isValidElement, useContext, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, User, CreditCard, Phone, Mail, ChevronDown, Check } from 'lucide-react';
@@ -7,13 +7,9 @@ import { DatePicker } from './DatePicker';
 import { TimePicker } from './TimePicker';
 import { setNativeValue, mergeRefs } from './nativeInputUtils';
 import { usePickerPopover } from './usePickerPopover';
+import { FormStepContext } from './FormStepContext';
+import { SPRING, slideVariants } from '../../styles/motion';
 import './Pickers.css';
-
-export const slideVariants = {
-  enter: (dir) => ({ x: dir > 0 ? 52 : -52, opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit: (dir) => ({ x: dir > 0 ? -52 : 52, opacity: 0 }),
-};
 
 /** Mensaje de error de un campo, con aparición/desaparición animada. */
 export function FieldError({ message, id }) {
@@ -61,18 +57,20 @@ function slugify(text) {
 export function Field({ id, label, icon: Icon, error, children }) {
   const fieldId = id ?? `field-${slugify(label)}`;
   const errorId = `${fieldId}-error`;
+  const labelId = `${fieldId}-label`;
   const singleChild = Children.count(children) === 1 ? Children.only(children) : null;
   const wiredChild = singleChild && isValidElement(singleChild)
     ? cloneElement(singleChild, {
       id: singleChild.props.id ?? fieldId,
       'aria-invalid': error ? 'true' : undefined,
       'aria-describedby': error ? errorId : undefined,
+      'aria-labelledby': singleChild.props['aria-labelledby'] ?? labelId,
     })
     : children;
 
   return (
     <div className="csf-field">
-      <label className="csf-label" htmlFor={fieldId}>
+      <label className="csf-label" id={labelId} htmlFor={fieldId}>
         <Icon size={13} strokeWidth={2} />
         {label}
       </label>
@@ -111,8 +109,15 @@ StyledInput.propTypes = {
   error: PropTypes.bool,
 };
 
-/** Contenedor de un paso de un formulario multi-paso, con animación de deslizamiento según `direction`. */
-export function FormStep({ direction, children }) {
+/**
+ * Contenedor de un paso de un formulario multi-paso, con animación de
+ * deslizamiento según `direction`. `onEntered` se dispara cuando terminó la
+ * animación de entrada (no la de salida); si no se pasa, usa el callback que
+ * provee `MultiStepFormShell` vía `FormStepContext` (→ `finNavGuard`).
+ */
+export function FormStep({ direction, onEntered, children }) {
+  const onEnteredFromShell = useContext(FormStepContext);
+  const handleEntered = onEntered ?? onEnteredFromShell;
   return (
     <motion.div
       custom={direction}
@@ -120,7 +125,8 @@ export function FormStep({ direction, children }) {
       initial="enter"
       animate="center"
       exit="exit"
-      transition={{ duration: 0.26, ease: 'easeInOut' }}
+      transition={SPRING.quick}
+      onAnimationComplete={(definition) => { if (definition === 'center') handleEntered?.(); }}
       className="csf-fields"
     >
       {children}
@@ -130,6 +136,7 @@ export function FormStep({ direction, children }) {
 
 FormStep.propTypes = {
   direction: PropTypes.number,
+  onEntered: PropTypes.func,
   children: PropTypes.node.isRequired,
 };
 
@@ -228,10 +235,12 @@ EmailField.propTypes = {
  * evento `change` nativo, así que tanto un `onChange` pasado directo como el
  * que devuelve `register()` de react-hook-form lo reciben sin cambios.
  */
-export function StyledSelect({ error, className, children, ref: forwardedRef, ...props }) {
+export function StyledSelect({
+  error, className, children, ref: forwardedRef, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby, ...props
+}) {
   const selectRef = useRef(null);
   const {
-    open, toggle, closePopover, position, triggerRef, popoverRef,
+    open, closing, toggle, closePopover, handleClosed, position, triggerRef, popoverRef,
   } = usePickerPopover({ width: 260, height: 260 });
   const [options, setOptions] = useState([]);
   const [currentValue, setCurrentValue] = useState('');
@@ -290,7 +299,14 @@ export function StyledSelect({ error, className, children, ref: forwardedRef, ..
 
   return (
     <div className="csf-picker">
-      <select ref={mergeRefs(selectRef, forwardedRef)} tabIndex={-1} className="csf-native-hidden" {...props}>
+      <select
+        ref={mergeRefs(selectRef, forwardedRef)}
+        tabIndex={-1}
+        className="csf-native-hidden"
+        aria-label={ariaLabelledby ? undefined : ariaLabel}
+        aria-labelledby={ariaLabelledby}
+        {...props}
+      >
         {children}
       </select>
       <button
@@ -314,13 +330,16 @@ export function StyledSelect({ error, className, children, ref: forwardedRef, ..
         <ChevronDown size={14} strokeWidth={2} />
       </button>
 
-      {open && createPortal(
+      {(open || closing) && createPortal(
         <ul
           ref={popoverRef}
-          className="csf-dropdown-popover"
+          className={`csf-dropdown-popover${closing ? ' csf-popover--closing' : ''}`}
+          data-placement={position.placement}
           role="listbox"
-          aria-label="Opciones"
+          aria-label={ariaLabelledby ? undefined : (ariaLabel ?? 'Opciones')}
+          aria-labelledby={ariaLabelledby}
           style={{ top: position.top, left: position.left, minWidth: triggerRef.current?.offsetWidth }}
+          onAnimationEnd={closing ? handleClosed : undefined}
         >
           {options.map((opt, i) => (
             <li key={`${opt.value}-${i}`}>
@@ -353,4 +372,6 @@ StyledSelect.propTypes = {
   error: PropTypes.bool,
   className: PropTypes.string,
   children: PropTypes.node.isRequired,
+  'aria-label': PropTypes.string,
+  'aria-labelledby': PropTypes.string,
 };

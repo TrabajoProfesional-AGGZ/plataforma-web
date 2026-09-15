@@ -36,3 +36,40 @@ export const PERMISO_LABELS = {
   'crear_entrada': 'Reservar entrada para socio',
   'crear_compra': 'Crear compra para socio'
 };
+
+/** Etiqueta legible por módulo (clave = lo que devuelve `moduloDePermiso`), para agrupar `PermisosModal`. */
+export const PERMISO_MODULO = {
+  socios: 'Socios',
+  usuarios: 'Usuarios',
+  reservas: 'Reservas',
+  instalaciones: 'Instalaciones',
+  disciplinas: 'Disciplinas',
+  noticias: 'Noticias',
+  alertas: 'Alertas',
+  metricas: 'Métricas',
+  tramites: 'Trámites',
+  eventos: 'Eventos',
+  pagos_pendientes: 'Pagos',
+  entradas: 'Eventos',
+  compras: 'Tienda',
+};
+
+/** Singular → plural para las claves de permiso que no coinciden con `PERMISO_MODULO` tal cual. */
+const SINGULAR_A_PLURAL = {
+  socio: 'socios',
+  usuario: 'usuarios',
+  reserva: 'reservas',
+  instalacion: 'instalaciones',
+  disciplina: 'disciplinas',
+  noticia: 'noticias',
+  alerta: 'alertas',
+  evento: 'eventos',
+  entrada: 'entradas',
+  compra: 'compras',
+};
+
+/** Módulo (clave de `PERMISO_MODULO`) al que pertenece una clave de permiso, tomando lo que sigue al primer `_`. */
+export function moduloDePermiso(key) {
+  const resto = key.slice(key.indexOf('_') + 1);
+  return SINGULAR_A_PLURAL[resto] ?? resto;
+}

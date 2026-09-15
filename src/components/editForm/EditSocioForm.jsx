@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   User, Phone,
   Calendar, MapPin, Activity, Tag,
@@ -28,7 +28,7 @@ const stepFields = {
  */
 export function EditSocioForm({ socio, onSuccess, onCancel }) {
   const {
-    step, direction, submitted, setSubmitted, navGuard,
+    step, direction, submitted, setSubmitted, navGuard, finNavGuard,
     goBack, goNext, formError, setFormError,
     register, handleSubmit, setValue, errors, isSubmitting,
   } = useMultiStepForm(stepFields, {
@@ -47,6 +47,8 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
     },
   });
   const [catalogo, setCatalogo] = useState({ estados: [], categorias: [] });
+  const [resultado, setResultado] = useState(null);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     Promise.all([fetchEstadosSocio(), fetchCategoriasSocio()])
@@ -69,8 +71,9 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
     });
     try {
       const socioActualizado = await updateSocio(socio.id, updates);
+      setResultado(socioActualizado);
       setSubmitted(true);
-      setTimeout(() => onSuccess(socioActualizado), 1800);
+      timerRef.current = setTimeout(() => onSuccess(socioActualizado), 3000);
     } catch (err) {
       if (err.message === 'servicio-no-disponible') {
         setFormError('El servicio no está disponible. Intentá de nuevo más tarde.');
@@ -88,10 +91,12 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Editar socio"
       successTitle="¡Datos actualizados!"
       successMessage="Los cambios fueron guardados correctamente."
+      onSuccessAction={() => { clearTimeout(timerRef.current); onSuccess(resultado); }}
       submitLabel="Guardar cambios"
       submitLoadingLabel="Guardando..."
       onCancel={onCancel}

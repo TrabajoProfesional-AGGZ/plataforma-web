@@ -1,17 +1,74 @@
 /* Estilos compartidos entre varias páginas */
 
-/* ── Botón de acción primaria (compartido entre páginas) ─────── */
-.cambiar-contrasena-button,
+/* ── Título de página ──────────── */
+.page-title {
+  font-size: var(--text-title);
+  line-height: var(--leading-title);
+  letter-spacing: var(--tracking-title);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-5);
+  text-align: center;
+  text-wrap: balance;
+}
+
+.page-title--display {
+  font-size: var(--text-display);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  font-weight: 700;
+}
+
+.page-subtitle {
+  font-size: var(--text-secondary);
+  line-height: var(--leading-secondary);
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin: calc(-1 * var(--space-3)) 0 var(--space-6);
+}
+
+@media (max-width: 480px) {
+  .page-title--display {
+    font-size: var(--text-title);
+    line-height: var(--leading-title);
+    letter-spacing: var(--tracking-title);
+  }
+}
+
+/* ── Botón de acción primaria (Perfil) ─────────────────────────── */
 .perfil-cambiar-button {
   padding: 10px var(--space-5);
   background-color: var(--color-text-primary);
   color: var(--color-surface);
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-weight: 500;
   cursor: pointer;
   transition: background-color var(--transition-fast);
+}
+
+/* ── Botón con aspecto de link (acciones secundarias en texto) ── */
+.link-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 var(--space-1);
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+@media (hover: hover) {
+  .link-btn:hover {
+    background-color: var(--color-bg-subtle);
+  }
 }
 
 /* ── Botón mostrar/ocultar contraseña ─────────────────────────── */
@@ -23,14 +80,19 @@
   background: none;
   border: none;
   color: var(--color-text-secondary);
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   font-weight: 500;
   cursor: pointer;
-  padding: 0;
+  min-height: 32px;
+  padding: 0 8px;
+  display: inline-flex;
+  align-items: center;
 }
 
-.toggle-password:hover,
-.login-toggle-password:hover,
-.perfil-toggle-password:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .toggle-password:hover,
+  .login-toggle-password:hover,
+  .perfil-toggle-password:hover {
+    color: var(--color-text-primary);
+  }
 }

@@ -179,7 +179,7 @@ describe('EditSocioForm', () => {
     await waitFor(() => expect(screen.getByText('¡Datos actualizados!')).toBeInTheDocument());
   });
 
-  test('llama a onSuccess tras 1800ms de la pantalla de éxito', async () => {
+  test('llama a onSuccess tras 3000ms de la pantalla de éxito', async () => {
     const { onSuccess } = renderForm();
     await screen.findByDisplayValue('Activo');
 
@@ -189,7 +189,7 @@ describe('EditSocioForm', () => {
     await waitFor(() => expect(screen.getByText('¡Datos actualizados!')).toBeInTheDocument());
     expect(onSuccess).not.toHaveBeenCalled();
 
-    await waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1), { timeout: 3000 });
+    await waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1), { timeout: 4000 });
   });
 
   test('muestra error de servicio no disponible al guardar', async () => {

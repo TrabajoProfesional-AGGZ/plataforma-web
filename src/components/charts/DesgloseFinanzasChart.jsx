@@ -1,6 +1,7 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import EmptyState from '../feedback/EmptyState';
+import { chartTheme } from './chartTheme';
 
 /**
  * Gráfico de barras con el desglose de recaudación por concepto, ordenado
@@ -21,23 +22,26 @@ export function DesgloseFinanzasChart({ datos }) {
           data={datosOrdenados}
           margin={{ top: 20, right: 30, left: 20, bottom: 25 }}
         >
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border-light)" />
-          <XAxis 
-            dataKey="concepto" 
-            tick={{ fill: 'var(--color-text-secondary)', fontSize: '0.75rem' }}
-            axisLine={{ stroke: 'var(--color-border-medium)' }}
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartTheme.grid.stroke} />
+          <XAxis
+            dataKey="concepto"
+            tick={chartTheme.tick()}
+            axisLine={chartTheme.axisLine}
             tickLine={false}
           />
-          <YAxis 
+          <YAxis
             tickFormatter={(value) => `$${value}`}
-            tick={{ fill: 'var(--color-text-secondary)', fontSize: '0.75rem' }}
+            tick={chartTheme.tick()}
             axisLine={false}
             tickLine={false}
             width={80}
           />
-          <Tooltip 
+          <Tooltip
             formatter={(value) => [`$${value.toLocaleString('es-AR')}`, 'Recaudación']}
-            contentStyle={{ borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border-medium)' }}
+            contentStyle={chartTheme.tooltip.contentStyle}
+            labelStyle={chartTheme.tooltip.labelStyle}
+            itemStyle={chartTheme.tooltip.itemStyle}
+            cursor={chartTheme.tooltip.cursor}
           />
           <Bar 
             dataKey="monto" 

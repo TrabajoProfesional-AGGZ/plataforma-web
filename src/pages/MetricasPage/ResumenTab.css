@@ -1,25 +1,3 @@
-.resumen-loading {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-12) 0;
-}
-
-.resumen-error {
-  text-align: center;
-  color: var(--color-danger);
-  font-size: 0.875rem;
-  background-color: var(--status-error-surface-bg);
-  border: 1px solid var(--status-error-surface-border);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-}
-
-.resumen-empty {
-  color: var(--color-text-secondary);
-  font-size: 0.875rem;
-  text-align: center;
-}
-
 .resumen-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -35,7 +13,7 @@
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-md);
   padding: var(--space-5);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+  box-shadow: var(--shadow-sm);
 }
 
 .resumen-card-header {
@@ -47,14 +25,14 @@
 }
 
 .resumen-card-header h2 {
-  font-size: 1rem;
+  font-size: var(--text-body);
   font-weight: 600;
   margin: 0;
 }
 
 .resumen-badge {
   margin-left: auto;
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
   background: var(--color-bg);
   padding: 2px 8px;
@@ -80,13 +58,13 @@
   border-radius: 50%;
   background: var(--color-text-primary);
   color: var(--color-surface);
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   font-weight: 700;
 }
 
 .ranking-info { display: flex; flex-direction: column; }
-.ranking-nombre { font-weight: 600; font-size: 0.875rem; color: var(--color-text-primary); }
-.ranking-detalle { font-size: 0.75rem; color: var(--color-text-secondary); }
+.ranking-nombre { font-weight: 600; font-size: var(--text-secondary); color: var(--color-text-primary); }
+.ranking-detalle { font-size: var(--text-caption); color: var(--color-text-secondary); }
 
 .ranking-bar-container {
   position: relative;
@@ -97,10 +75,12 @@
 }
 
 .ranking-bar {
+  width: 100%;
   height: 100%;
+  transform-origin: left;
   background: var(--color-text-primary);
   border-radius: var(--radius-full);
-  transition: width 0.6s ease;
+  transition: transform 0.6s var(--ease-out, ease);
 }
 
 .ranking-porcentaje {
@@ -108,7 +88,7 @@
   right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 0.6875rem;
+  font-size: var(--text-micro);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -122,14 +102,14 @@
 }
 
 .ocupacion-promedio-valor {
-  font-size: 2.625rem;
+  font-size: var(--text-display);
   font-weight: 700;
   color: var(--color-text-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-display);
 }
 
 .ocupacion-promedio-label {
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
 }
 
@@ -143,8 +123,8 @@
 }
 
 .ocupacion-info { display: flex; flex-direction: column; }
-.ocupacion-nombre { font-weight: 600; font-size: 0.875rem; color: var(--color-text-primary); }
-.ocupacion-tipo { font-size: 0.75rem; color: var(--color-text-secondary); }
+.ocupacion-nombre { font-weight: 600; font-size: var(--text-secondary); color: var(--color-text-primary); }
+.ocupacion-tipo { font-size: var(--text-caption); color: var(--color-text-secondary); }
 
 .ocupacion-bar-container {
   position: relative;
@@ -155,10 +135,12 @@
 }
 
 .ocupacion-bar {
+  width: 100%;
   height: 100%;
+  transform-origin: left;
   background: var(--color-text-primary);
   border-radius: var(--radius-full);
-  transition: width 0.6s ease;
+  transition: transform 0.6s var(--ease-out, ease);
 }
 
 .ocupacion-porcentaje {
@@ -166,13 +148,13 @@
   right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 0.6875rem;
+  font-size: var(--text-micro);
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
 .ocupacion-horas {
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
   white-space: nowrap;
 }

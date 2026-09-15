@@ -28,22 +28,34 @@ describe('entradasService', () => {
       await expect(createEntrada(datos)).rejects.toThrow('servicio-no-disponible');
     });
 
-    test('lanza "socio-moroso" cuando la respuesta es 403 con tipo moroso', async () => {
+    test('lanza "socio-moroso" con el socio incumpliendo cuando la respuesta es 403 con tipo moroso', async () => {
       fetchTo.mockResolvedValueOnce({
         ok: false,
         status: 403,
         json: async () => ({ detail: { tipo: 'moroso', socio: '1000' } }),
       });
-      await expect(createEntrada(datos)).rejects.toThrow('socio-moroso');
+      try {
+        await createEntrada(datos);
+        throw new Error('no debería llegar acá');
+      } catch (e) {
+        expect(e.message).toBe('socio-moroso');
+        expect(e.socio).toBe('1000');
+      }
     });
 
-    test('lanza "socio-suspendido" cuando la respuesta es 403 con tipo suspendido', async () => {
+    test('lanza "socio-suspendido" con el socio incumpliendo cuando la respuesta es 403 con tipo suspendido', async () => {
       fetchTo.mockResolvedValueOnce({
         ok: false,
         status: 403,
         json: async () => ({ detail: { tipo: 'suspendido', socio: '1000' } }),
       });
-      await expect(createEntrada(datos)).rejects.toThrow('socio-suspendido');
+      try {
+        await createEntrada(datos);
+        throw new Error('no debería llegar acá');
+      } catch (e) {
+        expect(e.message).toBe('socio-suspendido');
+        expect(e.socio).toBe('1000');
+      }
     });
 
     test('lanza el tipo del detalle cuando la respuesta es 409', async () => {

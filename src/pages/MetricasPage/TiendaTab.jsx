@@ -1,18 +1,18 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { ShoppingBag } from 'lucide-react';
 import { getTopProductos } from '../../services/metricasService';
-import { useTheme } from '../../hooks/useTheme';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import RankingList from './RankingList';
 import './TiendaTab.css';
 
 /** Pestaña "Tienda" de Métricas: ranking de productos más vendidos y su facturación. */
 function TiendaTab() {
-  const { logoSocio: logo } = useTheme();
   const [productos, setProductos] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  const cargar = useCallback(() => {
     let cancelled = false;
 
     setLoading(true);
@@ -38,20 +38,18 @@ function TiendaTab() {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => cargar(), [cargar]);
+
   if (loading) {
-    return (
-      <div className="tienda-tab-loading">
-        <img src={logo} alt="" className="loading-logo" />
-      </div>
-    );
+    return <SkeletonRows n={5} />;
   }
 
   if (error) {
-    return <p className="tienda-tab-error">{error}</p>;
+    return <ErrorBanner mensaje={error} onReintentar={cargar} />;
   }
 
   return (
-    <div className="tienda-tab">
+    <div>
       <div className="tienda-tab-card">
         <div className="tienda-tab-card-header">
           <ShoppingBag size={20} />

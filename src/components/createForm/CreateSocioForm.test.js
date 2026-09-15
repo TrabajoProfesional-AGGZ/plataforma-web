@@ -112,7 +112,7 @@ describe('CreateSocioForm', () => {
     await waitFor(() => expect(screen.getByText('¡Socio creado!')).toBeInTheDocument());
   });
 
-  test('llama a onSuccess tras 1800ms de la pantalla de éxito', async () => {
+  test('llama a onSuccess tras 3000ms de la pantalla de éxito', async () => {
     createSocio.mockResolvedValueOnce({ id: 'uuid-new' });
     render(<CreateSocioForm onSuccess={onSuccess} onCancel={onCancel} />);
     await navigateToStep3();
@@ -122,7 +122,7 @@ describe('CreateSocioForm', () => {
     await waitFor(() => expect(screen.getByText('¡Socio creado!')).toBeInTheDocument());
     expect(onSuccess).not.toHaveBeenCalled();
 
-    await waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1), { timeout: 3000 });
+    await waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1), { timeout: 4000 });
   });
 
   test('muestra error de duplicado cuando el servicio lanza socio-duplicado', async () => {

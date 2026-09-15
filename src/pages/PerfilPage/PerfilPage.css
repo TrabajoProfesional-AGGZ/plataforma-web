@@ -3,15 +3,6 @@
   margin: 0 auto;
 }
 
-.perfil-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  margin: 0 0 28px 0;
-  text-align: center;
-  letter-spacing: -0.02em;
-}
-
 .perfil-card {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border-medium);
@@ -56,15 +47,16 @@
 }
 
 .perfil-label {
-  font-size: 0.6875rem;
+  font-size: var(--text-label);
+  line-height: var(--leading-label);
+  letter-spacing: var(--tracking-label);
   font-weight: 600;
   color: var(--color-text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .perfil-value {
-  font-size: 1rem;
+  font-size: var(--text-body);
   color: var(--color-text-primary);
 }
 
@@ -72,20 +64,12 @@
   display: inline-block;
   padding: 4px 12px;
   border-radius: 12px;
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   font-weight: 500;
   align-self: flex-start;
-}
-
-.perfil-rol-admin {
   background-color: var(--color-bg);
   color: var(--color-text-primary);
   border: 1px solid var(--color-border-medium);
-}
-
-.perfil-rol-superAdmin {
-  background-color: var(--color-text-primary);
-  color: var(--color-surface);
 }
 
 .perfil-actions {
@@ -103,34 +87,32 @@
   background: none;
   border: none;
   color: var(--color-text-secondary);
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-weight: 500;
   cursor: pointer;
+  min-height: 36px;
   padding: 6px 0;
   text-decoration: underline;
   text-underline-offset: 3px;
 }
 
-.perfil-ver-permisos-button:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .perfil-ver-permisos-button:hover {
+    color: var(--color-text-primary);
+  }
 }
 
 /* .perfil-cambiar-button base → src/styles/shared.css */
 
-.perfil-cambiar-button:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .perfil-cambiar-button:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
 
-.perfil-password-wrapper {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.perfil-password-input {
-  width: 100%;
-  padding-right: 80px;
-  box-sizing: border-box;
+.perfil-toggle-password {
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 /* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */

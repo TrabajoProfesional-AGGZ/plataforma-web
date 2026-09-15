@@ -53,7 +53,7 @@ jest.mock('../../components/createDisciplinaForm/CreateDisciplinaForm', () => ({
 async function renderPage() {
   render(<MemoryRouter><DisciplinasPage /></MemoryRouter>);
   await waitFor(() =>
-    expect(document.querySelector('.list-loading')).not.toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   );
 }
 
@@ -183,18 +183,18 @@ describe('DisciplinasPage', () => {
     expect(screen.getAllByText('Activa').length).toBeGreaterThan(0);
   });
 
-  test('el botón "Eliminar" está visible en el detalle con permiso borrar_disciplina', async () => {
+  test('el botón "Pausar" está visible en el detalle con permiso borrar_disciplina', async () => {
     await renderPage();
     crearDisciplinaHelper();
     irAlDetalle();
-    expect(screen.getByRole('button', { name: 'Eliminar' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Pausar' })).toBeInTheDocument();
   });
 
-  test('abre el modal de pausar al hacer clic en Eliminar', async () => {
+  test('abre el modal de pausar al hacer clic en Pausar', async () => {
     await renderPage();
     crearDisciplinaHelper();
     irAlDetalle();
-    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pausar' }));
     expect(screen.getByText(/pausar disciplina/i)).toBeInTheDocument();
   });
 
@@ -202,7 +202,7 @@ describe('DisciplinasPage', () => {
     await renderPage();
     crearDisciplinaHelper();
     irAlDetalle();
-    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pausar' }));
     fireEvent.click(screen.getByRole('button', { name: 'Cancelar' }));
     expect(screen.queryByText(/pausar disciplina/i)).not.toBeInTheDocument();
   });
@@ -211,7 +211,7 @@ describe('DisciplinasPage', () => {
     await renderPage();
     crearDisciplinaHelper();
     irAlDetalle();
-    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pausar' }));
     expect(screen.getByText(/pausar disciplina/i)).toBeInTheDocument();
     fireEvent.keyDown(document, { key: 'Escape' });
     expect(screen.queryByText(/pausar disciplina/i)).not.toBeInTheDocument();
@@ -221,7 +221,7 @@ describe('DisciplinasPage', () => {
     await renderPage();
     crearDisciplinaHelper();
     irAlDetalle();
-    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pausar' }));
     expect(screen.getByText(/pausar disciplina/i)).toBeInTheDocument();
     fireEvent.click(document.querySelector('.csf-overlay'));
     expect(screen.queryByText(/pausar disciplina/i)).not.toBeInTheDocument();
@@ -231,7 +231,7 @@ describe('DisciplinasPage', () => {
     await renderPage();
     crearDisciplinaHelper();
     irAlDetalle();
-    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pausar' }));
     fireEvent.click(ultimoBoton('Pausar'));
     expect(screen.getByText('Disciplinas')).toBeInTheDocument();
     expect(screen.getByText('Pausada')).toBeInTheDocument();
@@ -428,6 +428,57 @@ describe('DisciplinasPage', () => {
     });
   });
 
+  test('muestra el motivo real (apto médico) y el socio incumpliendo cuando el rechazo es por apto médico', async () => {
+    inscribirSocioADisciplina.mockRejectedValueOnce(new Error('socio-apto-medico'));
+
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByLabelText('Número de socio a inscribir')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Número de socio a inscribir'), { target: { value: '2001' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Inscribir socio' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('El socio N° 2001 debe presentar un apto médico vigente antes de inscribirse.')).toBeInTheDocument();
+    });
+    expect(screen.queryByText(/situación financiera/i)).not.toBeInTheDocument();
+  });
+
+  test('muestra el motivo real (financiero) y el socio incumpliendo cuando el rechazo es por moroso', async () => {
+    inscribirSocioADisciplina.mockRejectedValueOnce(new Error('socio-moroso'));
+
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByLabelText('Número de socio a inscribir')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Número de socio a inscribir'), { target: { value: '2001' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Inscribir socio' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('El socio N° 2001 debe regularizar su situación financiera con el club antes de inscribirse.')).toBeInTheDocument();
+    });
+  });
+
+  test('muestra el motivo real (categoría) con la categoría requerida cuando el rechazo es por categoría no coincidente', async () => {
+    const error = new Error('categoria-no-coincide');
+    error.categoriaRequerida = 'Activo Pleno';
+    inscribirSocioADisciplina.mockRejectedValueOnce(error);
+
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByLabelText('Número de socio a inscribir')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Número de socio a inscribir'), { target: { value: '2001' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Inscribir socio' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('El socio N° 2001 no pertenece a la categoría de socio requerida para esta disciplina (Activo Pleno).')).toBeInTheDocument();
+    });
+  });
+
   test('el botón "Inscribir socio" está deshabilitado sin número ingresado', async () => {
     await renderPage();
     crearDisciplinaHelper();
@@ -458,7 +509,7 @@ describe('DisciplinasPage', () => {
     crearDisciplinaHelper();
     irAlDetalle();
 
-    fireEvent.click(screen.getByRole('button', { name: 'Eliminar' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Pausar' }));
     fireEvent.click(ultimoBoton('Pausar'));
 
     await waitFor(() => {
