@@ -47,7 +47,6 @@ function UsuariosPage() {
   const { userData } = useAuthContext();
 
   const cacheUsuariosRef = useRef(null);
-  const buscarTimeoutRef = useRef(null);
 
   const [busqueda, setBusqueda] = useState('');
   const [modo, setModo] = useState('lista');
@@ -98,10 +97,7 @@ function UsuariosPage() {
     fetchRoles()
       .then((data) => setRoles(Array.isArray(data) ? data : []))
       .catch(() => {});
-    return () => {
-      cancelled = true;
-      if (buscarTimeoutRef.current) clearTimeout(buscarTimeoutRef.current);
-    };
+    return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -134,26 +130,13 @@ function UsuariosPage() {
     await fetchYActualizarUsuarios();
   }
 
-  /** Filtra la lista local con un debounce de 400ms para no re-renderizar en cada tecla. */
   function handleBuscar(e) {
     e.preventDefault();
-    if (buscarTimeoutRef.current) clearTimeout(buscarTimeoutRef.current);
-    setLoading(true);
-    const termino = busqueda.trim().toLowerCase();
-    buscarTimeoutRef.current = setTimeout(() => {
-      buscarTimeoutRef.current = null;
-      setFiltroBusqueda(termino);
-      setModo('lista');
-      setLoading(false);
-    }, 400);
+    setFiltroBusqueda(busqueda.trim().toLowerCase());
+    setModo('lista');
   }
 
   function handleVerTodos() {
-    if (buscarTimeoutRef.current) {
-      clearTimeout(buscarTimeoutRef.current);
-      buscarTimeoutRef.current = null;
-      setLoading(false);
-    }
     setBusqueda('');
     setFiltroBusqueda('');
     setFiltroRol('');
@@ -333,11 +316,6 @@ function UsuariosPage() {
                   {listaPaginada.map((u) => {
                     const cfg = estadoConfig(u.estado?.nombre);
                     const verDetalle = () => {
-                      if (buscarTimeoutRef.current) {
-                        clearTimeout(buscarTimeoutRef.current);
-                        buscarTimeoutRef.current = null;
-                        setLoading(false);
-                      }
                       setResultado(u);
                       setModo('usuario');
                     };
