@@ -20,13 +20,15 @@
   z-index: var(--z-sidebar);
 }
 
+/* Misma altura que .app-header (72px) para que los bordes inferiores se alineen */
 .sidebar-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-3) var(--space-4);
+  padding: 0 var(--space-4);
   border-bottom: 1px solid var(--color-border-medium);
-  height: 56px;
+  height: 72px;
+  box-sizing: border-box;
   flex-shrink: 0;
 }
 
@@ -156,18 +158,27 @@
   overflow: hidden;
 }
 
+/* El borde y la sombra aparecen recién cuando .app-content hizo scroll
+   (clase --scrolled desde AppLayout.jsx): con el contenido al tope el header
+   se funde con la página. No es sticky: .app-content es el que scrollea. */
 .app-header {
-  height: 80px;
+  height: 72px;
+  box-sizing: border-box;
   flex-shrink: 0;
   display: flex;
   align-items: center;
   padding: 0 var(--space-8);
   background: var(--color-surface);
-  border-bottom: 1px solid var(--color-border-medium);
-  box-shadow: 0 1px 0 var(--color-border);
-  position: sticky;
-  top: 0;
-  z-index: var(--z-sticky);
+  border-bottom: 1px solid transparent;
+  box-shadow: none;
+  position: relative;
+  z-index: 1;
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.app-header--scrolled {
+  border-bottom-color: var(--color-border-medium);
+  box-shadow: var(--shadow-sm);
 }
 
 /* Centrado absoluto (true center), independiente del ancho de las acciones:
@@ -206,15 +217,17 @@
 }
 
 
+/* 60px dentro de un header de 72px: 6px de aire arriba y abajo */
 .app-header-logo {
-  height: 70px;
+  height: 60px;
   width: auto;
 }
 
 /* max-width: calcula el espacio disponible entre el borde derecho y el punto
-   donde empieza el logo (centrado en 50%, ancho real ~210px a 70px de alto)
-   más el padding del header y un margen de seguridad — así nunca lo toca,
-   sin importar cuán largo sea el mail. */
+   donde empieza el logo (centrado en 50%; texto.png es 866×288, o sea ~180px
+   de ancho a 60px de alto → 90px desde el centro) más el padding del header
+   (32px) y ~28px de margen — así nunca lo toca, sin importar cuán largo sea
+   el mail. */
 .app-header-actions {
   display: flex;
   align-items: center;

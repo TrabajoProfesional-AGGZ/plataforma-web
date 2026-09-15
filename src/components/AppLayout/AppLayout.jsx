@@ -23,7 +23,9 @@ function AppLayout() {
   const indicatorRef = useRef(null);
   const indicadorSinPosicionRef = useRef(true);
   const snapFrameRef = useRef(null);
+  const contentRef = useRef(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useBackToRoot(drawerOpen, false, () => setDrawerOpen(false));
   useDocumentTitle(seccionPorRuta(location.pathname)?.label);
@@ -72,6 +74,27 @@ function AppLayout() {
       if (snapFrameRef.current) cancelAnimationFrame(snapFrameRef.current);
     };
   }, [posicionarIndicador]);
+
+  // Marca el header con --scrolled cuando el contenido dejó de estar al tope
+  // (borde + sombra recién ahí). Se lee el scrollTop en un rAF para no hacer
+  // trabajo en cada evento de scroll.
+  useEffect(() => {
+    const contenido = contentRef.current;
+    if (!contenido) return;
+    let frame = null;
+    const handleScroll = () => {
+      if (frame !== null) return;
+      frame = requestAnimationFrame(() => {
+        frame = null;
+        setScrolled(contenido.scrollTop > 4);
+      });
+    };
+    contenido.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      contenido.removeEventListener('scroll', handleScroll);
+      if (frame !== null) cancelAnimationFrame(frame);
+    };
+  }, []);
 
   // Cierra el drawer mobile automáticamente al navegar a otra ruta.
   useEffect(() => {
@@ -141,7 +164,7 @@ function AppLayout() {
       </aside>
 
       <div className="app-main">
-        <header className="app-header">
+        <header className={`app-header${scrolled ? ' app-header--scrolled' : ''}`}>
           <button
             className="app-header-menu-btn"
             aria-label="Abrir menú"
@@ -160,7 +183,7 @@ function AppLayout() {
           </div>
         </header>
 
-        <main className="app-content">
+        <main className="app-content" ref={contentRef}>
           <Outlet />
         </main>
       </div>
