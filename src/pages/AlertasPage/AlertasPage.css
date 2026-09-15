@@ -43,10 +43,7 @@
 /* Loading wrapper → .list-loading en src/styles/ListPage.css */
 
 .alertas-btn-eliminar-fila {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
+  padding: 0;
   border: none;
   border-radius: var(--radius-sm);
   background: transparent;

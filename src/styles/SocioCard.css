@@ -73,8 +73,8 @@
   position: absolute;
   top: var(--space-3);
   right: var(--space-3);
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   background: var(--color-text-primary);
   color: var(--color-surface);
   border: none;
@@ -94,7 +94,7 @@
   color: var(--color-text-primary);
   background: none;
   border: none;
-  padding: 0;
+  padding: 2px 0;
   font: inherit;
 }
 

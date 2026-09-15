@@ -27,6 +27,9 @@
   align-items: center;
   font: inherit;
   color: inherit;
+  min-height: 32px;
+  padding: 0 4px;
+  margin: 0 -4px;
 }
 
 .th-sort-btn:focus-visible {

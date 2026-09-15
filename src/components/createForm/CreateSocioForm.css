@@ -491,10 +491,8 @@ button.csf-overlay {
   border: none;
   cursor: pointer;
   color: var(--color-text-secondary);
-  display: flex;
-  align-items: center;
   padding: 0;
-  margin-left: var(--space-2);
+  margin: -8px -6px -8px 0;
   transition: color var(--transition-fast);
 }
 

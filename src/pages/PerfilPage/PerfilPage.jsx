@@ -32,21 +32,9 @@ function PasswordInput({ id, value, onChange, autoComplete, required }) {
       />
       <button
         type="button"
+        className="icon-btn perfil-toggle-password"
         onClick={() => setShow((v) => !v)}
         aria-label={show ? 'Ocultar contraseña' : 'Mostrar contraseña'}
-        style={{
-          position: 'absolute',
-          right: 12,
-          top: '50%',
-          transform: 'translateY(-50%)',
-          background: 'none',
-          border: 'none',
-          cursor: 'pointer',
-          color: 'var(--color-text-secondary)',
-          padding: 0,
-          display: 'flex',
-          alignItems: 'center',
-        }}
       >
         {show ? <EyeOff size={16} /> : <Eye size={16} />}
       </button>

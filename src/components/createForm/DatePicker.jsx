@@ -129,7 +129,7 @@ export function DatePicker({ error, className, style, min, max, disabled, placeh
             </button>
             <div className="csf-calendar-title-selects">
               <select
-                className="csf-calendar-select"
+                className="csf-calendar-select hit-area"
                 aria-label="Mes"
                 value={viewDate.getMonth()}
                 onChange={(e) => setViewDate(new Date(viewDate.getFullYear(), Number(e.target.value), 1))}
@@ -137,7 +137,7 @@ export function DatePicker({ error, className, style, min, max, disabled, placeh
                 {MESES.map((m, i) => <option key={m} value={i}>{m}</option>)}
               </select>
               <select
-                className="csf-calendar-select"
+                className="csf-calendar-select hit-area"
                 aria-label="Año"
                 value={viewDate.getFullYear()}
                 onChange={(e) => setViewDate(new Date(Number(e.target.value), viewDate.getMonth(), 1))}

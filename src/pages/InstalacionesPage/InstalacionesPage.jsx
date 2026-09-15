@@ -355,7 +355,7 @@ function InstalacionesPage() {
                       <button
                         key={socio.id}
                         type="button"
-                        className="nro-socio-link"
+                        className="nro-socio-link hit-area"
                         onClick={() => abrirVerSocio(socio)}
                       >
                         {socio.nro_socio}

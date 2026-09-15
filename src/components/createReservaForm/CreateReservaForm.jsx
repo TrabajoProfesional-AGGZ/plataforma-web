@@ -32,12 +32,20 @@ const AVISOS_ESTADO_SOCIO = {
   Suspendido: 'No se puede realizar una reserva para este socio hasta que no termine su suspensión.',
 };
 
+/** Arma el mensaje de rechazo listando los N° de socio que no cumplen el requisito. */
+function mensajeSociosIncumpliendo(socios, requisito) {
+  const nros = (socios ?? []).map((n) => `N° ${n}`).join(', ');
+  const sujeto = (socios ?? []).length > 1 ? `Los socios ${nros} deben` : `El socio ${nros} debe`;
+  return `${sujeto} ${requisito} antes de poder reservar.`;
+}
+
 const MENSAJES_ERROR_SUBMIT = {
   superposicion: 'Ya existe una reserva en ese horario para esta instalación.',
   'sin-cupo': 'Ya no quedan cupos suficientes para ese turno con la cantidad de socios elegida.',
   'conflicto-temporal': 'La instalación está siendo actualizada por otra reserva. Probá de nuevo en unos segundos.',
-  'socio-moroso': AVISOS_ESTADO_SOCIO.Moroso,
-  'socio-suspendido': AVISOS_ESTADO_SOCIO.Suspendido,
+  'socio-moroso': (socios) => mensajeSociosIncumpliendo(socios, 'regularizar su situación financiera con el club'),
+  'socio-suspendido': (socios) => mensajeSociosIncumpliendo(socios, 'terminar su suspensión'),
+  'socio-apto-medico': (socios) => mensajeSociosIncumpliendo(socios, 'presentar un apto médico vigente'),
 };
 
 /**
@@ -194,7 +202,10 @@ export function CreateReservaForm({ onSuccess, onCancel, instalacion }) {
       setSubmitted(true);
       setTimeout(() => onSuccess(), 1800);
     } catch (e) {
-      setSubmitError(MENSAJES_ERROR_SUBMIT[e.message] || 'No se pudo registrar la reserva. Intentá de nuevo.');
+      const mensaje = MENSAJES_ERROR_SUBMIT[e.message];
+      setSubmitError(
+        typeof mensaje === 'function' ? mensaje(e.socios) : mensaje || 'No se pudo registrar la reserva. Intentá de nuevo.'
+      );
     }
   };
 

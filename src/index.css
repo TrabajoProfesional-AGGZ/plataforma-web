@@ -37,6 +37,26 @@ button:active:not(:disabled):not(.app-header-logo-btn) {
   outline-offset: 2px;
 }
 
+/* Área mínima de puntero: 32 px para íconos, 36 px para botones con texto
+   (WCAG 2.2 pide 24; la casa usa 32/36 en escritorio). */
+.icon-btn {
+  min-width: 32px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hit-area {
+  position: relative;
+}
+
+.hit-area::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

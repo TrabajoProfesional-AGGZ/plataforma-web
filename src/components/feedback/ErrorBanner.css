@@ -20,6 +20,7 @@
   text-decoration: underline;
   cursor: pointer;
   font: inherit;
-  padding: 0;
+  min-height: 32px;
+  padding: 0 6px;
   margin-left: var(--space-2);
 }

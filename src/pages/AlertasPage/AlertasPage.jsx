@@ -138,7 +138,7 @@ function AlertasPage() {
                   <td>
                     <button
                       type="button"
-                      className="alertas-btn-eliminar-fila"
+                      className="icon-btn alertas-btn-eliminar-fila"
                       aria-label="Eliminar alerta"
                       onClick={() => setAlertaAEliminar(a)}
                     >

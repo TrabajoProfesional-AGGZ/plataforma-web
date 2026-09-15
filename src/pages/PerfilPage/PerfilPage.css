@@ -106,6 +106,7 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
+  min-height: 36px;
   padding: 6px 0;
   text-decoration: underline;
   text-underline-offset: 3px;
@@ -123,6 +124,11 @@
   .perfil-cambiar-button:hover {
     background-color: var(--color-text-secondary);
   }
+}
+
+.perfil-toggle-password {
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .perfil-password-wrapper {
