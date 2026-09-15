@@ -56,18 +56,20 @@ function slugify(text) {
 export function Field({ id, label, icon: Icon, error, children }) {
   const fieldId = id ?? `field-${slugify(label)}`;
   const errorId = `${fieldId}-error`;
+  const labelId = `${fieldId}-label`;
   const singleChild = Children.count(children) === 1 ? Children.only(children) : null;
   const wiredChild = singleChild && isValidElement(singleChild)
     ? cloneElement(singleChild, {
       id: singleChild.props.id ?? fieldId,
       'aria-invalid': error ? 'true' : undefined,
       'aria-describedby': error ? errorId : undefined,
+      'aria-labelledby': singleChild.props['aria-labelledby'] ?? labelId,
     })
     : children;
 
   return (
     <div className="csf-field">
-      <label className="csf-label" htmlFor={fieldId}>
+      <label className="csf-label" id={labelId} htmlFor={fieldId}>
         <Icon size={13} strokeWidth={2} />
         {label}
       </label>
@@ -223,7 +225,9 @@ EmailField.propTypes = {
  * evento `change` nativo, así que tanto un `onChange` pasado directo como el
  * que devuelve `register()` de react-hook-form lo reciben sin cambios.
  */
-export function StyledSelect({ error, className, children, ref: forwardedRef, ...props }) {
+export function StyledSelect({
+  error, className, children, ref: forwardedRef, 'aria-label': ariaLabel, 'aria-labelledby': ariaLabelledby, ...props
+}) {
   const selectRef = useRef(null);
   const {
     open, toggle, closePopover, position, triggerRef, popoverRef,
@@ -285,7 +289,13 @@ export function StyledSelect({ error, className, children, ref: forwardedRef, ..
 
   return (
     <div className="csf-picker">
-      <select ref={mergeRefs(selectRef, forwardedRef)} tabIndex={-1} className="csf-native-hidden" {...props}>
+      <select
+        ref={mergeRefs(selectRef, forwardedRef)}
+        tabIndex={-1}
+        className="csf-native-hidden"
+        aria-labelledby={ariaLabelledby}
+        {...props}
+      >
         {children}
       </select>
       <button
@@ -314,7 +324,8 @@ export function StyledSelect({ error, className, children, ref: forwardedRef, ..
           ref={popoverRef}
           className="csf-dropdown-popover"
           role="listbox"
-          aria-label="Opciones"
+          aria-label={ariaLabelledby ? undefined : (ariaLabel ?? 'Opciones')}
+          aria-labelledby={ariaLabelledby}
           style={{ top: position.top, left: position.left, minWidth: triggerRef.current?.offsetWidth }}
         >
           {options.map((opt, i) => (
@@ -348,4 +359,6 @@ StyledSelect.propTypes = {
   error: PropTypes.bool,
   className: PropTypes.string,
   children: PropTypes.node.isRequired,
+  'aria-label': PropTypes.string,
+  'aria-labelledby': PropTypes.string,
 };

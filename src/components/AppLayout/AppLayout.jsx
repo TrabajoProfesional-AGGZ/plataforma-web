@@ -173,7 +173,7 @@ function AppLayout() {
           </button>
         </div>
 
-        <nav className="sidebar-nav" ref={navRef}>
+        <nav className="sidebar-nav" aria-label="Principal" ref={navRef}>
           <div ref={indicatorRef} className="sidebar-active-bg" />
           {navItems.map(({ to, label, Icon }) => (
             <NavLink
