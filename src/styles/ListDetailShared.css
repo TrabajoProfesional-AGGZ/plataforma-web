@@ -142,14 +142,14 @@
 
 .disciplinas-btn-eliminar,
 .instalaciones-btn-eliminar-inst {
-  background-color: var(--color-danger);
+  background-color: var(--color-danger-fill);
   color: var(--color-on-accent);
   transition: background-color var(--transition-fast);
 }
 
 .disciplinas-btn-eliminar:hover,
 .instalaciones-btn-eliminar-inst:hover {
-  background-color: var(--color-danger-hover);
+  background-color: var(--color-danger-fill-hover);
 }
 
 .detalle-id {

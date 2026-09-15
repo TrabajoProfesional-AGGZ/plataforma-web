@@ -279,7 +279,7 @@ button.csf-overlay {
 
 .csf-btn-danger {
   color: var(--color-on-accent);
-  background-color: var(--color-danger);
+  background-color: var(--color-danger-fill);
 }
 
 .csf-btn-submit:disabled,
@@ -294,7 +294,7 @@ button.csf-overlay {
 }
 
 .csf-btn-danger:hover:not(:disabled) {
-  background-color: var(--color-danger-hover);
+  background-color: var(--color-danger-fill-hover);
 }
 
 /* Spinner */

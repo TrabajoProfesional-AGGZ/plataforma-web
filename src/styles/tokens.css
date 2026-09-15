@@ -24,6 +24,10 @@
   --color-border-light: #efefef;
   --color-danger: #c0392b;
   --color-danger-hover: #96281b;
+  /* Relleno de botones destructivos. Separado de --color-danger (texto/borde)
+     porque en oscuro el rojo de texto es claro y el blanco encima no contrasta. */
+  --color-danger-fill: #c0392b;
+  --color-danger-fill-hover: #96281b;
   --color-row-hover: #f8f8f8;
   --color-bg-subtle: #f0f0f0;
   --color-overlay: rgba(0, 0, 0, 0.4);
@@ -122,6 +126,8 @@
   --color-border-light: #262626;
   --color-danger: #f87171;
   --color-danger-hover: #ef4444;
+  --color-danger-fill: #dc2626;
+  --color-danger-fill-hover: #b91c1c;
   --color-row-hover: #232323;
   --color-bg-subtle: #1a1a1a;
   --color-overlay: rgba(0, 0, 0, 0.6);

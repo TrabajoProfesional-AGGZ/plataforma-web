@@ -167,7 +167,7 @@
 }
 
 .usuarios-btn-eliminar:hover {
-  background-color: var(--color-danger);
+  background-color: var(--color-danger-fill);
   color: var(--color-on-accent);
 }
 

@@ -218,13 +218,13 @@
   font-weight: 500;
   cursor: pointer;
   border: none;
-  background-color: var(--color-danger);
+  background-color: var(--color-danger-fill);
   color: var(--color-on-accent);
   transition: background-color var(--transition-fast);
 }
 
 .noticias-btn-eliminar:hover {
-  background-color: var(--color-danger-hover);
+  background-color: var(--color-danger-fill-hover);
 }
 
 /* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */

@@ -110,13 +110,13 @@
 }
 
 .instalaciones-btn-reserva-eliminar {
-  background-color: var(--color-danger);
+  background-color: var(--color-danger-fill);
   color: var(--color-on-accent);
   border: none;
 }
 
 .instalaciones-btn-reserva-eliminar:hover {
-  background-color: var(--color-danger-hover);
+  background-color: var(--color-danger-fill-hover);
 }
 
 /* ── Secciones en vista lista ─────────────────────────────────── */
