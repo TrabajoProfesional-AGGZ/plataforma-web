@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
-import { Plus, ChevronDown, ChevronUp } from 'lucide-react';
+import { Plus, ChevronDown, ChevronUp, ChevronRight } from 'lucide-react';
 import { CreateInstalacionForm } from '../../components/createInstalacionForm/CreateInstalacionForm';
 import { DatePicker } from '../../components/createForm/DatePicker';
 import { CreateReservaForm } from '../../components/createReservaForm/CreateReservaForm';
@@ -290,6 +290,7 @@ function InstalacionesPage() {
               <th className="td-num">Capacidad máxima</th>
               <th className="td-num">Valor/Turno</th>
               <th className="td-center">Estado</th>
+              <th className="td-chevron" aria-hidden="true"></th>
             </tr>
           </thead>
           <tbody>
@@ -314,6 +315,7 @@ function InstalacionesPage() {
                     {inst.activa ? 'Activa' : 'Inactiva'}
                   </EstadoBadge>
                 </td>
+                <td className="td-chevron"><ChevronRight size={16} aria-hidden="true" /></td>
               </tr>
               );
             })}
@@ -344,7 +346,6 @@ function InstalacionesPage() {
         <table className="instalaciones-tabla">
           <thead>
             <tr>
-              <th>ID</th>
               <th>Socio(s)</th>
               <th className="td-num">Fecha</th>
               <th className="td-num">Inicio</th>
@@ -355,8 +356,7 @@ function InstalacionesPage() {
           </thead>
           <tbody>
             {reservasPaginadas.map((r) => (
-              <tr key={r.id}>
-                <td>{r.id}</td>
+              <tr key={r.id} title={`Reserva ${r.id}`}>
                 <td>
                   <div className="reserva-socios-list">
                     {(r.socios ?? []).map((socio) => (

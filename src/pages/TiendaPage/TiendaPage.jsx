@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Plus, PackageSearch } from 'lucide-react';
+import { Plus, PackageSearch, ChevronRight } from 'lucide-react';
 import { getProductos, getProducto } from '../../services/productosService';
 import { CreateProductoForm } from '../../components/createProductoForm/CreateProductoForm';
 import { EditProductoForm } from '../../components/editProductoForm/EditProductoForm';
@@ -149,6 +149,7 @@ function TiendaPage() {
               <th className="td-num">Precio</th>
               <th className="td-num">Stock</th>
               <th className="td-center">Estado</th>
+              <th className="td-chevron" aria-hidden="true"></th>
             </tr>
           </thead>
           <tbody>
@@ -180,6 +181,7 @@ function TiendaPage() {
                     {p.activo ? 'Activo' : 'Inactivo'}
                   </EstadoBadge>
                 </td>
+                <td className="td-chevron"><ChevronRight size={16} aria-hidden="true" /></td>
               </tr>
             ))}
           </tbody>

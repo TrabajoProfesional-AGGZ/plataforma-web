@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Search, Plus } from 'lucide-react';
+import { Search, Plus, ChevronRight } from 'lucide-react';
 import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import { fetchUsuarios, eliminarUsuario } from '../../services/usuariosService';
@@ -309,6 +309,7 @@ function UsuariosPage() {
                         Estado{iconoOrden('estado')}
                       </button>
                     </th>
+                    <th className="td-chevron" aria-hidden="true"></th>
                   </tr>
                 </thead>
                 <tbody>
@@ -343,6 +344,7 @@ function UsuariosPage() {
                             {u.estado?.nombre}
                           </span>
                         </td>
+                        <td className="td-chevron"><ChevronRight size={16} aria-hidden="true" /></td>
                       </tr>
                     );
                   })}

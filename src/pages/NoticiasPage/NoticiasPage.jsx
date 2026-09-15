@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Plus } from 'lucide-react';
+import { Plus, ChevronRight } from 'lucide-react';
 import { getNoticias, getNoticiasHistoricas, getNoticia, createNoticia, borrarNoticia } from '../../services/noticiasService';
 import { usePermiso } from '../../hooks/usePermiso';
 import { usePaginacion } from '../../hooks/usePaginacion';
@@ -167,6 +167,7 @@ function NoticiasPage() {
               <th className="td-num">Publicación</th>
               <th className="td-num">Vencimiento</th>
               <th className="td-center">Estado</th>
+              <th className="td-chevron" aria-hidden="true"></th>
             </tr>
           </thead>
           <tbody>
@@ -188,6 +189,7 @@ function NoticiasPage() {
                     {n.estado ?? '—'}
                   </EstadoBadge>
                 </td>
+                <td className="td-chevron"><ChevronRight size={16} aria-hidden="true" /></td>
               </tr>
             ))}
           </tbody>

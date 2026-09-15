@@ -15,10 +15,15 @@ import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
 
-/** Formatea una fecha ISO a fecha y hora local, o '—' si no hay valor. */
+/** Fecha corta ("1 jun 2026") para la celda; la hora completa va en el `title`. */
 function formatearFecha(fecha) {
   if (!fecha) return '—';
-  return new Date(fecha).toLocaleString();
+  return new Date(fecha).toLocaleDateString('es-AR', { dateStyle: 'medium' });
+}
+
+/** Fecha y hora completas para el tooltip nativo de la celda de fecha. */
+function fechaCompleta(fecha) {
+  return fecha ? new Date(fecha).toLocaleString('es-AR') : undefined;
 }
 
 /** Traduce un error de servicio a un mensaje amigable, o usa el mensaje por defecto. */
@@ -129,7 +134,7 @@ function AlertasPage() {
                 <td className="td-num" title={esDirigida ? nombresDestino : undefined}>
                   {esDirigida ? `${a.cantidad_destinatarios} (socios específicos)` : a.cantidad_destinatarios}
                 </td>
-                <td className="td-num">{formatearFecha(a.creado_en)}</td>
+                <td className="td-num" title={fechaCompleta(a.creado_en)}>{formatearFecha(a.creado_en)}</td>
                 {puedeBorrarAlerta && (
                   <td className="td-center">
                     <button

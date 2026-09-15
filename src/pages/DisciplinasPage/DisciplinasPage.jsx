@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
-import { Plus } from 'lucide-react';
+import { Plus, ChevronRight } from 'lucide-react';
 import { CreateDisciplinaForm } from '../../components/createDisciplinaForm/CreateDisciplinaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
@@ -178,6 +178,7 @@ function DisciplinasPage() {
               <th className="td-num">Cupo máximo</th>
               <th className="td-center">Arancelada</th>
               <th className="td-center">Estado</th>
+              <th className="td-chevron" aria-hidden="true"></th>
             </tr>
           </thead>
           <tbody>
@@ -207,6 +208,7 @@ function DisciplinasPage() {
                     {d.estado?.nombre ?? 'Activa'}
                   </EstadoBadge>
                 </td>
+                <td className="td-chevron"><ChevronRight size={16} aria-hidden="true" /></td>
               </tr>
               );
             })}

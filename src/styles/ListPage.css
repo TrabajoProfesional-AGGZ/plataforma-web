@@ -241,6 +241,16 @@
   text-align: center;
 }
 
+/* Última columna de las filas navegables: chevron que señala "hay detalle" */
+.td-chevron {
+  width: 32px;
+  color: var(--color-text-secondary);
+}
+
+.td-chevron svg {
+  display: block;
+}
+
 .socios-table tr:last-child td,
 .usuarios-tabla tr:last-child td,
 .disciplinas-tabla tr:last-child td,

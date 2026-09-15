@@ -659,7 +659,7 @@ describe('InstalacionesPage', () => {
     expect(screen.getByText('ID: inst-known-id')).toBeInTheDocument();
   });
 
-  test('muestra la columna ID en la tabla de reservas', async () => {
+  test('la fila de reserva lleva el ID en el title en vez de una columna', async () => {
     getReservasPorInstalacion.mockImplementation((instalacionId) => Promise.resolve([
       { id: 'reserva-id-1', id_instalacion: instalacionId, socios: [SOCIO_MOCK],fecha_reserva: '2026-09-01', hora_inicio: '10:00', hora_fin: '11:00' },
     ]));
@@ -669,7 +669,8 @@ describe('InstalacionesPage', () => {
     irAlDetalle();
 
     await waitFor(() => expect(screen.getByText('2026-09-01')).toBeInTheDocument());
-    expect(screen.getByText('reserva-id-1')).toBeInTheDocument();
+    expect(screen.queryByText('reserva-id-1')).not.toBeInTheDocument();
+    expect(screen.getByTitle('Reserva reserva-id-1')).toBeInTheDocument();
   });
 
   test('no muestra la columna Acciones si el usuario no tiene permiso borrar_reserva', async () => {
@@ -1136,7 +1137,7 @@ describe('InstalacionesPage', () => {
 
     await waitFor(() => expect(screen.getAllByText('1234').length).toBe(3));
 
-    const fechas = screen.getAllByRole('row').slice(1).map((fila) => fila.querySelectorAll('td')[2].textContent);
+    const fechas = screen.getAllByRole('row').slice(1).map((fila) => fila.querySelectorAll('td')[1].textContent);
     expect(fechas).toEqual(['2026-08-01', '2026-08-01', '2026-08-05']);
   });
 });
