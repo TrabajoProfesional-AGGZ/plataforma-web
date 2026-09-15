@@ -27,11 +27,13 @@
     background-color var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast);
 }
 
-.turno-chip:hover:not(:disabled):not(.turno-chip--selected) {
-  border-color: var(--color-border-medium);
-  background-color: var(--color-surface);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+@media (hover: hover) {
+  .turno-chip:hover:not(:disabled):not(.turno-chip--selected) {
+    border-color: var(--color-border-medium);
+    background-color: var(--color-surface);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
 }
 
 .turno-chip:active:not(:disabled) {

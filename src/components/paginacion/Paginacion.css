@@ -20,7 +20,13 @@
   cursor: pointer;
 }
 
-.paginacion-btn:hover:not(:disabled) {
+@media (hover: hover) {
+  .paginacion-btn:hover:not(:disabled) {
+    background-color: var(--color-bg);
+  }
+}
+
+.paginacion-btn:active:not(:disabled) {
   background-color: var(--color-bg);
 }
 

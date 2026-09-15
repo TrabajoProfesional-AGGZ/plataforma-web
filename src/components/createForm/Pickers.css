@@ -72,8 +72,10 @@
   color: var(--color-text-placeholder);
 }
 
-.csf-picker-trigger:hover:not(:disabled) {
-  background-color: var(--color-row-hover);
+@media (hover: hover) {
+  .csf-picker-trigger:hover:not(:disabled) {
+    background-color: var(--color-row-hover);
+  }
 }
 
 .csf-picker-trigger:focus-visible,
@@ -143,8 +145,10 @@
   cursor: pointer;
 }
 
-.csf-calendar-select:hover {
-  background-color: var(--color-row-hover);
+@media (hover: hover) {
+  .csf-calendar-select:hover {
+    background-color: var(--color-row-hover);
+  }
 }
 
 .csf-calendar-select:focus-visible {
@@ -166,9 +170,11 @@
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-.csf-calendar-nav:hover {
-  background-color: var(--color-row-hover);
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .csf-calendar-nav:hover {
+    background-color: var(--color-row-hover);
+    color: var(--color-text-primary);
+  }
 }
 
 .csf-calendar-weekdays {
@@ -207,7 +213,13 @@
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-.csf-calendar-day:hover:not(:disabled):not(.csf-calendar-day--selected) {
+@media (hover: hover) {
+  .csf-calendar-day:hover:not(:disabled):not(.csf-calendar-day--selected) {
+    background-color: var(--color-row-hover);
+  }
+}
+
+.csf-calendar-day:active:not(:disabled):not(.csf-calendar-day--selected) {
   background-color: var(--color-row-hover);
 }
 
@@ -249,8 +261,10 @@
   transition: color var(--transition-fast);
 }
 
-.csf-calendar-today-btn:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .csf-calendar-today-btn:hover {
+    color: var(--color-text-primary);
+  }
 }
 
 /* ── Horario (TimePicker) ── */
@@ -308,8 +322,10 @@
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-.csf-time-option:hover {
-  background-color: var(--color-row-hover);
+@media (hover: hover) {
+  .csf-time-option:hover {
+    background-color: var(--color-row-hover);
+  }
 }
 
 .csf-time-option--selected {

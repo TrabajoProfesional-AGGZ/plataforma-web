@@ -76,8 +76,10 @@
   align-self: flex-start;
 }
 
-.cambiar-contrasena-button:hover:not(:disabled) {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .cambiar-contrasena-button:hover:not(:disabled) {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .cambiar-contrasena-button:disabled {

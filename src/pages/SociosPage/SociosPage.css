@@ -24,8 +24,10 @@
   border: none;
 }
 
-.socios-search-button:hover:not(:disabled) {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .socios-search-button:hover:not(:disabled) {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .socios-search-button:disabled,
@@ -35,8 +37,10 @@
   cursor: not-allowed;
 }
 
-.socios-crear-button:hover:not(:disabled) {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .socios-crear-button:hover:not(:disabled) {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 /* ── Ajuste de error (agrega margin-bottom) ──────────────────── */
@@ -67,8 +71,10 @@
   transition: background-color var(--transition-fast);
 }
 
-.socios-btn-editar:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .socios-btn-editar:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .socios-btn-eliminar {
@@ -78,9 +84,11 @@
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-.socios-btn-eliminar:hover {
-  background-color: var(--color-danger-fill);
-  color: var(--color-on-accent);
+@media (hover: hover) {
+  .socios-btn-eliminar:hover {
+    background-color: var(--color-danger-fill);
+    color: var(--color-on-accent);
+  }
 }
 
 /* ── Extender suscripción (columna, visible al filtrar por disciplina) ── */

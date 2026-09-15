@@ -37,9 +37,11 @@
   transition: background-color var(--transition-fast);
 }
 
-.disciplinas-btn-crear:hover,
-.instalaciones-btn-crear:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .disciplinas-btn-crear:hover,
+  .instalaciones-btn-crear:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .disciplinas-btn-volver,
@@ -58,9 +60,11 @@
   transition: background-color var(--transition-fast);
 }
 
-.disciplinas-btn-volver:hover,
-.instalaciones-btn-volver:hover {
-  background-color: var(--color-bg);
+@media (hover: hover) {
+  .disciplinas-btn-volver:hover,
+  .instalaciones-btn-volver:hover {
+    background-color: var(--color-bg);
+  }
 }
 
 .disciplinas-detalle-content,
@@ -92,10 +96,12 @@
   transition: transform var(--transition-normal), box-shadow var(--transition-normal);
 }
 
-.disciplinas-detalle-card:hover,
-.instalaciones-detalle-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-lg);
+@media (hover: hover) {
+  .disciplinas-detalle-card:hover,
+  .instalaciones-detalle-card:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+  }
 }
 
 .disciplinas-detalle-row,
@@ -147,9 +153,11 @@
   transition: background-color var(--transition-fast);
 }
 
-.disciplinas-btn-eliminar:hover,
-.instalaciones-btn-eliminar-inst:hover {
-  background-color: var(--color-danger-fill-hover);
+@media (hover: hover) {
+  .disciplinas-btn-eliminar:hover,
+  .instalaciones-btn-eliminar-inst:hover {
+    background-color: var(--color-danger-fill-hover);
+  }
 }
 
 .detalle-id {

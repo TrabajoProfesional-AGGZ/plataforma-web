@@ -20,9 +20,11 @@
   border: 1px solid var(--color-border-medium);
 }
 
-.socios-ver-todos-button:hover:not(:disabled),
-.usuarios-ver-todos-button:hover:not(:disabled) {
-  background-color: var(--color-bg);
+@media (hover: hover) {
+  .socios-ver-todos-button:hover:not(:disabled),
+  .usuarios-ver-todos-button:hover:not(:disabled) {
+    background-color: var(--color-bg);
+  }
 }
 
 /* ── Layout de filtros ────────────────────────────────────────── */
@@ -56,9 +58,11 @@
   user-select: none;
 }
 
-.socios-th-sort:hover,
-.usuarios-th-sort:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .socios-th-sort:hover,
+  .usuarios-th-sort:hover {
+    color: var(--color-text-primary);
+  }
 }
 
 /* ── Barra de herramientas ─────────────────────────────────────── */
@@ -175,9 +179,17 @@
   transition: background-color var(--transition-fast);
 }
 
-.socios-filtro-toggle:hover,
-.usuarios-filtro-toggle:hover,
-.instalaciones-btn-toggle:hover {
+@media (hover: hover) {
+  .socios-filtro-toggle:hover,
+  .usuarios-filtro-toggle:hover,
+  .instalaciones-btn-toggle:hover {
+    background-color: var(--color-bg);
+  }
+}
+
+.socios-filtro-toggle:active,
+.usuarios-filtro-toggle:active,
+.instalaciones-btn-toggle:active {
   background-color: var(--color-bg);
 }
 
@@ -189,8 +201,10 @@
   background-color: var(--color-surface);
 }
 
-.filtros-select-trigger:hover:not(:disabled) {
-  background-color: var(--color-bg);
+@media (hover: hover) {
+  .filtros-select-trigger:hover:not(:disabled) {
+    background-color: var(--color-bg);
+  }
 }
 
 /* En los forms de creación value="" es un placeholder real ("Seleccionar...")
@@ -300,10 +314,19 @@
   box-shadow: inset 0 0 0 2px var(--color-text-primary);
 }
 
-.socios-tr-clickable:hover td,
-.usuarios-tr-clickable:hover td,
-.disciplinas-tr-clickable:hover td,
-.instalaciones-tr-clickable:hover td {
+@media (hover: hover) {
+  .socios-tr-clickable:hover td,
+  .usuarios-tr-clickable:hover td,
+  .disciplinas-tr-clickable:hover td,
+  .instalaciones-tr-clickable:hover td {
+    background-color: var(--color-row-hover);
+  }
+}
+
+.socios-tr-clickable:active td,
+.usuarios-tr-clickable:active td,
+.disciplinas-tr-clickable:active td,
+.instalaciones-tr-clickable:active td {
   background-color: var(--color-row-hover);
 }
 

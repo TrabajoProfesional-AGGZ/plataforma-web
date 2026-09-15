@@ -134,8 +134,10 @@
   margin-top: var(--space-1);
 }
 
-.login-button:hover:not(:disabled) {
-  opacity: 0.85;
+@media (hover: hover) {
+  .login-button:hover:not(:disabled) {
+    opacity: 0.85;
+  }
 }
 
 .login-button:disabled {

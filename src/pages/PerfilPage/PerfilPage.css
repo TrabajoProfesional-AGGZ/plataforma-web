@@ -111,14 +111,18 @@
   text-underline-offset: 3px;
 }
 
-.perfil-ver-permisos-button:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .perfil-ver-permisos-button:hover {
+    color: var(--color-text-primary);
+  }
 }
 
 /* .perfil-cambiar-button base → src/styles/shared.css */
 
-.perfil-cambiar-button:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .perfil-cambiar-button:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .perfil-password-wrapper {

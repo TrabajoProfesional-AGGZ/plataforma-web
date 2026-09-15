@@ -259,7 +259,14 @@ button.csf-overlay {
   transition: border-color var(--transition-fast), color var(--transition-fast);
 }
 
-.csf-btn-back:hover {
+@media (hover: hover) {
+  .csf-btn-back:hover {
+    border-color: var(--color-text-secondary);
+    color: var(--color-text-primary);
+  }
+}
+
+.csf-btn-back:active {
   border-color: var(--color-text-secondary);
   color: var(--color-text-primary);
 }
@@ -288,13 +295,21 @@ button.csf-overlay {
   cursor: not-allowed;
 }
 
-.csf-btn-next:hover,
-.csf-btn-submit:hover:not(:disabled) {
+@media (hover: hover) {
+  .csf-btn-next:hover,
+  .csf-btn-submit:hover:not(:disabled) {
+    background-color: var(--color-text-secondary);
+  }
+}
+
+.csf-btn-next:active {
   background-color: var(--color-text-secondary);
 }
 
-.csf-btn-danger:hover:not(:disabled) {
-  background-color: var(--color-danger-fill-hover);
+@media (hover: hover) {
+  .csf-btn-danger:hover:not(:disabled) {
+    background-color: var(--color-danger-fill-hover);
+  }
 }
 
 /* Spinner */
@@ -361,8 +376,10 @@ button.csf-overlay {
   user-select: none;
 }
 
-.csf-checkbox-label:hover {
-  background-color: var(--color-border);
+@media (hover: hover) {
+  .csf-checkbox-label:hover {
+    background-color: var(--color-border);
+  }
 }
 
 .csf-checkbox-input {
@@ -438,8 +455,10 @@ button.csf-overlay {
   transition: background-color var(--transition-fast);
 }
 
-.csf-btn-agregar-socio:hover:not(:disabled) {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .csf-btn-agregar-socio:hover:not(:disabled) {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .csf-btn-agregar-socio:disabled {
@@ -479,8 +498,10 @@ button.csf-overlay {
   transition: color var(--transition-fast);
 }
 
-.csf-socio-chip-remove:hover {
-  color: var(--color-danger);
+@media (hover: hover) {
+  .csf-socio-chip-remove:hover {
+    color: var(--color-danger);
+  }
 }
 
 /* ── Subida de imagen (CreateNoticiaForm) ──────────────────────── */
@@ -506,9 +527,11 @@ button.csf-overlay {
   position: relative;
 }
 
-.csf-upload-box:hover:not(:disabled) {
-  cursor: pointer;
-  border-color: var(--color-border-strong);
+@media (hover: hover) {
+  .csf-upload-box:hover:not(:disabled) {
+    cursor: pointer;
+    border-color: var(--color-border-strong);
+  }
 }
 
 .csf-upload-box:disabled {

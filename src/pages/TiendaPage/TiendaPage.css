@@ -42,9 +42,11 @@
     transition: color var(--transition-fast), background-color var(--transition-fast);
   }
 
-  .tienda-btn-volver:hover {
-    color: var(--color-text-primary);
-    background-color: var(--color-bg-subtle);
+  @media (hover: hover) {
+    .tienda-btn-volver:hover {
+      color: var(--color-text-primary);
+      background-color: var(--color-bg-subtle);
+    }
   }
 
   .tienda-detalle-error {
@@ -202,8 +204,10 @@
     transition: background-color var(--transition-fast), transform var(--transition-fast);
   }
 
-  .tienda-btn-editar:hover {
-    background-color: var(--color-text-secondary);
+  @media (hover: hover) {
+    .tienda-btn-editar:hover {
+      background-color: var(--color-text-secondary);
+    }
   }
 
   .tienda-btn-editar:active {

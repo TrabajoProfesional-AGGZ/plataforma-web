@@ -34,8 +34,10 @@
   transition: background-color var(--transition-fast);
 }
 
-.alertas-btn-crear:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .alertas-btn-crear:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 /* Loading wrapper → .list-loading en src/styles/ListPage.css */
@@ -53,8 +55,10 @@
   transition: background-color var(--transition-fast);
 }
 
-.alertas-btn-eliminar-fila:hover {
-  background-color: var(--status-error-surface-bg);
+@media (hover: hover) {
+  .alertas-btn-eliminar-fila:hover {
+    background-color: var(--status-error-surface-bg);
+  }
 }
 
 /* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */

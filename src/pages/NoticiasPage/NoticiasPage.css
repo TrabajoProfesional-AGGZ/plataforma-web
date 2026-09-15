@@ -36,8 +36,10 @@
   transition: background-color var(--transition-fast);
 }
 
-.noticias-btn-crear:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .noticias-btn-crear:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .noticias-btn-historicas {
@@ -52,8 +54,10 @@
   transition: background-color var(--transition-fast);
 }
 
-.noticias-btn-historicas:hover {
-  background-color: var(--color-bg);
+@media (hover: hover) {
+  .noticias-btn-historicas:hover {
+    background-color: var(--color-bg);
+  }
 }
 
 /* Estilos de tabla → src/styles/ListPage.css (.disciplinas-table-wrapper, .disciplinas-tabla, .disciplinas-tr-clickable)
@@ -83,8 +87,10 @@
   transition: background-color var(--transition-fast);
 }
 
-.noticias-btn-volver:hover {
-  background-color: var(--color-bg);
+@media (hover: hover) {
+  .noticias-btn-volver:hover {
+    background-color: var(--color-bg);
+  }
 }
 
 /* ── Carga y error ────────────────────────────────────────────── */
@@ -207,8 +213,10 @@
   transition: background-color var(--transition-fast);
 }
 
-.noticias-btn-editar:hover {
-  background-color: var(--color-bg);
+@media (hover: hover) {
+  .noticias-btn-editar:hover {
+    background-color: var(--color-bg);
+  }
 }
 
 .noticias-btn-eliminar {
@@ -223,8 +231,10 @@
   transition: background-color var(--transition-fast);
 }
 
-.noticias-btn-eliminar:hover {
-  background-color: var(--color-danger-fill-hover);
+@media (hover: hover) {
+  .noticias-btn-eliminar:hover {
+    background-color: var(--color-danger-fill-hover);
+  }
 }
 
 /* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */

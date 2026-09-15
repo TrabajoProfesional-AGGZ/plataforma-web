@@ -105,8 +105,10 @@
   border: 1px solid var(--color-border-medium);
 }
 
-.instalaciones-btn-reserva-editar:hover {
-  background-color: var(--color-bg);
+@media (hover: hover) {
+  .instalaciones-btn-reserva-editar:hover {
+    background-color: var(--color-bg);
+  }
 }
 
 .instalaciones-btn-reserva-eliminar {
@@ -115,8 +117,10 @@
   border: none;
 }
 
-.instalaciones-btn-reserva-eliminar:hover {
-  background-color: var(--color-danger-fill-hover);
+@media (hover: hover) {
+  .instalaciones-btn-reserva-eliminar:hover {
+    background-color: var(--color-danger-fill-hover);
+  }
 }
 
 /* ── Secciones en vista lista ─────────────────────────────────── */

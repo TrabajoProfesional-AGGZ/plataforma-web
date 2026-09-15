@@ -29,8 +29,10 @@
   padding: 0;
 }
 
-.toggle-password:hover,
-.login-toggle-password:hover,
-.perfil-toggle-password:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .toggle-password:hover,
+  .login-toggle-password:hover,
+  .perfil-toggle-password:hover {
+    color: var(--color-text-primary);
+  }
 }

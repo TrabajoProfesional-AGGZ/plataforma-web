@@ -35,8 +35,10 @@
   transition: background-color var(--transition-fast);
 }
 
-.eventos-btn-crear:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .eventos-btn-crear:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .eventos-thumb {
@@ -63,8 +65,10 @@
   transition: background-color var(--transition-fast);
 }
 
-.eventos-btn-reservar-entrada:hover:not(:disabled) {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .eventos-btn-reservar-entrada:hover:not(:disabled) {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .eventos-btn-reservar-entrada:disabled {

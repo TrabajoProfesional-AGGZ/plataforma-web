@@ -24,8 +24,10 @@
   border: none;
 }
 
-.usuarios-search-button:hover:not(:disabled) {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .usuarios-search-button:hover:not(:disabled) {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .usuarios-search-button:disabled,
@@ -35,8 +37,10 @@
   cursor: not-allowed;
 }
 
-.usuarios-crear-button:hover:not(:disabled) {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .usuarios-crear-button:hover:not(:disabled) {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 /* ── Badge de rol ─────────────────────────────────────────────── */
@@ -118,9 +122,11 @@
   transition: background-color var(--transition-fast), border-color var(--transition-fast);
 }
 
-.usuarios-btn-ver-permisos:hover {
-  background-color: var(--color-border);
-  border-color: var(--color-border-strong);
+@media (hover: hover) {
+  .usuarios-btn-ver-permisos:hover {
+    background-color: var(--color-border);
+    border-color: var(--color-border-strong);
+  }
 }
 
 .usuarios-card-actions {
@@ -144,8 +150,10 @@
   transition: background-color var(--transition-fast);
 }
 
-.usuarios-btn-editar:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .usuarios-btn-editar:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .usuarios-btn-cambiar-rol {
@@ -155,8 +163,10 @@
   transition: background-color var(--transition-fast);
 }
 
-.usuarios-btn-cambiar-rol:hover {
-  background-color: var(--color-bg);
+@media (hover: hover) {
+  .usuarios-btn-cambiar-rol:hover {
+    background-color: var(--color-bg);
+  }
 }
 
 .usuarios-btn-eliminar {
@@ -166,9 +176,11 @@
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-.usuarios-btn-eliminar:hover {
-  background-color: var(--color-danger-fill);
-  color: var(--color-on-accent);
+@media (hover: hover) {
+  .usuarios-btn-eliminar:hover {
+    background-color: var(--color-danger-fill);
+    color: var(--color-on-accent);
+  }
 }
 
 /* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
