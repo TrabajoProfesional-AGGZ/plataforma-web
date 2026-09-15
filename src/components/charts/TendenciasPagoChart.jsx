@@ -1,5 +1,6 @@
 import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { chartTheme } from './chartTheme';
 
 /**
  * Convierte cada mes de `{ mes, a_termino, fuera_de_termino }` (valores absolutos)
@@ -34,26 +35,29 @@ export function TendenciasPagoChart({ datos }) {
     <div style={{ width: '100%', height: 350 }}>
       <ResponsiveContainer>
         <BarChart data={datosPorcentaje} margin={{ top: 20, right: 30, left: 20, bottom: 25 }}>
-          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="var(--color-border-medium)" />
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke={chartTheme.grid.stroke} />
           <XAxis
             dataKey="mes"
-            tick={{ fill: 'var(--color-text-secondary)', fontSize: '0.75rem' }}
-            axisLine={{ stroke: 'var(--color-border-medium)' }}
+            tick={chartTheme.tick()}
+            axisLine={chartTheme.axisLine}
             tickLine={false}
           />
           <YAxis
             domain={[0, 100]}
             tickFormatter={(value) => `${value}%`}
-            tick={{ fill: 'var(--color-text-secondary)', fontSize: '0.75rem' }}
+            tick={chartTheme.tick()}
             axisLine={false}
             tickLine={false}
             width={50}
           />
           <Tooltip
             formatter={(value) => `${value.toFixed(1)}%`}
-            contentStyle={{ borderRadius: 'var(--radius-sm)', border: '1px solid var(--color-border-medium)' }}
+            contentStyle={chartTheme.tooltip.contentStyle}
+            labelStyle={chartTheme.tooltip.labelStyle}
+            itemStyle={chartTheme.tooltip.itemStyle}
+            cursor={chartTheme.tooltip.cursor}
           />
-          <Legend />
+          <Legend wrapperStyle={chartTheme.legend.wrapperStyle} />
           <Bar dataKey="pctATermino" name="A término" stackId="pct" fill="var(--color-text-primary)" />
           <Bar dataKey="pctFueraDeTermino" name="Fuera de término" stackId="pct" fill="var(--color-danger)" radius={[4, 4, 0, 0]} />
         </BarChart>
