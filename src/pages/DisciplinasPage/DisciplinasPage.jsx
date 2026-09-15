@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { Plus, ChevronLeft } from 'lucide-react';
 import { CreateDisciplinaForm } from '../../components/createDisciplinaForm/CreateDisciplinaForm';
@@ -331,12 +332,15 @@ function DisciplinasPage() {
       )}
 
       {/* ── Formulario: Crear disciplina ── */}
-      {crearOpen && (
-        <CreateDisciplinaForm
-          onSuccess={handleDisciplinaCreada}
-          onCancel={() => setCrearOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {crearOpen && (
+          <CreateDisciplinaForm
+            key="crear"
+            onSuccess={handleDisciplinaCreada}
+            onCancel={() => setCrearOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <ConfirmDeleteModal
         open={pausarOpen && !!disciplinaActual}

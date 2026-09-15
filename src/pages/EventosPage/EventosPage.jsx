@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Plus, Ticket } from 'lucide-react';
 import { getEventos, getEventosHistoricos, createEvento } from '../../services/eventosService';
 import { usePermiso } from '../../hooks/usePermiso';
@@ -191,25 +192,31 @@ function EventosPage() {
         )}
       </div>
 
-      {crearOpen && (
-        <CreateEventoForm
-          onSuccess={handleEventoCreado}
-          onCancel={() => setCrearOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {crearOpen && (
+          <CreateEventoForm
+            key="crear"
+            onSuccess={handleEventoCreado}
+            onCancel={() => setCrearOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
-      {eventoReserva && (
-        <ReservarEntradaForm
-          evento={eventoReserva}
-          onSuccess={() => {
-            setEventos((prev) => prev.map((e) => (
-              e.id === eventoReserva.id ? { ...e, entradas_vendidas: e.entradas_vendidas + 1 } : e
-            )));
-            setEventoReserva(null);
-          }}
-          onCancel={() => setEventoReserva(null)}
-        />
-      )}
+      <AnimatePresence>
+        {eventoReserva && (
+          <ReservarEntradaForm
+            key="reservar-entrada"
+            evento={eventoReserva}
+            onSuccess={() => {
+              setEventos((prev) => prev.map((e) => (
+                e.id === eventoReserva.id ? { ...e, entradas_vendidas: e.entradas_vendidas + 1 } : e
+              )));
+              setEventoReserva(null);
+            }}
+            onCancel={() => setEventoReserva(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

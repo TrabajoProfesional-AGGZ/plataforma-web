@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import PropTypes from 'prop-types';
 import { usePermiso } from '../../hooks/usePermiso';
 import { SocioDisciplinasModal } from '../socioDisciplinasModal/SocioDisciplinasModal';
@@ -66,34 +67,46 @@ function SocioAccionesExtra({ idSocio, nroSocio, nombreSocio }) {
         )}
       </div>
 
-      {disciplinasOpen && (
-        <SocioDisciplinasModal
-          idSocio={idSocio}
-          nombreSocio={nombreSocio}
-          onClose={() => setDisciplinasOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {disciplinasOpen && (
+          <SocioDisciplinasModal
+            key="disciplinas"
+            idSocio={idSocio}
+            nombreSocio={nombreSocio}
+            onClose={() => setDisciplinasOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
-      {reservasOpen && (
-        <SocioReservasModal
-          nroSocio={nroSocio}
-          onClose={() => setReservasOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {reservasOpen && (
+          <SocioReservasModal
+            key="reservas"
+            nroSocio={nroSocio}
+            onClose={() => setReservasOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
-      {tramitesOpen && (
-        <SocioTramitesModal
-          idSocio={idSocio}
-          onClose={() => setTramitesOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {tramitesOpen && (
+          <SocioTramitesModal
+            key="tramites"
+            idSocio={idSocio}
+            onClose={() => setTramitesOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
-      {pagosPendientesOpen && (
-        <SocioPagosPendientesModal
-          idSocio={idSocio}
-          onClose={() => setPagosPendientesOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {pagosPendientesOpen && (
+          <SocioPagosPendientesModal
+            key="pagos-pendientes"
+            idSocio={idSocio}
+            onClose={() => setPagosPendientesOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </>
   );
 }

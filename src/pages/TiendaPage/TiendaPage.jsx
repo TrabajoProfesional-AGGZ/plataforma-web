@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Plus, ChevronLeft, PackageSearch } from 'lucide-react';
 import { getProductos, getProducto } from '../../services/productosService';
 import { CreateProductoForm } from '../../components/createProductoForm/CreateProductoForm';
@@ -311,28 +312,37 @@ function TiendaPage() {
         </div>
       )}
 
-      {crearOpen && (
-        <CreateProductoForm
-          onSuccess={handleProductoCreado}
-          onCancel={() => setCrearOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {crearOpen && (
+          <CreateProductoForm
+            key="crear"
+            onSuccess={handleProductoCreado}
+            onCancel={() => setCrearOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
-      {editarOpen && productoActual && (
-        <EditProductoForm
-          producto={productoActual}
-          onSuccess={handleEditarExito}
-          onCancel={() => setEditarOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {editarOpen && productoActual && (
+          <EditProductoForm
+            key="editar"
+            producto={productoActual}
+            onSuccess={handleEditarExito}
+            onCancel={() => setEditarOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
-      {crearCompraOpen && productoActual && (
-        <CrearCompraForm
-          producto={productoActual}
-          onSuccess={handleCompraCreada}
-          onCancel={() => setCrearCompraOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {crearCompraOpen && productoActual && (
+          <CrearCompraForm
+            key="crear-compra"
+            producto={productoActual}
+            onSuccess={handleCompraCreada}
+            onCancel={() => setCrearCompraOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

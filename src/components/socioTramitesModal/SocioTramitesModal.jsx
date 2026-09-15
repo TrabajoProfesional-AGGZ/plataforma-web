@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { ChevronLeft } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { getTramitesPorSocio, getTramite } from '../../services/tramitesService';
@@ -206,13 +207,16 @@ function SocioTramitesModal({ idSocio, onClose }) {
         </div>
       )}
 
-      {reviewOpen && tramiteActual && (
-        <TramiteReviewModal
-          tramite={tramiteActual}
-          onSuccess={handleReviewed}
-          onCancel={() => setReviewOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {reviewOpen && tramiteActual && (
+          <TramiteReviewModal
+            key="review"
+            tramite={tramiteActual}
+            onSuccess={handleReviewed}
+            onCancel={() => setReviewOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </SocioSubModal>
   );
 }

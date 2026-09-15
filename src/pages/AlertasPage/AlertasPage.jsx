@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Plus, Trash2 } from 'lucide-react';
 import { getAlertas, createAlerta, borrarAlerta } from '../../services/alertasService';
 import { usePermiso } from '../../hooks/usePermiso';
@@ -173,12 +174,15 @@ function AlertasPage() {
 
       {renderLista()}
 
-      {crearOpen && (
-        <CreateAlertaForm
-          onSuccess={handleAlertaCreada}
-          onCancel={() => setCrearOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {crearOpen && (
+          <CreateAlertaForm
+            key="crear"
+            onSuccess={handleAlertaCreada}
+            onCancel={() => setCrearOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <ConfirmDeleteModal
         open={!!alertaAEliminar}

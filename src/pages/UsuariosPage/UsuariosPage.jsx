@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Search, Plus } from 'lucide-react';
 import { fetchUsuarios, eliminarUsuario } from '../../services/usuariosService';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
@@ -420,20 +421,26 @@ function UsuariosPage() {
         );
       })()}
 
-      {crearModalOpen && (
-        <CreateUserForm
-          onSuccess={() => { setCrearModalOpen(false); recargarUsuarios(); }}
-          onCancel={() => setCrearModalOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {crearModalOpen && (
+          <CreateUserForm
+            key="crear"
+            onSuccess={() => { setCrearModalOpen(false); recargarUsuarios(); }}
+            onCancel={() => setCrearModalOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
-      {editarModalOpen && resultado && !Array.isArray(resultado) && (
-        <EditUserForm
-          usuario={resultado}
-          onSuccess={(actualizado) => { setResultado(actualizado); setEditarModalOpen(false); }}
-          onCancel={() => setEditarModalOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {editarModalOpen && resultado && !Array.isArray(resultado) && (
+          <EditUserForm
+            key="editar"
+            usuario={resultado}
+            onSuccess={(actualizado) => { setResultado(actualizado); setEditarModalOpen(false); }}
+            onCancel={() => setEditarModalOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <ConfirmDeleteModal
         open={eliminarModalOpen && !!resultado && !Array.isArray(resultado)}
@@ -445,21 +452,27 @@ function UsuariosPage() {
         errorModal={errorModal}
       />
 
-      {cambiarRolModalOpen && resultado && !Array.isArray(resultado) && (
-        <CambiarRolForm
-          usuario={resultado}
-          roles={roles}
-          onSuccess={(actualizado) => { setResultado(actualizado); setCambiarRolModalOpen(false); }}
-          onCancel={() => setCambiarRolModalOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {cambiarRolModalOpen && resultado && !Array.isArray(resultado) && (
+          <CambiarRolForm
+            key="cambiar-rol"
+            usuario={resultado}
+            roles={roles}
+            onSuccess={(actualizado) => { setResultado(actualizado); setCambiarRolModalOpen(false); }}
+            onCancel={() => setCambiarRolModalOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
-      {permisosModalOpen && resultado && !Array.isArray(resultado) && (
-        <PermisosModal
-          permisos={(resultado.rol?.permisos ?? []).map((p) => p.nombre)}
-          onClose={() => setPermisosModalOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {permisosModalOpen && resultado && !Array.isArray(resultado) && (
+          <PermisosModal
+            key="permisos"
+            permisos={(resultado.rol?.permisos ?? []).map((p) => p.nombre)}
+            onClose={() => setPermisosModalOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

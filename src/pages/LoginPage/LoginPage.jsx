@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { login } from '../../services/authService';
 import { RecuperarContraseniaModal } from './RecuperarContraseniaModal';
 import { useTheme } from '../../hooks/useTheme';
@@ -193,9 +193,11 @@ function LoginPage() {
         </motion.div>
       </div>
 
-      {mostrarRecuperar && (
-        <RecuperarContraseniaModal onClose={() => setMostrarRecuperar(false)} />
-      )}
+      <AnimatePresence>
+        {mostrarRecuperar && (
+          <RecuperarContraseniaModal key="recuperar" onClose={() => setMostrarRecuperar(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

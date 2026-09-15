@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import { Package } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { crearCompra } from '../../services/comprasService';
@@ -59,12 +58,7 @@ export function CrearCompraForm({ producto, onSuccess, onCancel }) {
 
   return (
     <ModalOverlay onClose={onCancel} ariaLabel={`Crear compra: ${producto.nombre}`}>
-      <motion.div
-        key="form"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="csf-outer-card"
-      >
+      <div className="csf-outer-card">
         <div className="csf-header">
           <h1>Crear compra</h1>
           <p>{producto.nombre}</p>
@@ -106,7 +100,7 @@ export function CrearCompraForm({ producto, onSuccess, onCancel }) {
             />
           </div>
         </div>
-      </motion.div>
+      </div>
     </ModalOverlay>
   );
 }

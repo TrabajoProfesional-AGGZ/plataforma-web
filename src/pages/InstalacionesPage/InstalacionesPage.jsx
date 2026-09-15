@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
 import { Plus, ChevronLeft, ChevronDown, ChevronUp } from 'lucide-react';
 import { CreateInstalacionForm } from '../../components/createInstalacionForm/CreateInstalacionForm';
@@ -583,23 +584,29 @@ function InstalacionesPage() {
       )}
 
       {/* ── Formularios multi-paso (overlay) ── */}
-      {crearInstalacionFormOpen && (
-        <CreateInstalacionForm
-          onSuccess={handleInstalacionCreada}
-          onCancel={() => setCrearInstalacionFormOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {crearInstalacionFormOpen && (
+          <CreateInstalacionForm
+            key="crear-instalacion"
+            onSuccess={handleInstalacionCreada}
+            onCancel={() => setCrearInstalacionFormOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
-      {crearReservaFormOpen && instalacionActual && (
-        <CreateReservaForm
-          instalacion={instalacionActual}
-          onSuccess={async () => {
-            setCrearReservaFormOpen(false);
-            await cargarReservas(instalacionActual.id);
-          }}
-          onCancel={() => setCrearReservaFormOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {crearReservaFormOpen && instalacionActual && (
+          <CreateReservaForm
+            key="crear-reserva"
+            instalacion={instalacionActual}
+            onSuccess={async () => {
+              setCrearReservaFormOpen(false);
+              await cargarReservas(instalacionActual.id);
+            }}
+            onCancel={() => setCrearReservaFormOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <ConfirmDeleteModal
         open={eliminarInstalacionOpen && !!instalacionActual}
@@ -620,7 +627,7 @@ function InstalacionesPage() {
       />
 
       {/* ── Modal: Ver socio ── */}
-      {renderModalVerSocio()}
+      <AnimatePresence>{renderModalVerSocio()}</AnimatePresence>
     </div>
   );
 }

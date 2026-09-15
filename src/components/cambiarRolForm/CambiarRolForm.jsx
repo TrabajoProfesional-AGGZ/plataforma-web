@@ -41,12 +41,7 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
 
   return (
     <ModalOverlay onClose={onCancel} ariaLabel={`Cambiar rol de ${usuario.nombre} ${usuario.apellido}`}>
-        <motion.div
-          key="form"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="csf-outer-card"
-        >
+        <div className="csf-outer-card">
           <div className="csf-header">
             <h1>Cambiar rol</h1>
             <p>{usuario.nombre} {usuario.apellido}</p>
@@ -159,7 +154,7 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
 
             </AnimatePresence>
           </div>
-        </motion.div>
+        </div>
     </ModalOverlay>
   );
 }

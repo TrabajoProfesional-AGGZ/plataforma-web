@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { AlertTriangle } from 'lucide-react';
 import PropTypes from 'prop-types';
 import { ModalOverlay } from '../createForm/ModalOverlay';
@@ -36,61 +36,59 @@ function ConfirmDeleteModal({
   labelGuardando = 'Eliminando...',
   variant = 'danger',
 }) {
-  if (!open) return null;
-
   const modificadorAviso = variant === 'danger' ? 'danger' : 'warning';
   const colorAviso = variant === 'danger' ? 'var(--color-danger)' : 'var(--status-warning-border)';
 
   return (
-    <ModalOverlay onClose={onCancel}>
-      <motion.div
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="csf-outer-card"
-      >
-        <div className="csf-header">
-          <h1>{titulo}</h1>
-          {subtitulo && <p>{subtitulo}</p>}
-        </div>
-
-        <div className="csf-card">
-          <div className="csf-fields">
-            <div className={`confirm-aviso confirm-aviso--${modificadorAviso}`}>
-              <AlertTriangle size={20} color={colorAviso} strokeWidth={2} className="confirm-aviso-icono" />
-              <p className="confirm-aviso-texto">
-                {mensaje}
-              </p>
+    <AnimatePresence>
+      {open && (
+        <ModalOverlay onClose={onCancel}>
+          <div className="csf-outer-card">
+            <div className="csf-header">
+              <h1>{titulo}</h1>
+              {subtitulo && <p>{subtitulo}</p>}
             </div>
 
-            {errorModal && (
-              <p className="csf-form-error" role="alert">{errorModal}</p>
-            )}
+            <div className="csf-card">
+              <div className="csf-fields">
+                <div className={`confirm-aviso confirm-aviso--${modificadorAviso}`}>
+                  <AlertTriangle size={20} color={colorAviso} strokeWidth={2} className="confirm-aviso-icono" />
+                  <p className="confirm-aviso-texto">
+                    {mensaje}
+                  </p>
+                </div>
 
-            <div className="csf-nav csf-nav--between">
-              <motion.button
-                type="button"
-                onClick={onCancel}
-                whileHover={{ scale: 1.015 }}
-                whileTap={{ scale: 0.985 }}
-                className="csf-btn-back"
-              >
-                Cancelar
-              </motion.button>
-              <motion.button
-                type="button"
-                onClick={onConfirm}
-                disabled={guardando}
-                whileHover={{ scale: 1.015 }}
-                whileTap={{ scale: 0.985 }}
-                className={variant === 'danger' ? 'csf-btn-danger' : 'csf-btn-submit'}
-              >
-                {guardando ? labelGuardando : labelConfirmar}
-              </motion.button>
+                {errorModal && (
+                  <p className="csf-form-error" role="alert">{errorModal}</p>
+                )}
+
+                <div className="csf-nav csf-nav--between">
+                  <motion.button
+                    type="button"
+                    onClick={onCancel}
+                    whileHover={{ scale: 1.015 }}
+                    whileTap={{ scale: 0.985 }}
+                    className="csf-btn-back"
+                  >
+                    Cancelar
+                  </motion.button>
+                  <motion.button
+                    type="button"
+                    onClick={onConfirm}
+                    disabled={guardando}
+                    whileHover={{ scale: 1.015 }}
+                    whileTap={{ scale: 0.985 }}
+                    className={variant === 'danger' ? 'csf-btn-danger' : 'csf-btn-submit'}
+                  >
+                    {guardando ? labelGuardando : labelConfirmar}
+                  </motion.button>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </motion.div>
-    </ModalOverlay>
+        </ModalOverlay>
+      )}
+    </AnimatePresence>
   );
 }
 

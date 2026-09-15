@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Search, Plus } from 'lucide-react';
 import { getSocios, deleteSocio } from '../../services/sociosService';
 import { getDisciplinas, getSociosByDisciplina, extenderSuscripcionDisciplina } from '../../services/disciplinasService';
@@ -615,21 +616,27 @@ function SociosPage() {
       })()}
 
       {/* Modal crear socio */}
-      {crearModalOpen && (
-        <CreateSocioForm
-          onSuccess={() => { setCrearModalOpen(false); recargarSocios(); }}
-          onCancel={() => setCrearModalOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {crearModalOpen && (
+          <CreateSocioForm
+            key="crear"
+            onSuccess={() => { setCrearModalOpen(false); recargarSocios(); }}
+            onCancel={() => setCrearModalOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Modal editar socio */}
-      {editarModalOpen && resultado && (
-        <EditSocioForm
-          socio={resultado}
-          onSuccess={(socioActualizado) => { setResultado(socioActualizado); setEditarModalOpen(false); }}
-          onCancel={() => setEditarModalOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {editarModalOpen && resultado && (
+          <EditSocioForm
+            key="editar"
+            socio={resultado}
+            onSuccess={(socioActualizado) => { setResultado(socioActualizado); setEditarModalOpen(false); }}
+            onCancel={() => setEditarModalOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <ConfirmDeleteModal
         open={eliminarModalOpen && !!resultado}
@@ -641,15 +648,18 @@ function SociosPage() {
         errorModal={errorModal}
       />
 
-      {listaEsperaModal && (
-        <ResolverListaEsperaModal
-          idDisciplina={filtroDisciplina}
-          idSocio={listaEsperaModal.id}
-          nombreSocio={`${listaEsperaModal.apellido} ${listaEsperaModal.nombre}`}
-          onSuccess={handleListaEsperaSuccess}
-          onCancel={() => setListaEsperaModal(null)}
-        />
-      )}
+      <AnimatePresence>
+        {listaEsperaModal && (
+          <ResolverListaEsperaModal
+            key="lista-espera"
+            idDisciplina={filtroDisciplina}
+            idSocio={listaEsperaModal.id}
+            nombreSocio={`${listaEsperaModal.apellido} ${listaEsperaModal.nombre}`}
+            onSuccess={handleListaEsperaSuccess}
+            onCancel={() => setListaEsperaModal(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

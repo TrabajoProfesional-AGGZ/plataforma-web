@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
 import PropTypes from 'prop-types';
 import { createEntrada } from '../../services/entradasService';
 import { marcarPagadaCaja } from '../../services/finanzasService';
@@ -54,12 +53,7 @@ export function ReservarEntradaForm({ evento, onSuccess, onCancel }) {
 
   return (
     <ModalOverlay onClose={onCancel} ariaLabel={`Reservar entrada: ${evento.nombre}`}>
-      <motion.div
-        key="form"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="csf-outer-card"
-      >
+      <div className="csf-outer-card">
         <div className="csf-header">
           <h1>Reservar entrada</h1>
           <p>{evento.nombre}</p>
@@ -88,7 +82,7 @@ export function ReservarEntradaForm({ evento, onSuccess, onCancel }) {
             />
           </div>
         </div>
-      </motion.div>
+      </div>
     </ModalOverlay>
   );
 }

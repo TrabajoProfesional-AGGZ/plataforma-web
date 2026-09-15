@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Plus, ChevronLeft } from 'lucide-react';
 import { getNoticias, getNoticiasHistoricas, getNoticia, createNoticia, borrarNoticia } from '../../services/noticiasService';
 import { usePermiso } from '../../hooks/usePermiso';
@@ -297,20 +298,26 @@ function NoticiasPage() {
         </>
       )}
 
-      {crearOpen && (
-        <CreateNoticiaForm
-          onSuccess={handleNoticiaCreada}
-          onCancel={() => setCrearOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {crearOpen && (
+          <CreateNoticiaForm
+            key="crear"
+            onSuccess={handleNoticiaCreada}
+            onCancel={() => setCrearOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
-      {editarOpen && noticiaActual && (
-        <EditNoticiaForm
-          noticia={noticiaActual}
-          onSuccess={handleEditarExito}
-          onCancel={() => setEditarOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {editarOpen && noticiaActual && (
+          <EditNoticiaForm
+            key="editar"
+            noticia={noticiaActual}
+            onSuccess={handleEditarExito}
+            onCancel={() => setEditarOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <ConfirmDeleteModal
         open={eliminarOpen && !!noticiaActual}
