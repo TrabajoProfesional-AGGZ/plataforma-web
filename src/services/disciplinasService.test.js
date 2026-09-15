@@ -198,6 +198,39 @@ describe('disciplinasService', () => {
       fetchTo.mockResolvedValueOnce({ ok: false, status: 404 });
       await expect(inscribirSocioADisciplina('disc-uuid-1', 'socio-uuid-1')).rejects.toThrow('Error al inscribir al socio en la disciplina');
     });
+
+    test('lanza "socio-apto-medico" cuando la respuesta es 403 con tipo apto_medico', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        json: async () => ({ detail: { tipo: 'apto_medico', socio: '1000' } }),
+      });
+      await expect(inscribirSocioADisciplina('disc-uuid-1', 'socio-uuid-1')).rejects.toThrow('socio-apto-medico');
+    });
+
+    test('lanza "categoria-no-coincide" con la categoría requerida cuando la respuesta es 403 con ese tipo', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        json: async () => ({ detail: { tipo: 'categoria_no_coincide', categoria_requerida: 'Activo Pleno', categoria_socio: 'Cadete' } }),
+      });
+      try {
+        await inscribirSocioADisciplina('disc-uuid-1', 'socio-uuid-1');
+        throw new Error('no debería llegar acá');
+      } catch (e) {
+        expect(e.message).toBe('categoria-no-coincide');
+        expect(e.categoriaRequerida).toBe('Activo Pleno');
+      }
+    });
+
+    test('lanza "socio-moroso" cuando la respuesta es 403 con tipo moroso', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        json: async () => ({ detail: { tipo: 'moroso', socio: '1000' } }),
+      });
+      await expect(inscribirSocioADisciplina('disc-uuid-1', 'socio-uuid-1')).rejects.toThrow('socio-moroso');
+    });
   });
 
   describe('extenderSuscripcionDisciplina', () => {

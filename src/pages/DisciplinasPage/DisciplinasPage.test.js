@@ -428,6 +428,57 @@ describe('DisciplinasPage', () => {
     });
   });
 
+  test('muestra el motivo real (apto médico) y el socio incumpliendo cuando el rechazo es por apto médico', async () => {
+    inscribirSocioADisciplina.mockRejectedValueOnce(new Error('socio-apto-medico'));
+
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByLabelText('Número de socio a inscribir')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Número de socio a inscribir'), { target: { value: '2001' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Inscribir socio' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('El socio N° 2001 debe presentar un apto médico vigente antes de inscribirse.')).toBeInTheDocument();
+    });
+    expect(screen.queryByText(/situación financiera/i)).not.toBeInTheDocument();
+  });
+
+  test('muestra el motivo real (financiero) y el socio incumpliendo cuando el rechazo es por moroso', async () => {
+    inscribirSocioADisciplina.mockRejectedValueOnce(new Error('socio-moroso'));
+
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByLabelText('Número de socio a inscribir')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Número de socio a inscribir'), { target: { value: '2001' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Inscribir socio' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('El socio N° 2001 debe regularizar su situación financiera con el club antes de inscribirse.')).toBeInTheDocument();
+    });
+  });
+
+  test('muestra el motivo real (categoría) con la categoría requerida cuando el rechazo es por categoría no coincidente', async () => {
+    const error = new Error('categoria-no-coincide');
+    error.categoriaRequerida = 'Activo Pleno';
+    inscribirSocioADisciplina.mockRejectedValueOnce(error);
+
+    await renderPage();
+    crearDisciplinaHelper();
+    irAlDetalle();
+    await waitFor(() => expect(screen.getByLabelText('Número de socio a inscribir')).toBeInTheDocument());
+
+    fireEvent.change(screen.getByLabelText('Número de socio a inscribir'), { target: { value: '2001' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Inscribir socio' }));
+
+    await waitFor(() => {
+      expect(screen.getByText('El socio N° 2001 no pertenece a la categoría de socio requerida para esta disciplina (Activo Pleno).')).toBeInTheDocument();
+    });
+  });
+
   test('el botón "Inscribir socio" está deshabilitado sin número ingresado', async () => {
     await renderPage();
     crearDisciplinaHelper();

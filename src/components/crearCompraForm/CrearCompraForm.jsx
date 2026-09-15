@@ -11,14 +11,15 @@ import { FormFooterActions } from '../createForm/FormFooterActions';
 import { ModalOverlay } from '../createForm/ModalOverlay';
 import { SocioBuscadorField } from '../createForm/SocioBuscadorField';
 
-const AVISOS_ESTADO_SOCIO = {
-  Moroso: 'No se puede crear una compra para este socio hasta que no regularice su situación financiera con el club.',
-  Suspendido: 'No se puede crear una compra para este socio hasta que no termine su suspensión.',
-};
+/** Arma el mensaje de rechazo indicando el socio y el motivo real. */
+function mensajeSocioIncumpliendo(nroSocio, requisito) {
+  const sujeto = nroSocio ? `El socio N° ${nroSocio}` : 'El socio';
+  return `${sujeto} debe ${requisito} antes de poder crear la compra.`;
+}
 
 const MENSAJES_ERROR_SUBMIT = {
-  moroso: AVISOS_ESTADO_SOCIO.Moroso,
-  suspendido: AVISOS_ESTADO_SOCIO.Suspendido,
+  moroso: (nroSocio) => mensajeSocioIncumpliendo(nroSocio, 'regularizar su situación financiera con el club'),
+  suspendido: (nroSocio) => mensajeSocioIncumpliendo(nroSocio, 'terminar su suspensión'),
   sin_stock: 'No queda stock suficiente de este producto.',
   producto_inactivo: 'Este producto ya no está disponible.',
 };
@@ -47,7 +48,10 @@ export function CrearCompraForm({ producto, onSuccess, onCancel }) {
       await marcarPagadaCaja('compra', compra.id);
       onSuccess();
     } catch (e) {
-      setSubmitError(MENSAJES_ERROR_SUBMIT[e.message] || 'No se pudo crear la compra. Intentá de nuevo.');
+      const mensaje = MENSAJES_ERROR_SUBMIT[e.message];
+      setSubmitError(
+        typeof mensaje === 'function' ? mensaje(e.socio ?? buscador.socioSeleccionado?.nro_socio) : mensaje || 'No se pudo crear la compra. Intentá de nuevo.'
+      );
     } finally {
       setGuardando(false);
     }

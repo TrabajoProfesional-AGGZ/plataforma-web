@@ -25,6 +25,25 @@ function mensajeError(err, fallback) {
     : fallback;
 }
 
+/** Traduce un error de inscripción, indicando el socio y el motivo real del rechazo. */
+function mensajeErrorInscripcion(err, socio) {
+  const nroTxt = socio ? `El socio N° ${socio.nro_socio}` : 'El socio';
+  switch (err.message) {
+    case 'socio-no-encontrado':
+      return 'No existe un socio con ese número.';
+    case 'ya-inscripto':
+      return 'El socio ya está inscripto en esta disciplina.';
+    case 'socio-moroso':
+      return `${nroTxt} debe regularizar su situación financiera con el club antes de inscribirse.`;
+    case 'socio-apto-medico':
+      return `${nroTxt} debe presentar un apto médico vigente antes de inscribirse.`;
+    case 'categoria-no-coincide':
+      return `${nroTxt} no pertenece a la categoría de socio requerida para esta disciplina${err.categoriaRequerida ? ` (${err.categoriaRequerida})` : ''}.`;
+    default:
+      return 'No se pudo inscribir al socio.';
+  }
+}
+
 /** Página de listado y detalle de disciplinas: crear, pausar e inscribir socios. */
 function DisciplinasPage() {
   const { logoSocio: logo } = useTheme();
@@ -84,17 +103,14 @@ function DisciplinasPage() {
     setInscribiendoLoading(true);
     setInscribiendoError('');
     setInscribiendoExito(false);
+    let socio;
     try {
-      const socio = await getSocioByNroSocio(nro);
+      socio = await getSocioByNroSocio(nro);
       await inscribirSocioADisciplina(disciplinaActual.id, socio.id);
       setNroSocioInscribir('');
       setInscribiendoExito(true);
     } catch (err) {
-      const mensajes = {
-        'socio-no-encontrado': 'No existe un socio con ese número.',
-        'ya-inscripto': 'El socio ya está inscripto en esta disciplina.',
-      };
-      setInscribiendoError(mensajes[err.message] ?? 'No se pudo inscribir al socio.');
+      setInscribiendoError(mensajeErrorInscripcion(err, socio));
     } finally {
       setInscribiendoLoading(false);
     }

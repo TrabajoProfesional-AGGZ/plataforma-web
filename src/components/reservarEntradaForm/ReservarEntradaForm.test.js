@@ -87,13 +87,22 @@ describe('ReservarEntradaForm', () => {
     });
   });
 
-  test('muestra el error de socio moroso', async () => {
+  test('muestra el error de socio moroso indicando el socio incumpliendo', async () => {
     createEntrada.mockRejectedValueOnce(new Error('socio-moroso'));
     renderForm();
     await buscarSocio('1234');
     fireEvent.click(screen.getByRole('button', { name: /reservar entrada/i }));
 
-    expect(await screen.findByText(/regularice su situación financiera/i)).toBeInTheDocument();
+    expect(await screen.findByText('El socio N° 1234 debe regularizar su situación financiera con el club antes de poder reservar la entrada.')).toBeInTheDocument();
+  });
+
+  test('muestra el error de socio suspendido indicando el socio incumpliendo', async () => {
+    createEntrada.mockRejectedValueOnce(new Error('socio-suspendido'));
+    renderForm();
+    await buscarSocio('1234');
+    fireEvent.click(screen.getByRole('button', { name: /reservar entrada/i }));
+
+    expect(await screen.findByText('El socio N° 1234 debe terminar su suspensión antes de poder reservar la entrada.')).toBeInTheDocument();
   });
 
   test('muestra el error de sin cupo', async () => {
