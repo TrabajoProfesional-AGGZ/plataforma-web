@@ -47,7 +47,6 @@ export function CreateProductoForm({ onSuccess, onCancel }) {
     if (imagenUrl) setValue('imagen_url', imagenUrl, { shouldValidate: true });
 
     setSubmitted(true);
-    await new Promise((r) => setTimeout(r, 1800));
     onSuccess({
       nombre: data.nombre.trim(),
       descripcion: data.descripcion?.trim() || null,

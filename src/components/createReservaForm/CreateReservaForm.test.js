@@ -178,7 +178,7 @@ describe('CreateReservaForm', () => {
     await waitFor(() => {
       expect(screen.getByText('¡Reserva registrada!')).toBeInTheDocument();
     });
-    act(() => jest.advanceTimersByTime(1800));
+    act(() => jest.advanceTimersByTime(3000));
     expect(onSuccess).toHaveBeenCalledTimes(1);
   });
 

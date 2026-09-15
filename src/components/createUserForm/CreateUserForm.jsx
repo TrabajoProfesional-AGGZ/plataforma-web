@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import {
   User, CreditCard, Mail, Shield,
   Calendar, Lock,
@@ -38,6 +38,7 @@ export function CreateUserForm({ onSuccess, onCancel }) {
     register, handleSubmit, errors, isSubmitting,
   } = useMultiStepForm(stepFields);
   const [roles, setRoles] = useState([]);
+  const timerRef = useRef(null);
 
   useEffect(() => {
     fetchRoles()
@@ -60,7 +61,7 @@ export function CreateUserForm({ onSuccess, onCancel }) {
     try {
       await crearUsuario(payload);
       setSubmitted(true);
-      setTimeout(() => onSuccess(), 1800);
+      timerRef.current = setTimeout(() => onSuccess(), 3000);
     } catch (err) {
       if (err.message === 'usuario-duplicado') {
         setFormError('Ya existe un usuario con ese documento o email.');
@@ -84,6 +85,7 @@ export function CreateUserForm({ onSuccess, onCancel }) {
       title="Nuevo usuario"
       successTitle="¡Usuario creado!"
       successMessage="Los datos fueron guardados correctamente."
+      onSuccessAction={() => { clearTimeout(timerRef.current); onSuccess(); }}
       submitLabel="Crear usuario"
       submitLoadingLabel="Creando..."
       onCancel={onCancel}

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, fireEvent } from '@testing-library/react';
 import { User, FileText } from 'lucide-react';
 import { MultiStepFormShell } from './MultiStepFormShell';
 
@@ -46,5 +46,41 @@ describe('MultiStepFormShell', () => {
     expect(screen.queryByText(/paso 1 de 1/i)).not.toBeInTheDocument();
     expect(container.querySelector('.csf-steps')).not.toBeInTheDocument();
     expect(container.querySelector('.csf-progress')).not.toBeInTheDocument();
+  });
+
+  test('muestra el botón de acción y llama a onSuccessAction', () => {
+    const onSuccessAction = jest.fn();
+    render(
+      <MultiStepFormShell
+        {...baseProps({
+          steps: SINGLE_STEP,
+          submitted: true,
+          successTitle: '¡Listo!',
+          successMessage: 'Se guardó correctamente.',
+          onSuccessAction,
+        })}
+      >
+        <div>Contenido</div>
+      </MultiStepFormShell>
+    );
+    const boton = screen.getByRole('button', { name: 'Listo' });
+    fireEvent.click(boton);
+    expect(onSuccessAction).toHaveBeenCalledTimes(1);
+  });
+
+  test('sin onSuccessAction no muestra ningún botón en la pantalla de éxito', () => {
+    render(
+      <MultiStepFormShell
+        {...baseProps({
+          steps: SINGLE_STEP,
+          submitted: true,
+          successTitle: '¡Listo!',
+          successMessage: 'Se guardó correctamente.',
+        })}
+      >
+        <div>Contenido</div>
+      </MultiStepFormShell>
+    );
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
   });
 });

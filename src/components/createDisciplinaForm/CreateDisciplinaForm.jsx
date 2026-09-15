@@ -49,7 +49,6 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
 
   const onSubmit = async (data) => {
     setSubmitted(true);
-    await new Promise((resolve) => setTimeout(resolve, 1800));
     onSuccess({
       nombre: data.nombre.trim(),
       cupo_maximo: data.sin_limite_cupo ? null : Number(data.cupo_maximo),

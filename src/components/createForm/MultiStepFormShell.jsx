@@ -33,6 +33,8 @@ export function MultiStepFormShell({
   title,
   successTitle,
   successMessage,
+  onSuccessAction,
+  successActionLabel = 'Listo',
   submitLabel,
   submitLoadingLabel,
   onCancel,
@@ -78,6 +80,11 @@ export function MultiStepFormShell({
                 <h2>{successTitle}</h2>
                 <p>{successMessage}</p>
               </div>
+              {onSuccessAction && (
+                <button type="button" className="csf-btn-submit" onClick={onSuccessAction}>
+                  {successActionLabel}
+                </button>
+              )}
             </motion.div>
           ) : (
             <motion.div
@@ -245,6 +252,8 @@ MultiStepFormShell.propTypes = {
   title: PropTypes.string,
   successTitle: PropTypes.string,
   successMessage: PropTypes.string,
+  onSuccessAction: PropTypes.func,
+  successActionLabel: PropTypes.string,
   submitLabel: PropTypes.string,
   submitLoadingLabel: PropTypes.string,
   onCancel: PropTypes.func.isRequired,

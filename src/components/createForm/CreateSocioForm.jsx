@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import {
   User, CreditCard, Phone,
   Calendar, MapPin,
@@ -27,6 +28,7 @@ export function CreateSocioForm({ onSuccess, onCancel }) {
     goBack, goNext, formError, setFormError,
     register, handleSubmit, errors, isSubmitting,
   } = useMultiStepForm(stepFields);
+  const timerRef = useRef(null);
 
   const onSubmit = async (data) => {
     setFormError('');
@@ -44,7 +46,7 @@ export function CreateSocioForm({ onSuccess, onCancel }) {
     try {
       await createSocio(payload);
       setSubmitted(true);
-      setTimeout(() => onSuccess(), 1800);
+      timerRef.current = setTimeout(() => onSuccess(), 3000);
     } catch (err) {
       if (err.message === 'socio-duplicado') {
         setFormError('Ya existe un socio con ese documento o email.');
@@ -68,6 +70,7 @@ export function CreateSocioForm({ onSuccess, onCancel }) {
       title="Nuevo socio"
       successTitle="¡Socio creado!"
       successMessage="Los datos fueron guardados correctamente."
+      onSuccessAction={() => { clearTimeout(timerRef.current); onSuccess(); }}
       submitLabel="Crear socio"
       submitLoadingLabel="Creando..."
       onCancel={onCancel}

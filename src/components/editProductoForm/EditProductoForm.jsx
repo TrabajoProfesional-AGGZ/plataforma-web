@@ -65,7 +65,6 @@ export function EditProductoForm({ producto, onSuccess, onCancel }) {
     try {
       const actualizado = await editarProducto(producto.id, payload);
       setSubmitted(true);
-      await new Promise((r) => setTimeout(r, 1200));
       onSuccess(actualizado);
     } catch {
       // No hay mensaje de error visible para este caso: el formulario simplemente

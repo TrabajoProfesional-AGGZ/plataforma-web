@@ -56,7 +56,6 @@ export function CreateNoticiaForm({ onSuccess, onCancel }) {
     if (imagenUrl) setValue('imagen', imagenUrl, { shouldValidate: true });
 
     setSubmitted(true);
-    await new Promise((resolve) => setTimeout(resolve, 1800));
     onSuccess({
       titulo: data.titulo.trim(),
       cuerpo: data.cuerpo.trim(),

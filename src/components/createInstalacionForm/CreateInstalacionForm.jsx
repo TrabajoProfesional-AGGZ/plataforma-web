@@ -47,7 +47,6 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
 
   const onSubmit = async (data) => {
     setSubmitted(true);
-    await new Promise((resolve) => setTimeout(resolve, 1800));
     onSuccess({
       nombre: data.nombre.trim(),
       tipo: data.tipo.trim(),

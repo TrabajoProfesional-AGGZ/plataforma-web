@@ -185,7 +185,7 @@ describe('CreateUserForm', () => {
     await waitFor(() => expect(screen.getByText('¡Usuario creado!')).toBeInTheDocument());
   });
 
-  test('llama a onSuccess tras 1800ms de la pantalla de éxito', async () => {
+  test('llama a onSuccess tras 3000ms de la pantalla de éxito', async () => {
     const onSuccess = jest.fn();
     const onCancel = jest.fn();
     await navigateToStep4(onSuccess, onCancel);
@@ -195,7 +195,7 @@ describe('CreateUserForm', () => {
 
     await waitFor(() => expect(screen.getByText('¡Usuario creado!')).toBeInTheDocument());
     expect(onSuccess).not.toHaveBeenCalled();
-    await waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1), { timeout: 3000 });
+    await waitFor(() => expect(onSuccess).toHaveBeenCalledTimes(1), { timeout: 4000 });
   });
 
   test('muestra error de usuario duplicado al crear', async () => {

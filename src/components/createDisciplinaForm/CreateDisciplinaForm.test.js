@@ -165,7 +165,6 @@ describe('CreateDisciplinaForm', () => {
     await waitFor(() => {
       expect(screen.getByText('¡Disciplina creada!')).toBeInTheDocument();
     });
-    await act(async () => { jest.advanceTimersByTime(1800); });
     expect(onSuccess).toHaveBeenCalledWith({
       nombre: 'Natación',
       cupo_maximo: 20,
@@ -215,7 +214,6 @@ describe('CreateDisciplinaForm', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /crear disciplina/i }));
     });
-    await act(async () => { jest.advanceTimersByTime(1800); });
     expect(onSuccess).toHaveBeenCalledWith({
       nombre: 'Natación',
       cupo_maximo: 10,
@@ -254,7 +252,6 @@ describe('CreateDisciplinaForm', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /crear disciplina/i }));
     });
-    await act(async () => { jest.advanceTimersByTime(1800); });
     expect(onSuccess).toHaveBeenCalledWith(expect.objectContaining({ categoria_socio: 'Infantil', sede: 'Sede Norte' }));
   });
 
@@ -269,7 +266,6 @@ describe('CreateDisciplinaForm', () => {
     await waitFor(() => {
       expect(screen.getByText('¡Disciplina creada!')).toBeInTheDocument();
     });
-    await act(async () => { jest.advanceTimersByTime(1800); });
     expect(onSuccess).toHaveBeenCalledWith({
       nombre: 'Natación',
       cupo_maximo: null,

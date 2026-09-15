@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { AnimatePresence } from 'framer-motion';
 import {
@@ -72,6 +72,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalacion }) {
   const [turnosDisponibles, setTurnosDisponibles] = useState([]);
   const [cargandoTurnos, setCargandoTurnos] = useState(false);
   const [errorTurnos, setErrorTurnos] = useState('');
+  const timerRef = useRef(null);
 
   const {
     register,
@@ -200,7 +201,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalacion }) {
         hora_inicio: data.hora_inicio,
       });
       setSubmitted(true);
-      setTimeout(() => onSuccess(), 1800);
+      timerRef.current = setTimeout(() => onSuccess(), 3000);
     } catch (e) {
       const mensaje = MENSAJES_ERROR_SUBMIT[e.message];
       setSubmitError(
@@ -219,6 +220,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalacion }) {
       title="Nueva reserva"
       successTitle="¡Reserva registrada!"
       successMessage="La reserva fue procesada correctamente."
+      onSuccessAction={() => { clearTimeout(timerRef.current); onSuccess(); }}
       submitLabel="Registrar reserva"
       submitLoadingLabel="Registrando..."
       onCancel={onCancel}

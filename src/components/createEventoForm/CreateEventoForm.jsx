@@ -54,7 +54,6 @@ export function CreateEventoForm({ onSuccess, onCancel }) {
     if (fotoUrl) setValue('foto_url', fotoUrl, { shouldValidate: true });
 
     setSubmitted(true);
-    await new Promise((resolve) => setTimeout(resolve, 1800));
     onSuccess({
       nombre: data.nombre.trim(),
       descripcion: data.descripcion.trim(),

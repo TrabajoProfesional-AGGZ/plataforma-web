@@ -81,7 +81,6 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
     }
 
     setSubmitted(true);
-    await new Promise((resolve) => setTimeout(resolve, 1800));
     onSuccess(
       modo === 'socios'
         ? { mensaje: data.mensaje.trim(), ids_socios: sociosAgregados.map((s) => s.id) }
