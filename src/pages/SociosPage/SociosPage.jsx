@@ -16,10 +16,12 @@ import { ResolverListaEsperaModal } from '../../components/resolverListaEsperaMo
 import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
 import { useListState } from '../../hooks/useListState';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
 import { usePaginacion } from '../../hooks/usePaginacion';
 import { estadoConfig } from '../../utils/estadoConfig';
 import { urlImagenSegura } from '../../utils/utils';
+import { normalizarBusqueda } from '../../utils/busqueda';
 import { MAX_LEN } from '../../utils/formValidators';
 import { handleActivateKey } from '../../utils/a11y';
 import EmptyState from '../../components/feedback/EmptyState';
@@ -51,6 +53,22 @@ function ariaSortDe(orden, campo) {
 
 
 
+const SOLO_DIGITOS = /^\d+$/;
+
+/**
+ * Búsqueda en vivo (F6): si la consulta es solo dígitos, matchea el N° de socio
+ * exacto (comportamiento histórico del buscador); si no, busca por apellido o
+ * nombre (substring, sin distinguir mayúsculas ni tildes).
+ */
+function coincideBusqueda(socio, consulta) {
+  if (!consulta) return true;
+  if (SOLO_DIGITOS.test(consulta)) return String(socio.nro_socio) === consulta;
+  const q = normalizarBusqueda(consulta);
+  const apellido = normalizarBusqueda(socio.apellido);
+  const nombre = normalizarBusqueda(socio.nombre);
+  return `${apellido} ${nombre}`.includes(q) || `${nombre} ${apellido}`.includes(q);
+}
+
 /** Página de búsqueda/listado y detalle de socios: crear, editar, eliminar y filtrar por disciplina. */
 function SociosPage() {
   const puedeCrear = usePermiso('crear_socio');
@@ -61,9 +79,10 @@ function SociosPage() {
 
   const cacheSociosRef = useRef(null);
 
-  const [nroSocio, setNroSocio] = useState('');
+  const [busqueda, setBusqueda] = useState('');
+  const filtroBusqueda = useDebouncedValue(busqueda.trim(), 150);
   const [busquedaAbierta, setBusquedaAbierta] = useState(false);
-  const [modo, setModo] = useState('idle'); // idle | socio | lista | no-encontrado
+  const [modo, setModo] = useState('idle'); // idle | socio | lista
   // modoRef evita que el callback onPage (asíncrono, con closure sobre modo) actúe con un valor de modo desactualizado.
   const modoRef = useRef(modo);
   useEffect(() => { modoRef.current = modo; }, [modo]);
@@ -205,43 +224,12 @@ function SociosPage() {
   }
 
   async function recargarSocios() {
-    setNroSocio('');
+    setBusqueda('');
     setBusquedaAbierta(false);
     setOrden(ORDEN_INICIAL);
     limpiarFiltros();
     cacheSociosRef.current = null;
     await cargarSocios();
-  }
-
-  /** Busca por N° de socio usando la caché local si ya está disponible, para no reconsultar todo el listado. */
-  async function handleBuscar(e) {
-    e.preventDefault();
-    if (!nroSocio.trim()) return;
-    setLoading(true);
-    setError(null);
-    try {
-      let socios = cacheSociosRef.current;
-      if (socios === null) {
-        socios = await getSocios();
-        cacheSociosRef.current = socios;
-      }
-      const encontrados = socios.filter(s => String(s.nro_socio) === String(nroSocio.trim()));
-      if (encontrados.length === 0) {
-        setModo('no-encontrado');
-        setResultado(null);
-      } else {
-        setResultado(encontrados);
-        setModo('lista');
-      }
-    } catch (err) {
-      if (err.message === 'servicio-no-disponible') {
-        setError('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
-      } else {
-        setError('Error al buscar el socio. Intentá de nuevo.');
-      }
-    } finally {
-      setLoading(false);
-    }
   }
 
   /** Resetea solo los filtros del listado (categoría, estado, disciplina), sin tocar búsqueda ni orden. */
@@ -250,20 +238,6 @@ function SociosPage() {
     setFiltroCategoria('');
     setFiltroDisciplina('');
     setEstadoExtension({});
-  }
-
-  function handleVerTodos() {
-    setNroSocio('');
-    setBusquedaAbierta(false);
-    setOrden(ORDEN_INICIAL);
-    limpiarFiltros();
-    setError(null);
-    if (cacheSociosRef.current !== null) {
-      setResultado(cacheSociosRef.current);
-      setModo('lista');
-      return;
-    }
-    cargarSocios();
   }
 
   function abrirEditar() {
@@ -311,10 +285,8 @@ function SociosPage() {
     setErrorModal('');
     try {
       await deleteSocio(resultado.id);
-      cacheSociosRef.current = null;
       setEliminarModalOpen(false);
-      setModo('idle');
-      setResultado(null);
+      await recargarSocios();
     } catch (err) {
       if (err.message === 'servicio-no-disponible') {
         setErrorModal('El servicio no está disponible en este momento. Intentá de nuevo más tarde.');
@@ -331,7 +303,7 @@ function SociosPage() {
     const matchEstado = filtroEstado ? s.estado.nombre === filtroEstado : true;
     const matchCategoria = filtroCategoria ? s.categoria.nombre === filtroCategoria : true;
     const matchDisciplina = filtroDisciplina ? (estadoSuscripcionPorSocio?.has(s.id) ?? false) : true;
-    return matchEstado && matchCategoria && matchDisciplina;
+    return matchEstado && matchCategoria && matchDisciplina && coincideBusqueda(s, filtroBusqueda);
   });
   const listaOrdenada = aplicarOrden(listaFiltrada);
   const { pagina, totalPaginas, listaPaginada, irAPagina, resetPagina } = usePaginacion(listaOrdenada, 10);
@@ -339,13 +311,24 @@ function SociosPage() {
   useEffect(() => {
     resetPagina();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resultado, filtroEstado, filtroCategoria, filtroDisciplina]);
+  }, [resultado, filtroEstado, filtroCategoria, filtroDisciplina, filtroBusqueda]);
 
   const mostrarFiltros = !loading && modo === 'lista' && listaBase.length > 0;
   const estadosUnicos = [...new Set(listaBase.map((s) => s.estado.nombre))].sort();
   const categoriasUnicas = [...new Set(listaBase.map((s) => s.categoria.nombre))].sort();
   const cantidadFiltrosActivos = [filtroEstado, filtroCategoria, filtroDisciplina].filter(Boolean).length;
   const nombreDisciplinaFiltro = disciplinas.find((d) => String(d.id) === String(filtroDisciplina))?.nombre;
+  const mensajeListaVacia = filtroBusqueda
+    ? (SOLO_DIGITOS.test(filtroBusqueda)
+      ? 'No se encontró ningún socio con ese N° de socio.'
+      : 'No se encontró ningún socio con ese apellido o nombre.')
+    : 'No hay socios con los filtros seleccionados.';
+
+  /** Cerrar el buscador (lupa o Escape) también limpia la búsqueda: un filtro oculto confunde. */
+  function toggleBusqueda() {
+    if (busquedaAbierta) setBusqueda('');
+    setBusquedaAbierta((a) => !a);
+  }
 
   return (
     <div className="socios-page">
@@ -354,19 +337,14 @@ function SociosPage() {
         <div className="socios-toolbar-left">
           <BuscadorColapsable
             abierto={busquedaAbierta}
-            onToggle={() => setBusquedaAbierta((a) => !a)}
-            placeholder="Buscar por N° de socio"
-            value={nroSocio}
-            onChange={(e) => setNroSocio(e.target.value)}
-            onSubmit={handleBuscar}
-            disabled={loading}
-            maxLength={MAX_LEN.NRO_SOCIO}
+            onToggle={toggleBusqueda}
+            placeholder="Buscar por N°, apellido o nombre"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            maxLength={MAX_LEN.BUSQUEDA}
           />
         </div>
         <div className="socios-toolbar-right">
-          <button className="socios-ver-todos-button" onClick={handleVerTodos}>
-            Ver todos
-          </button>
           {puedeCrear && (
             <button className="socios-crear-button" onClick={() => setCrearModalOpen(true)} disabled={loading}>
               <Plus size={15} aria-hidden="true" />
@@ -425,10 +403,6 @@ function SociosPage() {
       {error && <ErrorBanner mensaje={error} onReintentar={cargarSocios} />}
 
       <ViewTransition screenKey={modo}>
-        {!loading && modo === 'no-encontrado' && (
-          <EmptyState mensaje="No se encontró ningún socio con ese N° de socio." />
-        )}
-
         {!loading && modo === 'socio' && resultado && (() => {
           const cfg = estadoConfig(resultado.estado.nombre);
           const fotoSegura = urlImagenSegura(resultado.foto_url);
@@ -513,7 +487,7 @@ function SociosPage() {
               {errorDisciplinaFiltro && <ErrorBanner mensaje={errorDisciplinaFiltro} onReintentar={recargarSociosDeDisciplina} />}
               <div className="socios-table-wrapper">
                 {listaFiltrada.length === 0 ? (
-                  <EmptyState mensaje="No hay socios con los filtros seleccionados." />
+                  <EmptyState mensaje={mensajeListaVacia} />
                 ) : (
                   <table className="socios-table">
                     {filtroDisciplina && nombreDisciplinaFiltro && (

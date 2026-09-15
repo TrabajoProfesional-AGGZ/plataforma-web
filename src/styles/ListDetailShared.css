@@ -24,9 +24,17 @@
   transition: background-color var(--transition-fast);
 }
 
+.socios-crear-button:disabled,
+.usuarios-crear-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
 @media (hover: hover) {
   .disciplinas-btn-crear:hover,
-  .instalaciones-btn-crear:hover {
+  .instalaciones-btn-crear:hover,
+  .socios-crear-button:hover:not(:disabled),
+  .usuarios-crear-button:hover:not(:disabled) {
     background-color: var(--color-text-secondary);
   }
 }

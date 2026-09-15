@@ -17,6 +17,9 @@ import { StyledSelect } from '../../components/createForm/FormFields';
 import { usePermiso } from '../../hooks/usePermiso';
 import { useSortedList } from '../../hooks/useSortedList';
 import { useListState } from '../../hooks/useListState';
+import { useDebouncedValue } from '../../hooks/useDebouncedValue';
+import { normalizarBusqueda } from '../../utils/busqueda';
+import { MAX_LEN } from '../../utils/formValidators';
 import { usePaginacion } from '../../hooks/usePaginacion';
 import { useAuthContext } from '../../context/AuthContext';
 import { estadoConfig } from '../../utils/estadoConfig';
@@ -55,13 +58,14 @@ function UsuariosPage() {
   const cacheUsuariosRef = useRef(null);
 
   const [busqueda, setBusqueda] = useState('');
+  // Búsqueda en vivo (F6): filtra al tipear, con debounce; sin botón "Buscar".
+  const filtroBusqueda = normalizarBusqueda(useDebouncedValue(busqueda, 150));
   const [busquedaAbierta, setBusquedaAbierta] = useState(false);
   const [modo, setModo] = useState('lista');
   const { resultado, setResultado, loading, setLoading, error, setError } = useListState();
   const { orden, setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden, ORDEN_INICIAL);
 
   const [filtroRol, setFiltroRol] = useState('');
-  const [filtroBusqueda, setFiltroBusqueda] = useState('');
 
   const [roles, setRoles] = useState([]);
 
@@ -129,32 +133,10 @@ function UsuariosPage() {
   async function recargarUsuarios() {
     setBusqueda('');
     setBusquedaAbierta(false);
-    setFiltroBusqueda('');
     setFiltroRol('');
     setOrden(ORDEN_INICIAL);
     cacheUsuariosRef.current = null;
     await fetchYActualizarUsuarios();
-  }
-
-  function handleBuscar(e) {
-    e.preventDefault();
-    setFiltroBusqueda(busqueda.trim().toLowerCase());
-    setModo('lista');
-  }
-
-  function handleVerTodos() {
-    setBusqueda('');
-    setBusquedaAbierta(false);
-    setFiltroBusqueda('');
-    setFiltroRol('');
-    setOrden(ORDEN_INICIAL);
-    setError(null);
-    if (cacheUsuariosRef.current !== null) {
-      setResultado(cacheUsuariosRef.current);
-      setModo('lista');
-      return;
-    }
-    fetchYActualizarUsuarios();
   }
 
   function abrirEditar() {
@@ -193,7 +175,7 @@ function UsuariosPage() {
   const listaFiltrada = listaBase.filter((u) => {
     const matchRol = filtroRol ? u.rol?.nombre === filtroRol : true;
     const matchBusqueda = filtroBusqueda
-      ? `${u.nombre} ${u.apellido} ${u.email}`.toLowerCase().includes(filtroBusqueda)
+      ? normalizarBusqueda(`${u.nombre} ${u.apellido} ${u.email}`).includes(filtroBusqueda)
       : true;
     return matchRol && matchBusqueda;
   });
@@ -209,6 +191,16 @@ function UsuariosPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resultado, filtroRol, filtroBusqueda]);
 
+  const mensajeListaVacia = filtroBusqueda
+    ? 'No se encontró ningún usuario con ese nombre, apellido o email.'
+    : 'No hay usuarios con los filtros seleccionados.';
+
+  /** Cerrar el buscador (lupa o Escape) también limpia la búsqueda: un filtro oculto confunde. */
+  function toggleBusqueda() {
+    if (busquedaAbierta) setBusqueda('');
+    setBusquedaAbierta((a) => !a);
+  }
+
   return (
     <div className="usuarios-page">
       <h1 className="page-title">Consultar Usuarios</h1>
@@ -217,18 +209,14 @@ function UsuariosPage() {
         <div className="usuarios-toolbar-left">
           <BuscadorColapsable
             abierto={busquedaAbierta}
-            onToggle={() => setBusquedaAbierta((a) => !a)}
+            onToggle={toggleBusqueda}
             placeholder="Buscar por nombre, apellido o email"
             value={busqueda}
             onChange={(e) => setBusqueda(e.target.value)}
-            onSubmit={handleBuscar}
-            disabled={loading}
+            maxLength={MAX_LEN.BUSQUEDA}
           />
         </div>
         <div className="usuarios-toolbar-right">
-          <button className="usuarios-ver-todos-button" onClick={handleVerTodos}>
-            Ver todos
-          </button>
           {puedeCrear && (
             <button className="usuarios-crear-button" onClick={() => setCrearModalOpen(true)} disabled={loading}>
               <Plus size={15} aria-hidden="true" />
@@ -267,7 +255,7 @@ function UsuariosPage() {
               {listaBase.length === 0 ? (
                 <EmptyState mensaje="No hay usuarios registrados." />
               ) : listaFiltrada.length === 0 ? (
-                <EmptyState mensaje="No hay usuarios con los filtros seleccionados." />
+                <EmptyState mensaje={mensajeListaVacia} />
               ) : (
                 <table className="usuarios-tabla">
                   <thead>

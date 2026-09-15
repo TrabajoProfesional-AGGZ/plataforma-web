@@ -5,12 +5,13 @@ import { SPRING } from '../../styles/motion';
 import './BuscadorColapsable.css';
 
 /**
- * Buscador colapsado a una lupa: al apretarla se despliega el input + "Buscar".
- * Controlado desde la página (`abierto`/`onToggle`) para que "Ver todos" pueda
- * cerrarlo. Escape cierra y devuelve el foco a la lupa.
+ * Buscador colapsado a una lupa: al apretarla se despliega el input. La
+ * búsqueda es en vivo (la página filtra al tipear, con debounce), así que no
+ * hay botón "Buscar". Controlado desde la página (`abierto`/`onToggle`), que
+ * al cerrarlo limpia el texto. Escape cierra y devuelve el foco a la lupa.
  */
 export function BuscadorColapsable({
-  abierto, onToggle, value, onChange, onSubmit, placeholder, disabled = false, maxLength, label = 'Abrir búsqueda',
+  abierto, onToggle, value, onChange, placeholder, maxLength, label = 'Abrir búsqueda',
 }) {
   const inputRef = useRef(null);
   const lupaRef = useRef(null);
@@ -28,7 +29,7 @@ export function BuscadorColapsable({
   }
 
   return (
-    <div className="buscador">
+    <div className="buscador" role="search">
       <button
         ref={lupaRef}
         type="button"
@@ -42,9 +43,8 @@ export function BuscadorColapsable({
 
       <AnimatePresence initial={false}>
         {abierto && (
-          <motion.form
-            className="buscador-form"
-            onSubmit={onSubmit}
+          <motion.div
+            className="buscador-campo"
             initial={{ opacity: 0, x: -8 }}
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: -8 }}
@@ -55,15 +55,14 @@ export function BuscadorColapsable({
               className="buscador-input"
               type="text"
               placeholder={placeholder}
+              aria-label={placeholder}
               value={value}
               onChange={onChange}
               onKeyDown={handleKeyDown}
               maxLength={maxLength}
+              autoComplete="off"
             />
-            <button type="submit" className="buscador-submit" disabled={disabled || !value.trim()}>
-              Buscar
-            </button>
-          </motion.form>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

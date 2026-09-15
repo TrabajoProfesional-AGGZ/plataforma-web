@@ -1,20 +1,5 @@
 /* Estilos compartidos para páginas de listado: SociosPage, UsuariosPage, DisciplinasPage, InstalacionesPage */
 
-/* ── Botón Ver-todos / secundario ─────────────────────────────── */
-.socios-ver-todos-button,
-.usuarios-ver-todos-button {
-  background-color: var(--color-surface);
-  color: var(--color-text-primary);
-  border: 1px solid var(--color-border-medium);
-}
-
-@media (hover: hover) {
-  .socios-ver-todos-button:hover:not(:disabled),
-  .usuarios-ver-todos-button:hover:not(:disabled) {
-    background-color: var(--color-bg);
-  }
-}
-
 /* ── Barra de filtros: segunda fila debajo del toolbar (selects a la izquierda,
    "N filtros activos · Limpiar" a la derecha) ── */
 .filtros-bar {
@@ -91,17 +76,6 @@
 }
 
 /* Búsqueda → src/components/BuscadorColapsable/BuscadorColapsable.css */
-
-.socios-ver-todos-button,
-.usuarios-ver-todos-button {
-  padding: var(--space-2) var(--space-4);
-  border-radius: var(--radius-sm);
-  font-size: var(--text-secondary);
-  font-weight: 500;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background-color var(--transition-fast), color var(--transition-fast);
-}
 
 /* ── Filtros ─────────────────────────────────────────────────── */
 .instalaciones-btn-toggle {

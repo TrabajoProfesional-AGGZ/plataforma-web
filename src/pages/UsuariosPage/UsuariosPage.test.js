@@ -124,17 +124,16 @@ describe('UsuariosPage', () => {
     expect(screen.queryByPlaceholderText(/buscar por nombre/i)).not.toBeInTheDocument();
     abrirBuscador();
     expect(screen.getByPlaceholderText(/buscar por nombre/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /buscar/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /ver todos/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /crear usuario/i })).toBeInTheDocument();
     await waitFor(() => expect(fetchUsuarios).toHaveBeenCalled());
   });
 
-  test('el botón buscar está deshabilitado si el campo está vacío', async () => {
+  test('la búsqueda es en vivo: no hay botón Buscar ni Ver todos', async () => {
     render(<UsuariosPage />);
     await waitFor(() => expect(fetchUsuarios).toHaveBeenCalled());
     abrirBuscador();
-    expect(screen.getByRole('button', { name: /buscar/i })).toBeDisabled();
+    expect(screen.queryByRole('button', { name: /^buscar$/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /ver todos/i })).not.toBeInTheDocument();
   });
 
   test('carga y muestra el listado de usuarios al montar la página', async () => {
@@ -208,24 +207,29 @@ describe('UsuariosPage', () => {
     fireEvent.change(screen.getByPlaceholderText(/buscar por nombre/i), {
       target: { value: 'laura' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
 
-    await waitFor(() => expect(screen.getAllByText('Sánchez').length).toBeGreaterThan(0));
-    expect(screen.queryByText('Rodríguez')).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.queryByText('Rodríguez')).not.toBeInTheDocument());
+    expect(screen.getAllByText('Sánchez').length).toBeGreaterThan(0);
   });
 
-  test('hacer click en Ver todos usa la caché y no vuelve a llamar al servidor', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
+  test('la búsqueda no distingue mayúsculas ni tildes y también busca por email', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock, usuarioMock2]);
     render(<UsuariosPage />);
-    await waitFor(() => expect(fetchUsuarios).toHaveBeenCalledTimes(1));
-
-    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
-
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-    expect(fetchUsuarios).toHaveBeenCalledTimes(1);
+
+    abrirBuscador();
+    const input = screen.getByPlaceholderText(/buscar por nombre/i);
+
+    fireEvent.change(input, { target: { value: 'RODRIGUEZ' } });
+    await waitFor(() => expect(screen.queryByText('Sánchez')).not.toBeInTheDocument());
+    expect(screen.getAllByText('Rodríguez').length).toBeGreaterThan(0);
+
+    fireEvent.change(input, { target: { value: usuarioMock2.email } });
+    await waitFor(() => expect(screen.queryByText('Rodríguez')).not.toBeInTheDocument());
+    expect(screen.getAllByText('Sánchez').length).toBeGreaterThan(0);
   });
 
-  test('Ver todos limpia el filtro y muestra la lista completa', async () => {
+  test('cerrar el buscador limpia la búsqueda y muestra la lista completa sin volver al servidor', async () => {
     fetchUsuarios.mockResolvedValue([usuarioMock, usuarioMock2]);
     render(<UsuariosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
@@ -235,13 +239,15 @@ describe('UsuariosPage', () => {
     fireEvent.change(screen.getByPlaceholderText(/buscar por nombre/i), {
       target: { value: 'laura' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
-    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
+    await waitFor(() => expect(screen.queryByText('Rodríguez')).not.toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /abrir búsqueda/i }));
 
     await waitFor(() => {
       expect(screen.getAllByText('Rodríguez').length).toBeGreaterThan(0);
-      expect(screen.getAllByText('Sánchez').length).toBeGreaterThan(0);
     });
+    expect(screen.getAllByText('Sánchez').length).toBeGreaterThan(0);
+    expect(fetchUsuarios).toHaveBeenCalledTimes(1);
   });
 
   // --- Filtro por rol ---
@@ -282,7 +288,7 @@ describe('UsuariosPage', () => {
     expect(screen.queryByText('Rodríguez')).not.toBeInTheDocument();
   });
 
-  test('muestra mensaje cuando no hay usuarios con los filtros seleccionados', async () => {
+  test('muestra mensaje específico cuando la búsqueda no coincide con ningún usuario', async () => {
     fetchUsuarios.mockResolvedValue([usuarioMock]);
     render(<UsuariosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
@@ -292,10 +298,9 @@ describe('UsuariosPage', () => {
     fireEvent.change(screen.getByPlaceholderText(/buscar por nombre/i), {
       target: { value: 'zzznombreinexistente' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
 
     await waitFor(() => {
-      expect(screen.getByText(/no hay usuarios con los filtros seleccionados/i)).toBeInTheDocument();
+      expect(screen.getByText(/no se encontró ningún usuario con ese nombre, apellido o email/i)).toBeInTheDocument();
     });
   });
 
@@ -431,6 +436,45 @@ describe('UsuariosPage', () => {
     });
   });
 
+  test('Reintentar tras un fallo inicial vuelve a pedir la lista y la muestra', async () => {
+    fetchUsuarios
+      .mockRejectedValueOnce(new Error('fallo inicial'))
+      .mockResolvedValueOnce([usuarioMock]);
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByText(/error al obtener los usuarios/i)).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /reintentar/i }));
+
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(fetchUsuarios).toHaveBeenCalledTimes(2);
+    expect(screen.queryByText(/error al obtener los usuarios/i)).not.toBeInTheDocument();
+  });
+
+  test('Reintentar muestra el error genérico si la recarga vuelve a fallar', async () => {
+    fetchUsuarios
+      .mockRejectedValueOnce(new Error('fallo inicial'))
+      .mockRejectedValueOnce(new Error('otro fallo'));
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByText(/error al obtener los usuarios/i)).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /reintentar/i }));
+
+    await waitFor(() => expect(fetchUsuarios).toHaveBeenCalledTimes(2));
+    expect(await screen.findByText(/error al obtener los usuarios/i)).toBeInTheDocument();
+  });
+
+  test('Reintentar muestra servicio no disponible si la recarga falla por ese motivo', async () => {
+    fetchUsuarios
+      .mockRejectedValueOnce(new Error('fallo inicial'))
+      .mockRejectedValueOnce(new Error('servicio-no-disponible'));
+    render(<UsuariosPage />);
+    await waitFor(() => expect(screen.getByText(/error al obtener los usuarios/i)).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /reintentar/i }));
+
+    expect(await screen.findByText(/el servicio no está disponible/i)).toBeInTheDocument();
+  });
+
   test('muestra error genérico si falla la eliminación', async () => {
     eliminarUsuario.mockRejectedValue(new Error('error-desconocido'));
     await renderYAbrirCardUsuario();
@@ -551,21 +595,6 @@ describe('UsuariosPage', () => {
     const fila = screen.getAllByRole('button', { name: /ver detalle de/i })[0];
     fireEvent.keyDown(fila, { key: 'Enter' });
     await waitFor(() => expect(screen.getByRole('button', { name: /^editar$/i })).toBeInTheDocument());
-  });
-
-  test('Ver todos recarga del servidor cuando no hay caché', async () => {
-    fetchUsuarios
-      .mockRejectedValueOnce(new Error('fallo inicial'))
-      .mockResolvedValueOnce([usuarioMock]);
-    render(<UsuariosPage />);
-    await waitFor(() => expect(fetchUsuarios).toHaveBeenCalledTimes(1));
-
-    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
-
-    await waitFor(() => {
-      expect(fetchUsuarios).toHaveBeenCalledTimes(2);
-      expect(screen.getByRole('table')).toBeInTheDocument();
-    });
   });
 
   // --- ESC cierra otros modales ---
