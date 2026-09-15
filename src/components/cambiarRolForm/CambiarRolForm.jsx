@@ -5,14 +5,7 @@ import { cambiarRolUsuario } from '../../services/usuariosService';
 import '../createForm/CreateSocioForm.css';
 import { StyledSelect } from '../createForm/FormFields';
 import { ModalOverlay } from '../createForm/ModalOverlay';
-
-// Props de animación (framer-motion) compartidas por ambos pasos del form.
-const STEP_SHARED_PROPS = {
-  animate: { x: 0, opacity: 1 },
-  exit: { x: -52, opacity: 0 },
-  transition: { duration: 0.26, ease: 'easeInOut' },
-  className: 'csf-fields',
-};
+import { SPRING, slideVariants } from '../../styles/motion';
 
 /**
  * Modal de dos pasos para cambiar el rol de un usuario administrativo:
@@ -22,6 +15,7 @@ const STEP_SHARED_PROPS = {
  */
 export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
   const [fase, setFase] = useState('seleccion');
+  const [direction, setDirection] = useState(1);
   const [rolSeleccionado, setRolSeleccionado] = useState(usuario.rol?.nombre ?? '');
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState('');
@@ -38,6 +32,7 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
       } else {
         setError('Error al cambiar el rol. Intentá de nuevo.');
       }
+      setDirection(-1);
       setFase('seleccion');
     } finally {
       setGuardando(false);
@@ -58,13 +53,18 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
           </div>
 
           <div className="csf-card">
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" custom={direction}>
 
               {fase === 'seleccion' && (
                 <motion.div
                   key="seleccion"
-                  initial={{ x: 0, opacity: 0 }}
-                  {...STEP_SHARED_PROPS}
+                  custom={direction}
+                  variants={slideVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={SPRING.quick}
+                  className="csf-fields"
                 >
                   <div className="csf-field">
                     <label className="csf-label">
@@ -94,7 +94,7 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
                     </motion.button>
                     <motion.button
                       type="button"
-                      onClick={() => setFase('confirmacion')}
+                      onClick={() => { setDirection(1); setFase('confirmacion'); }}
                       disabled={!rolSeleccionado}
                       whileHover={{ scale: 1.015 }}
                       whileTap={{ scale: 0.985 }}
@@ -110,8 +110,13 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
               {fase === 'confirmacion' && (
                 <motion.div
                   key="confirmacion"
-                  initial={{ x: 52, opacity: 0 }}
-                  {...STEP_SHARED_PROPS}
+                  custom={direction}
+                  variants={slideVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={SPRING.quick}
+                  className="csf-fields"
                 >
                   <div style={{
                     backgroundColor: 'var(--status-warning-bg)',
@@ -130,7 +135,7 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
                   <div className="csf-nav csf-nav--between" style={{ marginTop: 8 }}>
                     <motion.button
                       type="button"
-                      onClick={() => setFase('seleccion')}
+                      onClick={() => { setDirection(-1); setFase('seleccion'); }}
                       whileHover={{ scale: 1.015 }}
                       whileTap={{ scale: 0.985 }}
                       className="csf-btn-back"

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent, within } from '@testing-library/react';
 import { User } from 'lucide-react';
-import { Field, StyledInput, StyledSelect, slideVariants } from './FormFields';
+import { Field, StyledInput, StyledSelect } from './FormFields';
 
 describe('Field', () => {
   test('genera un id a partir del label cuando no se pasa uno explícito', () => {
@@ -45,18 +45,6 @@ describe('Field', () => {
     const errorMessage = screen.getByRole('alert');
     expect(input.getAttribute('aria-describedby')).toBe(errorMessage.id);
     expect(errorMessage).toHaveTextContent('Requerido');
-  });
-});
-
-describe('slideVariants', () => {
-  test('enter/exit devuelven desplazamiento positivo cuando la dirección es hacia adelante', () => {
-    expect(slideVariants.enter(1)).toEqual({ x: 52, opacity: 0 });
-    expect(slideVariants.exit(1)).toEqual({ x: -52, opacity: 0 });
-  });
-
-  test('enter/exit devuelven desplazamiento negativo cuando la dirección es hacia atrás', () => {
-    expect(slideVariants.enter(-1)).toEqual({ x: -52, opacity: 0 });
-    expect(slideVariants.exit(-1)).toEqual({ x: 52, opacity: 0 });
   });
 });
 

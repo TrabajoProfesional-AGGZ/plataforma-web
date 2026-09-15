@@ -7,13 +7,8 @@ import { DatePicker } from './DatePicker';
 import { TimePicker } from './TimePicker';
 import { setNativeValue, mergeRefs } from './nativeInputUtils';
 import { usePickerPopover } from './usePickerPopover';
+import { SPRING, slideVariants } from '../../styles/motion';
 import './Pickers.css';
-
-export const slideVariants = {
-  enter: (dir) => ({ x: dir > 0 ? 52 : -52, opacity: 0 }),
-  center: { x: 0, opacity: 1 },
-  exit: (dir) => ({ x: dir > 0 ? -52 : 52, opacity: 0 }),
-};
 
 /** Mensaje de error de un campo, con aparición/desaparición animada. */
 export function FieldError({ message, id }) {
@@ -120,7 +115,7 @@ export function FormStep({ direction, children }) {
       initial="enter"
       animate="center"
       exit="exit"
-      transition={{ duration: 0.26, ease: 'easeInOut' }}
+      transition={SPRING.quick}
       className="csf-fields"
     >
       {children}

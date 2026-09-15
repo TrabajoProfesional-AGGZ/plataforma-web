@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { login } from '../../services/authService';
 import { RecuperarContraseniaModal } from './RecuperarContraseniaModal';
 import { useTheme } from '../../hooks/useTheme';
+import { EASE } from '../../styles/motion';
 import './LoginPage.css';
 import '../../styles/shared.css';
 
@@ -15,8 +16,8 @@ const formContainerVariants = {
 
 const formItemVariants = {
   hidden: { x: -20, opacity: 0 },
-  visible: { x: 0, opacity: 1, transition: { duration: 0.35, ease: 'easeOut' } },
-  exiting: { x: -20, opacity: 0, transition: { duration: 0.25, ease: 'easeIn' } },
+  visible: { x: 0, opacity: 1, transition: { duration: 0.35, ease: EASE.out } },
+  exiting: { x: -20, opacity: 0, transition: { duration: 0.25, ease: EASE.in } },
 };
 
 const CODIGOS_CREDENCIALES_INVALIDAS = [
@@ -90,7 +91,7 @@ function LoginPage() {
           className="login-intro-overlay"
           initial={{ width: '100%' }}
           animate={{ width: animStarted ? '50%' : '100%' }}
-          transition={{ duration: 0.75, ease: [0.76, 0, 0.24, 1] }}
+          transition={{ duration: 0.75, ease: EASE.inOut }}
           aria-hidden="true"
         >
           <img src={logoLoginEntrada} alt="" className="login-intro-logo" />
@@ -101,7 +102,7 @@ function LoginPage() {
           className="login-exit-overlay"
           initial={{ width: '50%' }}
           animate={{ width: '100%' }}
-          transition={{ duration: 0.75, ease: [0.76, 0, 0.24, 1] }}
+          transition={{ duration: 0.75, ease: EASE.inOut }}
           onAnimationComplete={() => setLogoFadingOut(true)}
           aria-hidden="true"
         >
@@ -113,7 +114,7 @@ function LoginPage() {
             animate={logoFadingOut ? { x: 0, opacity: 0 } : { x: 0, opacity: 1 }}
             transition={logoFadingOut
               ? { duration: 0.5, delay: 0.3 }
-              : { delay: 0.25, duration: 0.45, ease: 'easeOut' }
+              : { delay: 0.25, duration: 0.45, ease: EASE.out }
             }
             onAnimationComplete={logoFadingOut ? safeNavigate : undefined}
           />

@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import logoVerde from '../../assets/logo-verde.png';
 import { ModalOverlay } from './ModalOverlay';
 import { useTheme } from '../../hooks/useTheme';
+import { SPRING } from '../../styles/motion';
 import './CreateSocioForm.css';
 
 // framer-motion interpola colores en JS (para animar background/rotate/etc.),
@@ -55,21 +56,21 @@ export function MultiStepFormShell({
               key="success"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: 'spring', stiffness: 180 }}
+              transition={SPRING.default}
               className="csf-outer-card csf-success"
             >
               <motion.div
                 className="csf-success-logo-circle"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 220, delay: 0.1 }}
+                transition={{ ...SPRING.celebrate, delay: 0.1 }}
               >
                 <img src={logoVerde} alt="SocioUnido" className="csf-success-logo" />
               </motion.div>
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 260, delay: 0.4 }}
+                transition={{ ...SPRING.celebrate, delay: 0.4 }}
               >
                 <CheckCircle2 size={48} color={colors.success} strokeWidth={1.5} />
               </motion.div>
@@ -114,7 +115,7 @@ export function MultiStepFormShell({
                                     key="check"
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
-                                    transition={{ type: 'spring', stiffness: 300 }}
+                                    transition={SPRING.quick}
                                   >
                                     <CheckCircle2 size={16} color={colors.onBubble} strokeWidth={2.5} />
                                   </motion.span>
@@ -135,7 +136,7 @@ export function MultiStepFormShell({
                                 className="csf-connector-fill"
                                 style={{ transformOrigin: 'left', width: '100%' }}
                                 animate={{ scaleX: step > s.id ? 1 : 0 }}
-                                transition={{ duration: 0.4, ease: 'easeInOut' }}
+                                transition={SPRING.default}
                               />
                             </div>
                           )}
@@ -149,7 +150,7 @@ export function MultiStepFormShell({
                       className="csf-progress-fill"
                       style={{ transformOrigin: 'left', width: '100%' }}
                       animate={{ scaleX: progress / 100 }}
-                      transition={{ duration: 0.4, ease: 'easeInOut' }}
+                      transition={SPRING.default}
                     />
                   </div>
                 </>
