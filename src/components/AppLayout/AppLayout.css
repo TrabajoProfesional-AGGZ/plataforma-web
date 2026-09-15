@@ -58,6 +58,12 @@
   pointer-events: none;
   will-change: transform;
   z-index: 0;
+  transition: transform 0.28s var(--ease-out), height 0.28s var(--ease-out);
+}
+
+/* Reposicionamiento instantáneo (primer render, resize): se quita al siguiente frame */
+.sidebar-active-bg--snap {
+  transition: none;
 }
 
 .sidebar-link {

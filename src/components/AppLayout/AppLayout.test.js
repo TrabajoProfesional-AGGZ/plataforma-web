@@ -138,14 +138,13 @@ describe('AppLayout', () => {
 
     const indicator = container.querySelector('.sidebar-active-bg');
     indicator.style.opacity = '0';
-    indicator.style.transition = 'transform 1s ease-out';
 
     act(() => {
       window.dispatchEvent(new Event('resize'));
     });
 
     expect(indicator.style.opacity).toBe('1');
-    expect(indicator.style.transition).toBe('none');
+    expect(indicator).toHaveClass('sidebar-active-bg--snap');
   });
 
   test('el drawer se cierra automáticamente al cambiar de ruta', () => {
