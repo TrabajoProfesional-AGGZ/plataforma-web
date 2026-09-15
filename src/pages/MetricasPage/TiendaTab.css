@@ -21,13 +21,13 @@
 }
 
 .tienda-tab-card-header h2 {
-  font-size: 1rem;
+  font-size: var(--text-body);
   font-weight: 600;
   margin: 0;
 }
 
 .tienda-tab-monto {
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-weight: 700;
   color: var(--color-text-primary);
 }

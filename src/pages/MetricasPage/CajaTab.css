@@ -21,26 +21,26 @@
 }
 
 .caja-tab-kpi-title {
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: var(--tracking-secondary);
   color: var(--color-text-secondary);
   margin: 0 0 var(--space-2) 0;
   font-weight: 600;
 }
 
 .caja-tab-kpi-value {
-  font-size: 3rem;
+  font-size: var(--text-display);
   font-weight: 700;
   color: var(--color-text-primary);
   margin: 0;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--tracking-display);
   font-variant-numeric: tabular-nums;
 }
 
 .caja-tab-kpi-subtitle {
   display: block;
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
   margin-top: var(--space-2);
 }
@@ -62,7 +62,7 @@
 }
 
 .caja-tab-desglose-header h3 {
-  font-size: 1rem;
+  font-size: var(--text-body);
   font-weight: 600;
   margin: 0;
 }
@@ -105,16 +105,16 @@
 }
 
 .caja-tab-desglose-info { display: flex; flex-direction: column; }
-.caja-tab-desglose-label { font-weight: 600; font-size: 0.875rem; color: var(--color-text-primary); }
-.caja-tab-desglose-cantidad { font-size: 0.75rem; color: var(--color-text-secondary); }
+.caja-tab-desglose-label { font-weight: 600; font-size: var(--text-secondary); color: var(--color-text-primary); }
+.caja-tab-desglose-cantidad { font-size: var(--text-caption); color: var(--color-text-secondary); }
 
 .caja-tab-desglose-monto {
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-weight: 700;
   color: var(--color-text-primary);
   font-variant-numeric: tabular-nums;
 }
 
 @media (max-width: 480px) {
-  .caja-tab-kpi-value { font-size: 2.25rem; }
+  .caja-tab-kpi-value { font-size: var(--text-display); }
 }

@@ -93,8 +93,7 @@ export function CreateProductoForm({ onSuccess, onCancel }) {
             })}
             placeholder="Describí el producto..."
             rows={4}
-            className={`csf-input${errors.descripcion ? ' csf-input--error' : ''}`}
-            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: '0.875rem' }}
+            className={`csf-input csf-textarea${errors.descripcion ? ' csf-input--error' : ''}`}
           />
         </Field>
         <Field label="Precio ($)" icon={DollarSign} error={errors.precio?.message}>

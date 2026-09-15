@@ -5,7 +5,7 @@
 
 .empty-state-mensaje {
   color: var(--color-text-secondary);
-  font-size: 0.9375rem;
+  font-size: var(--text-body);
   margin: 0 0 var(--space-4);
 }
 

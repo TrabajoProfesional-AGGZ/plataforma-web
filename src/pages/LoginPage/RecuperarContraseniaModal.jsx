@@ -48,7 +48,7 @@ export function RecuperarContraseniaModal({ onClose }) {
         <div className="csf-card">
           {enviado ? (
             <div className="csf-success">
-              <p style={{ fontSize: '1.15rem' }}>
+              <p className="csf-success-texto">
                 Si el email ingresado tiene una cuenta, te enviamos un mail para restablecer tu
                 contraseña. Si no lo encontrás, revisá la casilla de SPAM.
               </p>

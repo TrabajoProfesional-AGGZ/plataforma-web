@@ -16,7 +16,7 @@
 }
 
 .finanzas-filter-label {
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-weight: 500;
   color: var(--color-text-secondary);
 }
@@ -24,7 +24,7 @@
 .finanzas-input-month {
   border: none;
   font-family: inherit;
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   color: var(--color-text-primary);
   background: transparent;
   outline: none;
@@ -57,26 +57,26 @@
 }
 
 .finanzas-kpi-title {
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+  letter-spacing: var(--tracking-secondary);
   color: var(--color-text-secondary);
   margin: 0 0 var(--space-2) 0;
   font-weight: 600;
 }
 
 .finanzas-kpi-value {
-  font-size: 3rem;
+  font-size: var(--text-display);
   font-weight: 700;
   color: var(--color-text-primary);
   margin: 0;
-  letter-spacing: -0.03em;
+  letter-spacing: var(--tracking-display);
   font-variant-numeric: tabular-nums;
 }
 
 .finanzas-kpi-subtitle {
   display: block;
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
   margin-top: var(--space-2);
 }
@@ -91,7 +91,7 @@
 }
 
 .finanzas-chart-title {
-  font-size: 1.125rem;
+  font-size: var(--text-heading);
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0 0 var(--space-3) 0;
@@ -106,7 +106,7 @@
 /* ── Responsivo ───────────────────────────────────────────────── */
 @media (max-width: 480px) {
   .finanzas-kpi-value {
-    font-size: 2.25rem;
+    font-size: var(--text-display);
   }
 
   .finanzas-toolbar {

@@ -8,7 +8,7 @@
   color: var(--color-surface);
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-weight: 500;
   cursor: pointer;
   transition: background-color var(--transition-fast);
@@ -23,7 +23,7 @@
   background: none;
   border: none;
   color: var(--color-text-secondary);
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   font-weight: 500;
   cursor: pointer;
   min-height: 32px;

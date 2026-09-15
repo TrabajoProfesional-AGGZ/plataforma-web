@@ -31,14 +31,14 @@
 }
 
 .resumen-card-header h2 {
-  font-size: 1rem;
+  font-size: var(--text-body);
   font-weight: 600;
   margin: 0;
 }
 
 .resumen-badge {
   margin-left: auto;
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
   background: var(--color-bg);
   padding: 2px 8px;
@@ -64,13 +64,13 @@
   border-radius: 50%;
   background: var(--color-text-primary);
   color: var(--color-surface);
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   font-weight: 700;
 }
 
 .ranking-info { display: flex; flex-direction: column; }
-.ranking-nombre { font-weight: 600; font-size: 0.875rem; color: var(--color-text-primary); }
-.ranking-detalle { font-size: 0.75rem; color: var(--color-text-secondary); }
+.ranking-nombre { font-weight: 600; font-size: var(--text-secondary); color: var(--color-text-primary); }
+.ranking-detalle { font-size: var(--text-caption); color: var(--color-text-secondary); }
 
 .ranking-bar-container {
   position: relative;
@@ -94,7 +94,7 @@
   right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 0.6875rem;
+  font-size: var(--text-micro);
   font-weight: 600;
   color: var(--color-text-primary);
 }
@@ -108,14 +108,14 @@
 }
 
 .ocupacion-promedio-valor {
-  font-size: 2.625rem;
+  font-size: var(--text-display);
   font-weight: 700;
   color: var(--color-text-primary);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-display);
 }
 
 .ocupacion-promedio-label {
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
 }
 
@@ -129,8 +129,8 @@
 }
 
 .ocupacion-info { display: flex; flex-direction: column; }
-.ocupacion-nombre { font-weight: 600; font-size: 0.875rem; color: var(--color-text-primary); }
-.ocupacion-tipo { font-size: 0.75rem; color: var(--color-text-secondary); }
+.ocupacion-nombre { font-weight: 600; font-size: var(--text-secondary); color: var(--color-text-primary); }
+.ocupacion-tipo { font-size: var(--text-caption); color: var(--color-text-secondary); }
 
 .ocupacion-bar-container {
   position: relative;
@@ -154,13 +154,13 @@
   right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  font-size: 0.6875rem;
+  font-size: var(--text-micro);
   font-weight: 600;
   color: var(--color-text-primary);
 }
 
 .ocupacion-horas {
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
   white-space: nowrap;
 }

@@ -85,8 +85,7 @@ export function EditNoticiaForm({ noticia, onSuccess, onCancel }) {
               maxLength: { value: MAX_LEN.CUERPO_NOTICIA, message: `Máximo ${MAX_LEN.CUERPO_NOTICIA} caracteres` },
             })}
             rows={5}
-            className={`csf-input${errors.cuerpo ? ' csf-input--error' : ''}`}
-            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: '0.875rem' }}
+            className={`csf-input csf-textarea${errors.cuerpo ? ' csf-input--error' : ''}`}
           />
         </Field>
         {formError && (

@@ -4,12 +4,12 @@
 }
 
 .perfil-title {
-  font-size: 2rem;
+  font-size: var(--text-title);
   font-weight: 700;
   color: var(--color-text-primary);
   margin: 0 0 28px 0;
   text-align: center;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-title);
 }
 
 .perfil-card {
@@ -56,15 +56,16 @@
 }
 
 .perfil-label {
-  font-size: 0.6875rem;
+  font-size: var(--text-label);
+  line-height: var(--leading-label);
+  letter-spacing: var(--tracking-label);
   font-weight: 600;
   color: var(--color-text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.5px;
 }
 
 .perfil-value {
-  font-size: 1rem;
+  font-size: var(--text-body);
   color: var(--color-text-primary);
 }
 
@@ -72,7 +73,7 @@
   display: inline-block;
   padding: 4px 12px;
   border-radius: 12px;
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   font-weight: 500;
   align-self: flex-start;
 }
@@ -103,7 +104,7 @@
   background: none;
   border: none;
   color: var(--color-text-secondary);
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-weight: 500;
   cursor: pointer;
   min-height: 36px;

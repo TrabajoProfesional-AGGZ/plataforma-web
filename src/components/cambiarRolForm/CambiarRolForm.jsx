@@ -118,17 +118,9 @@ export function CambiarRolForm({ usuario, roles, onSuccess, onCancel }) {
                   transition={SPRING.quick}
                   className="csf-fields"
                 >
-                  <div style={{
-                    backgroundColor: 'var(--status-warning-bg)',
-                    border: '1px solid var(--status-warning-border)',
-                    borderRadius: '8px',
-                    padding: '16px',
-                    display: 'flex',
-                    gap: '12px',
-                    alignItems: 'flex-start',
-                  }}>
-                    <AlertTriangle size={20} color="var(--status-warning-border)" strokeWidth={2} style={{ flexShrink: 0, marginTop: 2 }} />
-                    <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--status-warning-border)', lineHeight: 1.5 }}>
+                  <div className="confirm-aviso confirm-aviso--warning">
+                    <AlertTriangle size={20} color="var(--status-warning-border)" strokeWidth={2} className="confirm-aviso-icono" />
+                    <p className="confirm-aviso-texto">
                       Advertencia: modificar el rol de un usuario modifica también sus permisos. ¿Confirmar?
                     </p>
                   </div>

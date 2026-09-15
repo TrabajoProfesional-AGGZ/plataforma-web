@@ -3,11 +3,11 @@
 }
 
 .cambiar-contrasena-title {
-  font-size: 1.5rem;
+  font-size: var(--text-title);
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0 0 var(--space-6) 0;
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-title);
 }
 
 .cambiar-contrasena-form {
@@ -23,7 +23,7 @@
 }
 
 .cambiar-contrasena-field label {
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-weight: 500;
   color: var(--color-text-secondary);
 }
@@ -39,7 +39,7 @@
   padding: 10px 80px 10px 12px;
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   outline: none;
   transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
   box-sizing: border-box;
@@ -51,7 +51,7 @@
 
 .cambiar-contrasena-error {
   color: var(--color-danger);
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   margin: 0;
   background-color: var(--status-error-surface-bg);
   border: 1px solid var(--status-error-surface-border);

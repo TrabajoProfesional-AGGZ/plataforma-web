@@ -1,6 +1,6 @@
 .turno-loading-label {
   margin: 0 0 var(--space-2);
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
 }
 
@@ -46,7 +46,7 @@
 }
 
 .turno-chip-hora {
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
@@ -55,7 +55,7 @@
   display: flex;
   align-items: center;
   gap: 3px;
-  font-size: 0.6875rem;
+  font-size: var(--text-micro);
   color: var(--color-text-secondary);
   white-space: nowrap;
 }

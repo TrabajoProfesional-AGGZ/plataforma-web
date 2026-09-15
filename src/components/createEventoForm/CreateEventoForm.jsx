@@ -104,8 +104,7 @@ export function CreateEventoForm({ onSuccess, onCancel }) {
             })}
             placeholder="Contale a los socios de qué se trata el evento..."
             rows={4}
-            className={`csf-input${errors.descripcion ? ' csf-input--error' : ''}`}
-            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: '0.875rem' }}
+            className={`csf-input csf-textarea${errors.descripcion ? ' csf-input--error' : ''}`}
           />
         </Field>
         <Field label="Día" icon={Calendar} error={errors.dia?.message}>

@@ -13,7 +13,7 @@
 .morosidad-periodo {
   text-align: center;
   color: var(--color-text-secondary);
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   margin: 0;
 }
 
@@ -26,7 +26,7 @@
 }
 
 .morosidad-section-title {
-  font-size: 1.125rem;
+  font-size: var(--text-heading);
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0 0 var(--space-4) 0;
@@ -51,7 +51,7 @@
 }
 
 .morosidad-filter-label {
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   font-weight: 500;
   color: var(--color-text-secondary);
 }
@@ -59,7 +59,7 @@
 .morosidad-select {
   border: none;
   font-family: inherit;
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   color: var(--color-text-primary);
   background: transparent;
   outline: none;
