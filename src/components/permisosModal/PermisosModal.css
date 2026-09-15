@@ -1,16 +1,98 @@
 .permisos-modal-wrapper {
-  max-width: 340px;
+  max-width: 440px;
+}
+
+/* .csf-card (compartido con los formularios multi-paso) tiene overflow:hidden
+   para clipear la animación de slide entre pasos — acá no hay slide, pero el
+   overflow sigue activo y recorta cualquier borde que se salga del ancho
+   disponible. Con pocos módulos el `Paginacion` compartido (Anterior/Página
+   X de Y/Siguiente) no entra en una sola línea a los anchos angostos que
+   tenía este modal antes, y sus botones quedaban con el borde cortado.
+   El indicador "Página X de Y" pasa a su propia línea arriba (`order: -1` +
+   `flex-basis: 100%` fuerza el wrap ahí) y "Anterior"/"Siguiente" quedan
+   siempre juntos en la línea de abajo, a la misma altura. */
+.permisos-modal-wrapper .paginacion {
+  flex-wrap: wrap;
+  row-gap: var(--space-2);
+}
+
+.permisos-modal-wrapper .paginacion-indicador {
+  order: -1;
+  flex-basis: 100%;
+  text-align: center;
+}
+
+.permisos-lista-modulos {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.permisos-fila-h {
+  margin: 0;
+}
+
+.permisos-fila {
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.permisos-fila-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  width: 100%;
+  border: none;
+  background: var(--color-surface);
+  padding: 12px 14px;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+}
+
+@media (hover: hover) {
+  .permisos-fila-header:hover {
+    background-color: var(--color-row-hover);
+  }
+}
+
+.permisos-fila-titulo {
+  flex: 1;
+  font-size: var(--text-secondary);
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+
+.permisos-fila-count {
+  font-size: var(--text-caption);
+  color: var(--color-text-secondary);
+  background-color: var(--color-bg);
+  border-radius: var(--radius-full);
+  min-width: 20px;
+  padding: 1px 6px;
+  text-align: center;
+}
+
+.permisos-fila-chevron {
+  flex-shrink: 0;
+  color: var(--color-text-secondary);
+  transition: transform var(--transition-fast);
+}
+
+.permisos-fila-header[aria-expanded='true'] .permisos-fila-chevron {
+  transform: rotate(180deg);
 }
 
 .permisos-lista-scroll {
   list-style: none;
-  padding: 0;
+  padding: 6px;
   margin: 0;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  max-height: 240px;
-  overflow-y: auto;
+  overflow: hidden;
+  border-top: 1px solid var(--color-border-medium);
 }
 
 .permisos-lista-item {

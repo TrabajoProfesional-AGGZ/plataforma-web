@@ -10,15 +10,6 @@
   margin: 0 0 var(--space-6) 0;
 }
 
-.metricas-error {
-  text-align: center;
-  color: var(--color-danger);
-  font-size: var(--text-secondary);
-  background-color: var(--status-error-surface-bg);
-  border: 1px solid var(--status-error-surface-border);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-}
 
 /* ── Pestañas ─────────────────────────────────────────────────── */
 .metricas-tablist {

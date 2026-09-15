@@ -137,7 +137,7 @@ function PerfilPage() {
           </div>
           <div className="perfil-field">
             <span className="perfil-label">Rol</span>
-            <span className={`perfil-rol-badge perfil-rol-${role}`}>{role}</span>
+            <span className="perfil-rol-badge">{role}</span>
           </div>
         </div>
       </div>
