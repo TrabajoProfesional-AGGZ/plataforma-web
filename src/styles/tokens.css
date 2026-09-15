@@ -52,7 +52,7 @@
   --status-error-surface-bg: #fdecea;
   --status-error-surface-border: #f5c6cb;
 
-  /* Variante suave para banners de éxito (LoginPage, CambiarContrasenaPage) */
+  /* Variante suave para banners de éxito (LoginPage, modal de cambio de contraseña en Perfil) */
   --surface-success-bg: #f0faf5;
   --surface-success-border: #b7dfc8;
 

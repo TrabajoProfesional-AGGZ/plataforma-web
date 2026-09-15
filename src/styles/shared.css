@@ -35,8 +35,7 @@
   }
 }
 
-/* ── Botón de acción primaria (compartido entre páginas) ─────── */
-.cambiar-contrasena-button,
+/* ── Botón de acción primaria (Perfil) ─────────────────────────── */
 .perfil-cambiar-button {
   padding: 10px var(--space-5);
   background-color: var(--color-text-primary);
