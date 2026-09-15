@@ -99,6 +99,32 @@
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes csf-popover-in-up {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes csf-popover-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: scale(0.97); }
+}
+
+.csf-calendar-popover, .csf-time-popover, .csf-dropdown-popover {
+  transform-origin: top left;
+  animation: csf-popover-in 0.16s var(--ease-out);
+}
+
+.csf-calendar-popover[data-placement="top"],
+.csf-time-popover[data-placement="top"],
+.csf-dropdown-popover[data-placement="top"] {
+  transform-origin: bottom left;
+  animation-name: csf-popover-in-up;
+}
+
+.csf-popover--closing {
+  animation: csf-popover-out 0.1s var(--ease-in) forwards !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .csf-calendar-popover, .csf-time-popover, .csf-dropdown-popover {
     animation: none !important;
@@ -116,7 +142,6 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   padding: var(--space-4);
-  animation: csf-popover-in 0.14s ease-out;
 }
 
 .csf-calendar-header {
@@ -279,7 +304,6 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   padding: var(--space-2);
-  animation: csf-popover-in 0.14s ease-out;
 }
 
 .csf-time-columns {
@@ -350,7 +374,6 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   padding: 6px;
-  animation: csf-popover-in 0.14s ease-out;
 }
 
 .csf-dropdown-option {

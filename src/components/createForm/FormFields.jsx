@@ -230,7 +230,7 @@ export function StyledSelect({
 }) {
   const selectRef = useRef(null);
   const {
-    open, toggle, closePopover, position, triggerRef, popoverRef,
+    open, closing, toggle, closePopover, handleClosed, position, triggerRef, popoverRef,
   } = usePickerPopover({ width: 260, height: 260 });
   const [options, setOptions] = useState([]);
   const [currentValue, setCurrentValue] = useState('');
@@ -319,14 +319,16 @@ export function StyledSelect({
         <ChevronDown size={14} strokeWidth={2} />
       </button>
 
-      {open && createPortal(
+      {(open || closing) && createPortal(
         <ul
           ref={popoverRef}
-          className="csf-dropdown-popover"
+          className={`csf-dropdown-popover${closing ? ' csf-popover--closing' : ''}`}
+          data-placement={position.placement}
           role="listbox"
           aria-label={ariaLabelledby ? undefined : (ariaLabel ?? 'Opciones')}
           aria-labelledby={ariaLabelledby}
           style={{ top: position.top, left: position.left, minWidth: triggerRef.current?.offsetWidth }}
+          onAnimationEnd={closing ? handleClosed : undefined}
         >
           {options.map((opt, i) => (
             <li key={`${opt.value}-${i}`}>

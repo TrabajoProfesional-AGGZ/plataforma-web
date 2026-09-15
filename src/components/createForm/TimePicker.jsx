@@ -24,7 +24,7 @@ function parseTime(str) {
 export function TimePicker({ error, className, disabled, placeholder, ref: forwardedRef, ...props }) {
   const inputRef = useRef(null);
   const {
-    open, toggle, closePopover, position, triggerRef, popoverRef,
+    open, closing, toggle, closePopover, handleClosed, position, triggerRef, popoverRef,
   } = usePickerPopover({ width: 172, height: 232 });
   const [value, setValue] = useState('');
 
@@ -69,13 +69,15 @@ export function TimePicker({ error, className, disabled, placeholder, ref: forwa
         <span className={parsed ? '' : 'csf-picker-placeholder'}>{label}</span>
       </button>
 
-      {open && createPortal(
+      {(open || closing) && createPortal(
         <div
           ref={popoverRef}
-          className="csf-time-popover"
+          className={`csf-time-popover${closing ? ' csf-popover--closing' : ''}`}
+          data-placement={position.placement}
           role="dialog"
           aria-label="Elegir hora"
           style={{ top: position.top, left: position.left }}
+          onAnimationEnd={closing ? handleClosed : undefined}
         >
           <div className="csf-time-columns">
             <ul className="csf-time-col" role="listbox" aria-label="Hora">

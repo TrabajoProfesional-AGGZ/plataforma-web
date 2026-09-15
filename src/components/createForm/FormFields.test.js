@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, within } from '@testing-library/react';
+import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
 import { User } from 'lucide-react';
 import { Field, StyledInput, StyledSelect } from './FormFields';
 
@@ -59,14 +59,16 @@ describe('StyledSelect', () => {
     );
   }
 
-  test('clickear una opción del listbox la selecciona y cierra el popover', () => {
+  test('clickear una opción del listbox la selecciona y cierra el popover', async () => {
     const { container } = renderSelect();
     fireEvent.click(screen.getByRole('button', { name: /seleccionar/i }));
     fireEvent.click(within(screen.getByRole('listbox')).getByRole('option', { name: 'Opción B' }));
 
     const hiddenSelect = container.querySelector('select');
     expect(hiddenSelect.value).toBe('b');
-    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    });
   });
 
   test('pasar el mouse por una opción la resalta', () => {
@@ -103,7 +105,7 @@ describe('StyledSelect', () => {
     expect(screen.getByRole('listbox')).toBeInTheDocument();
   });
 
-  test('flecha abajo/arriba recorren las opciones y Enter confirma la resaltada', () => {
+  test('flecha abajo/arriba recorren las opciones y Enter confirma la resaltada', async () => {
     const { container } = renderSelect();
     const trigger = screen.getByRole('button', { name: /seleccionar/i });
     fireEvent.click(trigger);
@@ -115,10 +117,12 @@ describe('StyledSelect', () => {
 
     const hiddenSelect = container.querySelector('select');
     expect(hiddenSelect.value).toBe('a');
-    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    });
   });
 
-  test('flecha arriba no baja el índice resaltado por debajo de cero', () => {
+  test('flecha arriba no baja el índice resaltado por debajo de cero', async () => {
     renderSelect();
     const trigger = screen.getByRole('button', { name: /seleccionar/i });
     fireEvent.click(trigger);
@@ -126,7 +130,9 @@ describe('StyledSelect', () => {
     fireEvent.keyDown(trigger, { key: 'ArrowUp' });
     fireEvent.keyDown(trigger, { key: ' ' });
 
-    expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByRole('listbox')).not.toBeInTheDocument();
+    });
   });
 
   test('reabrir el select con un valor ya elegido resalta esa opción', () => {
