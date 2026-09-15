@@ -260,6 +260,40 @@ describe('CreateReservaForm', () => {
     expect(onSuccess).not.toHaveBeenCalled();
   });
 
+  test('muestra el motivo real (apto médico) y los socios incumpliendo cuando createReserva lanza "socio-apto-medico"', async () => {
+    const error = new Error('socio-apto-medico');
+    error.socios = ['1234', '5678'];
+    createReserva.mockRejectedValue(error);
+    await llenarYEnviarPaso2();
+    await waitFor(() => {
+      expect(screen.getByText(/n° 1234, n° 5678.*apto médico vigente/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByText(/regularizar su situación financiera/i)).not.toBeInTheDocument();
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  test('muestra el motivo real (moroso) y el socio incumpliendo cuando createReserva lanza "socio-moroso"', async () => {
+    const error = new Error('socio-moroso');
+    error.socios = ['1234'];
+    createReserva.mockRejectedValue(error);
+    await llenarYEnviarPaso2();
+    await waitFor(() => {
+      expect(screen.getByText(/el socio n° 1234 debe regularizar su situación financiera/i)).toBeInTheDocument();
+    });
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  test('muestra el motivo real (suspendido) y el socio incumpliendo cuando createReserva lanza "socio-suspendido"', async () => {
+    const error = new Error('socio-suspendido');
+    error.socios = ['1234'];
+    createReserva.mockRejectedValue(error);
+    await llenarYEnviarPaso2();
+    await waitFor(() => {
+      expect(screen.getByText(/el socio n° 1234 debe terminar su suspensión/i)).toBeInTheDocument();
+    });
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
   // ── Tests del preview inline al perder el foco ──
 
   test('al perder el foco con un nro válido, muestra el nombre del socio inline', async () => {
