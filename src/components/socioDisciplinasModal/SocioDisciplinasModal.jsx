@@ -46,7 +46,7 @@ function SocioDisciplinasModal({ idSocio, nombreSocio, onClose }) {
       onClose={resolverDisciplina ? () => {} : handleClose}
     >
       {loading ? (
-        <div className="socio-modal-loading">
+        <div className="socio-modal-loading" role="status" aria-label="Cargando">
           <img src={logo} alt="" className="loading-logo" />
         </div>
       ) : disciplinas.length === 0 ? (

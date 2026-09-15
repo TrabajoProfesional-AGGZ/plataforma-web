@@ -33,7 +33,7 @@ function SocioReservasModal({ nroSocio, onClose }) {
   return (
     <SocioSubModal titulo="Reservas activas" wrapperClass="socio-reservas-wrapper" onClose={handleClose}>
       {loading ? (
-        <div className="socio-modal-loading">
+        <div className="socio-modal-loading" role="status" aria-label="Cargando">
           <img src={logo} alt="" className="loading-logo" />
         </div>
       ) : reservas.length === 0 ? (

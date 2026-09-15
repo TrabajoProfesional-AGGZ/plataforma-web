@@ -73,7 +73,7 @@ function SocioPagosPendientesModal({ idSocio, onClose }) {
   let contenido;
   if (loading) {
     contenido = (
-      <div className="socio-modal-loading">
+      <div className="socio-modal-loading" role="status" aria-label="Cargando">
         <img src={logo} alt="" className="loading-logo" />
       </div>
     );

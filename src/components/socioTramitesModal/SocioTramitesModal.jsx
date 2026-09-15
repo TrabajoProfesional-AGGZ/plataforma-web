@@ -125,7 +125,7 @@ function SocioTramitesModal({ idSocio, onClose }) {
     >
       {vista === 'lista' && (
         loading ? (
-          <div className="socio-modal-loading">
+          <div className="socio-modal-loading" role="status" aria-label="Cargando">
             <img src={logo} alt="" className="loading-logo" />
           </div>
         ) : tramites.length === 0 ? (
@@ -163,7 +163,7 @@ function SocioTramitesModal({ idSocio, onClose }) {
           </button>
 
           {loadingDetalle && (
-            <div className="socio-modal-loading">
+            <div className="socio-modal-loading" role="status" aria-label="Cargando">
               <img src={logo} alt="" className="loading-logo" />
             </div>
           )}
