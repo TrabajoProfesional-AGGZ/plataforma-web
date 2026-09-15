@@ -15,6 +15,16 @@ describe('DatePicker', () => {
     expect(screen.queryByRole('dialog', { name: /elegir fecha/i })).not.toBeInTheDocument();
   });
 
+  test('clickear un día en la grilla muestra la fecha seleccionada en el trigger', () => {
+    render(<DatePicker name="fecha" />);
+
+    fireEvent.click(screen.getByRole('button', { name: /seleccionar fecha/i }));
+    fireEvent.click(screen.getByRole('button', { name: '15' }));
+
+    expect(screen.queryByText(/seleccionar fecha/i)).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /15 de/i })).toBeInTheDocument();
+  });
+
   test('los botones de mes anterior/siguiente cambian el mes mostrado en los selects', () => {
     render(<DatePicker name="fecha" />);
     fireEvent.click(screen.getByRole('button', { name: /seleccionar fecha/i }));
@@ -73,7 +83,8 @@ describe('DatePicker', () => {
     const hiddenInput = container.querySelector('input[type="date"]');
     expect(hiddenInput.value).toMatch(/-10$/);
 
-    fireEvent.click(screen.getByRole('button', { name: /seleccionar fecha/i }));
+    const trigger = container.querySelector('.csf-picker-trigger');
+    fireEvent.click(trigger);
     expect(screen.getByRole('dialog', { name: /elegir fecha/i })).toBeInTheDocument();
   });
 });
