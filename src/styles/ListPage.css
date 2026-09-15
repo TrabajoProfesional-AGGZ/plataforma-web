@@ -195,7 +195,9 @@
 .usuarios-tabla td,
 .disciplinas-tabla td,
 .instalaciones-tabla td {
-  padding: var(--space-3) var(--space-5);
+  /* padding en `em` (hereda --text-secondary = 15.4px):
+     0.78em ≈ 12px, 1.3em ≈ 20px — equivale a --space-3/--space-5. */
+  padding: 0.78em 1.3em;
   border-bottom: 1px solid var(--color-border);
   color: var(--color-text-primary);
   vertical-align: middle;

@@ -3,7 +3,10 @@
 .disciplinas-tabla th,
 .instalaciones-tabla th {
   text-align: left;
-  padding: var(--space-3) var(--space-5);
+  /* padding en `em` sobre --text-caption (0.78rem = 13.7px):
+     0.875em ≈ 12px, 1.45em ≈ 20px — mismo padding horizontal que los `td`
+     (1.3em × 15.4px) para que las columnas sigan alineadas. */
+  padding: 0.875em 1.45em;
   background: var(--color-bg);
   border-bottom: 1px solid var(--color-border-medium);
   color: var(--color-text-secondary);

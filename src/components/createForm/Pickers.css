@@ -28,7 +28,10 @@
   gap: 8px;
   width: 100%;
   border-radius: var(--radius-md);
-  padding: calc(var(--space-3) + 1px) var(--space-4);
+  /* padding en `em` para que el control crezca con su propio
+     font-size (0.875rem = 15.4px): 0.85em ≈ 13px, 1.05em ≈ 16px — misma
+     geometría que tenía con --space-3/--space-4 en px. */
+  padding: 0.85em 1.05em;
   outline: none;
   font-size: var(--text-secondary);
   font-family: inherit;
