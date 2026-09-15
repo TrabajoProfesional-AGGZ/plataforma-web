@@ -27,7 +27,7 @@ const TEXTO_ESTADO_IMAGEN = {
  * @param {{ onSuccess: (payload: object) => void, onCancel: () => void }} props
  */
 export function CreateEventoForm({ onSuccess, onCancel }) {
-  const { step, direction, submitted, setSubmitted, navGuard } = useMultiStepFormState();
+  const { step, direction, submitted, setSubmitted, navGuard, finNavGuard } = useMultiStepFormState();
   const {
     fileInputRef,
     imagenPreview,
@@ -72,6 +72,7 @@ export function CreateEventoForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Nuevo evento"
       successTitle="¡Evento creado!"

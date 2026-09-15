@@ -24,7 +24,7 @@ const stepFields = {
  */
 export function CreateSocioForm({ onSuccess, onCancel }) {
   const {
-    step, direction, submitted, setSubmitted, navGuard,
+    step, direction, submitted, setSubmitted, navGuard, finNavGuard,
     goBack, goNext, formError, setFormError,
     register, handleSubmit, errors, isSubmitting,
   } = useMultiStepForm(stepFields);
@@ -66,6 +66,7 @@ export function CreateSocioForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Nuevo socio"
       successTitle="¡Socio creado!"

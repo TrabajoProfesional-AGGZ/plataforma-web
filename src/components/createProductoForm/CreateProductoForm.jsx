@@ -26,7 +26,7 @@ const TEXTO_ESTADO_IMAGEN = {
  * @param {{ onSuccess: (payload: object) => void, onCancel: () => void }} props
  */
 export function CreateProductoForm({ onSuccess, onCancel }) {
-  const { step, direction, submitted, setSubmitted, navGuard } = useMultiStepFormState();
+  const { step, direction, submitted, setSubmitted, navGuard, finNavGuard } = useMultiStepFormState();
   const {
     fileInputRef, imagenPreview, estadoImagen, errorImagen,
     handleArchivoSeleccionado, subirSiCorresponde,
@@ -62,6 +62,7 @@ export function CreateProductoForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Nuevo producto"
       successTitle="¡Producto creado!"

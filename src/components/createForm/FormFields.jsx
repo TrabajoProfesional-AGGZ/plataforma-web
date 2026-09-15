@@ -1,4 +1,4 @@
-import { Children, cloneElement, isValidElement, useEffect, useRef, useState } from 'react';
+import { Children, cloneElement, isValidElement, useContext, useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { AlertCircle, User, CreditCard, Phone, Mail, ChevronDown, Check } from 'lucide-react';
@@ -7,6 +7,7 @@ import { DatePicker } from './DatePicker';
 import { TimePicker } from './TimePicker';
 import { setNativeValue, mergeRefs } from './nativeInputUtils';
 import { usePickerPopover } from './usePickerPopover';
+import { FormStepContext } from './FormStepContext';
 import { SPRING, slideVariants } from '../../styles/motion';
 import './Pickers.css';
 
@@ -108,8 +109,15 @@ StyledInput.propTypes = {
   error: PropTypes.bool,
 };
 
-/** Contenedor de un paso de un formulario multi-paso, con animación de deslizamiento según `direction`. */
-export function FormStep({ direction, children }) {
+/**
+ * Contenedor de un paso de un formulario multi-paso, con animación de
+ * deslizamiento según `direction`. `onEntered` se dispara cuando terminó la
+ * animación de entrada (no la de salida); si no se pasa, usa el callback que
+ * provee `MultiStepFormShell` vía `FormStepContext` (→ `finNavGuard`).
+ */
+export function FormStep({ direction, onEntered, children }) {
+  const onEnteredFromShell = useContext(FormStepContext);
+  const handleEntered = onEntered ?? onEnteredFromShell;
   return (
     <motion.div
       custom={direction}
@@ -118,6 +126,7 @@ export function FormStep({ direction, children }) {
       animate="center"
       exit="exit"
       transition={SPRING.quick}
+      onAnimationComplete={(definition) => { if (definition === 'center') handleEntered?.(); }}
       className="csf-fields"
     >
       {children}
@@ -127,6 +136,7 @@ export function FormStep({ direction, children }) {
 
 FormStep.propTypes = {
   direction: PropTypes.number,
+  onEntered: PropTypes.func,
   children: PropTypes.node.isRequired,
 };
 

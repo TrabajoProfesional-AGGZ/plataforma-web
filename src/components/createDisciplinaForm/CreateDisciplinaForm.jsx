@@ -21,7 +21,7 @@ const STEPS = [
  * @param {{ onSuccess: (payload: object) => void, onCancel: () => void }} props
  */
 export function CreateDisciplinaForm({ onSuccess, onCancel }) {
-  const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
+  const { step, direction, submitted, setSubmitted, navGuard, finNavGuard, advance, goBack } = useMultiStepFormState();
 
   const {
     register, handleSubmit, trigger, watch, getValues, formState: { errors, isSubmitting },
@@ -66,6 +66,7 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Nueva disciplina"
       successTitle="¡Disciplina creada!"

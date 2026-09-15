@@ -26,7 +26,7 @@ const DURACIONES_TURNO = [30, 45, 60, 90, 120];
  * @param {{ onSuccess: (payload: object) => void, onCancel: () => void }} props
  */
 export function CreateInstalacionForm({ onSuccess, onCancel }) {
-  const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
+  const { step, direction, submitted, setSubmitted, navGuard, finNavGuard, advance, goBack } = useMultiStepFormState();
 
   const {
     register,
@@ -64,6 +64,7 @@ export function CreateInstalacionForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Nueva instalación"
       successTitle="¡Instalación creada!"

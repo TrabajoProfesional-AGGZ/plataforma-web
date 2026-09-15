@@ -61,7 +61,7 @@ const MENSAJES_ERROR_SUBMIT = {
  */
 export function CreateReservaForm({ onSuccess, onCancel, instalacion }) {
   const { logoSocio: logo } = useTheme();
-  const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
+  const { step, direction, submitted, setSubmitted, navGuard, finNavGuard, advance, goBack } = useMultiStepFormState();
   const [nroSocioInput, setNroSocioInput] = useState('');
   const [busquedaSocio, setBusquedaSocio] = useState(false);
   const [errorSocio, setErrorSocio] = useState('');
@@ -216,6 +216,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalacion }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Nueva reserva"
       successTitle="¡Reserva registrada!"

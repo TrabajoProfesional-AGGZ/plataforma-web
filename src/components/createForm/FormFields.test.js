@@ -1,6 +1,29 @@
 import { render, screen, fireEvent, within, waitFor } from '@testing-library/react';
 import { User } from 'lucide-react';
-import { Field, StyledInput, StyledSelect } from './FormFields';
+import { Field, StyledInput, StyledSelect, FormStep } from './FormFields';
+import { FormStepContext } from './FormStepContext';
+
+// Envuelve el mock compartido de framer-motion para capturar el último
+// `onAnimationComplete` y poder dispararlo a mano con "exit"/"center".
+let mockUltimoOnAnimationComplete = null;
+jest.mock('framer-motion', () => {
+  const React = require('react');
+  const compartido = jest.requireActual('../../../__mocks__/framer-motion');
+  const cache = {};
+  const motion = new Proxy({}, {
+    get: (_, tag) => {
+      if (!cache[tag]) {
+        const Base = compartido.motion[tag];
+        cache[tag] = ({ onAnimationComplete, ...props }) => {
+          if (onAnimationComplete) mockUltimoOnAnimationComplete = onAnimationComplete;
+          return React.createElement(Base, { ...props, onAnimationComplete });
+        };
+      }
+      return cache[tag];
+    },
+  });
+  return { ...compartido, motion };
+});
 
 describe('Field', () => {
   test('genera un id a partir del label cuando no se pasa uno explícito', () => {
@@ -145,5 +168,59 @@ describe('StyledSelect', () => {
 
     expect(within(screen.getByRole('listbox')).getByRole('option', { name: 'Opción B' }))
       .toHaveClass('csf-dropdown-option--highlighted');
+  });
+});
+
+describe('FormStep', () => {
+  beforeEach(() => { mockUltimoOnAnimationComplete = null; });
+
+  test('renderiza el contenido del paso', () => {
+    render(<FormStep direction={1}><p>Campos del paso</p></FormStep>);
+    expect(screen.getByText('Campos del paso')).toBeInTheDocument();
+  });
+
+  test('dispara onEntered cuando termina la animación de entrada', () => {
+    const onEntered = jest.fn();
+    render(<FormStep direction={1} onEntered={onEntered}><p>Paso</p></FormStep>);
+    expect(onEntered).toHaveBeenCalledTimes(1);
+  });
+
+  test('no dispara onEntered cuando la que termina es la animación de salida', () => {
+    const onEntered = jest.fn();
+    render(<FormStep direction={1} onEntered={onEntered}><p>Paso</p></FormStep>);
+    onEntered.mockClear();
+
+    mockUltimoOnAnimationComplete('exit');
+    expect(onEntered).not.toHaveBeenCalled();
+
+    mockUltimoOnAnimationComplete('center');
+    expect(onEntered).toHaveBeenCalledTimes(1);
+  });
+
+  test('sin onEntered usa el callback que provee FormStepContext', () => {
+    const desdeShell = jest.fn();
+    render(
+      <FormStepContext.Provider value={desdeShell}>
+        <FormStep direction={1}><p>Paso</p></FormStep>
+      </FormStepContext.Provider>
+    );
+    expect(desdeShell).toHaveBeenCalledTimes(1);
+  });
+
+  test('onEntered explícito tiene prioridad sobre el del contexto', () => {
+    const desdeShell = jest.fn();
+    const propio = jest.fn();
+    render(
+      <FormStepContext.Provider value={desdeShell}>
+        <FormStep direction={1} onEntered={propio}><p>Paso</p></FormStep>
+      </FormStepContext.Provider>
+    );
+    expect(propio).toHaveBeenCalledTimes(1);
+    expect(desdeShell).not.toHaveBeenCalled();
+  });
+
+  test('sin onEntered ni contexto no rompe al terminar la animación', () => {
+    render(<FormStep direction={1}><p>Paso</p></FormStep>);
+    expect(() => mockUltimoOnAnimationComplete('center')).not.toThrow();
   });
 });

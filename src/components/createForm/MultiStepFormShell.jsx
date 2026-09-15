@@ -3,6 +3,7 @@ import { CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import PropTypes from 'prop-types';
 import logoVerde from '../../assets/logo-verde.png';
 import { ModalOverlay } from './ModalOverlay';
+import { FormStepContext } from './FormStepContext';
 import { useTheme } from '../../hooks/useTheme';
 import { SPRING } from '../../styles/motion';
 import './CreateSocioForm.css';
@@ -23,12 +24,17 @@ const STEP_COLORS = {
  * progreso (ocultos si `steps` tiene un solo elemento), los botones de
  * navegación (Atrás/Siguiente/Cancelar/Confirmar según el paso) y, cuando
  * `submitted` es `true`, una pantalla de éxito animada en su lugar.
+ *
+ * `onStepEntered` (normalmente `finNavGuard` del hook) llega a cada `FormStep`
+ * hijo vía `FormStepContext` y se dispara al terminar la animación de entrada
+ * del paso: libera `navGuard` justo cuando el botón de submit ya está quieto.
  */
 export function MultiStepFormShell({
   steps,
   step,
   submitted,
   navGuard,
+  onStepEntered,
   isSubmitting = false,
   title,
   successTitle,
@@ -166,11 +172,13 @@ export function MultiStepFormShell({
                   onSubmit={onFormSubmit}
                   onKeyDown={(e) => { if (e.key === 'Enter' && step < steps.length) e.preventDefault(); }}
                 >
-                  {direction !== undefined ? (
-                    <AnimatePresence mode="wait" custom={direction}>
-                      {children}
-                    </AnimatePresence>
-                  ) : children}
+                  <FormStepContext.Provider value={onStepEntered ?? null}>
+                    {direction !== undefined ? (
+                      <AnimatePresence mode="wait" custom={direction}>
+                        {children}
+                      </AnimatePresence>
+                    ) : children}
+                  </FormStepContext.Provider>
 
                   <div className={`csf-nav ${step > 1 ? 'csf-nav--between' : 'csf-nav--end'}`}>
                     {step > 1 && (
@@ -248,6 +256,7 @@ MultiStepFormShell.propTypes = {
   step: PropTypes.number.isRequired,
   submitted: PropTypes.bool.isRequired,
   navGuard: PropTypes.bool,
+  onStepEntered: PropTypes.func,
   isSubmitting: PropTypes.bool,
   title: PropTypes.string,
   successTitle: PropTypes.string,

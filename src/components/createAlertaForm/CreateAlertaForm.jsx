@@ -24,7 +24,7 @@ const STEPS = [{ id: 1, label: 'Datos', icon: MessageSquare }];
  */
 export function CreateAlertaForm({ onSuccess, onCancel }) {
   const { logoSocio: logo } = useTheme();
-  const { step, direction, submitted, setSubmitted, navGuard } = useMultiStepFormState();
+  const { step, direction, submitted, setSubmitted, navGuard, finNavGuard } = useMultiStepFormState();
 
   const {
     register,
@@ -98,6 +98,7 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Nueva alerta"
       successTitle="¡Alerta enviada!"

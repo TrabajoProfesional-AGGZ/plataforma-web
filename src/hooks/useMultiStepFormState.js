@@ -1,11 +1,20 @@
-import { useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
+
+/** Respaldo por si la animación del paso nunca termina (p. ej. reduced motion sin callback). */
+const NAV_GUARD_FALLBACK_MS = 300;
 
 /**
  * Estado de navegación de un formulario multi-paso: paso actual, dirección de
  * la transición (para la animación) y bandera de envío.
+ *
+ * `navGuard` bloquea el botón de submit desde que se llama a `advance()` hasta
+ * que el paso nuevo terminó de entrar (`finNavGuard()`, cableado por
+ * `MultiStepFormShell` al `onAnimationComplete` de `FormStep`). Evita el click
+ * hijacking del paso siguiente (ver `.claude/BUGS.md`). Si nadie llama a
+ * `finNavGuard()`, un `setTimeout` de respaldo lo libera igual.
  * @returns {{
  *   step: number, direction: 1|-1, submitted: boolean, setSubmitted: (v: boolean) => void,
- *   navGuard: boolean, advance: () => void, goBack: () => void
+ *   navGuard: boolean, finNavGuard: () => void, advance: () => void, goBack: () => void
  * }}
  */
 export function useMultiStepFormState() {
@@ -13,14 +22,20 @@ export function useMultiStepFormState() {
   const [direction, setDirection] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [navGuard, setNavGuard] = useState(false);
+  const fallbackRef = useRef(null);
+
+  const finNavGuard = useCallback(() => {
+    clearTimeout(fallbackRef.current);
+    fallbackRef.current = null;
+    setNavGuard(false);
+  }, []);
 
   const advance = () => {
-    // navGuard bloquea clicks durante la animación de transición entre pasos
-    // (evita el click hijacking del paso siguiente mientras el actual se anima).
     setNavGuard(true);
     setDirection(1);
     setStep((s) => s + 1);
-    setTimeout(() => setNavGuard(false), 300);
+    clearTimeout(fallbackRef.current);
+    fallbackRef.current = setTimeout(finNavGuard, NAV_GUARD_FALLBACK_MS);
   };
 
   const goBack = () => {
@@ -28,5 +43,5 @@ export function useMultiStepFormState() {
     setStep((s) => s - 1);
   };
 
-  return { step, direction, submitted, setSubmitted, navGuard, advance, goBack };
+  return { step, direction, submitted, setSubmitted, navGuard, finNavGuard, advance, goBack };
 }

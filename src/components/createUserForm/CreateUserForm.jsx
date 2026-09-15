@@ -33,7 +33,7 @@ const stepFields = {
  */
 export function CreateUserForm({ onSuccess, onCancel }) {
   const {
-    step, direction, submitted, setSubmitted, navGuard,
+    step, direction, submitted, setSubmitted, navGuard, finNavGuard,
     goBack, goNext, formError, setFormError,
     register, handleSubmit, errors, isSubmitting,
   } = useMultiStepForm(stepFields);
@@ -81,6 +81,7 @@ export function CreateUserForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Nuevo usuario"
       successTitle="¡Usuario creado!"

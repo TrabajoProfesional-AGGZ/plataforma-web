@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import { User, FileText } from 'lucide-react';
 import { MultiStepFormShell } from './MultiStepFormShell';
+import { FormStep } from './FormFields';
 
 jest.mock('../../hooks/useTheme', () => ({
   useTheme: () => ({ theme: 'light', toggleTheme: jest.fn(), logoSocio: 'logo.png', logoTexto: 'texto.png' }),
@@ -82,5 +83,24 @@ describe('MultiStepFormShell', () => {
       </MultiStepFormShell>
     );
     expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  test('onStepEntered llega al FormStep hijo y se dispara al terminar la animación de entrada', () => {
+    const onStepEntered = jest.fn();
+    render(
+      <MultiStepFormShell {...baseProps({ steps: MULTI_STEPS, direction: 1, onStepEntered })}>
+        <FormStep key="step1" direction={1}><p>Paso 1</p></FormStep>
+      </MultiStepFormShell>
+    );
+    expect(onStepEntered).toHaveBeenCalledTimes(1);
+  });
+
+  test('con navGuard activo el botón de submit queda deshabilitado', () => {
+    render(
+      <MultiStepFormShell {...baseProps({ steps: SINGLE_STEP, navGuard: true })}>
+        <div>Contenido</div>
+      </MultiStepFormShell>
+    );
+    expect(screen.getByRole('button', { name: /guardar/i })).toBeDisabled();
   });
 });

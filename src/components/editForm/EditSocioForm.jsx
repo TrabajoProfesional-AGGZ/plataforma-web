@@ -28,7 +28,7 @@ const stepFields = {
  */
 export function EditSocioForm({ socio, onSuccess, onCancel }) {
   const {
-    step, direction, submitted, setSubmitted, navGuard,
+    step, direction, submitted, setSubmitted, navGuard, finNavGuard,
     goBack, goNext, formError, setFormError,
     register, handleSubmit, setValue, errors, isSubmitting,
   } = useMultiStepForm(stepFields, {
@@ -91,6 +91,7 @@ export function EditSocioForm({ socio, onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Editar socio"
       successTitle="¡Datos actualizados!"
