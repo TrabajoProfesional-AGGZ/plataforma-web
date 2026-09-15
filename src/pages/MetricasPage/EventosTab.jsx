@@ -66,7 +66,7 @@ function EventosTab() {
             <div className="eventos-tab-bar-container">
               <div
                 className="eventos-tab-bar"
-                style={{ width: `${Math.min(e.porcentaje_ocupacion, 100)}%` }}
+                style={{ transform: `scaleX(${Math.min(e.porcentaje_ocupacion, 100) / 100})` }}
               />
               <span className="eventos-tab-porcentaje">{e.porcentaje_ocupacion}%</span>
             </div>

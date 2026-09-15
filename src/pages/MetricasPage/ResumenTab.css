@@ -97,10 +97,12 @@
 }
 
 .ranking-bar {
+  width: 100%;
   height: 100%;
+  transform-origin: left;
   background: var(--color-text-primary);
   border-radius: var(--radius-full);
-  transition: width 0.6s ease;
+  transition: transform 0.6s var(--ease-out, ease);
 }
 
 .ranking-porcentaje {
@@ -155,10 +157,12 @@
 }
 
 .ocupacion-bar {
+  width: 100%;
   height: 100%;
+  transform-origin: left;
   background: var(--color-text-primary);
   border-radius: var(--radius-full);
-  transition: width 0.6s ease;
+  transition: transform 0.6s var(--ease-out, ease);
 }
 
 .ocupacion-porcentaje {

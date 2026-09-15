@@ -133,7 +133,8 @@ export function MultiStepFormShell({
                             <div className="csf-connector">
                               <motion.div
                                 className="csf-connector-fill"
-                                animate={{ width: step > s.id ? '100%' : '0%' }}
+                                style={{ transformOrigin: 'left', width: '100%' }}
+                                animate={{ scaleX: step > s.id ? 1 : 0 }}
                                 transition={{ duration: 0.4, ease: 'easeInOut' }}
                               />
                             </div>
@@ -146,7 +147,8 @@ export function MultiStepFormShell({
                   <div className="csf-progress">
                     <motion.div
                       className="csf-progress-fill"
-                      animate={{ width: `${progress}%` }}
+                      style={{ transformOrigin: 'left', width: '100%' }}
+                      animate={{ scaleX: progress / 100 }}
                       transition={{ duration: 0.4, ease: 'easeInOut' }}
                     />
                   </div>

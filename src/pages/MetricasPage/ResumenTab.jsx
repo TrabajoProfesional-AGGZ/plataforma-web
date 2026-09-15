@@ -78,7 +78,7 @@ function ResumenTab() {
                     <>
                       <div
                         className="ranking-bar"
-                        style={{ width: `${Math.min(d.porcentaje_cupo, 100)}%` }}
+                        style={{ transform: `scaleX(${Math.min(d.porcentaje_cupo, 100) / 100})` }}
                       />
                       <span className="ranking-porcentaje">{d.porcentaje_cupo}%</span>
                     </>
@@ -121,7 +121,7 @@ function ResumenTab() {
                 <div className="ocupacion-bar-container">
                   <div
                     className="ocupacion-bar"
-                    style={{ width: `${Math.min(inst.porcentaje_ocupacion, 100)}%` }}
+                    style={{ transform: `scaleX(${Math.min(inst.porcentaje_ocupacion, 100) / 100})` }}
                   />
                   <span className="ocupacion-porcentaje">{inst.porcentaje_ocupacion}%</span>
                 </div>
