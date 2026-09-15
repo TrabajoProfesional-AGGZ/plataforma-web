@@ -21,7 +21,14 @@ const TABS = [
 function MetricasPage() {
   const puedeVerMetricas = usePermiso('ver_metricas');
   const [activeTab, setActiveTab] = useState(TABS[0].id);
+  const [visitedTabs, setVisitedTabs] = useState(() => new Set([TABS[0].id]));
   const tabRefs = useRef({});
+
+  /** Cambia de pestaña sin desmontar las ya visitadas, para no re-fetchear sus datos al volver. */
+  function selectTab(id) {
+    setActiveTab(id);
+    setVisitedTabs((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
+  }
 
   /** Navega entre pestañas con flechas/Home/End y mueve el foco a la pestaña activa. */
   function handleKeyDown(e) {
@@ -35,11 +42,9 @@ function MetricasPage() {
     if (nextIdx === null) return;
     e.preventDefault();
     const nextId = TABS[nextIdx].id;
-    setActiveTab(nextId);
+    selectTab(nextId);
     tabRefs.current[nextId]?.focus();
   }
-
-  const ActiveComponent = TABS.find((t) => t.id === activeTab).Component;
 
   return (
     <div className="metricas-page">
@@ -69,20 +74,24 @@ function MetricasPage() {
                 aria-controls={`metricas-panel-${id}`}
                 tabIndex={activeTab === id ? 0 : -1}
                 className="metricas-tab"
-                onClick={() => setActiveTab(id)}
+                onClick={() => selectTab(id)}
               >
                 {label}
               </button>
             ))}
           </div>
 
-          <div
-            role="tabpanel"
-            id={`metricas-panel-${activeTab}`}
-            aria-labelledby={`metricas-tab-${activeTab}`}
-          >
-            <ActiveComponent />
-          </div>
+          {TABS.map(({ id, Component }) => visitedTabs.has(id) && (
+            <div
+              key={id}
+              role="tabpanel"
+              id={`metricas-panel-${id}`}
+              aria-labelledby={`metricas-tab-${id}`}
+              hidden={activeTab !== id}
+            >
+              <Component />
+            </div>
+          ))}
         </>
       )}
     </div>

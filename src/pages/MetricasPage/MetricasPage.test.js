@@ -35,7 +35,7 @@ describe('MetricasPage', () => {
     render(<MetricasPage />);
 
     expect(screen.getByRole('tab', { name: 'Instalaciones' })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByTestId('panel-resumen')).toBeInTheDocument();
+    expect(screen.getByTestId('panel-resumen')).toBeVisible();
     expect(screen.queryByTestId('panel-finanzas')).not.toBeInTheDocument();
   });
 
@@ -47,8 +47,22 @@ describe('MetricasPage', () => {
     fireEvent.click(screen.getByRole('tab', { name: 'Finanzas' }));
 
     expect(screen.getByRole('tab', { name: 'Finanzas' })).toHaveAttribute('aria-selected', 'true');
-    expect(screen.getByTestId('panel-finanzas')).toBeInTheDocument();
-    expect(screen.queryByTestId('panel-resumen')).not.toBeInTheDocument();
+    expect(screen.getByTestId('panel-finanzas')).toBeVisible();
+    expect(screen.getByTestId('panel-resumen')).not.toBeVisible();
+  });
+
+  test('volver a una pestaña ya visitada no vuelve a montar su componente (evita re-fetch)', () => {
+    usePermiso.mockReturnValue(true);
+
+    render(<MetricasPage />);
+    fireEvent.click(screen.getByRole('tab', { name: 'Finanzas' }));
+    const panelFinanzas = screen.getByTestId('panel-finanzas');
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Instalaciones' }));
+    expect(screen.getByTestId('panel-finanzas')).not.toBeVisible();
+
+    fireEvent.click(screen.getByRole('tab', { name: 'Finanzas' }));
+    expect(screen.getByTestId('panel-finanzas')).toBe(panelFinanzas);
   });
 
   test('click en la pestaña Morosidad muestra su panel', () => {
