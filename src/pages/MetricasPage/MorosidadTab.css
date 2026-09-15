@@ -1,9 +1,3 @@
-.morosidad-loading {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-12) 0;
-}
-
 .morosidad-dashboard {
   display: flex;
   flex-direction: column;

@@ -3,7 +3,7 @@ import { Wallet, Receipt, CalendarCheck, Ticket, ShoppingBag } from 'lucide-reac
 import { getPagosEnCaja } from '../../services/metricasService';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
-import { useTheme } from '../../hooks/useTheme';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import './CajaTab.css';
 
 const ICONO_POR_TIPO = {
@@ -22,7 +22,6 @@ const LABEL_POR_TIPO = {
 
 /** Pestaña "Caja" de Métricas: total y desglose por tipo de los pagos marcados como pagados en caja. */
 function CajaTab() {
-  const { logoSocio: logo } = useTheme();
   const [datos, setDatos] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -57,8 +56,10 @@ function CajaTab() {
 
   if (loading) {
     return (
-      <div className="caja-tab-loading">
-        <img src={logo} alt="" className="loading-logo" />
+      <div className="caja-tab">
+        <div className="caja-tab-kpi-card">
+          <SkeletonRows n={1} altura={120} />
+        </div>
       </div>
     );
   }

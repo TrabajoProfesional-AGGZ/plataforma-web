@@ -72,7 +72,7 @@ function mockUnaReserva() {
 async function renderPage() {
   render(<MemoryRouter><InstalacionesPage /></MemoryRouter>);
   await waitFor(() =>
-    expect(document.querySelector('.list-loading')).not.toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   );
 }
 

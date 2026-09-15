@@ -8,9 +8,9 @@ import { CreateEventoForm } from '../../components/createEventoForm/CreateEvento
 import { ReservarEntradaForm } from '../../components/reservarEntradaForm/ReservarEntradaForm';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import { Paginacion } from '../../components/paginacion/Paginacion';
 import { urlImagenSegura } from '../../utils/utils';
-import { useTheme } from '../../hooks/useTheme';
 import './EventosPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
@@ -25,7 +25,6 @@ function mensajeError(err, fallback) {
 
 /** Página de listado de eventos vigentes/históricos: crear evento y reservar entradas por socio. */
 function EventosPage() {
-  const { logoSocio: logo } = useTheme();
   const puedeVerEventos = usePermiso('ver_eventos');
   const puedeCrearEvento = usePermiso('crear_evento');
   const puedeCrearEntrada = usePermiso('crear_entrada');
@@ -89,11 +88,7 @@ function EventosPage() {
 
   function renderLista() {
     if (cargandoActual) {
-      return (
-        <div className="list-loading">
-          <img src={logo} alt="" className="loading-logo" />
-        </div>
-      );
+      return <SkeletonRows n={6} />;
     }
     if (error && listaActual.length === 0) {
       return <ErrorBanner mensaje={error} onReintentar={esVigentes ? cargarEventos : verHistoricos} />;

@@ -91,19 +91,11 @@
   color: var(--color-danger);
 }
 
-/* Skeleton mientras se cargan los turnos disponibles */
+/* Skeleton mientras se cargan los turnos disponibles (animación compartida: .skeleton-pulse en SkeletonRows.css) */
 .turno-chip--skeleton {
   height: 52px;
   border-color: transparent;
-  background: linear-gradient(90deg, var(--color-bg-subtle) 25%, var(--color-border-light) 50%, var(--color-bg-subtle) 75%);
-  background-size: 200% 100%;
-  animation: turno-skeleton-pulse 1.3s ease-in-out infinite;
   cursor: default;
-}
-
-@keyframes turno-skeleton-pulse {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
 }
 
 @media (prefers-reduced-motion: reduce) {

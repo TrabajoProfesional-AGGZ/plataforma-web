@@ -16,9 +16,9 @@ import { VerSocioModal } from '../../components/verSocioModal/VerSocioModal';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import { Paginacion } from '../../components/paginacion/Paginacion';
 import { handleActivateKey } from '../../utils/a11y';
-import { useTheme } from '../../hooks/useTheme';
 import './InstalacionesPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/SocioCard.css';
@@ -34,7 +34,6 @@ function mensajeError(err, fallback) {
 
 /** Página de listado y detalle de instalaciones, con gestión de sus reservas. */
 function InstalacionesPage() {
-  const { logoSocio: logo } = useTheme();
   const location = useLocation();
   const puedeVerInstalaciones = usePermiso('ver_instalaciones');
   const puedeCrearInstalacion = usePermiso('crear_instalacion');
@@ -48,6 +47,7 @@ function InstalacionesPage() {
   const [instalaciones, setInstalaciones] = useState([]);
   const [reservas, setReservas] = useState([]);
   const [loadingInstalaciones, setLoadingInstalaciones] = useState(false);
+  const [loadingReservas, setLoadingReservas] = useState(false);
   const [error, setError] = useState('');
 
   const [crearInstalacionFormOpen, setCrearInstalacionFormOpen] = useState(false);
@@ -85,15 +85,20 @@ function InstalacionesPage() {
 
   /** Carga las reservas activas de la instalación, completando cada socio con sus datos completos. */
   async function cargarReservas(instalacionId) {
-    const [reservasData, sociosData] = await Promise.all([getReservasPorInstalacion(instalacionId), getSocios()]);
-    const socioMap = Object.fromEntries(sociosData.map((s) => [s.id, s]));
-    setReservas(reservasData.map((r) => ({
-      ...r,
-      socios: (r.socios ?? []).map((s) => socioMap[s.id] ?? s),
-    })));
-    setReservasBusqueda(null);
-    setFiltroNroSocio('');
-    resetPaginaReservas();
+    setLoadingReservas(true);
+    try {
+      const [reservasData, sociosData] = await Promise.all([getReservasPorInstalacion(instalacionId), getSocios()]);
+      const socioMap = Object.fromEntries(sociosData.map((s) => [s.id, s]));
+      setReservas(reservasData.map((r) => ({
+        ...r,
+        socios: (r.socios ?? []).map((s) => socioMap[s.id] ?? s),
+      })));
+      setReservasBusqueda(null);
+      setFiltroNroSocio('');
+      resetPaginaReservas();
+    } finally {
+      setLoadingReservas(false);
+    }
   }
 
   /** Busca todas las reservas del socio y filtra solo las de la instalación actual. */
@@ -236,16 +241,21 @@ function InstalacionesPage() {
 
   /** Carga las reservas históricas de la instalación, completando cada socio con sus datos completos. */
   async function cargarReservasHistoricas(instalacionId) {
-    const [reservasData, sociosData] = await Promise.all([
-      getReservasHistoricasPorInstalacion(instalacionId),
-      getSocios(),
-    ]);
-    const socioMap = Object.fromEntries(sociosData.map((s) => [s.id, s]));
-    setReservasHistoricas(reservasData.map((r) => ({
-      ...r,
-      socios: (r.socios ?? []).map((s) => socioMap[s.id] ?? s),
-    })));
-    resetPaginaReservas();
+    setLoadingReservas(true);
+    try {
+      const [reservasData, sociosData] = await Promise.all([
+        getReservasHistoricasPorInstalacion(instalacionId),
+        getSocios(),
+      ]);
+      const socioMap = Object.fromEntries(sociosData.map((s) => [s.id, s]));
+      setReservasHistoricas(reservasData.map((r) => ({
+        ...r,
+        socios: (r.socios ?? []).map((s) => socioMap[s.id] ?? s),
+      })));
+      resetPaginaReservas();
+    } finally {
+      setLoadingReservas(false);
+    }
   }
 
   function abrirVerSocio(socio) {
@@ -257,11 +267,7 @@ function InstalacionesPage() {
 
   const renderContenidoInstalaciones = () => {
     if (loadingInstalaciones) {
-      return (
-        <div className="list-loading">
-          <img src={logo} alt="" className="loading-logo" />
-        </div>
-      );
+      return <SkeletonRows n={6} />;
     }
     if (error && instalaciones.length === 0) {
       return <ErrorBanner mensaje={error} onReintentar={cargarInstalaciones} />;
@@ -546,7 +552,9 @@ function InstalacionesPage() {
 
             {reservasVisible && (
               <>
-                {vistaReservas === 'activas'
+                {loadingReservas ? (
+                  <SkeletonRows n={4} />
+                ) : vistaReservas === 'activas'
                   ? renderTablaReservas(reservasFiltradas, { mostrarEstado: true, mostrarAcciones: true })
                   : renderTablaReservas(reservasHistoricasFiltradas, { mostrarEstado: true, mensajeVacio: 'No hay reservas históricas para esta instalación.' })}
                 {puedeVerReservas && (

@@ -10,10 +10,10 @@ import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDelet
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import { Paginacion } from '../../components/paginacion/Paginacion';
 import { urlImagenSegura } from '../../utils/utils';
 import { handleActivateKey } from '../../utils/a11y';
-import { useTheme } from '../../hooks/useTheme';
 import './NoticiasPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
@@ -28,7 +28,6 @@ function mensajeError(err, fallback) {
 
 /** Página de listado (vigentes/históricas) y detalle de noticias: crear, editar y eliminar. */
 function NoticiasPage() {
-  const { logoSocio: logo } = useTheme();
   const puedeVerNoticias = usePermiso('ver_noticias');
   const puedeCrearNoticia = usePermiso('crear_noticia');
   const puedeEditarNoticia = usePermiso('editar_noticia');
@@ -150,11 +149,7 @@ function NoticiasPage() {
 
   function renderLista() {
     if (loading) {
-      return (
-        <div className="list-loading">
-          <img src={logo} alt="" className="loading-logo" />
-        </div>
-      );
+      return <SkeletonRows n={6} />;
     }
     if (error && noticias.length === 0) {
       return <ErrorBanner mensaje={error} onReintentar={() => cargarNoticias()} />;
@@ -234,11 +229,7 @@ function NoticiasPage() {
             </button>
           </div>
 
-          {loadingDetalle && (
-            <div className="list-loading">
-              <img src={logo} alt="" className="loading-logo" />
-            </div>
-          )}
+          {loadingDetalle && <SkeletonRows n={4} />}
 
           {errorDetalle && !loadingDetalle && (
             <ErrorBanner mensaje={errorDetalle} />

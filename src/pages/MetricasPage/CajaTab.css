@@ -1,9 +1,3 @@
-.caja-tab-loading {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-12) 0;
-}
-
 .caja-tab {
   display: flex;
   flex-direction: column;

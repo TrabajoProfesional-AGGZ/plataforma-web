@@ -53,7 +53,7 @@ jest.mock('../../components/createDisciplinaForm/CreateDisciplinaForm', () => ({
 async function renderPage() {
   render(<MemoryRouter><DisciplinasPage /></MemoryRouter>);
   await waitFor(() =>
-    expect(document.querySelector('.list-loading')).not.toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   );
 }
 

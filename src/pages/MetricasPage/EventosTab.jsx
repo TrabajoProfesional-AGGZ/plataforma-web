@@ -2,13 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { Ticket } from 'lucide-react';
 import { getTopEventos } from '../../services/metricasService';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
-import { useTheme } from '../../hooks/useTheme';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import RankingList from './RankingList';
 import './EventosTab.css';
 
 /** Pestaña "Eventos" de Métricas: ranking de eventos por entradas vendidas y % de ocupación. */
 function EventosTab() {
-  const { logoSocio: logo } = useTheme();
   const [eventos, setEventos] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -42,11 +41,7 @@ function EventosTab() {
   useEffect(() => cargar(), [cargar]);
 
   if (loading) {
-    return (
-      <div className="eventos-tab-loading">
-        <img src={logo} alt="" className="loading-logo" />
-      </div>
-    );
+    return <SkeletonRows n={5} />;
   }
 
   if (error) {

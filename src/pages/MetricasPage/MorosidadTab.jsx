@@ -6,8 +6,8 @@ import { Paginacion } from '../../components/paginacion/Paginacion';
 import { TendenciasPagoChart } from '../../components/charts/TendenciasPagoChart';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import { riesgoConfig } from '../../utils/riesgoConfig';
-import { useTheme } from '../../hooks/useTheme';
 import './MorosidadTab.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
@@ -34,7 +34,6 @@ function SelectorMes({ id, label, value, onChange, opciones }) {
 
 /** Pestaña "Morosidad" de Métricas: predicción de atraso por socio y gráfico de tendencias de pago filtrable por rango de mes. */
 function MorosidadTab() {
-  const { logoSocio: logo } = useTheme();
   const { resultado: datos, setResultado: setDatos, loading, setLoading, error, setError } = useListState();
   const [mesDesde, setMesDesde] = useState('');
   const [mesHasta, setMesHasta] = useState('');
@@ -96,11 +95,7 @@ function MorosidadTab() {
   });
 
   if (loading) {
-    return (
-      <div className="morosidad-loading">
-        <img src={logo} alt="" className="loading-logo" />
-      </div>
-    );
+    return <SkeletonRows n={6} />;
   }
 
   if (error) {

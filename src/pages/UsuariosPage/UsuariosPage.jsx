@@ -18,8 +18,8 @@ import { estadoConfig } from '../../utils/estadoConfig';
 import { handleActivateKey } from '../../utils/a11y';
 import EmptyState from '../../components/feedback/EmptyState';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import { Paginacion } from '../../components/paginacion/Paginacion';
-import { useTheme } from '../../hooks/useTheme';
 import './UsuariosPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/ListDetailShared.css';
@@ -42,7 +42,6 @@ function ariaSortDe(orden, campo) {
 
 /** Página de búsqueda/listado y detalle de usuarios administrativos: crear, editar, eliminar y cambiar rol. */
 function UsuariosPage() {
-  const { logoSocio: logo } = useTheme();
   const puedeCrear = usePermiso('crear_usuario');
   const puedeEditar = usePermiso('editar_usuario');
   const puedeBorrar = usePermiso('borrar_usuario');
@@ -243,11 +242,7 @@ function UsuariosPage() {
         </div>
       </div>
 
-      {loading && (
-        <div className="list-loading">
-          <img src={logo} alt="" className="loading-logo" />
-        </div>
-      )}
+      {loading && <SkeletonRows n={6} />}
       {error && <ErrorBanner mensaje={error} onReintentar={fetchYActualizarUsuarios} />}
 
       {!loading && modo === 'lista' && (

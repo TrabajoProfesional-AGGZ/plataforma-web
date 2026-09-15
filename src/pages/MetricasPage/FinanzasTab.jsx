@@ -2,12 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { getDashboardFinanzas } from '../../services/metricasService';
 import { DesgloseFinanzasChart } from '../../components/charts/DesgloseFinanzasChart';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
-import { useTheme } from '../../hooks/useTheme';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import './FinanzasTab.css';
 
 /** Pestaña "Finanzas" de Métricas: recaudación total y desglose por concepto para un período elegido. */
 function FinanzasTab() {
-  const { logoSocio: logo } = useTheme();
   const [datosFinanzas, setDatosFinanzas] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -54,8 +53,10 @@ function FinanzasTab() {
   function renderContenido() {
     if (loading) {
       return (
-        <div className="finanzas-loading">
-          <img src={logo} alt="" className="loading-logo" />
+        <div className="finanzas-dashboard">
+          <div className="finanzas-kpi-card">
+            <SkeletonRows n={1} altura={120} />
+          </div>
         </div>
       );
     }

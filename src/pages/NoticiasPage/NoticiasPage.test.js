@@ -69,7 +69,7 @@ const NOTICIA_DETALLE = {
 async function renderPage() {
   render(<MemoryRouter><NoticiasPage /></MemoryRouter>);
   await waitFor(() =>
-    expect(document.querySelector('.list-loading')).not.toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   );
 }
 

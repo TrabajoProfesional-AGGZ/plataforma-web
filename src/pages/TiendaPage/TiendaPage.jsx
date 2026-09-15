@@ -10,9 +10,9 @@ import { createProducto } from '../../services/productosService';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import { urlImagenSegura } from '../../utils/utils';
 import { handleActivateKey } from '../../utils/a11y';
-import { useTheme } from '../../hooks/useTheme';
 import { usePermiso } from '../../hooks/usePermiso';
 import { usePaginacion } from '../../hooks/usePaginacion';
 import { Paginacion } from '../../components/paginacion/Paginacion';
@@ -30,7 +30,6 @@ function mensajeError(err, fallback) {
 
 /** Página de catálogo y detalle de productos: crear, editar y crear compras para un socio. */
 function TiendaPage() {
-  const { logoSocio: logo } = useTheme();
   const puedeCrearCompra = usePermiso('crear_compra');
 
   const [vista, setVista] = useState('lista');
@@ -131,11 +130,7 @@ function TiendaPage() {
 
   function renderLista() {
     if (loading) {
-      return (
-        <div className="list-loading">
-          <img src={logo} alt="" className="loading-logo" />
-        </div>
-      );
+      return <SkeletonRows n={6} />;
     }
     if (error && productos.length === 0) {
       return <ErrorBanner mensaje={error} onReintentar={cargarProductos} />;
@@ -231,9 +226,7 @@ function TiendaPage() {
             Volver a la tienda
           </button>
 
-          {loadingDetalle && (
-            <div className="list-loading"><img src={logo} alt="" className="loading-logo" /></div>
-          )}
+          {loadingDetalle && <SkeletonRows n={4} />}
 
           {errorDetalle && !loadingDetalle && <ErrorBanner mensaje={errorDetalle} />}
 

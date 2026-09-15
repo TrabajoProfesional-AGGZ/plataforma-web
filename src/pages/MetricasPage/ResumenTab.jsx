@@ -3,12 +3,11 @@ import { TrendingUp, BarChart3 } from 'lucide-react';
 import { getTopDisciplinas, getOcupacionInstalaciones } from '../../services/metricasService';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
-import { useTheme } from '../../hooks/useTheme';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import './ResumenTab.css';
 
 /** Pestaña "Instalaciones" de Métricas: ranking de disciplinas por inscriptos y ocupación de instalaciones. */
 function ResumenTab() {
-  const { logoSocio: logo } = useTheme();
   const [disciplinas, setDisciplinas] = useState(null);
   const [ocupacion, setOcupacion] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -44,11 +43,7 @@ function ResumenTab() {
   useEffect(() => cargar(), [cargar]);
 
   if (loading) {
-    return (
-      <div className="resumen-loading">
-        <img src={logo} alt="" className="loading-logo" />
-      </div>
-    );
+    return <SkeletonRows n={6} />;
   }
 
   if (error) {

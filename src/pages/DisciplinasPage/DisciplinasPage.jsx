@@ -11,9 +11,9 @@ import { usePaginacion } from '../../hooks/usePaginacion';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import { Paginacion } from '../../components/paginacion/Paginacion';
 import { handleActivateKey } from '../../utils/a11y';
-import { useTheme } from '../../hooks/useTheme';
 import './DisciplinasPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
@@ -47,7 +47,6 @@ function mensajeErrorInscripcion(err, socio) {
 
 /** Página de listado y detalle de disciplinas: crear, pausar e inscribir socios. */
 function DisciplinasPage() {
-  const { logoSocio: logo } = useTheme();
   const location = useLocation();
   const puedeVerDisciplinas = usePermiso('ver_disciplinas');
   const puedeCrearDisciplina = usePermiso('crear_disciplina');
@@ -159,11 +158,7 @@ function DisciplinasPage() {
 
   function renderListaContenido() {
     if (loading) {
-      return (
-        <div className="list-loading">
-          <img src={logo} alt="" className="loading-logo" />
-        </div>
-      );
+      return <SkeletonRows n={6} />;
     }
     if (error && disciplinas.length === 0) {
       return <ErrorBanner mensaje={error} onReintentar={cargarDisciplinas} />;

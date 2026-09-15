@@ -19,9 +19,9 @@ import { MAX_LEN } from '../../utils/formValidators';
 import { handleActivateKey } from '../../utils/a11y';
 import EmptyState from '../../components/feedback/EmptyState';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import { SocioAccionesExtra } from '../../components/socioAccionesExtra/SocioAccionesExtra';
 import { Paginacion } from '../../components/paginacion/Paginacion';
-import { useTheme } from '../../hooks/useTheme';
 import './SociosPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/ListDetailShared.css';
@@ -48,7 +48,6 @@ function ariaSortDe(orden, campo) {
 
 /** Página de búsqueda/listado y detalle de socios: crear, editar, eliminar y filtrar por disciplina. */
 function SociosPage() {
-  const { logoSocio: logo } = useTheme();
   const puedeCrear = usePermiso('crear_socio');
   const puedeEditar = usePermiso('editar_socio');
   const puedeBorrar = usePermiso('borrar_socio');
@@ -374,11 +373,7 @@ function SociosPage() {
         </div>
       </div>
 
-      {loading && (
-        <div className="list-loading">
-          <img src={logo} alt="" className="loading-logo" />
-        </div>
-      )}
+      {loading && <SkeletonRows n={6} />}
       {error && <ErrorBanner mensaje={error} onReintentar={cargarSocios} />}
 
       {!loading && modo === 'no-encontrado' && (

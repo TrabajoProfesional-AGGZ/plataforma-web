@@ -69,7 +69,7 @@ const PRODUCTOS = [
 async function renderPage() {
   render(<MemoryRouter><TiendaPage /></MemoryRouter>);
   await waitFor(() =>
-    expect(document.querySelector('.list-loading')).not.toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   );
 }
 

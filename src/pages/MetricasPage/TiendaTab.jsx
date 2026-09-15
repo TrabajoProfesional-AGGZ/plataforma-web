@@ -2,13 +2,12 @@ import { useState, useEffect, useCallback } from 'react';
 import { ShoppingBag } from 'lucide-react';
 import { getTopProductos } from '../../services/metricasService';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
-import { useTheme } from '../../hooks/useTheme';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import RankingList from './RankingList';
 import './TiendaTab.css';
 
 /** Pestaña "Tienda" de Métricas: ranking de productos más vendidos y su facturación. */
 function TiendaTab() {
-  const { logoSocio: logo } = useTheme();
   const [productos, setProductos] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -42,11 +41,7 @@ function TiendaTab() {
   useEffect(() => cargar(), [cargar]);
 
   if (loading) {
-    return (
-      <div className="tienda-tab-loading">
-        <img src={logo} alt="" className="loading-logo" />
-      </div>
-    );
+    return <SkeletonRows n={5} />;
   }
 
   if (error) {

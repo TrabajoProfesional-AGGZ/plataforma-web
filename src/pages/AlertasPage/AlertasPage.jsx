@@ -8,8 +8,8 @@ import { CreateAlertaForm } from '../../components/createAlertaForm/CreateAlerta
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import { Paginacion } from '../../components/paginacion/Paginacion';
-import { useTheme } from '../../hooks/useTheme';
 import './AlertasPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
@@ -30,7 +30,6 @@ function mensajeError(err, fallback) {
 
 /** Página de listado de alertas: crear, ver destinatarios y eliminar. */
 function AlertasPage() {
-  const { logoSocio: logo } = useTheme();
   const puedeVerAlertas = usePermiso('ver_alertas');
   const puedeCrearAlerta = usePermiso('crear_alerta');
   const puedeBorrarAlerta = usePermiso('borrar_alerta');
@@ -95,11 +94,7 @@ function AlertasPage() {
 
   function renderLista() {
     if (loading) {
-      return (
-        <div className="list-loading">
-          <img src={logo} alt="" className="loading-logo" />
-        </div>
-      );
+      return <SkeletonRows n={6} />;
     }
     if (error && alertas.length === 0) {
       return <ErrorBanner mensaje={error} onReintentar={cargarAlertas} />;

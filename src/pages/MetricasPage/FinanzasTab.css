@@ -32,13 +32,6 @@
 }
 
 /* ── Carga y error ────────────────────────────────────────────── */
-.finanzas-loading {
-  display: flex;
-  justify-content: center;
-  padding: var(--space-12) 0;
-}
-
-
 /* ── Layout del dashboard ─────────────────────────────────────── */
 .finanzas-dashboard {
   display: flex;
