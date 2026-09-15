@@ -155,19 +155,10 @@
   background-color: var(--color-bg);
 }
 
-/* StyledSelect usado como filtro: por defecto usa el mismo fondo que la
-   página (--color-bg), pensado para contrastar contra la tarjeta blanca de
-   los formularios de creación — acá el filtro va directo sobre el fondo de
-   la página, así que necesita fondo blanco propio para distinguirse. */
-.filtros-select-trigger {
-  background-color: var(--color-surface);
-}
-
-@media (hover: hover) {
-  .filtros-select-trigger:hover:not(:disabled) {
-    background-color: var(--color-bg);
-  }
-}
+/* Antes .filtros-select-trigger pisaba el fondo del trigger a blanco para
+   distinguirse del fondo de la página (--color-bg) — con C4 el trigger pasó
+   a tener borde de 1px (--color-border-medium) por defecto, que ya lo separa
+   del fondo sin necesitar un fondo propio; se borró el override. */
 
 /* En los forms de creación value="" es un placeholder real ("Seleccionar...")
    y StyledSelect lo pinta en gris tenue (--color-border-medium). Acá value=""
