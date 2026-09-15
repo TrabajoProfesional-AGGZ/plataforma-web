@@ -66,7 +66,9 @@ describe('DatePicker', () => {
   test('reabrir el picker luego de elegir un día vuelve a mostrar la grilla', () => {
     const { container } = render(<DatePicker name="fecha" />);
     fireEvent.click(screen.getByRole('button', { name: /seleccionar fecha/i }));
-    fireEvent.click(screen.getByRole('button', { name: '10' }));
+    const dias = screen.getAllByRole('button', { name: '10' });
+    const diaEnMes = dias.find((d) => !d.className.includes('muted'));
+    fireEvent.click(diaEnMes);
 
     const hiddenInput = container.querySelector('input[type="date"]');
     expect(hiddenInput.value).toMatch(/-10$/);
