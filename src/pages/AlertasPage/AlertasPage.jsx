@@ -158,7 +158,7 @@ function AlertasPage() {
 
   return (
     <div className="alertas-page">
-      <h1 className="alertas-title">Alertas</h1>
+      <h1 className="page-title">Alertas</h1>
 
       <div className="alertas-toolbar">
         {puedeCrearAlerta && (

@@ -1,17 +1,5 @@
 /* Estilos compartidos para páginas de listado: SociosPage, UsuariosPage, DisciplinasPage, InstalacionesPage */
 
-/* ── Título de página ────────────────────────────────────────── */
-.socios-title,
-.usuarios-title {
-  font-size: var(--text-title);
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0 0 var(--space-6) 0;
-  text-align: center;
-  letter-spacing: var(--tracking-title);
-  text-wrap: balance;
-}
-
 /* ── Botón Ver-todos / secundario ─────────────────────────────── */
 .socios-ver-todos-button,
 .usuarios-ver-todos-button {
@@ -349,10 +337,3 @@
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-/* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
-@media (max-width: 480px) {
-  .socios-title,
-  .usuarios-title {
-    font-size: var(--text-title);
-  }
-}

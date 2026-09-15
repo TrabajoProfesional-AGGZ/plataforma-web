@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useChangePassword } from '../../hooks/useChangePassword';
 import './CambiarContrasenaPage.css';
-import '../../styles/shared.css';
 
 /** Input de contraseña con botón para mostrar/ocultar el valor. */
 function PasswordField({ id, label, value, onChange, autoComplete }) {
@@ -37,7 +36,7 @@ function CambiarContrasenaPage() {
 
   return (
     <div className="cambiar-contrasena-page">
-      <h1 className="cambiar-contrasena-title">Cambiar contraseña</h1>
+      <h1 className="page-title">Cambiar contraseña</h1>
       <form onSubmit={handleSubmit} className="cambiar-contrasena-form">
         <PasswordField
           id="actual"

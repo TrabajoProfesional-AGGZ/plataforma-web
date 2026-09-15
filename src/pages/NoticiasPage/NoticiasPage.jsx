@@ -204,7 +204,7 @@ function NoticiasPage() {
     <div className="noticias-page">
       {vista === 'lista' && (
         <>
-          <h1 className="noticias-title">Noticias</h1>
+          <h1 className="page-title">Noticias</h1>
           <div className="noticias-toolbar">
             <button className="noticias-btn-historicas" onClick={handleToggleHistoricas}>
               {verHistoricas ? 'Ver vigentes' : 'Ver históricas'}

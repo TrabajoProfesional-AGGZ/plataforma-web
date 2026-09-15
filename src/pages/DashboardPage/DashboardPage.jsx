@@ -65,7 +65,7 @@ function DashboardPage() {
 
   return (
     <div className="dashboard-main">
-      <h1 className="dashboard-title">Panel principal</h1>
+      <h1 className="page-title page-title--display">Panel principal</h1>
       <p className="dashboard-subtitle">Bienvenido, <strong>{user?.email}</strong>. Accedé rápidamente a las secciones del sistema.</p>
 
       <div className="dashboard-grid">

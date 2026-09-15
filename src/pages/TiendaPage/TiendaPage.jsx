@@ -195,7 +195,7 @@ function TiendaPage() {
     <div className="tienda-admin-page">
       {vista === 'lista' && (
         <>
-          <h1 className="noticias-title">Tienda</h1>
+          <h1 className="page-title">Tienda</h1>
           <div className="noticias-toolbar">
             <div className="tienda-orden-select-wrap">
               <StyledSelect

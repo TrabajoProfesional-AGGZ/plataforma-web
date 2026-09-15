@@ -3,15 +3,6 @@
   margin: 0 auto;
 }
 
-.perfil-title {
-  font-size: var(--text-title);
-  font-weight: 700;
-  color: var(--color-text-primary);
-  margin: 0 0 28px 0;
-  text-align: center;
-  letter-spacing: var(--tracking-title);
-}
-
 .perfil-card {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border-medium);

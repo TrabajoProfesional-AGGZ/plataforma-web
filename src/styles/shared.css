@@ -1,5 +1,40 @@
 /* Estilos compartidos entre varias páginas */
 
+/* ── Título de página ──────────── */
+.page-title {
+  font-size: var(--text-title);
+  line-height: var(--leading-title);
+  letter-spacing: var(--tracking-title);
+  font-weight: 600;
+  color: var(--color-text-primary);
+  margin: 0 0 var(--space-5);
+  text-align: center;
+  text-wrap: balance;
+}
+
+.page-title--display {
+  font-size: var(--text-display);
+  line-height: var(--leading-display);
+  letter-spacing: var(--tracking-display);
+  font-weight: 700;
+}
+
+.page-subtitle {
+  font-size: var(--text-secondary);
+  line-height: var(--leading-secondary);
+  color: var(--color-text-secondary);
+  text-align: center;
+  margin: calc(-1 * var(--space-3)) 0 var(--space-6);
+}
+
+@media (max-width: 480px) {
+  .page-title--display {
+    font-size: var(--text-title);
+    line-height: var(--leading-title);
+    letter-spacing: var(--tracking-title);
+  }
+}
+
 /* ── Botón de acción primaria (compartido entre páginas) ─────── */
 .cambiar-contrasena-button,
 .perfil-cambiar-button {

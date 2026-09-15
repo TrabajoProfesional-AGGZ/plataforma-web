@@ -6,7 +6,6 @@ import { RecuperarContraseniaModal } from './RecuperarContraseniaModal';
 import { useTheme } from '../../hooks/useTheme';
 import { EASE } from '../../styles/motion';
 import './LoginPage.css';
-import '../../styles/shared.css';
 
 const formContainerVariants = {
   hidden: {},

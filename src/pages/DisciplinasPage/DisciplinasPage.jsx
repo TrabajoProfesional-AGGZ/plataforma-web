@@ -225,7 +225,7 @@ function DisciplinasPage() {
       {/* ── Vista: Lista ── */}
       {vista === 'lista' && (
         <>
-          <h1 className="disciplinas-title">Disciplinas</h1>
+          <h1 className="page-title">Disciplinas</h1>
 
           <div className="disciplinas-toolbar">
             {puedeCrearDisciplina && (

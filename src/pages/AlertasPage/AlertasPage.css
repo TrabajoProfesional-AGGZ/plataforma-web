@@ -3,16 +3,6 @@
   margin: 0 auto;
 }
 
-.alertas-title {
-  font-size: var(--text-title);
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0 0 var(--space-5) 0;
-  text-align: center;
-  letter-spacing: var(--tracking-title);
-  text-wrap: balance;
-}
-
 .alertas-toolbar {
   display: flex;
   justify-content: flex-end;
@@ -58,9 +48,3 @@
   }
 }
 
-/* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
-@media (max-width: 480px) {
-  .alertas-title {
-    font-size: var(--text-title);
-  }
-}

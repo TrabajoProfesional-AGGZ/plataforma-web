@@ -6,7 +6,6 @@ import { PermisosModal } from '../../components/permisosModal/PermisosModal';
 import { Lock, Eye, EyeOff } from 'lucide-react';
 import '../../components/createForm/CreateSocioForm.css';
 import './PerfilPage.css';
-import '../../styles/shared.css';
 
 /** Input de contraseña con botón para mostrar/ocultar el valor. */
 function PasswordInput({ id, value, onChange, autoComplete, required }) {
@@ -126,7 +125,7 @@ function PerfilPage() {
 
   return (
     <div className="perfil-page">
-      <h1 className="perfil-title">Mi perfil</h1>
+      <h1 className="page-title">Mi perfil</h1>
       <div className="perfil-card">
         <div className="perfil-avatar" aria-hidden="true">
           <svg viewBox="0 0 24 24" fill="currentColor">

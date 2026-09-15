@@ -1,7 +1,8 @@
 /* Barra de herramientas, búsqueda, filtros, tabla base, estado-cell, btn base → src/styles/ListPage.css
    btn-crear → src/styles/ListDetailShared.css
    estilos de th, card → src/styles/PageTableHeader.css, SocioCard.css
-   socios-title, socios-ver-todos-button, socios-filtros*, socios-th-sort → src/styles/ListPage.css */
+   título de página → .page-title en src/styles/shared.css
+   socios-ver-todos-button, socios-filtros*, socios-th-sort → src/styles/ListPage.css */
 
 .socios-page {
   max-width: 1000px;

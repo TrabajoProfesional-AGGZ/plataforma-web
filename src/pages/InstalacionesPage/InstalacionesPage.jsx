@@ -404,7 +404,7 @@ function InstalacionesPage() {
       {/* ── Vista: Lista ── */}
       {vista === 'lista' && (
         <>
-          <h1 className="instalaciones-title">Reservas e Instalaciones</h1>
+          <h1 className="page-title">Reservas e Instalaciones</h1>
 
           <div className="instalaciones-seccion-separator">
             <div className="instalaciones-seccion-header">

@@ -165,7 +165,7 @@ function EventosPage() {
 
   return (
     <div className="eventos-page">
-      <h1 className="eventos-title">Eventos</h1>
+      <h1 className="page-title">Eventos</h1>
       <div className="eventos-toolbar">
         {puedeCrearEvento && vista === 'vigentes' && (
           <button className="eventos-btn-crear" onClick={() => setCrearOpen(true)}>

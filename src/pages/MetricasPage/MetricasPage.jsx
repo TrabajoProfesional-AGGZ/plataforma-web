@@ -43,7 +43,7 @@ function MetricasPage() {
 
   return (
     <div className="metricas-page">
-      <h1 className="metricas-title">Métricas</h1>
+      <h1 className="page-title">Métricas</h1>
       <p className="metricas-subtitle">Panel financiero, de uso y de riesgo del club</p>
 
       {!puedeVerMetricas ? (

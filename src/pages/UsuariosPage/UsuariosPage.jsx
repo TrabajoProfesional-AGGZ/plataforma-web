@@ -205,7 +205,7 @@ function UsuariosPage() {
 
   return (
     <div className="usuarios-page">
-      <h1 className="usuarios-title">Consultar Usuarios</h1>
+      <h1 className="page-title">Consultar Usuarios</h1>
 
       <div className="usuarios-toolbar">
         <div className="usuarios-toolbar-left">

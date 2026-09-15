@@ -336,7 +336,7 @@ function SociosPage() {
 
   return (
     <div className="socios-page">
-      <h1 className="socios-title">Consultar Socios</h1>
+      <h1 className="page-title">Consultar Socios</h1>
       <div className="socios-toolbar">
         <div className="socios-toolbar-left">
           <form className="socios-search-form" onSubmit={handleBuscar}>

@@ -3,16 +3,6 @@
   margin: 0 auto;
 }
 
-.eventos-title {
-  font-size: var(--text-title);
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0 0 var(--space-5) 0;
-  text-align: center;
-  letter-spacing: var(--tracking-title);
-  text-wrap: balance;
-}
-
 .eventos-toolbar {
   display: flex;
   justify-content: flex-end;
@@ -96,8 +86,3 @@
   color: var(--color-text-primary);
 }
 
-@media (max-width: 480px) {
-  .eventos-title {
-    font-size: var(--text-title);
-  }
-}
