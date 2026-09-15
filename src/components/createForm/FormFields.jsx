@@ -293,6 +293,7 @@ export function StyledSelect({
         ref={mergeRefs(selectRef, forwardedRef)}
         tabIndex={-1}
         className="csf-native-hidden"
+        aria-label={ariaLabelledby ? undefined : ariaLabel}
         aria-labelledby={ariaLabelledby}
         {...props}
       >
