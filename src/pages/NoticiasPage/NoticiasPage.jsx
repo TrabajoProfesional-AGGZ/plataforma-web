@@ -1,18 +1,21 @@
 import { useState, useEffect } from 'react';
-import { Plus, ChevronLeft } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
+import { Plus, ChevronRight } from 'lucide-react';
 import { getNoticias, getNoticiasHistoricas, getNoticia, createNoticia, borrarNoticia } from '../../services/noticiasService';
 import { usePermiso } from '../../hooks/usePermiso';
 import { usePaginacion } from '../../hooks/usePaginacion';
 import { CreateNoticiaForm } from '../../components/createNoticiaForm/CreateNoticiaForm';
 import { EditNoticiaForm } from '../../components/editNoticiaForm/EditNoticiaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
+import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
+import { ViewTransition, scrollAlInicio } from '../../components/ViewTransition/ViewTransition';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import { Paginacion } from '../../components/paginacion/Paginacion';
 import { urlImagenSegura } from '../../utils/utils';
 import { handleActivateKey } from '../../utils/a11y';
-import { useTheme } from '../../hooks/useTheme';
 import './NoticiasPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
@@ -27,7 +30,6 @@ function mensajeError(err, fallback) {
 
 /** Página de listado (vigentes/históricas) y detalle de noticias: crear, editar y eliminar. */
 function NoticiasPage() {
-  const { logoSocio: logo } = useTheme();
   const puedeVerNoticias = usePermiso('ver_noticias');
   const puedeCrearNoticia = usePermiso('crear_noticia');
   const puedeEditarNoticia = usePermiso('editar_noticia');
@@ -82,6 +84,7 @@ function NoticiasPage() {
     setLoadingDetalle(true);
     setErrorDetalle('');
     setVista('detalle');
+    scrollAlInicio();
     try {
       const detalle = await getNoticia(n.id);
       setNoticiaActual(detalle);
@@ -149,11 +152,7 @@ function NoticiasPage() {
 
   function renderLista() {
     if (loading) {
-      return (
-        <div className="list-loading">
-          <img src={logo} alt="" className="loading-logo" />
-        </div>
-      );
+      return <SkeletonRows n={6} />;
     }
     if (error && noticias.length === 0) {
       return <ErrorBanner mensaje={error} onReintentar={() => cargarNoticias()} />;
@@ -167,9 +166,10 @@ function NoticiasPage() {
           <thead>
             <tr>
               <th>Título</th>
-              <th>Publicación</th>
-              <th>Vencimiento</th>
-              <th>Estado</th>
+              <th className="td-num">Publicación</th>
+              <th className="td-num">Vencimiento</th>
+              <th className="td-center">Estado</th>
+              <th className="td-chevron" aria-hidden="true"></th>
             </tr>
           </thead>
           <tbody>
@@ -184,13 +184,14 @@ function NoticiasPage() {
                 onKeyDown={handleActivateKey(() => handleClickFila(n))}
               >
                 <td>{n.titulo}</td>
-                <td>{n.fecha_publicacion}</td>
-                <td>{n.fecha_expiracion}</td>
-                <td>
+                <td className="td-num">{n.fecha_publicacion}</td>
+                <td className="td-num">{n.fecha_expiracion}</td>
+                <td className="td-center">
                   <EstadoBadge variant={estadoBadgeVariant(n.estado)}>
                     {n.estado ?? '—'}
                   </EstadoBadge>
                 </td>
+                <td className="td-chevron"><ChevronRight size={16} aria-hidden="true" /></td>
               </tr>
             ))}
           </tbody>
@@ -202,115 +203,119 @@ function NoticiasPage() {
 
   return (
     <div className="noticias-page">
-      {vista === 'lista' && (
-        <>
-          <h1 className="noticias-title">Noticias</h1>
-          <div className="noticias-toolbar">
-            <button className="noticias-btn-historicas" onClick={handleToggleHistoricas}>
-              {verHistoricas ? 'Ver vigentes' : 'Ver históricas'}
-            </button>
-            {puedeCrearNoticia && (
-              <button className="noticias-btn-crear" onClick={() => setCrearOpen(true)}>
-                <Plus size={15} aria-hidden="true" />
-                Nueva noticia
+      <ViewTransition screenKey={vista}>
+        {vista === 'lista' && (
+          <>
+            <h1 className="page-title">Noticias</h1>
+            <div className="noticias-toolbar">
+              <button className="noticias-btn-historicas" onClick={handleToggleHistoricas}>
+                {verHistoricas ? 'Ver vigentes' : 'Ver históricas'}
               </button>
-            )}
-          </div>
-          {error && noticias.length > 0 && <ErrorBanner mensaje={error} />}
-          {renderLista()}
-        </>
-      )}
-
-      {vista === 'detalle' && (
-        <>
-          <div className="noticias-nav">
-            <button
-              className="noticias-btn-volver"
-              onClick={() => { setVista('lista'); setNoticiaActual(null); setErrorDetalle(''); }}
-            >
-              <ChevronLeft size={16} aria-hidden="true" />
-              Volver
-            </button>
-          </div>
-
-          {loadingDetalle && (
-            <div className="list-loading">
-              <img src={logo} alt="" className="loading-logo" />
-            </div>
-          )}
-
-          {errorDetalle && !loadingDetalle && (
-            <p className="noticias-error">{errorDetalle}</p>
-          )}
-
-          {!loadingDetalle && !errorDetalle && noticiaActual && (
-            <article className="noticias-diario">
-              <header className="noticias-diario-masthead">
-                <span className="noticias-diario-seccion">Noticias del Club</span>
-                <div className="noticias-diario-masthead-right">
-                  <span className="noticias-diario-fecha">Fecha de publicación: {noticiaActual.fecha_publicacion}</span>
-                  {noticiaActual.fecha_expiracion && (
-                    <span className="noticias-diario-fecha">Fecha de vencimiento: {noticiaActual.fecha_expiracion}</span>
-                  )}
-                </div>
-              </header>
-
-              <h1 className="noticias-diario-titulo">{noticiaActual.titulo}</h1>
-
-              <hr className="noticias-diario-rule" />
-
-              {imagenSegura && (
-                <figure className="noticias-diario-figura">
-                  <img
-                    src={imagenSegura}
-                    alt="Imagen de la noticia"
-                    className="noticias-diario-imagen"
-                    referrerPolicy="no-referrer"
-                  />
-                </figure>
+              {puedeCrearNoticia && (
+                <button className="noticias-btn-crear" onClick={() => setCrearOpen(true)}>
+                  <Plus size={15} aria-hidden="true" />
+                  Nueva noticia
+                </button>
               )}
+            </div>
+            {error && noticias.length > 0 && <ErrorBanner mensaje={error} />}
+            {renderLista()}
+          </>
+        )}
 
-              <div className="noticias-diario-cuerpo">
-                {(noticiaActual.cuerpo || '').split(/\n\n+/).map((parrafo, i) => (
-                  <p key={i}>
-                    {parrafo.split('\n').map((linea, j, arr) =>
-                      j < arr.length - 1 ? [linea, <br key={j} />] : linea
+        {vista === 'detalle' && (() => {
+          const detalleListo = !loadingDetalle && !errorDetalle && !!noticiaActual;
+          return (
+          <>
+            <DetailHeader
+              onBack={() => { setVista('lista'); setNoticiaActual(null); setErrorDetalle(''); }}
+              titulo={detalleListo ? noticiaActual.titulo : null}
+              estado={detalleListo && (
+                <EstadoBadge variant={estadoBadgeVariant(noticiaActual.estado)}>
+                  {noticiaActual.estado ?? '—'}
+                </EstadoBadge>
+              )}
+              acciones={detalleListo && (puedeEditarNoticia || puedeBorrarNoticia) && (
+                <>
+                  {puedeEditarNoticia && (
+                    <button type="button" className="btn-outline" onClick={() => setEditarOpen(true)}>
+                      Editar
+                    </button>
+                  )}
+                  {puedeBorrarNoticia && (
+                    <button type="button" className="btn-outline-danger" onClick={() => setEliminarOpen(true)}>
+                      Eliminar
+                    </button>
+                  )}
+                </>
+              )}
+            />
+
+            {loadingDetalle && <SkeletonRows n={4} />}
+
+            {errorDetalle && !loadingDetalle && (
+              <ErrorBanner mensaje={errorDetalle} />
+            )}
+
+            {detalleListo && (
+              <article className="noticias-diario">
+                <header className="noticias-diario-masthead">
+                  <span className="noticias-diario-seccion">Noticias del Club</span>
+                  <div className="noticias-diario-masthead-right">
+                    <span className="noticias-diario-fecha">Fecha de publicación: {noticiaActual.fecha_publicacion}</span>
+                    {noticiaActual.fecha_expiracion && (
+                      <span className="noticias-diario-fecha">Fecha de vencimiento: {noticiaActual.fecha_expiracion}</span>
                     )}
-                  </p>
-                ))}
-              </div>
+                  </div>
+                </header>
 
-              <div className="noticias-detalle-actions">
-                {puedeEditarNoticia && (
-                  <button className="noticias-btn-editar" onClick={() => setEditarOpen(true)}>
-                    Editar
-                  </button>
+                {imagenSegura && (
+                  <figure className="noticias-diario-figura">
+                    <img
+                      src={imagenSegura}
+                      alt="Imagen de la noticia"
+                      className="noticias-diario-imagen"
+                      referrerPolicy="no-referrer"
+                    />
+                  </figure>
                 )}
-                {puedeBorrarNoticia && (
-                  <button className="noticias-btn-eliminar" onClick={() => setEliminarOpen(true)}>
-                    Eliminar
-                  </button>
-                )}
-              </div>
-            </article>
-          )}
-        </>
-      )}
 
-      {crearOpen && (
-        <CreateNoticiaForm
-          onSuccess={handleNoticiaCreada}
-          onCancel={() => setCrearOpen(false)}
-        />
-      )}
+                <div className="noticias-diario-cuerpo">
+                  {(noticiaActual.cuerpo || '').split(/\n\n+/).map((parrafo, i) => (
+                    <p key={i}>
+                      {parrafo.split('\n').map((linea, j, arr) =>
+                        j < arr.length - 1 ? [linea, <br key={j} />] : linea
+                      )}
+                    </p>
+                  ))}
+                </div>
+              </article>
+            )}
+          </>
+          );
+        })()}
+      </ViewTransition>
 
-      {editarOpen && noticiaActual && (
-        <EditNoticiaForm
-          noticia={noticiaActual}
-          onSuccess={handleEditarExito}
-          onCancel={() => setEditarOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {crearOpen && (
+          <CreateNoticiaForm
+            key="crear"
+            onSuccess={handleNoticiaCreada}
+            onCancel={() => setCrearOpen(false)}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {editarOpen && noticiaActual && (
+          <EditNoticiaForm
+            key="editar"
+            noticia={noticiaActual}
+            onSuccess={handleEditarExito}
+            onCancel={() => setEditarOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <ConfirmDeleteModal
         open={eliminarOpen && !!noticiaActual}

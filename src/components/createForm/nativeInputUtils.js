@@ -36,11 +36,11 @@ export function mergeRefs(...refs) {
 
 /** Posición fija (viewport) para un popover anclado a `triggerEl`, con flip vertical si no entra abajo. */
 export function computePopoverPosition(triggerEl, popoverHeight = 320, popoverWidth = 280) {
-  if (!triggerEl) return { top: 0, left: 0 };
+  if (!triggerEl) return { top: 0, left: 0, placement: 'bottom' };
   const rect = triggerEl.getBoundingClientRect();
   const spaceBelow = window.innerHeight - rect.bottom;
   const openUp = spaceBelow < popoverHeight && rect.top > spaceBelow;
   const top = openUp ? Math.max(8, rect.top - popoverHeight - 6) : rect.bottom + 6;
   const left = Math.min(Math.max(8, rect.left), window.innerWidth - popoverWidth - 8);
-  return { top, left };
+  return { top, left, placement: openUp ? 'top' : 'bottom' };
 }

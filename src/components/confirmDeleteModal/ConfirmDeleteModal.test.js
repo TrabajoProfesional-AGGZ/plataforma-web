@@ -101,4 +101,20 @@ describe('ConfirmDeleteModal', () => {
     fireEvent.keyDown(overlay, { key: 'Enter' });
     expect(defaultProps.onCancel).not.toHaveBeenCalled();
   });
+
+  test('con variant danger (default) el botón de confirmar es rojo', () => {
+    render(<ConfirmDeleteModal {...defaultProps} />);
+    expect(screen.getByText('Eliminar')).toHaveClass('csf-btn-danger');
+  });
+
+  test('con variant primary el botón de confirmar no es rojo', () => {
+    render(<ConfirmDeleteModal {...defaultProps} variant="primary" />);
+    expect(screen.getByText('Eliminar')).toHaveClass('csf-btn-submit');
+  });
+
+  test('con variant primary el aviso usa el color de advertencia, no de peligro', () => {
+    const { container } = render(<ConfirmDeleteModal {...defaultProps} variant="primary" />);
+    expect(container.querySelector('.confirm-aviso--warning')).toBeInTheDocument();
+    expect(container.querySelector('.confirm-aviso--danger')).not.toBeInTheDocument();
+  });
 });

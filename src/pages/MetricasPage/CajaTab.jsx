@@ -1,7 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Wallet, Receipt, CalendarCheck, Ticket, ShoppingBag } from 'lucide-react';
 import { getPagosEnCaja } from '../../services/metricasService';
-import { useTheme } from '../../hooks/useTheme';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
+import EmptyState from '../../components/feedback/EmptyState';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import './CajaTab.css';
 
 const ICONO_POR_TIPO = {
@@ -20,12 +22,11 @@ const LABEL_POR_TIPO = {
 
 /** Pestaña "Caja" de Métricas: total y desglose por tipo de los pagos marcados como pagados en caja. */
 function CajaTab() {
-  const { logoSocio: logo } = useTheme();
   const [datos, setDatos] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  const cargar = useCallback(() => {
     let cancelled = false;
 
     setLoading(true);
@@ -51,16 +52,20 @@ function CajaTab() {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => cargar(), [cargar]);
+
   if (loading) {
     return (
-      <div className="caja-tab-loading">
-        <img src={logo} alt="" className="loading-logo" />
+      <div className="caja-tab">
+        <div className="caja-tab-kpi-card">
+          <SkeletonRows n={1} altura={120} />
+        </div>
       </div>
     );
   }
 
   if (error) {
-    return <p className="caja-tab-error">{error}</p>;
+    return <ErrorBanner mensaje={error} onReintentar={cargar} />;
   }
 
   const desglose = datos?.desglose ?? [];
@@ -99,7 +104,7 @@ function CajaTab() {
             })}
           </div>
         ) : (
-          <p className="caja-tab-empty">Todavía no se registraron pagos en caja.</p>
+          <EmptyState mensaje="Todavía no se registraron pagos en caja." />
         )}
       </div>
     </div>

@@ -138,14 +138,41 @@ describe('AppLayout', () => {
 
     const indicator = container.querySelector('.sidebar-active-bg');
     indicator.style.opacity = '0';
-    indicator.style.transition = 'transform 1s ease-out';
 
     act(() => {
       window.dispatchEvent(new Event('resize'));
     });
 
     expect(indicator.style.opacity).toBe('1');
-    expect(indicator.style.transition).toBe('none');
+    expect(indicator).toHaveClass('sidebar-active-bg--snap');
+  });
+
+  test('el header muestra borde y sombra solo cuando el contenido hizo scroll', async () => {
+    const { container } = renderLayout();
+    const header = container.querySelector('.app-header');
+    const contenido = container.querySelector('.app-content');
+    expect(header).not.toHaveClass('app-header--scrolled');
+
+    contenido.scrollTop = 40;
+    fireEvent.scroll(contenido);
+    await waitFor(() => expect(header).toHaveClass('app-header--scrolled'));
+
+    contenido.scrollTop = 0;
+    fireEvent.scroll(contenido);
+    await waitFor(() => expect(header).not.toHaveClass('app-header--scrolled'));
+  });
+
+  test('varios eventos de scroll en el mismo frame se resuelven en una sola lectura', async () => {
+    const { container } = renderLayout();
+    const header = container.querySelector('.app-header');
+    const contenido = container.querySelector('.app-content');
+
+    contenido.scrollTop = 2;
+    fireEvent.scroll(contenido);
+    contenido.scrollTop = 40;
+    fireEvent.scroll(contenido);
+
+    await waitFor(() => expect(header).toHaveClass('app-header--scrolled'));
   });
 
   test('el drawer se cierra automáticamente al cambiar de ruta', () => {

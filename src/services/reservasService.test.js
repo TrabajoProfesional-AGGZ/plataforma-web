@@ -179,13 +179,19 @@ describe('reservasService', () => {
       await expect(createReserva(datos)).rejects.toThrow('superposicion');
     });
 
-    test('lanza "socio-moroso" si el body del 403 no se puede parsear como JSON', async () => {
+    test('lanza "socio-moroso" con socios vacío si el body del 403 no se puede parsear como JSON', async () => {
       fetchTo.mockResolvedValueOnce({
         ok: false,
         status: 403,
         json: async () => { throw new Error('invalid json'); },
       });
-      await expect(createReserva(datos)).rejects.toThrow('socio-moroso');
+      try {
+        await createReserva(datos);
+        throw new Error('no debería llegar acá');
+      } catch (e) {
+        expect(e.message).toBe('socio-moroso');
+        expect(e.socios).toEqual([]);
+      }
     });
 
     test('lanza "conflicto-temporal" cuando la respuesta es 409 con tipo conflicto_temporal', async () => {
@@ -197,22 +203,49 @@ describe('reservasService', () => {
       await expect(createReserva(datos)).rejects.toThrow('conflicto-temporal');
     });
 
-    test('lanza "socio-moroso" cuando la respuesta es 403 con tipo moroso', async () => {
+    test('lanza "socio-moroso" cuando la respuesta es 403 con tipo moroso, con los socios incumpliendo', async () => {
       fetchTo.mockResolvedValueOnce({
         ok: false,
         status: 403,
         json: async () => ({ detail: { tipo: 'moroso', socios_moroso: ['1000'] } }),
       });
-      await expect(createReserva(datos)).rejects.toThrow('socio-moroso');
+      try {
+        await createReserva(datos);
+        throw new Error('no debería llegar acá');
+      } catch (e) {
+        expect(e.message).toBe('socio-moroso');
+        expect(e.socios).toEqual(['1000']);
+      }
     });
 
-    test('lanza "socio-suspendido" cuando la respuesta es 403 con tipo suspendido', async () => {
+    test('lanza "socio-suspendido" cuando la respuesta es 403 con tipo suspendido, con los socios incumpliendo', async () => {
       fetchTo.mockResolvedValueOnce({
         ok: false,
         status: 403,
         json: async () => ({ detail: { tipo: 'suspendido', socios_suspendido: ['1000'] } }),
       });
-      await expect(createReserva(datos)).rejects.toThrow('socio-suspendido');
+      try {
+        await createReserva(datos);
+        throw new Error('no debería llegar acá');
+      } catch (e) {
+        expect(e.message).toBe('socio-suspendido');
+        expect(e.socios).toEqual(['1000']);
+      }
+    });
+
+    test('lanza "socio-apto-medico" cuando la respuesta es 403 con tipo apto_medico, con los socios incumpliendo', async () => {
+      fetchTo.mockResolvedValueOnce({
+        ok: false,
+        status: 403,
+        json: async () => ({ detail: { tipo: 'apto_medico', socios_sin_apto_medico: ['1000', '1001'] } }),
+      });
+      try {
+        await createReserva(datos);
+        throw new Error('no debería llegar acá');
+      } catch (e) {
+        expect(e.message).toBe('socio-apto-medico');
+        expect(e.socios).toEqual(['1000', '1001']);
+      }
     });
 
     test('lanza error genérico en 400', async () => {

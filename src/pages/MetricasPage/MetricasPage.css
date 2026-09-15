@@ -3,31 +3,13 @@
   margin: 0 auto;
 }
 
-.metricas-title {
-  font-size: 2rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0 0 var(--space-2) 0;
-  text-align: center;
-  letter-spacing: -0.02em;
-}
-
 .metricas-subtitle {
   color: var(--color-text-secondary);
-  font-size: 0.9375rem;
+  font-size: var(--text-body);
   text-align: center;
   margin: 0 0 var(--space-6) 0;
 }
 
-.metricas-error {
-  text-align: center;
-  color: var(--color-danger);
-  font-size: 0.875rem;
-  background-color: var(--status-error-surface-bg);
-  border: 1px solid var(--status-error-surface-border);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-}
 
 /* ── Pestañas ─────────────────────────────────────────────────── */
 .metricas-tablist {
@@ -46,7 +28,7 @@
   margin-bottom: -1px;
   padding: var(--space-3) var(--space-4);
   font-family: inherit;
-  font-size: 0.9375rem;
+  font-size: var(--text-body);
   font-weight: 500;
   color: var(--color-text-secondary);
   cursor: pointer;
@@ -55,7 +37,13 @@
   transition: color var(--transition-fast), border-color var(--transition-fast);
 }
 
-.metricas-tab:hover {
+@media (hover: hover) {
+  .metricas-tab:hover {
+    color: var(--color-text-primary);
+  }
+}
+
+.metricas-tab:active {
   color: var(--color-text-primary);
 }
 
@@ -70,9 +58,3 @@
   border-bottom-color: var(--color-text-primary);
 }
 
-/* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
-@media (max-width: 480px) {
-  .metricas-title {
-    font-size: 1.5rem;
-  }
-}

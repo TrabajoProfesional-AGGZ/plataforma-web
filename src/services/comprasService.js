@@ -6,8 +6,12 @@ export async function crearCompra({ id_producto, id_socio, cantidad }) {
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (!res.ok) {
     const body = await res.json().catch(() => null);
-    const tipo = body?.detail?.tipo;
-    if (tipo) throw new Error(tipo); // sin_stock / producto_inactivo / moroso / suspendido
+    const detail = body?.detail ?? {};
+    if (detail.tipo) {
+      const error = new Error(detail.tipo); // sin_stock / producto_inactivo / moroso / suspendido
+      error.socio = detail.socio ?? null;
+      throw error;
+    }
     throw new Error('Error al crear la compra');
   }
   return res.json();

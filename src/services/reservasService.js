@@ -41,8 +41,22 @@ export async function createReserva(data) {
   }
   if (res.status === 403) {
     const body = await res.json().catch(() => null);
-    const tipo = body?.detail?.tipo;
-    throw new Error(tipo === 'suspendido' ? 'socio-suspendido' : 'socio-moroso');
+    const detail = body?.detail ?? {};
+    let mensaje;
+    let socios;
+    if (detail.tipo === 'suspendido') {
+      mensaje = 'socio-suspendido';
+      socios = detail.socios_suspendido;
+    } else if (detail.tipo === 'apto_medico') {
+      mensaje = 'socio-apto-medico';
+      socios = detail.socios_sin_apto_medico;
+    } else {
+      mensaje = 'socio-moroso';
+      socios = detail.socios_moroso;
+    }
+    const error = new Error(mensaje);
+    error.socios = socios ?? [];
+    throw error;
   }
   if (!res.ok) throw new Error('Error al crear reserva');
   return res.json();

@@ -28,9 +28,12 @@
   gap: 8px;
   width: 100%;
   border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
+  /* padding en `em` para que el control crezca con su propio
+     font-size (0.875rem = 15.4px): 0.85em ≈ 13px, 1.05em ≈ 16px — misma
+     geometría que tenía con --space-3/--space-4 en px. */
+  padding: 0.85em 1.05em;
   outline: none;
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-family: inherit;
   /* Fondo blanco y texto negro fijos en ambos temas, igual que .csf-input
      en CreateSocioForm.css (decisión de producto) — ver --input-* en
@@ -75,8 +78,10 @@
   color: var(--input-placeholder);
 }
 
-.csf-picker-trigger:hover:not(:disabled) {
-  background-color: var(--color-row-hover);
+@media (hover: hover) {
+  .csf-picker-trigger:hover:not(:disabled) {
+    background-color: var(--color-row-hover);
+  }
 }
 
 .csf-picker-trigger:focus-visible,
@@ -100,6 +105,32 @@
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
+@keyframes csf-popover-in-up {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to { opacity: 1; transform: none; }
+}
+
+@keyframes csf-popover-out {
+  from { opacity: 1; transform: none; }
+  to { opacity: 0; transform: scale(0.97); }
+}
+
+.csf-calendar-popover, .csf-time-popover, .csf-dropdown-popover {
+  transform-origin: top left;
+  animation: csf-popover-in 0.16s var(--ease-out);
+}
+
+.csf-calendar-popover[data-placement="top"],
+.csf-time-popover[data-placement="top"],
+.csf-dropdown-popover[data-placement="top"] {
+  transform-origin: bottom left;
+  animation-name: csf-popover-in-up;
+}
+
+.csf-popover--closing {
+  animation: csf-popover-out 0.1s var(--ease-in) forwards !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .csf-calendar-popover, .csf-time-popover, .csf-dropdown-popover {
     animation: none !important;
@@ -117,7 +148,6 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   padding: var(--space-4);
-  animation: csf-popover-in 0.14s ease-out;
 }
 
 .csf-calendar-header {
@@ -136,18 +166,21 @@
 .csf-calendar-select {
   border: none;
   border-radius: var(--radius-sm);
-  padding: 2px 4px;
+  min-height: 28px;
+  padding: 2px 6px;
   background: transparent;
   color: var(--color-text-primary);
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   font-weight: 600;
   font-family: inherit;
   text-transform: capitalize;
   cursor: pointer;
 }
 
-.csf-calendar-select:hover {
-  background-color: var(--color-row-hover);
+@media (hover: hover) {
+  .csf-calendar-select:hover {
+    background-color: var(--color-row-hover);
+  }
 }
 
 .csf-calendar-select:focus-visible {
@@ -159,8 +192,8 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   border: none;
   border-radius: var(--radius-sm);
   background: transparent;
@@ -169,9 +202,11 @@
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-.csf-calendar-nav:hover {
-  background-color: var(--color-row-hover);
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .csf-calendar-nav:hover {
+    background-color: var(--color-row-hover);
+    color: var(--color-text-primary);
+  }
 }
 
 .csf-calendar-weekdays {
@@ -182,9 +217,9 @@
 
 .csf-calendar-weekdays span {
   text-align: center;
-  font-size: 0.625rem;
+  font-size: var(--text-micro);
   font-weight: 600;
-  letter-spacing: 0.03em;
+  letter-spacing: var(--tracking-micro);
   color: var(--color-text-secondary);
   padding-bottom: 4px;
 }
@@ -204,18 +239,24 @@
   border-radius: var(--radius-sm);
   background: transparent;
   color: var(--color-text-primary);
-  font-size: 0.7812rem;
+  font-size: var(--text-caption);
   font-variant-numeric: tabular-nums;
   cursor: pointer;
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-.csf-calendar-day:hover:not(:disabled):not(.csf-calendar-day--selected) {
+@media (hover: hover) {
+  .csf-calendar-day:hover:not(:disabled):not(.csf-calendar-day--selected) {
+    background-color: var(--color-row-hover);
+  }
+}
+
+.csf-calendar-day:active:not(:disabled):not(.csf-calendar-day--selected) {
   background-color: var(--color-row-hover);
 }
 
 .csf-calendar-day--muted {
-  color: var(--color-border-medium);
+  color: var(--color-text-placeholder);
 }
 
 .csf-calendar-day--today {
@@ -231,7 +272,9 @@
 
 .csf-calendar-day:disabled {
   cursor: not-allowed;
-  color: var(--color-border-light);
+  color: var(--color-text-placeholder);
+  opacity: 0.45;
+  text-decoration: line-through;
 }
 
 .csf-calendar-today-btn {
@@ -243,15 +286,17 @@
   border-radius: 0;
   background: transparent;
   color: var(--color-text-secondary);
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   transition: color var(--transition-fast);
 }
 
-.csf-calendar-today-btn:hover {
-  color: var(--color-text-primary);
+@media (hover: hover) {
+  .csf-calendar-today-btn:hover {
+    color: var(--color-text-primary);
+  }
 }
 
 /* ── Horario (TimePicker) ── */
@@ -265,7 +310,6 @@
   border-radius: var(--radius-lg);
   box-shadow: var(--shadow-lg);
   padding: var(--space-2);
-  animation: csf-popover-in 0.14s ease-out;
 }
 
 .csf-time-columns {
@@ -302,15 +346,17 @@
   padding: 6px 0;
   background: transparent;
   color: var(--color-text-primary);
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   font-variant-numeric: tabular-nums;
   text-align: center;
   cursor: pointer;
   transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
-.csf-time-option:hover {
-  background-color: var(--color-row-hover);
+@media (hover: hover) {
+  .csf-time-option:hover {
+    background-color: var(--color-row-hover);
+  }
 }
 
 .csf-time-option--selected {
@@ -334,7 +380,6 @@
   border-radius: var(--radius-md);
   box-shadow: var(--shadow-lg);
   padding: 6px;
-  animation: csf-popover-in 0.14s ease-out;
 }
 
 .csf-dropdown-option {
@@ -348,7 +393,7 @@
   padding: 9px 10px;
   background: transparent;
   color: var(--color-text-primary);
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-family: inherit;
   text-align: left;
   cursor: pointer;
@@ -376,5 +421,5 @@
 
 .csf-dropdown-option:disabled {
   cursor: not-allowed;
-  color: var(--color-border-medium);
+  color: var(--color-text-placeholder);
 }

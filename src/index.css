@@ -1,4 +1,5 @@
 @import './styles/tokens.css';
+@import './styles/shared.css';
 
 html {
   scroll-behavior: smooth;
@@ -11,7 +12,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
   background-color: var(--color-bg);
   color: var(--color-text-primary);
-  transition: background-color var(--transition-normal), color var(--transition-normal);
+}
+
+/* Transición suave al cambiar de tema (ver ThemeContext.jsx::toggleTheme). */
+[data-theme-transition] *, [data-theme-transition] *::before, [data-theme-transition] *::after {
+  transition: background-color 0.2s var(--ease-out), border-color 0.2s var(--ease-out), color 0.2s var(--ease-out) !important;
 }
 
 input,
@@ -35,6 +40,26 @@ button:active:not(:disabled):not(.app-header-logo-btn) {
 :focus-visible {
   outline: 2px solid var(--color-text-primary);
   outline-offset: 2px;
+}
+
+/* Área mínima de puntero: 32 px para íconos, 36 px para botones con texto
+   (WCAG 2.2 pide 24; la casa usa 32/36 en escritorio). */
+.icon-btn {
+  min-width: 32px;
+  min-height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hit-area {
+  position: relative;
+}
+
+.hit-area::before {
+  content: '';
+  position: absolute;
+  inset: -6px;
 }
 
 @media (prefers-reduced-motion: reduce) {

@@ -23,7 +23,7 @@ describe('DashboardPage', () => {
 
     expect(screen.getByRole('heading', { name: /panel principal/i })).toBeInTheDocument();
     expect(screen.queryByText('Socios')).not.toBeInTheDocument();
-    expect(screen.queryByText('Usuarios Administrativos')).not.toBeInTheDocument();
+    expect(screen.queryByText('Usuarios')).not.toBeInTheDocument();
     expect(screen.queryByText('Métricas')).not.toBeInTheDocument();
   });
 
@@ -32,7 +32,7 @@ describe('DashboardPage', () => {
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
     expect(screen.getByText('Socios')).toBeInTheDocument();
-    expect(screen.queryByText('Usuarios Administrativos')).not.toBeInTheDocument();
+    expect(screen.queryByText('Usuarios')).not.toBeInTheDocument();
   });
 
   test('muestra ambas tarjetas con ver_socios y ver_usuarios', () => {
@@ -40,7 +40,7 @@ describe('DashboardPage', () => {
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
     expect(screen.getByText('Socios')).toBeInTheDocument();
-    expect(screen.getByText('Usuarios Administrativos')).toBeInTheDocument();
+    expect(screen.getByText('Usuarios')).toBeInTheDocument();
   });
 
   test('navega a /socios al hacer click en la tarjeta de Socios', () => {
@@ -51,11 +51,11 @@ describe('DashboardPage', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/socios');
   });
 
-  test('navega a /usuarios al hacer click en la tarjeta de Usuarios Administrativos', () => {
+  test('navega a /usuarios al hacer click en la tarjeta de Usuarios', () => {
     useAuth.mockReturnValue({ user: { email: 'admin@club.com' }, permisos: ['ver_socios', 'ver_usuarios'] });
     render(<MemoryRouter><DashboardPage /></MemoryRouter>);
 
-    fireEvent.click(screen.getByText('Usuarios Administrativos').closest('button'));
+    fireEvent.click(screen.getByText('Usuarios').closest('button'));
     expect(mockNavigate).toHaveBeenCalledWith('/usuarios');
   });
 });

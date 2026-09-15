@@ -1,48 +1,15 @@
 /* Barra de herramientas, búsqueda, filtros, tabla base, estado-cell, btn base → src/styles/ListPage.css
-   btn-crear → src/styles/ListDetailShared.css
+   btn-crear (+ :disabled/:hover) → src/styles/ListDetailShared.css
    estilos de th, card → src/styles/PageTableHeader.css, SocioCard.css
-   socios-title, socios-ver-todos-button, socios-filtros*, socios-th-sort → src/styles/ListPage.css */
+   título de página → .page-title en src/styles/shared.css
+   socios-filtros*, socios-th-sort → src/styles/ListPage.css */
 
 .socios-page {
   max-width: 1000px;
   margin: 0 auto;
 }
 
-/* ── Formulario de búsqueda ───────────────────────────────────── */
-.socios-search-form {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex: 1;
-  max-width: 420px;
-}
-
-/* ── Variantes de color de botón ──────────────────────────────── */
-.socios-search-button {
-  background-color: var(--color-text-primary);
-  color: var(--color-surface);
-  border: none;
-}
-
-.socios-search-button:hover:not(:disabled) {
-  background-color: var(--color-text-secondary);
-}
-
-.socios-search-button:disabled,
-.socios-ver-todos-button:disabled,
-.socios-crear-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.socios-crear-button:hover:not(:disabled) {
-  background-color: var(--color-text-secondary);
-}
-
-/* ── Ajuste de error (agrega margin-bottom) ──────────────────── */
-.socios-error {
-  margin-bottom: var(--space-3);
-}
+/* Búsqueda → src/components/BuscadorColapsable/BuscadorColapsable.css */
 
 /* ── Logo de estado ───────────────────────────────────────────── */
 .socios-estado-logo {
@@ -50,38 +17,7 @@
   height: auto;
 }
 
-/* ── Acciones de la card ──────────────────────────────────────── */
-.socios-card-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: var(--space-4);
-  padding-top: var(--space-4);
-  border-top: 1px solid var(--color-border);
-}
-
-/* ── Colores de botones de acción de la card ──────────────────── */
-.socios-btn-editar {
-  background-color: var(--color-text-primary);
-  color: var(--color-surface);
-  transition: background-color var(--transition-fast);
-}
-
-.socios-btn-editar:hover {
-  background-color: var(--color-text-secondary);
-}
-
-.socios-btn-eliminar {
-  background: transparent;
-  color: var(--color-danger);
-  border: 1.5px solid var(--color-danger);
-  transition: background-color var(--transition-fast), color var(--transition-fast);
-}
-
-.socios-btn-eliminar:hover {
-  background-color: var(--color-danger);
-  color: var(--color-on-accent);
-}
+/* Acciones del detalle (Editar/Eliminar) → DetailHeader (src/components/DetailHeader/) */
 
 /* ── Extender suscripción (columna, visible al filtrar por disciplina) ── */
 .socios-btn-extender {
@@ -90,7 +26,7 @@
   border: 1px solid var(--color-text-primary);
   border-radius: var(--radius-sm);
   padding: 5px var(--space-3);
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;

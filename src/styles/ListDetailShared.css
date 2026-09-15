@@ -1,18 +1,5 @@
-/* ── Título de página (compartido entre Disciplinas e Instalaciones) ─── */
-.disciplinas-title,
-.instalaciones-title {
-  font-size: 2rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0 0 var(--space-5) 0;
-  text-align: center;
-  letter-spacing: -0.02em;
-  text-wrap: balance;
-}
-
-/* ── Barra de herramientas (compartida entre Disciplinas e Instalaciones) ── */
-.disciplinas-toolbar,
-.instalaciones-toolbar {
+/* ── Barra de herramientas ────────────────────────────────────── */
+.disciplinas-toolbar {
   display: flex;
   justify-content: flex-end;
   margin-bottom: var(--space-4);
@@ -28,7 +15,7 @@
   padding: var(--space-2) var(--space-4);
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
@@ -37,30 +24,19 @@
   transition: background-color var(--transition-fast);
 }
 
-.disciplinas-btn-crear:hover,
-.instalaciones-btn-crear:hover {
-  background-color: var(--color-text-secondary);
+.socios-crear-button:disabled,
+.usuarios-crear-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.disciplinas-btn-volver,
-.instalaciones-btn-volver {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border-medium);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text-primary);
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
-}
-
-.disciplinas-btn-volver:hover,
-.instalaciones-btn-volver:hover {
-  background-color: var(--color-bg);
+@media (hover: hover) {
+  .disciplinas-btn-crear:hover,
+  .instalaciones-btn-crear:hover,
+  .socios-crear-button:hover:not(:disabled),
+  .usuarios-crear-button:hover:not(:disabled) {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .disciplinas-detalle-content,
@@ -68,16 +44,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  padding: var(--space-10) var(--space-6) var(--space-6);
-}
-
-.disciplinas-detalle-nombre,
-.instalaciones-detalle-nombre {
-  font-size: 1.375rem;
-  font-weight: 700;
-  color: var(--color-text-primary);
-  text-align: center;
-  margin: 0 0 var(--space-10) 0;
+  padding: 0 var(--space-6) var(--space-6);
 }
 
 .disciplinas-detalle-card,
@@ -88,14 +55,15 @@
   border-radius: var(--radius-md);
   overflow: hidden;
   box-shadow: var(--shadow-md);
-  margin-bottom: var(--space-8);
   transition: transform var(--transition-normal), box-shadow var(--transition-normal);
 }
 
-.disciplinas-detalle-card:hover,
-.instalaciones-detalle-card:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-lg);
+@media (hover: hover) {
+  .disciplinas-detalle-card:hover,
+  .instalaciones-detalle-card:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-lg);
+  }
 }
 
 .disciplinas-detalle-row,
@@ -109,55 +77,24 @@
 .disciplinas-detalle-row-label,
 .instalaciones-detalle-row-label {
   color: var(--color-text-secondary);
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
 }
 
 .disciplinas-detalle-row-value,
 .instalaciones-detalle-row-value {
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-weight: 600;
+  color: var(--color-text-primary);
 }
 
-.disciplinas-btn-eliminar,
-.instalaciones-btn-eliminar-inst,
-.socios-btn-eliminar,
-.socios-btn-editar,
-.usuarios-btn-eliminar,
-.usuarios-btn-editar,
-.usuarios-btn-cambiar-rol {
-  padding: var(--space-2) var(--space-5);
-  border-radius: var(--radius-sm);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-}
-
-/* Variantes rellenas/sin borde */
-.disciplinas-btn-eliminar,
-.instalaciones-btn-eliminar-inst,
-.socios-btn-editar,
-.usuarios-btn-editar {
-  border: none;
-}
-
-.disciplinas-btn-eliminar,
-.instalaciones-btn-eliminar-inst {
-  background-color: var(--color-danger);
-  color: var(--color-on-accent);
-  transition: background-color var(--transition-fast);
-}
-
-.disciplinas-btn-eliminar:hover,
-.instalaciones-btn-eliminar-inst:hover {
-  background-color: var(--color-danger-hover);
-}
+/* Botones de acción del detalle (.btn-outline, .btn-outline-danger) → src/components/DetailHeader/DetailHeader.css */
 
 .detalle-id {
-  text-align: center;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
-  font-size: 0.85rem;
-  margin-top: -20px;
-  margin-bottom: 0;
+  text-align: center;
+  margin: var(--space-3) 0 0;
 }
 
 /* ── Componentes de card de detalle compartidos (socios + usuarios) ── */
@@ -168,8 +105,8 @@
   box-sizing: border-box;
   border-radius: 50%;
   background: var(--color-surface);
-  border: 4px solid var(--estado-color, var(--color-border-medium));
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+  border: 2px solid var(--estado-color, var(--color-border-medium));
+  box-shadow: var(--shadow-md);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -194,10 +131,10 @@
 }
 
 .detalle-full-name {
-  font-size: 1rem;
+  font-size: var(--text-body);
   font-weight: 700;
   color: var(--color-text-primary);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--tracking-body);
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -209,9 +146,9 @@
   align-items: center;
   padding: 2px 10px;
   border-radius: var(--radius-full);
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: var(--tracking-caption);
   border: 1.5px solid;
   white-space: nowrap;
   flex-shrink: 0;
@@ -219,11 +156,6 @@
 
 /* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
 @media (max-width: 480px) {
-  .disciplinas-title,
-  .instalaciones-title {
-    font-size: 1.5rem;
-  }
-
   .disciplinas-detalle-row,
   .instalaciones-detalle-row {
     flex-wrap: wrap;

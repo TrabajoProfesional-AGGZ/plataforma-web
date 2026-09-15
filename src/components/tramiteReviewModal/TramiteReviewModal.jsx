@@ -43,12 +43,7 @@ export function TramiteReviewModal({ tramite, onSuccess, onCancel }) {
 
   return (
     <ModalOverlay onClose={onCancel} ariaLabel={`Revisar trámite: ${tramite.tipo_tramite.nombre}`}>
-      <motion.div
-        key="form"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="csf-outer-card"
-      >
+      <div className="csf-outer-card">
         <div className="csf-header">
           <h1>Revisar trámite</h1>
           <p>{tramite.tipo_tramite.nombre}</p>
@@ -123,7 +118,7 @@ export function TramiteReviewModal({ tramite, onSuccess, onCancel }) {
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </ModalOverlay>
   );
 }

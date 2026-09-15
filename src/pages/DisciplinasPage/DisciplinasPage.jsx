@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { useLocation } from 'react-router-dom';
-import { Plus, ChevronLeft } from 'lucide-react';
+import { Plus, ChevronRight } from 'lucide-react';
 import { CreateDisciplinaForm } from '../../components/createDisciplinaForm/CreateDisciplinaForm';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
+import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
+import { ViewTransition, scrollAlInicio } from '../../components/ViewTransition/ViewTransition';
 import { getDisciplinas, createDisciplina, pausarDisciplina, inscribirSocioADisciplina } from '../../services/disciplinasService';
 import { getSocioByNroSocio } from '../../services/sociosService';
 import { usePermiso } from '../../hooks/usePermiso';
@@ -10,9 +13,9 @@ import { usePaginacion } from '../../hooks/usePaginacion';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import { Paginacion } from '../../components/paginacion/Paginacion';
 import { handleActivateKey } from '../../utils/a11y';
-import { useTheme } from '../../hooks/useTheme';
 import './DisciplinasPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
@@ -25,9 +28,27 @@ function mensajeError(err, fallback) {
     : fallback;
 }
 
+/** Traduce un error de inscripción, indicando el socio y el motivo real del rechazo. */
+function mensajeErrorInscripcion(err, socio) {
+  const nroTxt = socio ? `El socio N° ${socio.nro_socio}` : 'El socio';
+  switch (err.message) {
+    case 'socio-no-encontrado':
+      return 'No existe un socio con ese número.';
+    case 'ya-inscripto':
+      return 'El socio ya está inscripto en esta disciplina.';
+    case 'socio-moroso':
+      return `${nroTxt} debe regularizar su situación financiera con el club antes de inscribirse.`;
+    case 'socio-apto-medico':
+      return `${nroTxt} debe presentar un apto médico vigente antes de inscribirse.`;
+    case 'categoria-no-coincide':
+      return `${nroTxt} no pertenece a la categoría de socio requerida para esta disciplina${err.categoriaRequerida ? ` (${err.categoriaRequerida})` : ''}.`;
+    default:
+      return 'No se pudo inscribir al socio.';
+  }
+}
+
 /** Página de listado y detalle de disciplinas: crear, pausar e inscribir socios. */
 function DisciplinasPage() {
-  const { logoSocio: logo } = useTheme();
   const location = useLocation();
   const puedeVerDisciplinas = usePermiso('ver_disciplinas');
   const puedeCrearDisciplina = usePermiso('crear_disciplina');
@@ -66,7 +87,7 @@ function DisciplinasPage() {
   useEffect(() => {
     if (!location.state?.disciplinaId || disciplinas.length === 0) return;
     const found = disciplinas.find((d) => d.id === location.state.disciplinaId);
-    if (found) { setDisciplinaActual(found); setVista('detalle'); }
+    if (found) { setDisciplinaActual(found); setVista('detalle'); scrollAlInicio(); }
   }, [disciplinas]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
@@ -84,17 +105,14 @@ function DisciplinasPage() {
     setInscribiendoLoading(true);
     setInscribiendoError('');
     setInscribiendoExito(false);
+    let socio;
     try {
-      const socio = await getSocioByNroSocio(nro);
+      socio = await getSocioByNroSocio(nro);
       await inscribirSocioADisciplina(disciplinaActual.id, socio.id);
       setNroSocioInscribir('');
       setInscribiendoExito(true);
     } catch (err) {
-      const mensajes = {
-        'socio-no-encontrado': 'No existe un socio con ese número.',
-        'ya-inscripto': 'El socio ya está inscripto en esta disciplina.',
-      };
-      setInscribiendoError(mensajes[err.message] ?? 'No se pudo inscribir al socio.');
+      setInscribiendoError(mensajeErrorInscripcion(err, socio));
     } finally {
       setInscribiendoLoading(false);
     }
@@ -142,11 +160,7 @@ function DisciplinasPage() {
 
   function renderListaContenido() {
     if (loading) {
-      return (
-        <div className="list-loading">
-          <img src={logo} alt="" className="loading-logo" />
-        </div>
-      );
+      return <SkeletonRows n={6} />;
     }
     if (error && disciplinas.length === 0) {
       return <ErrorBanner mensaje={error} onReintentar={cargarDisciplinas} />;
@@ -162,14 +176,15 @@ function DisciplinasPage() {
               <th>Nombre</th>
               <th>Categoría de socio</th>
               <th>Sede</th>
-              <th>Cupo máximo</th>
-              <th>Arancelada</th>
-              <th>Estado</th>
+              <th className="td-num">Cupo máximo</th>
+              <th className="td-center">Arancelada</th>
+              <th className="td-center">Estado</th>
+              <th className="td-chevron" aria-hidden="true"></th>
             </tr>
           </thead>
           <tbody>
             {listaPaginada.map((d) => {
-              const verDetalle = () => { setDisciplinaActual(d); setVista('detalle'); };
+              const verDetalle = () => { setDisciplinaActual(d); setVista('detalle'); scrollAlInicio(); };
               return (
               <tr
                 key={d.id}
@@ -183,17 +198,18 @@ function DisciplinasPage() {
                 <td>{d.nombre}</td>
                 <td>{d.categoria_socio?.nombre ?? '—'}</td>
                 <td>{d.sede?.nombre ?? '—'}</td>
-                <td>{d.cupo_maximo != null ? `${d.cupo_maximo} personas` : 'Sin límite'}</td>
-                <td>
+                <td className="td-num">{d.cupo_maximo != null ? `${d.cupo_maximo} personas` : 'Sin límite'}</td>
+                <td className="td-center">
                   <EstadoBadge variant={d.arancelada ? 'success' : 'neutral'}>
                     {d.arancelada ? 'Sí' : 'No'}
                   </EstadoBadge>
                 </td>
-                <td>
+                <td className="td-center">
                   <EstadoBadge variant={d.estado?.nombre === 'Pausada' ? 'warning' : 'success'}>
                     {d.estado?.nombre ?? 'Activa'}
                   </EstadoBadge>
                 </td>
+                <td className="td-chevron"><ChevronRight size={16} aria-hidden="true" /></td>
               </tr>
               );
             })}
@@ -206,121 +222,114 @@ function DisciplinasPage() {
 
   return (
     <div className="disciplinas-page">
-      {/* ── Vista: Lista ── */}
-      {vista === 'lista' && (
-        <>
-          <h1 className="disciplinas-title">Disciplinas</h1>
+      <ViewTransition screenKey={vista}>
+        {/* ── Vista: Lista ── */}
+        {vista === 'lista' && (
+          <>
+            <h1 className="page-title">Disciplinas</h1>
 
-          <div className="disciplinas-toolbar">
-            {puedeCrearDisciplina && (
-              <button className="disciplinas-btn-crear" onClick={() => setCrearOpen(true)}>
-                <Plus size={15} aria-hidden="true" />
-                Nueva disciplina
-              </button>
-            )}
-          </div>
-
-          {error && disciplinas.length > 0 && <ErrorBanner mensaje={error} />}
-          {renderListaContenido()}
-        </>
-      )}
-
-      {/* ── Vista: Detalle ── */}
-      {vista === 'detalle' && disciplinaActual && (
-        <>
-          <div className="disciplinas-nav">
-            <button className="disciplinas-btn-volver" onClick={() => setVista('lista')}>
-              <ChevronLeft size={16} aria-hidden="true" />
-              Volver
-            </button>
-          </div>
-
-          <div className="disciplinas-detalle-content">
-            <h1 className="disciplinas-detalle-nombre">{disciplinaActual.nombre}</h1>
-
-            <div className="disciplinas-detalle-card">
-              {[
-                { label: 'Categoría de socio', value: disciplinaActual.categoria_socio?.nombre ?? '—' },
-                { label: 'Sede', value: disciplinaActual.sede?.nombre ?? '—' },
-                {
-                  label: 'Cupo máximo',
-                  value: disciplinaActual.cupo_maximo != null ? `${disciplinaActual.cupo_maximo} personas` : 'Sin límite',
-                },
-                { label: 'Arancelada', value: disciplinaActual.arancelada ? 'Sí' : 'No' },
-                ...(disciplinaActual.arancelada
-                  ? [{ label: 'Concepto de cobro', value: disciplinaActual.concepto_cobro }]
-                  : []),
-                {
-                  label: 'Estado',
-                  value: disciplinaActual.estado?.nombre ?? 'Activa',
-                  color: disciplinaActual.estado?.nombre === 'Pausada' ? 'var(--status-warning-border)' : 'var(--status-success-border)',
-                },
-              ].map((field, i, arr) => (
-                <div
-                  key={field.label}
-                  className="disciplinas-detalle-row"
-                  style={{ borderBottom: i < arr.length - 1 ? '1px solid var(--color-bg)' : 'none' }}
-                >
-                  <span className="disciplinas-detalle-row-label">{field.label}</span>
-                  <span
-                    className="disciplinas-detalle-row-value"
-                    style={{ color: field.color ?? 'var(--color-text-primary)' }}
-                  >
-                    {field.value}
-                  </span>
-                </div>
-              ))}
-            </div>
-            <p className="detalle-id">ID: {disciplinaActual.id}</p>
-          </div>
-
-          {puedeCrearDisciplina && (
-            <div className="disciplinas-socios-section">
-              <h3 className="disciplinas-socios-title">Inscribir socio</h3>
-              <p className="disciplinas-socios-hint">
-                Para ver los socios inscriptos en esta disciplina, andá a la sección Socios y filtrá por disciplina.
-              </p>
-
-              <form className="disciplinas-inscribir-form" onSubmit={handleInscribirSocio}>
-                <input
-                  type="text"
-                  className="disciplinas-filtro-socio"
-                  placeholder="N° de socio a inscribir"
-                  value={nroSocioInscribir}
-                  onChange={(e) => setNroSocioInscribir(e.target.value)}
-                  aria-label="Número de socio a inscribir"
-                  disabled={inscribiendoLoading}
-                />
-                <button
-                  type="submit"
-                  className="disciplinas-btn-inscribir"
-                  disabled={inscribiendoLoading || !nroSocioInscribir.trim()}
-                >
-                  {inscribiendoLoading ? 'Inscribiendo…' : 'Inscribir socio'}
+            <div className="disciplinas-toolbar">
+              {puedeCrearDisciplina && (
+                <button className="disciplinas-btn-crear" onClick={() => setCrearOpen(true)}>
+                  <Plus size={15} aria-hidden="true" />
+                  Nueva disciplina
                 </button>
-              </form>
-              {inscribiendoError && <p className="disciplinas-inscribir-error">{inscribiendoError}</p>}
-              {inscribiendoExito && <p className="disciplinas-inscribir-exito">Socio inscripto correctamente.</p>}
+              )}
             </div>
-          )}
 
-          {puedeBorrarDisciplina && (
-            <div className="disciplinas-detalle-actions">
-              <button className="disciplinas-btn-eliminar" onClick={() => setPausarOpen(true)}>
-                Eliminar
-              </button>
+            {error && disciplinas.length > 0 && <ErrorBanner mensaje={error} />}
+            {renderListaContenido()}
+          </>
+        )}
+
+        {/* ── Vista: Detalle ── */}
+        {vista === 'detalle' && disciplinaActual && (
+          <>
+            <DetailHeader
+              onBack={() => setVista('lista')}
+              titulo={disciplinaActual.nombre}
+              estado={
+                <EstadoBadge variant={disciplinaActual.estado?.nombre === 'Pausada' ? 'warning' : 'success'}>
+                  {disciplinaActual.estado?.nombre ?? 'Activa'}
+                </EstadoBadge>
+              }
+              acciones={puedeBorrarDisciplina && (
+                <button type="button" className="btn-outline-danger" onClick={() => setPausarOpen(true)}>
+                  Pausar
+                </button>
+              )}
+            />
+
+            <div className="disciplinas-detalle-content">
+              <div className="disciplinas-detalle-card">
+                {[
+                  { label: 'Categoría de socio', value: disciplinaActual.categoria_socio?.nombre ?? '—' },
+                  { label: 'Sede', value: disciplinaActual.sede?.nombre ?? '—' },
+                  {
+                    label: 'Cupo máximo',
+                    value: disciplinaActual.cupo_maximo != null ? `${disciplinaActual.cupo_maximo} personas` : 'Sin límite',
+                  },
+                  { label: 'Arancelada', value: disciplinaActual.arancelada ? 'Sí' : 'No' },
+                  ...(disciplinaActual.arancelada
+                    ? [{ label: 'Concepto de cobro', value: disciplinaActual.concepto_cobro }]
+                    : []),
+                ].map((field, i, arr) => (
+                  <div
+                    key={field.label}
+                    className="disciplinas-detalle-row"
+                    style={{ borderBottom: i < arr.length - 1 ? '1px solid var(--color-bg)' : 'none' }}
+                  >
+                    <span className="disciplinas-detalle-row-label">{field.label}</span>
+                    <span className="disciplinas-detalle-row-value">{field.value}</span>
+                  </div>
+                ))}
+              </div>
+              <p className="detalle-id">ID: {disciplinaActual.id}</p>
             </div>
-          )}
-        </>
-      )}
+
+            {puedeCrearDisciplina && (
+              <div className="disciplinas-socios-section">
+                <h3 className="disciplinas-socios-title">Inscribir socio</h3>
+                <p className="disciplinas-socios-hint">
+                  Para ver los socios inscriptos en esta disciplina, andá a la sección Socios y filtrá por disciplina.
+                </p>
+
+                <form className="disciplinas-inscribir-form" onSubmit={handleInscribirSocio}>
+                  <input
+                    type="text"
+                    className="disciplinas-filtro-socio"
+                    placeholder="N° de socio a inscribir"
+                    value={nroSocioInscribir}
+                    onChange={(e) => setNroSocioInscribir(e.target.value)}
+                    aria-label="Número de socio a inscribir"
+                    disabled={inscribiendoLoading}
+                  />
+                  <button
+                    type="submit"
+                    className="disciplinas-btn-inscribir"
+                    disabled={inscribiendoLoading || !nroSocioInscribir.trim()}
+                  >
+                    {inscribiendoLoading ? 'Inscribiendo…' : 'Inscribir socio'}
+                  </button>
+                </form>
+                {inscribiendoError && <p className="disciplinas-inscribir-error">{inscribiendoError}</p>}
+                {inscribiendoExito && <p className="disciplinas-inscribir-exito">Socio inscripto correctamente.</p>}
+              </div>
+            )}
+          </>
+        )}
+      </ViewTransition>
 
       {/* ── Formulario: Crear disciplina ── */}
-      {crearOpen && (
-        <CreateDisciplinaForm
-          onSuccess={handleDisciplinaCreada}
-          onCancel={() => setCrearOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {crearOpen && (
+          <CreateDisciplinaForm
+            key="crear"
+            onSuccess={handleDisciplinaCreada}
+            onCancel={() => setCrearOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <ConfirmDeleteModal
         open={pausarOpen && !!disciplinaActual}
@@ -330,6 +339,7 @@ function DisciplinasPage() {
         guardando={guardando}
         onCancel={() => setPausarOpen(false)}
         labelConfirmar="Pausar"
+        variant="primary"
       />
     </div>
   );

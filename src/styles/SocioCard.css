@@ -47,13 +47,13 @@
   font-weight: 500;
   color: var(--color-text-secondary);
   min-width: 90px;
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   flex-shrink: 0;
 }
 
 .socios-card-row span:last-child {
   color: var(--color-text-primary);
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
@@ -72,13 +72,13 @@
   position: absolute;
   top: var(--space-3);
   right: var(--space-3);
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   background: var(--color-text-primary);
   color: var(--color-surface);
   border: none;
   border-radius: 50%;
-  font-size: 1.125rem;
+  font-size: var(--text-heading);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -93,7 +93,7 @@
   color: var(--color-text-primary);
   background: none;
   border: none;
-  padding: 0;
+  padding: 2px 0;
   font: inherit;
 }
 

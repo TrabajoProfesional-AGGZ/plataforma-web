@@ -146,7 +146,6 @@ describe('CreateInstalacionForm', () => {
     await waitFor(() => {
       expect(screen.getByText('¡Instalación creada!')).toBeInTheDocument();
     });
-    await act(async () => { jest.advanceTimersByTime(1800); });
     expect(onSuccess).toHaveBeenCalledWith({
       nombre: 'Pileta',
       tipo: 'Acuática',
@@ -182,7 +181,6 @@ describe('CreateInstalacionForm', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /crear instalación/i }));
     });
-    await act(async () => { jest.advanceTimersByTime(1800); });
     expect(onSuccess).toHaveBeenCalledWith(expect.objectContaining({ activa: false }));
   });
 
@@ -225,7 +223,6 @@ describe('CreateInstalacionForm', () => {
     await act(async () => {
       fireEvent.click(screen.getByRole('button', { name: /crear instalación/i }));
     });
-    await act(async () => { jest.advanceTimersByTime(1800); });
     expect(onSuccess).toHaveBeenCalledWith(expect.objectContaining({ tiempo_minimo_cancelacion: 120 }));
   });
 

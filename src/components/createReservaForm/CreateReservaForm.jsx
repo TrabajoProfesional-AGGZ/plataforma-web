@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { AnimatePresence } from 'framer-motion';
 import {
@@ -32,12 +32,20 @@ const AVISOS_ESTADO_SOCIO = {
   Suspendido: 'No se puede realizar una reserva para este socio hasta que no termine su suspensión.',
 };
 
+/** Arma el mensaje de rechazo listando los N° de socio que no cumplen el requisito. */
+function mensajeSociosIncumpliendo(socios, requisito) {
+  const nros = (socios ?? []).map((n) => `N° ${n}`).join(', ');
+  const sujeto = (socios ?? []).length > 1 ? `Los socios ${nros} deben` : `El socio ${nros} debe`;
+  return `${sujeto} ${requisito} antes de poder reservar.`;
+}
+
 const MENSAJES_ERROR_SUBMIT = {
   superposicion: 'Ya existe una reserva en ese horario para esta instalación.',
   'sin-cupo': 'Ya no quedan cupos suficientes para ese turno con la cantidad de socios elegida.',
   'conflicto-temporal': 'La instalación está siendo actualizada por otra reserva. Probá de nuevo en unos segundos.',
-  'socio-moroso': AVISOS_ESTADO_SOCIO.Moroso,
-  'socio-suspendido': AVISOS_ESTADO_SOCIO.Suspendido,
+  'socio-moroso': (socios) => mensajeSociosIncumpliendo(socios, 'regularizar su situación financiera con el club'),
+  'socio-suspendido': (socios) => mensajeSociosIncumpliendo(socios, 'terminar su suspensión'),
+  'socio-apto-medico': (socios) => mensajeSociosIncumpliendo(socios, 'presentar un apto médico vigente'),
 };
 
 /**
@@ -53,7 +61,7 @@ const MENSAJES_ERROR_SUBMIT = {
  */
 export function CreateReservaForm({ onSuccess, onCancel, instalacion }) {
   const { logoSocio: logo } = useTheme();
-  const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
+  const { step, direction, submitted, setSubmitted, navGuard, finNavGuard, advance, goBack } = useMultiStepFormState();
   const [nroSocioInput, setNroSocioInput] = useState('');
   const [busquedaSocio, setBusquedaSocio] = useState(false);
   const [errorSocio, setErrorSocio] = useState('');
@@ -64,6 +72,7 @@ export function CreateReservaForm({ onSuccess, onCancel, instalacion }) {
   const [turnosDisponibles, setTurnosDisponibles] = useState([]);
   const [cargandoTurnos, setCargandoTurnos] = useState(false);
   const [errorTurnos, setErrorTurnos] = useState('');
+  const timerRef = useRef(null);
 
   const {
     register,
@@ -192,9 +201,12 @@ export function CreateReservaForm({ onSuccess, onCancel, instalacion }) {
         hora_inicio: data.hora_inicio,
       });
       setSubmitted(true);
-      setTimeout(() => onSuccess(), 1800);
+      timerRef.current = setTimeout(() => onSuccess(), 3000);
     } catch (e) {
-      setSubmitError(MENSAJES_ERROR_SUBMIT[e.message] || 'No se pudo registrar la reserva. Intentá de nuevo.');
+      const mensaje = MENSAJES_ERROR_SUBMIT[e.message];
+      setSubmitError(
+        typeof mensaje === 'function' ? mensaje(e.socios) : mensaje || 'No se pudo registrar la reserva. Intentá de nuevo.'
+      );
     }
   };
 
@@ -204,10 +216,12 @@ export function CreateReservaForm({ onSuccess, onCancel, instalacion }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Nueva reserva"
       successTitle="¡Reserva registrada!"
       successMessage="La reserva fue procesada correctamente."
+      onSuccessAction={() => { clearTimeout(timerRef.current); onSuccess(); }}
       submitLabel="Registrar reserva"
       submitLoadingLabel="Registrando..."
       onCancel={onCancel}

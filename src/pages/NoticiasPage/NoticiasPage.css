@@ -3,16 +3,6 @@
   margin: 0 auto;
 }
 
-.noticias-title {
-  font-size: 2rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0 0 var(--space-5) 0;
-  text-align: center;
-  letter-spacing: -0.02em;
-  text-wrap: balance;
-}
-
 /* ── Barra de herramientas ────────────────────────────────────── */
 .noticias-toolbar {
   display: flex;
@@ -28,7 +18,7 @@
   padding: var(--space-2) var(--space-4);
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-weight: 500;
   cursor: pointer;
   background-color: var(--color-text-primary);
@@ -36,15 +26,17 @@
   transition: background-color var(--transition-fast);
 }
 
-.noticias-btn-crear:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .noticias-btn-crear:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
 
 .noticias-btn-historicas {
   padding: var(--space-2) var(--space-4);
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-sm);
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-weight: 500;
   cursor: pointer;
   background-color: var(--color-surface);
@@ -52,8 +44,10 @@
   transition: background-color var(--transition-fast);
 }
 
-.noticias-btn-historicas:hover {
-  background-color: var(--color-bg);
+@media (hover: hover) {
+  .noticias-btn-historicas:hover {
+    background-color: var(--color-bg);
+  }
 }
 
 /* Estilos de tabla → src/styles/ListPage.css (.disciplinas-table-wrapper, .disciplinas-tabla, .disciplinas-tr-clickable)
@@ -61,44 +55,7 @@
    Estado vacío → .disciplinas-empty en src/styles/ListPage.css
    Badges de estado → src/components/badge/EstadoBadge.css (EstadoBadge) */
 
-/* ── Navegación / volver ──────────────────────────────────────── */
-.noticias-nav {
-  display: flex;
-  align-items: center;
-  margin-bottom: var(--space-5);
-}
-
-.noticias-btn-volver {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid var(--color-border-medium);
-  border-radius: var(--radius-sm);
-  background: var(--color-surface);
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: var(--color-text-primary);
-  cursor: pointer;
-  transition: background-color var(--transition-fast);
-}
-
-.noticias-btn-volver:hover {
-  background-color: var(--color-bg);
-}
-
 /* ── Carga y error ────────────────────────────────────────────── */
-/* Loading wrapper → .list-loading en src/styles/ListPage.css */
-
-.noticias-error {
-  text-align: center;
-  color: var(--color-danger);
-  font-size: 0.875rem;
-  background-color: var(--status-error-surface-bg);
-  border: 1px solid var(--status-error-surface-border);
-  border-radius: var(--radius-sm);
-  padding: 10px 14px;
-}
 
 /* ── Vista diario (artículo tipo periódico) ───────────────────── */
 .noticias-diario {
@@ -117,7 +74,7 @@
 }
 
 .noticias-diario-seccion {
-  font-size: 0.6875rem;
+  font-size: var(--text-label);
   font-weight: 700;
   letter-spacing: 0.14em;
   text-transform: uppercase;
@@ -132,26 +89,8 @@
 }
 
 .noticias-diario-fecha {
-  font-size: 0.75rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
-}
-
-.noticias-diario-titulo {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 2.75rem;
-  font-weight: 700;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  color: var(--color-text-primary);
-  text-align: left;
-  margin: 0 0 var(--space-3) 0;
-}
-
-
-.noticias-diario-rule {
-  border: none;
-  border-top: 1px solid var(--color-text-primary);
-  margin: var(--space-4) 0;
 }
 
 .noticias-diario-figura {
@@ -171,8 +110,8 @@
 }
 
 .noticias-diario-cuerpo p {
-  font-size: 1.0625rem;
-  line-height: 1.78;
+  font-size: var(--text-heading);
+  line-height: var(--leading-heading);
   color: var(--color-text-primary);
   margin: 0 0 var(--space-4) 0;
 }
@@ -187,58 +126,10 @@
   color: var(--color-text-primary);
 }
 
-/* ── Botones de acción del detalle ────────────────────────────── */
-.noticias-detalle-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-3);
-  margin-top: var(--space-4);
-}
-
-.noticias-btn-editar {
-  padding: var(--space-2) var(--space-5);
-  border-radius: var(--radius-sm);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  border: 1px solid var(--color-border-medium);
-  background-color: var(--color-surface);
-  color: var(--color-text-primary);
-  transition: background-color var(--transition-fast);
-}
-
-.noticias-btn-editar:hover {
-  background-color: var(--color-bg);
-}
-
-.noticias-btn-eliminar {
-  padding: var(--space-2) var(--space-5);
-  border-radius: var(--radius-sm);
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  border: none;
-  background-color: var(--color-danger);
-  color: var(--color-on-accent);
-  transition: background-color var(--transition-fast);
-}
-
-.noticias-btn-eliminar:hover {
-  background-color: var(--color-danger-hover);
-}
+/* Botones de acción del detalle → .btn-outline / .btn-outline-danger en src/components/DetailHeader/DetailHeader.css */
 
 /* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
-@media (max-width: 768px) {
-  .noticias-diario-titulo {
-    font-size: 2rem;
-  }
-}
-
 @media (max-width: 480px) {
-  .noticias-title {
-    font-size: 1.5rem;
-  }
-
   .noticias-diario-masthead {
     flex-wrap: wrap;
     gap: 6px;
@@ -246,9 +137,5 @@
 
   .noticias-diario-masthead-right {
     align-items: flex-start;
-  }
-
-  .noticias-diario-titulo {
-    font-size: 1.625rem;
   }
 }

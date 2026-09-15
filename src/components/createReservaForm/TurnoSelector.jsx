@@ -18,7 +18,7 @@ export function TurnoSelector({
         <p className="turno-loading-label" role="status">Cargando turnos...</p>
         <div className="turno-grid" aria-hidden="true">
           {[0, 1, 2, 3].map((i) => (
-            <div key={i} className="turno-chip turno-chip--skeleton" />
+            <div key={i} className="turno-chip turno-chip--skeleton skeleton-pulse" />
           ))}
         </div>
       </div>

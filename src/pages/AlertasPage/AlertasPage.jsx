@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { AnimatePresence } from 'framer-motion';
 import { Plus, Trash2 } from 'lucide-react';
 import { getAlertas, createAlerta, borrarAlerta } from '../../services/alertasService';
 import { usePermiso } from '../../hooks/usePermiso';
@@ -7,17 +8,22 @@ import { CreateAlertaForm } from '../../components/createAlertaForm/CreateAlerta
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
 import ErrorBanner from '../../components/feedback/ErrorBanner';
 import EmptyState from '../../components/feedback/EmptyState';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import { Paginacion } from '../../components/paginacion/Paginacion';
-import { useTheme } from '../../hooks/useTheme';
 import './AlertasPage.css';
 import '../../styles/ListPage.css';
 import '../../styles/PageTableHeader.css';
 import '../../styles/ListDetailShared.css';
 
-/** Formatea una fecha ISO a fecha y hora local, o '—' si no hay valor. */
+/** Fecha corta ("1 jun 2026") para la celda; la hora completa va en el `title`. */
 function formatearFecha(fecha) {
   if (!fecha) return '—';
-  return new Date(fecha).toLocaleString();
+  return new Date(fecha).toLocaleDateString('es-AR', { dateStyle: 'medium' });
+}
+
+/** Fecha y hora completas para el tooltip nativo de la celda de fecha. */
+function fechaCompleta(fecha) {
+  return fecha ? new Date(fecha).toLocaleString('es-AR') : undefined;
 }
 
 /** Traduce un error de servicio a un mensaje amigable, o usa el mensaje por defecto. */
@@ -29,7 +35,6 @@ function mensajeError(err, fallback) {
 
 /** Página de listado de alertas: crear, ver destinatarios y eliminar. */
 function AlertasPage() {
-  const { logoSocio: logo } = useTheme();
   const puedeVerAlertas = usePermiso('ver_alertas');
   const puedeCrearAlerta = usePermiso('crear_alerta');
   const puedeBorrarAlerta = usePermiso('borrar_alerta');
@@ -94,11 +99,7 @@ function AlertasPage() {
 
   function renderLista() {
     if (loading) {
-      return (
-        <div className="list-loading">
-          <img src={logo} alt="" className="loading-logo" />
-        </div>
-      );
+      return <SkeletonRows n={6} />;
     }
     if (error && alertas.length === 0) {
       return <ErrorBanner mensaje={error} onReintentar={cargarAlertas} />;
@@ -114,9 +115,9 @@ function AlertasPage() {
               <th>Mensaje</th>
               <th>Categoría</th>
               <th>Estado</th>
-              <th>Destinatarios</th>
-              <th>Fecha</th>
-              {puedeBorrarAlerta && <th></th>}
+              <th className="td-num">Destinatarios</th>
+              <th className="td-num">Fecha</th>
+              {puedeBorrarAlerta && <th className="td-center"></th>}
             </tr>
           </thead>
           <tbody>
@@ -130,15 +131,15 @@ function AlertasPage() {
                 <td className="td-truncate" title={a.mensaje}>{a.mensaje}</td>
                 <td>{esDirigida ? '—' : (a.filtro_categoria ?? 'Todas')}</td>
                 <td>{esDirigida ? '—' : (a.filtro_estado ?? 'Todos')}</td>
-                <td title={esDirigida ? nombresDestino : undefined}>
+                <td className="td-num" title={esDirigida ? nombresDestino : undefined}>
                   {esDirigida ? `${a.cantidad_destinatarios} (socios específicos)` : a.cantidad_destinatarios}
                 </td>
-                <td>{formatearFecha(a.creado_en)}</td>
+                <td className="td-num" title={fechaCompleta(a.creado_en)}>{formatearFecha(a.creado_en)}</td>
                 {puedeBorrarAlerta && (
-                  <td>
+                  <td className="td-center">
                     <button
                       type="button"
-                      className="alertas-btn-eliminar-fila"
+                      className="icon-btn alertas-btn-eliminar-fila"
                       aria-label="Eliminar alerta"
                       onClick={() => setAlertaAEliminar(a)}
                     >
@@ -158,7 +159,7 @@ function AlertasPage() {
 
   return (
     <div className="alertas-page">
-      <h1 className="alertas-title">Alertas</h1>
+      <h1 className="page-title">Alertas</h1>
 
       <div className="alertas-toolbar">
         {puedeCrearAlerta && (
@@ -173,12 +174,15 @@ function AlertasPage() {
 
       {renderLista()}
 
-      {crearOpen && (
-        <CreateAlertaForm
-          onSuccess={handleAlertaCreada}
-          onCancel={() => setCrearOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {crearOpen && (
+          <CreateAlertaForm
+            key="crear"
+            onSuccess={handleAlertaCreada}
+            onCancel={() => setCrearOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       <ConfirmDeleteModal
         open={!!alertaAEliminar}

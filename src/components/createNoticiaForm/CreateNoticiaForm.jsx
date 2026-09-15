@@ -28,7 +28,7 @@ const TEXTO_ESTADO_IMAGEN = {
  * @param {{ onSuccess: (payload: object) => void, onCancel: () => void }} props
  */
 export function CreateNoticiaForm({ onSuccess, onCancel }) {
-  const { step, direction, submitted, setSubmitted, navGuard } = useMultiStepFormState();
+  const { step, direction, submitted, setSubmitted, navGuard, finNavGuard } = useMultiStepFormState();
   const {
     fileInputRef,
     imagenPreview,
@@ -56,7 +56,6 @@ export function CreateNoticiaForm({ onSuccess, onCancel }) {
     if (imagenUrl) setValue('imagen', imagenUrl, { shouldValidate: true });
 
     setSubmitted(true);
-    await new Promise((resolve) => setTimeout(resolve, 1800));
     onSuccess({
       titulo: data.titulo.trim(),
       cuerpo: data.cuerpo.trim(),
@@ -71,6 +70,7 @@ export function CreateNoticiaForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Nueva noticia"
       successTitle="¡Noticia creada!"
@@ -102,8 +102,7 @@ export function CreateNoticiaForm({ onSuccess, onCancel }) {
             })}
             placeholder="Redactá el contenido de la noticia..."
             rows={5}
-            className={`csf-input${errors.cuerpo ? ' csf-input--error' : ''}`}
-            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: '0.875rem' }}
+            className={`csf-input csf-textarea${errors.cuerpo ? ' csf-input--error' : ''}`}
           />
         </Field>
         <ImagenUploadField

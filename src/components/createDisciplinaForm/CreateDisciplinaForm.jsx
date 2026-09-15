@@ -21,7 +21,7 @@ const STEPS = [
  * @param {{ onSuccess: (payload: object) => void, onCancel: () => void }} props
  */
 export function CreateDisciplinaForm({ onSuccess, onCancel }) {
-  const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
+  const { step, direction, submitted, setSubmitted, navGuard, finNavGuard, advance, goBack } = useMultiStepFormState();
 
   const {
     register, handleSubmit, trigger, watch, getValues, formState: { errors, isSubmitting },
@@ -49,7 +49,6 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
 
   const onSubmit = async (data) => {
     setSubmitted(true);
-    await new Promise((resolve) => setTimeout(resolve, 1800));
     onSuccess({
       nombre: data.nombre.trim(),
       cupo_maximo: data.sin_limite_cupo ? null : Number(data.cupo_maximo),
@@ -67,6 +66,7 @@ export function CreateDisciplinaForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Nueva disciplina"
       successTitle="¡Disciplina creada!"

@@ -17,7 +17,6 @@ jest.mock('./components/AppLayout/AppLayout', () => {
 jest.mock('./pages/LoginPage/LoginPage', () => () => <div>Login Page</div>);
 jest.mock('./pages/DashboardPage/DashboardPage', () => () => <div>Dashboard Page</div>);
 jest.mock('./pages/PerfilPage/PerfilPage', () => () => <div>Perfil Page</div>);
-jest.mock('./pages/CambiarContrasenaPage/CambiarContrasenaPage', () => () => <div>Cambiar Contraseña Page</div>);
 jest.mock('./pages/SociosPage/SociosPage', () => () => <div>Socios Page</div>);
 jest.mock('./pages/UsuariosPage/UsuariosPage', () => () => <div>Usuarios Page</div>);
 jest.mock('./pages/InstalacionesPage/InstalacionesPage', () => () => <div>Instalaciones Page</div>);
@@ -60,9 +59,14 @@ describe('App - mapeo ruta -> permiso', () => {
     expect(screen.getByText('Disciplinas Page')).toBeInTheDocument();
   });
 
-  test('/dashboard, /perfil y /cambiar-contrasena no requieren permiso', () => {
+  test('/dashboard y /perfil no requieren permiso', () => {
     renderAt('/perfil', []);
     expect(screen.getByText('Perfil Page')).toBeInTheDocument();
+  });
+
+  test('/cambiar-contrasena ya no existe: redirige al dashboard (el cambio es un modal en Perfil)', () => {
+    renderAt('/cambiar-contrasena', []);
+    expect(screen.getByText('Dashboard Page')).toBeInTheDocument();
   });
 
   test('/socios sigue gateado por ver_socios', () => {

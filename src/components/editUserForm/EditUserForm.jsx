@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { User } from 'lucide-react';
 import { editarUsuario } from '../../services/usuariosService';
@@ -17,6 +17,8 @@ const STEPS = [{ id: 1, label: 'Datos', icon: User }];
 export function EditUserForm({ usuario, onSuccess, onCancel }) {
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
+  const [resultado, setResultado] = useState(null);
+  const timerRef = useRef(null);
 
   const {
     register,
@@ -37,8 +39,9 @@ export function EditUserForm({ usuario, onSuccess, onCancel }) {
         nombre: data.nombre.trim(),
         apellido: data.apellido.trim(),
       });
+      setResultado(actualizado);
       setSubmitted(true);
-      setTimeout(() => onSuccess(actualizado), 1800);
+      timerRef.current = setTimeout(() => onSuccess(actualizado), 3000);
     } catch (err) {
       if (err.message === 'servicio-no-disponible') {
         setFormError('El servicio no está disponible. Intentá de nuevo más tarde.');
@@ -58,6 +61,7 @@ export function EditUserForm({ usuario, onSuccess, onCancel }) {
       title="Editar usuario"
       successTitle="¡Datos actualizados!"
       successMessage="Los cambios fueron guardados correctamente."
+      onSuccessAction={() => { clearTimeout(timerRef.current); onSuccess(resultado); }}
       submitLabel="Guardar cambios"
       submitLoadingLabel="Guardando..."
       onCancel={onCancel}

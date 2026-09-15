@@ -1,22 +1,23 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { motion, useReducedMotion } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { login } from '../../services/authService';
 import { RecuperarContraseniaModal } from './RecuperarContraseniaModal';
 import { useTheme } from '../../hooks/useTheme';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
+import { EASE } from '../../styles/motion';
 import './LoginPage.css';
-import '../../styles/shared.css';
 
 const formContainerVariants = {
   hidden: {},
-  visible: { transition: { staggerChildren: 0.08, delayChildren: 0.85 } },
+  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.3 } },
   exiting: { transition: { staggerChildren: 0.05, staggerDirection: -1 } },
 };
 
 const formItemVariants = {
   hidden: { x: -20, opacity: 0 },
-  visible: { x: 0, opacity: 1, transition: { duration: 0.35, ease: 'easeOut' } },
-  exiting: { x: -20, opacity: 0, transition: { duration: 0.25, ease: 'easeIn' } },
+  visible: { x: 0, opacity: 1, transition: { duration: 0.25, ease: EASE.out } },
+  exiting: { x: -20, opacity: 0, transition: { duration: 0.25, ease: EASE.in } },
 };
 
 const CODIGOS_CREDENCIALES_INVALIDAS = [
@@ -35,6 +36,7 @@ function resolverMensajeErrorLogin(err) {
 
 /** Pantalla de login con animación de entrada/salida y recuperación de contraseña. */
 function LoginPage() {
+  useDocumentTitle('Ingresar');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -43,7 +45,13 @@ function LoginPage() {
   const [exiting, setExiting] = useState(false);
   const [mostrarRecuperar, setMostrarRecuperar] = useState(false);
   const [logoFadingOut, setLogoFadingOut] = useState(false);
-  const shouldReduceMotion = useReducedMotion();
+  const shouldReduceMotionPref = useReducedMotion();
+  const [isMobile] = useState(() => (
+    typeof window !== 'undefined' && typeof window.matchMedia === 'function'
+      ? window.matchMedia('(max-width: 768px)').matches
+      : false
+  ));
+  const shouldReduceMotion = shouldReduceMotionPref || isMobile;
   const { logoSocioAlt, logoLoginEntrada, logoConTexto } = useTheme();
   const [animStarted, setAnimStarted] = useState(false);
   const navigate = useNavigate();
@@ -53,7 +61,7 @@ function LoginPage() {
 
   useEffect(() => {
     if (shouldReduceMotion) return;
-    const timer = setTimeout(() => setAnimStarted(true), 300);
+    const timer = setTimeout(() => setAnimStarted(true), 100);
     return () => clearTimeout(timer);
   }, [shouldReduceMotion]);
 
@@ -75,7 +83,7 @@ function LoginPage() {
         safeNavigate();
       } else {
         setExiting(true);
-        setTimeout(safeNavigate, 2000);
+        setTimeout(safeNavigate, 1500);
       }
     } catch (err) {
       setError(resolverMensajeErrorLogin(err));
@@ -90,7 +98,7 @@ function LoginPage() {
           className="login-intro-overlay"
           initial={{ width: '100%' }}
           animate={{ width: animStarted ? '50%' : '100%' }}
-          transition={{ duration: 0.75, ease: [0.76, 0, 0.24, 1] }}
+          transition={{ duration: 0.5, ease: EASE.inOut, delay: 0.1 }}
           aria-hidden="true"
         >
           <img src={logoLoginEntrada} alt="" className="login-intro-logo" />
@@ -101,7 +109,7 @@ function LoginPage() {
           className="login-exit-overlay"
           initial={{ width: '50%' }}
           animate={{ width: '100%' }}
-          transition={{ duration: 0.75, ease: [0.76, 0, 0.24, 1] }}
+          transition={{ duration: 0.4, ease: EASE.inOut }}
           onAnimationComplete={() => setLogoFadingOut(true)}
           aria-hidden="true"
         >
@@ -112,8 +120,8 @@ function LoginPage() {
             initial={{ x: 60, opacity: 0 }}
             animate={logoFadingOut ? { x: 0, opacity: 0 } : { x: 0, opacity: 1 }}
             transition={logoFadingOut
-              ? { duration: 0.5, delay: 0.3 }
-              : { delay: 0.25, duration: 0.45, ease: 'easeOut' }
+              ? { duration: 0.25 }
+              : { delay: 0.15, duration: 0.3, ease: EASE.out }
             }
             onAnimationComplete={logoFadingOut ? safeNavigate : undefined}
           />
@@ -193,9 +201,11 @@ function LoginPage() {
         </motion.div>
       </div>
 
-      {mostrarRecuperar && (
-        <RecuperarContraseniaModal onClose={() => setMostrarRecuperar(false)} />
-      )}
+      <AnimatePresence>
+        {mostrarRecuperar && (
+          <RecuperarContraseniaModal key="recuperar" onClose={() => setMostrarRecuperar(false)} />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

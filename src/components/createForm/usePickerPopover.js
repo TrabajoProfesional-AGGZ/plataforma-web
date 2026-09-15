@@ -17,32 +17,66 @@ import { computePopoverPosition } from './nativeInputUtils';
  * con pocas opciones, mucho más bajo que los 260px estimados) el popover
  * quedaba flotando lejos del trigger, con un hueco grande en el medio de la
  * pantalla en vez de pegado a donde correspondía.
+ *
+ * `closing` es un segundo booleano para la salida animada, independiente de
+ * `open` (que pasa a `false` al toque, así `toggle`/`openPopover` reaccionan
+ * de inmediato si se reabre en medio de la salida): `closePopover` pone
+ * `closing=true` y el consumidor sigue renderizando el popover mientras
+ * tanto (`open || closing`, con `data-placement` para elegir la animación de
+ * salida acorde), desmontándolo recién cuando `closing` vuelve a `false` en
+ * `onAnimationEnd` (`handleClosed`, con un `setTimeout` de respaldo por si la
+ * animación no dispara, ej. bajo `prefers-reduced-motion` donde el CSS la
+ * anula).
  */
 export function usePickerPopover({ width = 280, height = 320 } = {}) {
   const [open, setOpen] = useState(false);
-  const [position, setPosition] = useState({ top: 0, left: 0 });
+  const [closing, setClosing] = useState(false);
+  const [position, setPosition] = useState({ top: 0, left: 0, placement: 'bottom' });
   const triggerRef = useRef(null);
   const popoverRef = useRef(null);
+  const closeTimeoutRef = useRef(null);
 
   const reposition = useCallback(() => {
     const measured = popoverRef.current?.getBoundingClientRect();
     setPosition(computePopoverPosition(triggerRef.current, measured?.height || height, measured?.width || width));
   }, [height, width]);
 
+  const clearCloseTimeout = useCallback(() => {
+    if (closeTimeoutRef.current) {
+      clearTimeout(closeTimeoutRef.current);
+      closeTimeoutRef.current = null;
+    }
+  }, []);
+
   const openPopover = useCallback(() => {
+    clearCloseTimeout();
     reposition();
+    setClosing(false);
     setOpen(true);
-  }, [reposition]);
+  }, [reposition, clearCloseTimeout]);
 
   useLayoutEffect(() => {
     if (open) reposition();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
-  const closePopover = useCallback(() => setOpen(false), []);
+  const handleClosed = useCallback(() => {
+    clearCloseTimeout();
+    setClosing(false);
+  }, [clearCloseTimeout]);
+
+  const closePopover = useCallback(() => {
+    setOpen(false);
+    setClosing(true);
+    clearCloseTimeout();
+    closeTimeoutRef.current = setTimeout(handleClosed, 120);
+  }, [handleClosed, clearCloseTimeout]);
+
   const toggle = useCallback(() => {
     if (open) closePopover(); else openPopover();
   }, [open, openPopover, closePopover]);
+
+  useEffect(() => clearCloseTimeout, [clearCloseTimeout]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -74,6 +108,6 @@ export function usePickerPopover({ width = 280, height = 320 } = {}) {
   }, [open, reposition, closePopover]);
 
   return {
-    open, openPopover, closePopover, toggle, position, triggerRef, popoverRef,
+    open, closing, openPopover, closePopover, handleClosed, toggle, position, triggerRef, popoverRef,
   };
 }

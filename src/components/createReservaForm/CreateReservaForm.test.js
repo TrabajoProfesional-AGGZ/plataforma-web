@@ -178,7 +178,7 @@ describe('CreateReservaForm', () => {
     await waitFor(() => {
       expect(screen.getByText('¡Reserva registrada!')).toBeInTheDocument();
     });
-    act(() => jest.advanceTimersByTime(1800));
+    act(() => jest.advanceTimersByTime(3000));
     expect(onSuccess).toHaveBeenCalledTimes(1);
   });
 
@@ -256,6 +256,40 @@ describe('CreateReservaForm', () => {
     await llenarYEnviarPaso2();
     await waitFor(() => {
       expect(screen.getByText('La instalación está siendo actualizada por otra reserva. Probá de nuevo en unos segundos.')).toBeInTheDocument();
+    });
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  test('muestra el motivo real (apto médico) y los socios incumpliendo cuando createReserva lanza "socio-apto-medico"', async () => {
+    const error = new Error('socio-apto-medico');
+    error.socios = ['1234', '5678'];
+    createReserva.mockRejectedValue(error);
+    await llenarYEnviarPaso2();
+    await waitFor(() => {
+      expect(screen.getByText(/n° 1234, n° 5678.*apto médico vigente/i)).toBeInTheDocument();
+    });
+    expect(screen.queryByText(/regularizar su situación financiera/i)).not.toBeInTheDocument();
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  test('muestra el motivo real (moroso) y el socio incumpliendo cuando createReserva lanza "socio-moroso"', async () => {
+    const error = new Error('socio-moroso');
+    error.socios = ['1234'];
+    createReserva.mockRejectedValue(error);
+    await llenarYEnviarPaso2();
+    await waitFor(() => {
+      expect(screen.getByText(/el socio n° 1234 debe regularizar su situación financiera/i)).toBeInTheDocument();
+    });
+    expect(onSuccess).not.toHaveBeenCalled();
+  });
+
+  test('muestra el motivo real (suspendido) y el socio incumpliendo cuando createReserva lanza "socio-suspendido"', async () => {
+    const error = new Error('socio-suspendido');
+    error.socios = ['1234'];
+    createReserva.mockRejectedValue(error);
+    await llenarYEnviarPaso2();
+    await waitFor(() => {
+      expect(screen.getByText(/el socio n° 1234 debe terminar su suspensión/i)).toBeInTheDocument();
     });
     expect(onSuccess).not.toHaveBeenCalled();
   });

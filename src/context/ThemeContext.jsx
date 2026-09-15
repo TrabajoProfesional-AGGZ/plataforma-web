@@ -36,7 +36,10 @@ export function ThemeProvider({ children }) {
   }, [theme]);
 
   const toggleTheme = useCallback(() => {
+    const root = document.documentElement;
+    root.setAttribute('data-theme-transition', '');
     setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+    window.setTimeout(() => root.removeAttribute('data-theme-transition'), 240);
   }, []);
 
   const value = useMemo(

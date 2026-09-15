@@ -1,6 +1,8 @@
 import { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
+import { motion } from 'framer-motion';
 import { useModalHistory } from '../../hooks/useModalHistory';
+import { SPRING, EASE } from '../../styles/motion';
 import './CreateSocioForm.css';
 
 const FOCUSABLE_SELECTOR = 'a[href], button:not([disabled]), textarea:not([disabled]), input:not([disabled]), select:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -52,14 +54,18 @@ export function ModalOverlay({ onClose, wrapperClass, children, ariaLabel, ariaL
   }, []);
 
   return (
-    <div
+    <motion.div
       className="csf-overlay"
       role="presentation"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0, transition: { duration: 0.16 } }}
+      transition={{ duration: 0.2 }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
     >
-      <div
+      <motion.div
         ref={wrapperRef}
         className={['csf-wrapper', wrapperClass].filter(Boolean).join(' ')}
         role="dialog"
@@ -67,10 +73,14 @@ export function ModalOverlay({ onClose, wrapperClass, children, ariaLabel, ariaL
         aria-label={ariaLabel}
         aria-labelledby={ariaLabelledBy}
         tabIndex={-1}
+        initial={{ y: 12, scale: 0.98, opacity: 0 }}
+        animate={{ y: 0, scale: 1, opacity: 1 }}
+        exit={{ y: 12, scale: 0.98, opacity: 0, transition: { duration: 0.16, ease: EASE.in } }}
+        transition={SPRING.default}
       >
         {children}
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 }
 

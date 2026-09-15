@@ -34,12 +34,7 @@ export function ResolverListaEsperaModal({ idDisciplina, idSocio, nombreSocio, o
 
   return (
     <ModalOverlay onClose={onCancel} ariaLabel={`Quitar de lista de espera: ${nombreSocio}`}>
-      <motion.div
-        key="form"
-        initial={{ opacity: 0, y: 16 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="csf-outer-card"
-      >
+      <div className="csf-outer-card">
         <div className="csf-header">
           <h1>Lista de espera</h1>
           <p>{nombreSocio}</p>
@@ -85,7 +80,7 @@ export function ResolverListaEsperaModal({ idDisciplina, idSocio, nombreSocio, o
             </div>
           </div>
         </div>
-      </motion.div>
+      </div>
     </ModalOverlay>
   );
 }
