@@ -15,28 +15,38 @@
   }
 }
 
-/* ── Layout de filtros ────────────────────────────────────────── */
+/* ── Barra de filtros: segunda fila debajo del toolbar (selects a la izquierda,
+   "N filtros activos · Limpiar" a la derecha) ── */
+.filtros-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-4);
+}
+
 .socios-filtros,
 .usuarios-filtros {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: var(--space-3);
-  margin-bottom: var(--space-3);
+  gap: var(--space-2);
   flex-wrap: wrap;
 }
 
-.socios-filtros-dropdowns,
-.usuarios-filtros-dropdowns {
-  display: flex;
-  flex-direction: row;
-  gap: var(--space-2);
+.socios-filtros .csf-picker,
+.usuarios-filtros .csf-picker {
+  width: 170px;
 }
 
-.socios-filtros-grupo,
-.usuarios-filtros-grupo {
-  width: 100%;
-  max-width: 180px;
+/* Caption de tabla: contexto del listado cuando hay un filtro que cambia el universo (ej. disciplina) */
+.tabla-caption {
+  caption-side: top;
+  text-align: left;
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-caption);
+  color: var(--color-text-secondary);
+  border-bottom: 1px solid var(--color-border);
 }
 
 /* ── Orden de tabla ───────────────────────────────────────────── */
@@ -80,43 +90,10 @@
   gap: var(--space-2);
 }
 
-/* ── Búsqueda ────────────────────────────────────────────────── */
-.socios-search-container,
-.usuarios-search-container {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border-medium);
-  border-radius: var(--radius-sm);
-  padding: var(--space-2) var(--space-3);
-  flex: 1;
-  transition: border-color var(--transition-fast);
-}
+/* Búsqueda → src/components/BuscadorColapsable/BuscadorColapsable.css */
 
-.socios-search-container:focus-within,
-.usuarios-search-container:focus-within {
-  border-color: var(--color-border-strong);
-}
-
-.socios-search-container svg,
-.usuarios-search-container svg {
-  color: var(--color-text-secondary);
-  flex-shrink: 0;
-}
-
-.socios-search-input,
-.usuarios-search-input {
-  border: none;
-  outline: none;
-  background: transparent;
-  color: var(--color-text-primary);
-  width: 100%;
-  font-size: var(--text-secondary);
-}
-
-.socios-search-button, .socios-ver-todos-button,
-.usuarios-search-button, .usuarios-ver-todos-button {
+.socios-ver-todos-button,
+.usuarios-ver-todos-button {
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-sm);
   font-size: var(--text-secondary);
@@ -127,8 +104,6 @@
 }
 
 /* ── Filtros ─────────────────────────────────────────────────── */
-.socios-filtro-toggle,
-.usuarios-filtro-toggle,
 .instalaciones-btn-toggle {
   padding: 6px var(--space-3);
   border: 1px solid var(--color-border-medium);
@@ -142,15 +117,11 @@
 }
 
 @media (hover: hover) {
-  .socios-filtro-toggle:hover,
-  .usuarios-filtro-toggle:hover,
   .instalaciones-btn-toggle:hover {
     background-color: var(--color-bg);
   }
 }
 
-.socios-filtro-toggle:active,
-.usuarios-filtro-toggle:active,
 .instalaciones-btn-toggle:active {
   background-color: var(--color-bg);
 }

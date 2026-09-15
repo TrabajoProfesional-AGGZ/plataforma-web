@@ -97,6 +97,11 @@ const rolesMock = [
   { id: 2, nombre: 'PRESIDENTE', permisos: [] },
 ];
 
+/** El buscador arranca colapsado en una lupa: hay que abrirlo antes de escribir. */
+function abrirBuscador() {
+  fireEvent.click(screen.getByRole('button', { name: /abrir búsqueda/i }));
+}
+
 async function renderYAbrirCardUsuario() {
   fetchUsuarios.mockResolvedValue([usuarioMock]);
   render(<UsuariosPage />);
@@ -116,6 +121,8 @@ describe('UsuariosPage', () => {
   test('renderiza el título, el campo de búsqueda y los botones', async () => {
     render(<UsuariosPage />);
     expect(screen.getByRole('heading', { name: /consultar usuarios/i })).toBeInTheDocument();
+    expect(screen.queryByPlaceholderText(/buscar por nombre/i)).not.toBeInTheDocument();
+    abrirBuscador();
     expect(screen.getByPlaceholderText(/buscar por nombre/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /buscar/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /ver todos/i })).toBeInTheDocument();
@@ -126,6 +133,7 @@ describe('UsuariosPage', () => {
   test('el botón buscar está deshabilitado si el campo está vacío', async () => {
     render(<UsuariosPage />);
     await waitFor(() => expect(fetchUsuarios).toHaveBeenCalled());
+    abrirBuscador();
     expect(screen.getByRole('button', { name: /buscar/i })).toBeDisabled();
   });
 
@@ -195,6 +203,8 @@ describe('UsuariosPage', () => {
     render(<UsuariosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
+    abrirBuscador();
+
     fireEvent.change(screen.getByPlaceholderText(/buscar por nombre/i), {
       target: { value: 'laura' },
     });
@@ -220,6 +230,8 @@ describe('UsuariosPage', () => {
     render(<UsuariosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
+    abrirBuscador();
+
     fireEvent.change(screen.getByPlaceholderText(/buscar por nombre/i), {
       target: { value: 'laura' },
     });
@@ -234,21 +246,29 @@ describe('UsuariosPage', () => {
 
   // --- Filtro por rol ---
 
-  test('aparece el botón Filtrar por en la lista', async () => {
+  test('el selector de rol está visible sin abrir nada', async () => {
     fetchUsuarios.mockResolvedValue([usuarioMock]);
     render(<UsuariosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-    expect(screen.getByRole('button', { name: /filtrar por/i })).toBeInTheDocument();
+
+    expect(screen.queryByRole('button', { name: /filtrar por/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Filtrar por rol' })).toHaveDisplayValue('Rol: Todos');
   });
 
-  test('al clickear Filtrar por aparece el dropdown de rol', async () => {
-    fetchUsuarios.mockResolvedValue([usuarioMock]);
+  test('muestra "1 filtro activo" al filtrar por rol y Limpiar lo resetea', async () => {
+    fetchUsuarios.mockResolvedValue([usuarioMock, usuarioMock2]);
     render(<UsuariosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(screen.queryByText('1 filtro activo')).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    fireEvent.change(screen.getByRole('combobox', { name: 'Filtrar por rol' }), { target: { value: 'PRESIDENTE' } });
+    expect(screen.getByText('1 filtro activo')).toBeInTheDocument();
+    expect(screen.queryByText('Rodríguez')).not.toBeInTheDocument();
 
-    expect(screen.getByRole('combobox')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Limpiar' }));
+
+    expect(screen.queryByText('1 filtro activo')).not.toBeInTheDocument();
+    expect(screen.getAllByText('Rodríguez').length).toBeGreaterThan(0);
   });
 
   test('filtrar por rol muestra solo los usuarios de ese rol', async () => {
@@ -256,7 +276,6 @@ describe('UsuariosPage', () => {
     render(<UsuariosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'PRESIDENTE' } });
 
     expect(screen.getAllByText('Sánchez').length).toBeGreaterThan(0);
@@ -267,6 +286,8 @@ describe('UsuariosPage', () => {
     fetchUsuarios.mockResolvedValue([usuarioMock]);
     render(<UsuariosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    abrirBuscador();
 
     fireEvent.change(screen.getByPlaceholderText(/buscar por nombre/i), {
       target: { value: 'zzznombreinexistente' },
@@ -680,7 +701,6 @@ describe('UsuariosPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /página siguiente/i }));
     expect(screen.getByText('Página 2 de 2')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
     fireEvent.change(screen.getByDisplayValue('Rol: Todos'), { target: { value: 'PRESIDENTE' } });
 
     await waitFor(() => {

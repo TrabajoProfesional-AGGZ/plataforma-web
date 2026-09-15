@@ -1,0 +1,80 @@
+.buscador {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  min-width: 0;
+}
+
+/* Lupa e input comparten borde/fondo para leerse como un mismo control */
+.buscador-lupa,
+.buscador-input {
+  min-height: 36px;
+  border: 1px solid var(--color-border-medium);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text-primary);
+  transition: background-color var(--transition-fast), border-color var(--transition-fast);
+}
+
+.buscador-lupa {
+  min-width: 36px;
+  cursor: pointer;
+}
+
+@media (hover: hover) {
+  .buscador-lupa:hover {
+    background-color: var(--color-bg-subtle);
+  }
+}
+
+.buscador-lupa--activa {
+  border-color: var(--color-border-strong);
+}
+
+.buscador-form {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex: 1;
+  max-width: 460px;
+  min-width: 0;
+}
+
+.buscador-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0 var(--space-3);
+  font-size: var(--text-secondary);
+  font-family: inherit;
+  outline: none;
+}
+
+.buscador-input:focus {
+  border-color: var(--color-border-strong);
+}
+
+.buscador-submit {
+  min-height: 36px;
+  padding: 0 var(--space-4);
+  border: none;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-text-primary);
+  color: var(--color-surface);
+  font-size: var(--text-secondary);
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--transition-fast);
+}
+
+@media (hover: hover) {
+  .buscador-submit:hover:not(:disabled) {
+    background-color: var(--color-text-secondary);
+  }
+}
+
+.buscador-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

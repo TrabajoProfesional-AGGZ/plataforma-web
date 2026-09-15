@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Search, Plus, ChevronRight } from 'lucide-react';
+import { Plus, ChevronRight } from 'lucide-react';
 import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
+import { FiltrosActivos } from '../../components/FiltrosActivos/FiltrosActivos';
+import { BuscadorColapsable } from '../../components/BuscadorColapsable/BuscadorColapsable';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import { fetchUsuarios, eliminarUsuario } from '../../services/usuariosService';
 import ConfirmDeleteModal from '../../components/confirmDeleteModal/ConfirmDeleteModal';
@@ -52,12 +54,12 @@ function UsuariosPage() {
   const cacheUsuariosRef = useRef(null);
 
   const [busqueda, setBusqueda] = useState('');
+  const [busquedaAbierta, setBusquedaAbierta] = useState(false);
   const [modo, setModo] = useState('lista');
   const { resultado, setResultado, loading, setLoading, error, setError } = useListState();
   const { orden, setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden, ORDEN_INICIAL);
 
   const [filtroRol, setFiltroRol] = useState('');
-  const [filtroAbierto, setFiltroAbierto] = useState(false);
   const [filtroBusqueda, setFiltroBusqueda] = useState('');
 
   const [roles, setRoles] = useState([]);
@@ -125,9 +127,9 @@ function UsuariosPage() {
 
   async function recargarUsuarios() {
     setBusqueda('');
+    setBusquedaAbierta(false);
     setFiltroBusqueda('');
     setFiltroRol('');
-    setFiltroAbierto(false);
     setOrden(ORDEN_INICIAL);
     cacheUsuariosRef.current = null;
     await fetchYActualizarUsuarios();
@@ -141,9 +143,9 @@ function UsuariosPage() {
 
   function handleVerTodos() {
     setBusqueda('');
+    setBusquedaAbierta(false);
     setFiltroBusqueda('');
     setFiltroRol('');
-    setFiltroAbierto(false);
     setOrden(ORDEN_INICIAL);
     setError(null);
     if (cacheUsuariosRef.current !== null) {
@@ -196,6 +198,7 @@ function UsuariosPage() {
   });
 
   const rolesUnicos = [...new Set(listaBase.map((u) => u.rol?.nombre).filter(Boolean))].sort();
+  const mostrarFiltros = !loading && modo === 'lista' && listaBase.length > 0;
 
   const listaOrdenada = aplicarOrden(listaFiltrada);
   const { pagina, totalPaginas, listaPaginada, irAPagina, resetPagina } = usePaginacion(listaOrdenada, 10);
@@ -211,25 +214,15 @@ function UsuariosPage() {
 
       <div className="usuarios-toolbar">
         <div className="usuarios-toolbar-left">
-          <form className="usuarios-search-form" onSubmit={handleBuscar}>
-            <div className="usuarios-search-container">
-              <Search size={16} aria-hidden="true" />
-              <input
-                className="usuarios-search-input"
-                type="text"
-                placeholder="Buscar por nombre, apellido o email"
-                value={busqueda}
-                onChange={(e) => setBusqueda(e.target.value)}
-              />
-            </div>
-            <button
-              className="usuarios-search-button"
-              type="submit"
-              disabled={loading || !busqueda.trim()}
-            >
-              Buscar
-            </button>
-          </form>
+          <BuscadorColapsable
+            abierto={busquedaAbierta}
+            onToggle={() => setBusquedaAbierta((a) => !a)}
+            placeholder="Buscar por nombre, apellido o email"
+            value={busqueda}
+            onChange={(e) => setBusqueda(e.target.value)}
+            onSubmit={handleBuscar}
+            disabled={loading}
+          />
         </div>
         <div className="usuarios-toolbar-right">
           <button className="usuarios-ver-todos-button" onClick={handleVerTodos}>
@@ -244,37 +237,30 @@ function UsuariosPage() {
         </div>
       </div>
 
+      {mostrarFiltros && (
+        <div className="filtros-bar">
+          <div className="usuarios-filtros">
+            <StyledSelect
+              className="filtros-select-trigger"
+              aria-label="Filtrar por rol"
+              value={filtroRol}
+              onChange={(e) => setFiltroRol(e.target.value)}
+            >
+              <option value="">Rol: Todos</option>
+              {rolesUnicos.map((r) => (
+                <option key={r} value={r}>{r}</option>
+              ))}
+            </StyledSelect>
+          </div>
+          <FiltrosActivos cantidad={filtroRol ? 1 : 0} onLimpiar={() => setFiltroRol('')} />
+        </div>
+      )}
+
       {loading && <SkeletonRows n={6} />}
       {error && <ErrorBanner mensaje={error} onReintentar={fetchYActualizarUsuarios} />}
 
       {!loading && modo === 'lista' && (
         <>
-          <div className="usuarios-filtros">
-            <button
-              className="usuarios-filtro-toggle"
-              type="button"
-              onClick={() => setFiltroAbierto((p) => !p)}
-            >
-              Filtrar por
-            </button>
-            {filtroAbierto && (
-              <div className="usuarios-filtros-dropdowns">
-                <div className="usuarios-filtros-grupo">
-                  <StyledSelect
-                    className="filtros-select-trigger"
-                    value={filtroRol}
-                    onChange={(e) => setFiltroRol(e.target.value)}
-                  >
-                    <option value="">Rol: Todos</option>
-                    {rolesUnicos.map((r) => (
-                      <option key={r} value={r}>{r}</option>
-                    ))}
-                  </StyledSelect>
-                </div>
-              </div>
-            )}
-          </div>
-
           <div className="usuarios-table-wrapper">
             {listaBase.length === 0 ? (
               <EmptyState mensaje="No hay usuarios registrados." />

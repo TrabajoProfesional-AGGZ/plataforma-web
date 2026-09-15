@@ -9,29 +9,9 @@
   margin: 0 auto;
 }
 
-/* ── Formulario de búsqueda ───────────────────────────────────── */
-.usuarios-search-form {
-  display: flex;
-  align-items: center;
-  gap: var(--space-2);
-  flex: 1;
-  max-width: 460px;
-}
+/* Búsqueda → src/components/BuscadorColapsable/BuscadorColapsable.css */
 
 /* ── Variantes de color de botón ──────────────────────────────── */
-.usuarios-search-button {
-  background-color: var(--color-text-primary);
-  color: var(--color-surface);
-  border: none;
-}
-
-@media (hover: hover) {
-  .usuarios-search-button:hover:not(:disabled) {
-    background-color: var(--color-text-secondary);
-  }
-}
-
-.usuarios-search-button:disabled,
 .usuarios-ver-todos-button:disabled,
 .usuarios-crear-button:disabled {
   opacity: 0.5;

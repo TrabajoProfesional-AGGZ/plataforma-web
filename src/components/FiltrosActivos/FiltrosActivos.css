@@ -1,0 +1,8 @@
+.filtros-activos {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 0 auto;
+  font-size: var(--text-caption);
+  color: var(--color-text-secondary);
+}

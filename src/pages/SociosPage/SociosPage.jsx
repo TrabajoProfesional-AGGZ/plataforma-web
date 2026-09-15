@@ -1,7 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Search, Plus, ChevronRight } from 'lucide-react';
+import { Plus, ChevronRight } from 'lucide-react';
 import { DetailHeader } from '../../components/DetailHeader/DetailHeader';
+import { FiltrosActivos } from '../../components/FiltrosActivos/FiltrosActivos';
+import { BuscadorColapsable } from '../../components/BuscadorColapsable/BuscadorColapsable';
 import EstadoBadge from '../../components/badge/EstadoBadge';
 import { getSocios, deleteSocio } from '../../services/sociosService';
 import { getDisciplinas, getSociosByDisciplina, extenderSuscripcionDisciplina } from '../../services/disciplinasService';
@@ -59,6 +61,7 @@ function SociosPage() {
   const cacheSociosRef = useRef(null);
 
   const [nroSocio, setNroSocio] = useState('');
+  const [busquedaAbierta, setBusquedaAbierta] = useState(false);
   const [modo, setModo] = useState('idle'); // idle | socio | lista | no-encontrado
   // modoRef evita que el callback onPage (asíncrono, con closure sobre modo) actúe con un valor de modo desactualizado.
   const modoRef = useRef(modo);
@@ -68,7 +71,6 @@ function SociosPage() {
   const { orden, setOrden, toggleOrden, iconoOrden, aplicarOrden } = useSortedList(getValorOrden, ORDEN_INICIAL);
 
   const [filtroEstado, setFiltroEstado] = useState('');
-  const [filtroAbierto, setFiltroAbierto] = useState(false);
   const [filtroCategoria, setFiltroCategoria] = useState('');
   const [filtroDisciplina, setFiltroDisciplina] = useState('');
   const [disciplinas, setDisciplinas] = useState([]);
@@ -203,12 +205,9 @@ function SociosPage() {
 
   async function recargarSocios() {
     setNroSocio('');
+    setBusquedaAbierta(false);
     setOrden(ORDEN_INICIAL);
-    setFiltroEstado('');
-    setFiltroAbierto(false);
-    setFiltroCategoria('');
-    setFiltroDisciplina('');
-    setEstadoExtension({});
+    limpiarFiltros();
     cacheSociosRef.current = null;
     await cargarSocios();
   }
@@ -244,14 +243,19 @@ function SociosPage() {
     }
   }
 
-  function handleVerTodos() {
-    setNroSocio('');
-    setOrden(ORDEN_INICIAL);
+  /** Resetea solo los filtros del listado (categoría, estado, disciplina), sin tocar búsqueda ni orden. */
+  function limpiarFiltros() {
     setFiltroEstado('');
-    setFiltroAbierto(false);
     setFiltroCategoria('');
     setFiltroDisciplina('');
     setEstadoExtension({});
+  }
+
+  function handleVerTodos() {
+    setNroSocio('');
+    setBusquedaAbierta(false);
+    setOrden(ORDEN_INICIAL);
+    limpiarFiltros();
     setError(null);
     if (cacheSociosRef.current !== null) {
       setResultado(cacheSociosRef.current);
@@ -336,31 +340,27 @@ function SociosPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [resultado, filtroEstado, filtroCategoria, filtroDisciplina]);
 
+  const mostrarFiltros = !loading && modo === 'lista' && listaBase.length > 0;
+  const estadosUnicos = [...new Set(listaBase.map((s) => s.estado.nombre))].sort();
+  const categoriasUnicas = [...new Set(listaBase.map((s) => s.categoria.nombre))].sort();
+  const cantidadFiltrosActivos = [filtroEstado, filtroCategoria, filtroDisciplina].filter(Boolean).length;
+  const nombreDisciplinaFiltro = disciplinas.find((d) => String(d.id) === String(filtroDisciplina))?.nombre;
+
   return (
     <div className="socios-page">
       <h1 className="page-title">Consultar Socios</h1>
       <div className="socios-toolbar">
         <div className="socios-toolbar-left">
-          <form className="socios-search-form" onSubmit={handleBuscar}>
-            <div className="socios-search-container">
-              <Search size={16} aria-hidden="true" />
-              <input
-                className="socios-search-input"
-                type="text"
-                placeholder="Buscar por N° de socio"
-                value={nroSocio}
-                onChange={(e) => setNroSocio(e.target.value)}
-                maxLength={MAX_LEN.NRO_SOCIO}
-              />
-            </div>
-            <button
-              className="socios-search-button"
-              type="submit"
-              disabled={loading || !nroSocio.trim()}
-            >
-              Buscar
-            </button>
-          </form>
+          <BuscadorColapsable
+            abierto={busquedaAbierta}
+            onToggle={() => setBusquedaAbierta((a) => !a)}
+            placeholder="Buscar por N° de socio"
+            value={nroSocio}
+            onChange={(e) => setNroSocio(e.target.value)}
+            onSubmit={handleBuscar}
+            disabled={loading}
+            maxLength={MAX_LEN.NRO_SOCIO}
+          />
         </div>
         <div className="socios-toolbar-right">
           <button className="socios-ver-todos-button" onClick={handleVerTodos}>
@@ -374,6 +374,51 @@ function SociosPage() {
           )}
         </div>
       </div>
+
+      {mostrarFiltros && (
+        <div className="filtros-bar">
+          <div className="socios-filtros">
+            <StyledSelect
+              className="filtros-select-trigger"
+              aria-label="Filtrar por categoría"
+              value={filtroCategoria}
+              onChange={(e) => setFiltroCategoria(e.target.value)}
+            >
+              <option value="">Categoría: Todas</option>
+              {categoriasUnicas.map(c => (
+                <option key={c} value={c}>{c}</option>
+              ))}
+            </StyledSelect>
+            <StyledSelect
+              id="filtro-estado"
+              className="filtros-select-trigger"
+              aria-label="Filtrar por estado"
+              value={filtroEstado}
+              onChange={(e) => setFiltroEstado(e.target.value)}
+            >
+              <option value="">Estado: Todos</option>
+              {estadosUnicos.map(e => (
+                <option key={e} value={e}>{e}</option>
+              ))}
+            </StyledSelect>
+            {puedeVerDisciplinas && disciplinas.length > 0 && (
+              <StyledSelect
+                id="filtro-disciplina"
+                className="filtros-select-trigger"
+                aria-label="Filtrar por disciplina"
+                value={filtroDisciplina}
+                onChange={(e) => setFiltroDisciplina(e.target.value)}
+              >
+                <option value="">Disciplina: Todas</option>
+                {disciplinas.map(d => (
+                  <option key={d.id} value={d.id}>{d.nombre}</option>
+                ))}
+              </StyledSelect>
+            )}
+          </div>
+          <FiltrosActivos cantidad={cantidadFiltrosActivos} onLimpiar={limpiarFiltros} />
+        </div>
+      )}
 
       {loading && <SkeletonRows n={6} />}
       {error && <ErrorBanner mensaje={error} onReintentar={cargarSocios} />}
@@ -460,70 +505,18 @@ function SociosPage() {
             </div>
           );
         }
-        const estadosUnicos = [...new Set(resultado.map(s => s.estado.nombre))].sort();
-        const categoriasUnicas = [...new Set(resultado.map(s => s.categoria.nombre))].sort();
         const mostrarColumnaSuscripcion = !!filtroDisciplina && puedeCrearDisciplina;
         return (
           <>
-            <div className="socios-filtros">
-              <button
-                className="socios-filtro-toggle"
-                type="button"
-                onClick={() => setFiltroAbierto(p => !p)}
-              >
-                Filtrar por
-              </button>
-              {filtroAbierto && (
-                <div className="socios-filtros-dropdowns">
-                  <div className="socios-filtros-grupo">
-                    <StyledSelect
-                      className="filtros-select-trigger"
-                      value={filtroCategoria}
-                      onChange={(e) => setFiltroCategoria(e.target.value)}
-                    >
-                      <option value="">Categoría: Todas</option>
-                      {categoriasUnicas.map(c => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
-                    </StyledSelect>
-                  </div>
-                  <div className="socios-filtros-grupo">
-                    <StyledSelect
-                      id="filtro-estado"
-                      className="filtros-select-trigger"
-                      value={filtroEstado}
-                      onChange={(e) => setFiltroEstado(e.target.value)}
-                    >
-                      <option value="">Estado: Todos</option>
-                      {estadosUnicos.map(e => (
-                        <option key={e} value={e}>{e}</option>
-                      ))}
-                    </StyledSelect>
-                  </div>
-                  {puedeVerDisciplinas && disciplinas.length > 0 && (
-                    <div className="socios-filtros-grupo">
-                      <StyledSelect
-                        id="filtro-disciplina"
-                        className="filtros-select-trigger"
-                        value={filtroDisciplina}
-                        onChange={(e) => setFiltroDisciplina(e.target.value)}
-                      >
-                        <option value="">Disciplina: Todas</option>
-                        {disciplinas.map(d => (
-                          <option key={d.id} value={d.id}>{d.nombre}</option>
-                        ))}
-                      </StyledSelect>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
             {errorDisciplinaFiltro && <ErrorBanner mensaje={errorDisciplinaFiltro} onReintentar={recargarSociosDeDisciplina} />}
             <div className="socios-table-wrapper">
               {listaFiltrada.length === 0 ? (
                 <EmptyState mensaje="No hay socios con los filtros seleccionados." />
               ) : (
                 <table className="socios-table">
+                  {filtroDisciplina && nombreDisciplinaFiltro && (
+                    <caption className="tabla-caption">Mostrando inscriptos en {nombreDisciplinaFiltro}</caption>
+                  )}
                   <thead>
                     <tr>
                       <th className="socios-th-sort td-num" aria-sort={ariaSortDe(orden, 'nro_socio')}>

@@ -49,6 +49,29 @@
   transition: background-color var(--transition-fast);
 }
 
+/* ── Botón con aspecto de link (acciones secundarias en texto) ── */
+.link-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 0 var(--space-1);
+  border: none;
+  background: none;
+  font: inherit;
+  font-weight: 600;
+  color: var(--color-text-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+@media (hover: hover) {
+  .link-btn:hover {
+    background-color: var(--color-bg-subtle);
+  }
+}
+
 /* ── Botón mostrar/ocultar contraseña ─────────────────────────── */
 .toggle-password,
 .login-toggle-password,
