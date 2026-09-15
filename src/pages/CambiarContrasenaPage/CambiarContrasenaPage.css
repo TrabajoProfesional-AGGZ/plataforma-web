@@ -47,7 +47,6 @@
 
 .password-wrapper input:focus {
   border-color: var(--color-border-strong);
-  box-shadow: 0 0 0 3px rgba(17, 17, 17, 0.06);
 }
 
 .cambiar-contrasena-error {

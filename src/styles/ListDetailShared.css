@@ -176,7 +176,7 @@
   border-radius: 50%;
   background: var(--color-surface);
   border: 2px solid var(--estado-color, var(--color-border-medium));
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.10);
+  box-shadow: var(--shadow-md);
   display: flex;
   align-items: center;
   justify-content: center;

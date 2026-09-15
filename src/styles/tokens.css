@@ -31,6 +31,9 @@
   --color-row-hover: #f8f8f8;
   --color-bg-subtle: #f0f0f0;
   --color-overlay: rgba(0, 0, 0, 0.4);
+  /* Scrim de modales (material sobre el contenido). */
+  --color-scrim: rgba(0, 0, 0, 0.38);
+  --scrim-blur: blur(4px);
 
   /* Texto fijo sobre botones de color sólido (ej. danger) — a diferencia de
      --color-surface, nunca invierte en modo oscuro (el botón sigue siendo
@@ -131,6 +134,12 @@
   --color-row-hover: #232323;
   --color-bg-subtle: #1a1a1a;
   --color-overlay: rgba(0, 0, 0, 0.6);
+  --color-scrim: rgba(0, 0, 0, 0.6);
+  --scrim-blur: blur(4px);
+  /* Sombras claras desaparecen sobre superficies oscuras; se redefinen con
+     más opacidad para seguir marcando la elevación. */
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35), 0 1px 4px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3);
 
   --status-success-bg: #1c3a26;
   --status-success-border: #4ade80;
