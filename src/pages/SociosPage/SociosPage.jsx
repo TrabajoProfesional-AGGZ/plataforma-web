@@ -524,7 +524,7 @@ function SociosPage() {
                 <table className="socios-table">
                   <thead>
                     <tr>
-                      <th className="socios-th-sort" aria-sort={ariaSortDe(orden, 'nro_socio')}>
+                      <th className="socios-th-sort td-num" aria-sort={ariaSortDe(orden, 'nro_socio')}>
                         <button type="button" className="th-sort-btn" onClick={() => toggleOrden('nro_socio')}>
                           N° Socio{iconoOrden('nro_socio')}
                         </button>
@@ -544,12 +544,12 @@ function SociosPage() {
                           Categoría{iconoOrden('categoria')}
                         </button>
                       </th>
-                      <th className="socios-th-sort" aria-sort={ariaSortDe(orden, 'estado')}>
+                      <th className="socios-th-sort td-center" aria-sort={ariaSortDe(orden, 'estado')}>
                         <button type="button" className="th-sort-btn" onClick={() => toggleOrden('estado')}>
                           Estado{iconoOrden('estado')}
                         </button>
                       </th>
-                      {mostrarColumnaSuscripcion && <th>Suscripción</th>}
+                      {mostrarColumnaSuscripcion && <th className="td-center">Suscripción</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -566,11 +566,11 @@ function SociosPage() {
                           onClick={verDetalle}
                           onKeyDown={handleActivateKey(verDetalle)}
                         >
-                          <td>{s.nro_socio}</td>
+                          <td className="td-num">{s.nro_socio}</td>
                           <td>{s.apellido}</td>
                           <td>{s.nombre}</td>
                           <td>{s.categoria.nombre}</td>
-                          <td>
+                          <td className="td-center">
                             <span
                               className="socios-estado-cell"
                               style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}
@@ -580,7 +580,7 @@ function SociosPage() {
                             </span>
                           </td>
                           {mostrarColumnaSuscripcion && (
-                            <td>
+                            <td className="td-center">
                               {estadoSuscripcionPorSocio?.get(s.id) === 'en_espera' ? (
                                 <button
                                   type="button"

@@ -278,6 +278,15 @@
   color: var(--color-text-primary);
   vertical-align: middle;
   font-variant-numeric: tabular-nums;
+  text-align: left;
+}
+
+.td-num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.td-center {
   text-align: center;
 }
 

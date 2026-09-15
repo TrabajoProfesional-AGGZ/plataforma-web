@@ -279,9 +279,9 @@ function InstalacionesPage() {
             <tr>
               <th>Nombre</th>
               <th>Tipo</th>
-              <th>Capacidad máxima</th>
-              <th>Valor/Turno</th>
-              <th>Estado</th>
+              <th className="td-num">Capacidad máxima</th>
+              <th className="td-num">Valor/Turno</th>
+              <th className="td-center">Estado</th>
             </tr>
           </thead>
           <tbody>
@@ -299,9 +299,9 @@ function InstalacionesPage() {
               >
                 <td>{inst.nombre}</td>
                 <td>{inst.tipo}</td>
-                <td>{inst.capacidad_maxima} personas</td>
-                <td>${inst.valor_turno}/turno</td>
-                <td>
+                <td className="td-num">{inst.capacidad_maxima} personas</td>
+                <td className="td-num">${inst.valor_turno}/turno</td>
+                <td className="td-center">
                   <EstadoBadge variant={inst.activa ? 'success' : 'neutral'}>
                     {inst.activa ? 'Activa' : 'Inactiva'}
                   </EstadoBadge>
@@ -338,11 +338,11 @@ function InstalacionesPage() {
             <tr>
               <th>ID</th>
               <th>Socio(s)</th>
-              <th>Fecha</th>
-              <th>Inicio</th>
-              <th>Fin</th>
-              {mostrarEstado && <th>Estado</th>}
-              {mostrarAcciones && puedeBorrarReserva && <th>Acciones</th>}
+              <th className="td-num">Fecha</th>
+              <th className="td-num">Inicio</th>
+              <th className="td-num">Fin</th>
+              {mostrarEstado && <th className="td-center">Estado</th>}
+              {mostrarAcciones && puedeBorrarReserva && <th className="td-center">Acciones</th>}
             </tr>
           </thead>
           <tbody>
@@ -363,12 +363,12 @@ function InstalacionesPage() {
                     ))}
                   </div>
                 </td>
-                <td>{r.fecha_reserva ?? r.fecha}</td>
-                <td>{r.hora_inicio?.slice(0, 5)}</td>
-                <td>{r.hora_fin?.slice(0, 5)}</td>
-                {mostrarEstado && <td>{r.estado}</td>}
+                <td className="td-num">{r.fecha_reserva ?? r.fecha}</td>
+                <td className="td-num">{r.hora_inicio?.slice(0, 5)}</td>
+                <td className="td-num">{r.hora_fin?.slice(0, 5)}</td>
+                {mostrarEstado && <td className="td-center">{r.estado}</td>}
                 {mostrarAcciones && puedeBorrarReserva && (
-                  <td>
+                  <td className="td-center">
                     <div className="instalaciones-reserva-acciones">
                       {r.estado !== 'Cancelada' && (
                         <button

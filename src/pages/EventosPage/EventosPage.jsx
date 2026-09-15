@@ -109,13 +109,13 @@ function EventosPage() {
         <table className="disciplinas-tabla">
           <thead>
             <tr>
-              <th>Foto</th>
+              <th className="td-center">Foto</th>
               <th>Nombre</th>
-              <th>Día</th>
-              <th>Horario</th>
-              <th>Entradas</th>
-              <th>Valor</th>
-              {esVigentes && puedeCrearEntrada && <th>Acciones</th>}
+              <th className="td-num">Día</th>
+              <th className="td-num">Horario</th>
+              <th className="td-num">Entradas</th>
+              <th className="td-num">Valor</th>
+              {esVigentes && puedeCrearEntrada && <th className="td-center">Acciones</th>}
             </tr>
           </thead>
           <tbody>
@@ -123,7 +123,7 @@ function EventosPage() {
               const imagenSegura = urlImagenSegura(e.foto_url);
               return (
                 <tr key={e.id}>
-                  <td>
+                  <td className="td-center">
                     {imagenSegura ? (
                       <img
                         src={imagenSegura}
@@ -136,12 +136,12 @@ function EventosPage() {
                     )}
                   </td>
                   <td>{e.nombre}</td>
-                  <td>{e.dia}</td>
-                  <td>{e.hora_inicio?.slice(0, 5)} - {e.hora_fin?.slice(0, 5)}</td>
-                  <td>{e.entradas_vendidas} / {e.capacidad_maxima}</td>
-                  <td>${Number(e.valor_entrada).toLocaleString('es-AR')}</td>
+                  <td className="td-num">{e.dia}</td>
+                  <td className="td-num">{e.hora_inicio?.slice(0, 5)} - {e.hora_fin?.slice(0, 5)}</td>
+                  <td className="td-num">{e.entradas_vendidas} / {e.capacidad_maxima}</td>
+                  <td className="td-num">${Number(e.valor_entrada).toLocaleString('es-AR')}</td>
                   {esVigentes && puedeCrearEntrada && (
-                    <td>
+                    <td className="td-center">
                       <button
                         type="button"
                         className="eventos-btn-reservar-entrada"

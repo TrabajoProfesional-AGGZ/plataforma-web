@@ -123,9 +123,9 @@ function MorosidadTab() {
               <thead>
                 <tr>
                   <th>Socio</th>
-                  <th>Probabilidad de atraso</th>
-                  <th>Días promedio histórico</th>
-                  <th>Nivel de riesgo</th>
+                  <th className="td-num">Probabilidad de atraso</th>
+                  <th className="td-num">Días promedio histórico</th>
+                  <th className="td-center">Nivel de riesgo</th>
                 </tr>
               </thead>
               <tbody>
@@ -134,9 +134,9 @@ function MorosidadTab() {
                   return (
                     <tr key={p.socio_id}>
                       <td>{p.nombre_completo}</td>
-                      <td>{formatearPorcentaje(p.probabilidad_atraso)}</td>
-                      <td>{p.dias_promedio_historico} días</td>
-                      <td>
+                      <td className="td-num">{formatearPorcentaje(p.probabilidad_atraso)}</td>
+                      <td className="td-num">{p.dias_promedio_historico} días</td>
+                      <td className="td-center">
                         <span
                           className="disciplinas-badge"
                           style={{ backgroundColor: bg, borderColor: border, color: border }}

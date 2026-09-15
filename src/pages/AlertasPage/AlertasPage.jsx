@@ -114,9 +114,9 @@ function AlertasPage() {
               <th>Mensaje</th>
               <th>Categoría</th>
               <th>Estado</th>
-              <th>Destinatarios</th>
-              <th>Fecha</th>
-              {puedeBorrarAlerta && <th></th>}
+              <th className="td-num">Destinatarios</th>
+              <th className="td-num">Fecha</th>
+              {puedeBorrarAlerta && <th className="td-center"></th>}
             </tr>
           </thead>
           <tbody>
@@ -130,12 +130,12 @@ function AlertasPage() {
                 <td className="td-truncate" title={a.mensaje}>{a.mensaje}</td>
                 <td>{esDirigida ? '—' : (a.filtro_categoria ?? 'Todas')}</td>
                 <td>{esDirigida ? '—' : (a.filtro_estado ?? 'Todos')}</td>
-                <td title={esDirigida ? nombresDestino : undefined}>
+                <td className="td-num" title={esDirigida ? nombresDestino : undefined}>
                   {esDirigida ? `${a.cantidad_destinatarios} (socios específicos)` : a.cantidad_destinatarios}
                 </td>
-                <td>{formatearFecha(a.creado_en)}</td>
+                <td className="td-num">{formatearFecha(a.creado_en)}</td>
                 {puedeBorrarAlerta && (
-                  <td>
+                  <td className="td-center">
                     <button
                       type="button"
                       className="icon-btn alertas-btn-eliminar-fila"

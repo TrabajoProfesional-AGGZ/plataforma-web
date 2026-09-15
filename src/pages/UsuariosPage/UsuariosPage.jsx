@@ -317,12 +317,12 @@ function UsuariosPage() {
                         Email{iconoOrden('email')}
                       </button>
                     </th>
-                    <th className="usuarios-th-sort" aria-sort={ariaSortDe(orden, 'rol')}>
+                    <th className="usuarios-th-sort td-center" aria-sort={ariaSortDe(orden, 'rol')}>
                       <button type="button" className="th-sort-btn" onClick={() => toggleOrden('rol')}>
                         Rol{iconoOrden('rol')}
                       </button>
                     </th>
-                    <th className="usuarios-th-sort" aria-sort={ariaSortDe(orden, 'estado')}>
+                    <th className="usuarios-th-sort td-center" aria-sort={ariaSortDe(orden, 'estado')}>
                       <button type="button" className="th-sort-btn" onClick={() => toggleOrden('estado')}>
                         Estado{iconoOrden('estado')}
                       </button>
@@ -354,10 +354,10 @@ function UsuariosPage() {
                         <td>{u.apellido}</td>
                         <td>{u.nombre}</td>
                         <td className="td-truncate" title={u.email}>{u.email}</td>
-                        <td>
+                        <td className="td-center">
                           <span className="usuarios-rol-badge">{u.rol?.nombre}</span>
                         </td>
-                        <td>
+                        <td className="td-center">
                           <span
                             className="usuarios-estado-cell"
                             style={{ backgroundColor: cfg.bg, borderColor: cfg.border }}

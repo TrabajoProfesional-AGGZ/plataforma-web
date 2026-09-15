@@ -148,9 +148,9 @@ function TiendaPage() {
           <thead>
             <tr>
               <th>Producto</th>
-              <th>Precio</th>
-              <th>Stock</th>
-              <th>Estado</th>
+              <th className="td-num">Precio</th>
+              <th className="td-num">Stock</th>
+              <th className="td-center">Estado</th>
             </tr>
           </thead>
           <tbody>
@@ -175,9 +175,9 @@ function TiendaPage() {
                   )}
                   {p.nombre}
                 </td>
-                <td>${Number(p.precio).toLocaleString('es-AR')}</td>
-                <td>{p.stock}</td>
-                <td>
+                <td className="td-num">${Number(p.precio).toLocaleString('es-AR')}</td>
+                <td className="td-num">{p.stock}</td>
+                <td className="td-center">
                   <EstadoBadge variant={p.activo ? 'success' : 'warning'}>
                     {p.activo ? 'Activo' : 'Inactivo'}
                   </EstadoBadge>

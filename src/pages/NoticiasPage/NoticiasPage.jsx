@@ -167,9 +167,9 @@ function NoticiasPage() {
           <thead>
             <tr>
               <th>Título</th>
-              <th>Publicación</th>
-              <th>Vencimiento</th>
-              <th>Estado</th>
+              <th className="td-num">Publicación</th>
+              <th className="td-num">Vencimiento</th>
+              <th className="td-center">Estado</th>
             </tr>
           </thead>
           <tbody>
@@ -184,9 +184,9 @@ function NoticiasPage() {
                 onKeyDown={handleActivateKey(() => handleClickFila(n))}
               >
                 <td>{n.titulo}</td>
-                <td>{n.fecha_publicacion}</td>
-                <td>{n.fecha_expiracion}</td>
-                <td>
+                <td className="td-num">{n.fecha_publicacion}</td>
+                <td className="td-num">{n.fecha_expiracion}</td>
+                <td className="td-center">
                   <EstadoBadge variant={estadoBadgeVariant(n.estado)}>
                     {n.estado ?? '—'}
                   </EstadoBadge>

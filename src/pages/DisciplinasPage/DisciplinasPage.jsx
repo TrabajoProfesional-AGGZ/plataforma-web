@@ -178,9 +178,9 @@ function DisciplinasPage() {
               <th>Nombre</th>
               <th>Categoría de socio</th>
               <th>Sede</th>
-              <th>Cupo máximo</th>
-              <th>Arancelada</th>
-              <th>Estado</th>
+              <th className="td-num">Cupo máximo</th>
+              <th className="td-center">Arancelada</th>
+              <th className="td-center">Estado</th>
             </tr>
           </thead>
           <tbody>
@@ -199,13 +199,13 @@ function DisciplinasPage() {
                 <td>{d.nombre}</td>
                 <td>{d.categoria_socio?.nombre ?? '—'}</td>
                 <td>{d.sede?.nombre ?? '—'}</td>
-                <td>{d.cupo_maximo != null ? `${d.cupo_maximo} personas` : 'Sin límite'}</td>
-                <td>
+                <td className="td-num">{d.cupo_maximo != null ? `${d.cupo_maximo} personas` : 'Sin límite'}</td>
+                <td className="td-center">
                   <EstadoBadge variant={d.arancelada ? 'success' : 'neutral'}>
                     {d.arancelada ? 'Sí' : 'No'}
                   </EstadoBadge>
                 </td>
-                <td>
+                <td className="td-center">
                   <EstadoBadge variant={d.estado?.nombre === 'Pausada' ? 'warning' : 'success'}>
                     {d.estado?.nombre ?? 'Activa'}
                   </EstadoBadge>
