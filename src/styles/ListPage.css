@@ -108,9 +108,13 @@
 /* En los forms de creación value="" es un placeholder real ("Seleccionar...")
    y StyledSelect lo pinta en gris tenue (--color-border-medium). Acá value=""
    es una opción con significado propio ("Categoría: Todas", etc.), no un
-   placeholder, así que necesita el mismo color de texto que el resto. */
+   placeholder, así que necesita el mismo color de texto que el resto — el del
+   trigger (--input-text, negro fijo en ambos temas, ver Pickers.css), no
+   --color-text-primary: el trigger tiene fondo blanco fijo (--input-bg) en
+   los dos temas, así que un texto theme-aware (rosa en oscuro) quedaba poco
+   legible sobre ese blanco fijo. */
 .filtros-select-trigger .csf-picker-placeholder {
-  color: var(--color-text-primary);
+  color: var(--input-text);
 }
 
 .instalaciones-filtro-fecha {

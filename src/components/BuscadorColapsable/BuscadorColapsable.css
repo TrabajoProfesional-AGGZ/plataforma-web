@@ -32,6 +32,13 @@
   border-color: var(--color-border-strong);
 }
 
+/* En oscuro el rosa de --color-text-primary sobre --color-surface (bordó) se
+   reemplaza por blanco fijo (--color-on-accent), a pedido explícito. */
+:root[data-theme="dark"] .buscador-lupa,
+:root[data-theme="dark"] .buscador-input {
+  color: var(--color-on-accent);
+}
+
 .buscador-campo {
   display: flex;
   align-items: center;
