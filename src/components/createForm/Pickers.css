@@ -69,7 +69,7 @@
 }
 
 .csf-picker-placeholder {
-  color: var(--color-border-medium);
+  color: var(--color-text-placeholder);
 }
 
 .csf-picker-trigger:hover:not(:disabled) {
@@ -212,7 +212,7 @@
 }
 
 .csf-calendar-day--muted {
-  color: var(--color-border-medium);
+  color: var(--color-text-placeholder);
 }
 
 .csf-calendar-day--today {
@@ -228,7 +228,9 @@
 
 .csf-calendar-day:disabled {
   cursor: not-allowed;
-  color: var(--color-border-light);
+  color: var(--color-text-placeholder);
+  opacity: 0.45;
+  text-decoration: line-through;
 }
 
 .csf-calendar-today-btn {
@@ -373,5 +375,5 @@
 
 .csf-dropdown-option:disabled {
   cursor: not-allowed;
-  color: var(--color-border-medium);
+  color: var(--color-text-placeholder);
 }
