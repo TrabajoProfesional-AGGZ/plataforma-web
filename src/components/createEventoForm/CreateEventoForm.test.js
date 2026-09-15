@@ -139,7 +139,6 @@ describe('CreateEventoForm', () => {
       expect(screen.getByText('¡Evento creado!')).toBeInTheDocument();
     });
 
-    await act(async () => { jest.advanceTimersByTime(1800); });
     expect(onSuccess).toHaveBeenCalledWith({
       nombre: 'Fiesta de fin de año',
       descripcion: 'Un evento de prueba',
@@ -160,7 +159,6 @@ describe('CreateEventoForm', () => {
       fireEvent.click(screen.getByRole('button', { name: /crear evento/i }));
     });
 
-    await act(async () => { jest.advanceTimersByTime(1800); });
     expect(onSuccess).toHaveBeenCalledWith(expect.objectContaining({ foto_url: null }));
     expect(subirImagenEvento).not.toHaveBeenCalled();
   });

@@ -1,5 +1,6 @@
 /* empty, table-wrapper, tabla, td, tr-clickable, badge base → src/styles/ListPage.css
-   btn-crear, btn-volver, detalle-* → src/styles/ListDetailShared.css
+   btn-crear, detalle-* → src/styles/ListDetailShared.css
+   encabezado del detalle (volver, título, badge, acciones) → src/components/DetailHeader/DetailHeader.css
    th styles → src/styles/PageTableHeader.css */
 
 .disciplinas-page {
@@ -7,22 +8,8 @@
   margin: 0 auto;
 }
 
-/* .disciplinas-title, .disciplinas-toolbar → src/styles/ListDetailShared.css */
+/* .disciplinas-toolbar → src/styles/ListDetailShared.css; título de página → .page-title en src/styles/shared.css */
 /* Badges de estado → src/components/badge/EstadoBadge.css (EstadoBadge) */
-
-/* ── Vista de detalle ─────────────────────────────────────────── */
-.disciplinas-nav {
-  display: flex;
-  align-items: center;
-  margin-bottom: var(--space-5);
-}
-
-.disciplinas-detalle-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: var(--space-3);
-  margin-bottom: var(--space-5);
-}
 
 /* ── Sección de inscripción de socios ────────────────────────── */
 .disciplinas-socios-section {
@@ -30,14 +17,14 @@
 }
 
 .disciplinas-socios-title {
-  font-size: 1.125rem;
+  font-size: var(--text-heading);
   font-weight: 600;
   color: var(--color-text-primary);
   margin: 0 0 var(--space-2) 0;
 }
 
 .disciplinas-socios-hint {
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   color: var(--color-text-secondary);
   margin: 0 0 var(--space-3) 0;
 }
@@ -55,7 +42,7 @@
   border: none;
   border-radius: var(--radius-md);
   padding: var(--space-2) var(--space-3);
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-weight: 500;
   cursor: pointer;
   white-space: nowrap;
@@ -68,13 +55,13 @@
 
 .disciplinas-inscribir-error {
   color: var(--status-danger-border);
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   margin: var(--space-3) 0 0 0;
 }
 
 .disciplinas-inscribir-exito {
   color: var(--status-success-border);
-  font-size: 0.8125rem;
+  font-size: var(--text-caption);
   margin: var(--space-3) 0 0 0;
 }
 
@@ -85,7 +72,7 @@
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border-medium);
   border-radius: var(--radius-md);
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-family: inherit;
   color: var(--color-text-primary);
   background-color: var(--color-surface);
@@ -96,5 +83,4 @@
   border-color: var(--color-border-strong);
 }
 
-/* Loading wrapper → .list-loading en src/styles/ListPage.css */
 

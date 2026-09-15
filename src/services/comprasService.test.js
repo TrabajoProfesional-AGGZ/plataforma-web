@@ -46,22 +46,34 @@ describe('comprasService', () => {
       await expect(crearCompra(datos)).rejects.toThrow('producto_inactivo');
     });
 
-    test('lanza "moroso" cuando la respuesta es 403 con tipo moroso', async () => {
+    test('lanza "moroso" con el socio incumpliendo cuando la respuesta es 403 con tipo moroso', async () => {
       fetchTo.mockResolvedValueOnce({
         ok: false,
         status: 403,
         json: async () => ({ detail: { tipo: 'moroso', socio: '1000' } }),
       });
-      await expect(crearCompra(datos)).rejects.toThrow('moroso');
+      try {
+        await crearCompra(datos);
+        throw new Error('no debería llegar acá');
+      } catch (e) {
+        expect(e.message).toBe('moroso');
+        expect(e.socio).toBe('1000');
+      }
     });
 
-    test('lanza "suspendido" cuando la respuesta es 403 con tipo suspendido', async () => {
+    test('lanza "suspendido" con el socio incumpliendo cuando la respuesta es 403 con tipo suspendido', async () => {
       fetchTo.mockResolvedValueOnce({
         ok: false,
         status: 403,
         json: async () => ({ detail: { tipo: 'suspendido', socio: '1000' } }),
       });
-      await expect(crearCompra(datos)).rejects.toThrow('suspendido');
+      try {
+        await crearCompra(datos);
+        throw new Error('no debería llegar acá');
+      } catch (e) {
+        expect(e.message).toBe('suspendido');
+        expect(e.socio).toBe('1000');
+      }
     });
 
     test('lanza error genérico cuando no hay tipo reconocible', async () => {

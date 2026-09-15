@@ -47,6 +47,17 @@ export async function inscribirSocioADisciplina(idDisciplina, idSocio) {
   const res = await fetchTo(`/api/v1/disciplinas/${encodeURIComponent(idDisciplina)}/socios/${encodeURIComponent(idSocio)}`, 'POST');
   if (res.status >= 500) throw new Error('servicio-no-disponible');
   if (res.status === 409) throw new Error('ya-inscripto');
+  if (res.status === 403) {
+    const body = await res.json().catch(() => null);
+    const detail = body?.detail ?? {};
+    if (detail.tipo === 'apto_medico') throw new Error('socio-apto-medico');
+    if (detail.tipo === 'categoria_no_coincide') {
+      const error = new Error('categoria-no-coincide');
+      error.categoriaRequerida = detail.categoria_requerida ?? null;
+      throw error;
+    }
+    throw new Error('socio-moroso');
+  }
   if (!res.ok) throw new Error('Error al inscribir al socio en la disciplina');
   return res.json();
 }

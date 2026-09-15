@@ -9,11 +9,13 @@
   /* Tamaño base para el cálculo de rem (16px default del navegador).
      110% = fuentes ~10% más grandes en toda la app sin tocar cada
      declaración individual — todo font-size del proyecto está en rem. */
-  font-size: 115%;
+  font-size: 110%;
 
   /* Colors */
   --color-text-primary: #111111;
   --color-text-secondary: #4a4a4a;
+  /* Placeholders y texto atenuado que igual debe leerse (≥ 4.5:1 sobre --color-bg). */
+  --color-text-placeholder: #707070;
   --color-bg: #f5f5f5;
   --color-surface: #ffffff;
   --color-border: #e8e8e8;
@@ -22,9 +24,16 @@
   --color-border-light: #efefef;
   --color-danger: #c0392b;
   --color-danger-hover: #96281b;
+  /* Relleno de botones destructivos. Separado de --color-danger (texto/borde)
+     porque en oscuro el rojo de texto es claro y el blanco encima no contrasta. */
+  --color-danger-fill: #c0392b;
+  --color-danger-fill-hover: #96281b;
   --color-row-hover: #f8f8f8;
   --color-bg-subtle: #f0f0f0;
   --color-overlay: rgba(0, 0, 0, 0.4);
+  /* Scrim de modales (material sobre el contenido). */
+  --color-scrim: rgba(0, 0, 0, 0.38);
+  --scrim-blur: blur(4px);
 
   /* Texto fijo sobre botones de color sólido (ej. danger) — a diferencia de
      --color-surface, nunca invierte en modo oscuro (el botón sigue siendo
@@ -33,17 +42,17 @@
 
   /* Status colors (bg/border pairs used by estado badges, banners) */
   --status-success-bg: #a7daa7;
-  --status-success-border: #0D6E0D;
+  --status-success-border: #0b640b;
   --status-danger-bg: #f4bebe;
   --status-danger-border: #A01414;
   --status-warning-bg: #f5e9b2;
-  --status-warning-border: #9A6200;
+  --status-warning-border: #8a5700;
   --status-suspended-bg: #ffbd98;
-  --status-suspended-border: #f14701;
+  --status-suspended-border: #9c2d00;
   --status-error-surface-bg: #fdecea;
   --status-error-surface-border: #f5c6cb;
 
-  /* Variante suave para banners de éxito (LoginPage, CambiarContrasenaPage) */
+  /* Variante suave para banners de éxito (LoginPage, modal de cambio de contraseña en Perfil) */
   --surface-success-bg: #f0faf5;
   --surface-success-border: #b7dfc8;
 
@@ -74,9 +83,11 @@
   --transition-fast: 0.15s ease;
   --transition-normal: 0.2s ease;
   --transition-slow: 0.3s ease;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.76, 0, 0.24, 1);
 
   /* Z-index scale */
-  --z-dropdown: 100;
   --z-sticky: 200;
   --z-sidebar: 300;
   --z-modal: 400;
@@ -85,17 +96,23 @@
      del `.csf-overlay` del modal (z-index 400) en vez de anidados dentro —
      necesitan su propio nivel por encima para no quedar tapados. */
   --z-popover: 450;
-  --z-toast: 500;
 
   /* Sidebar widths */
   --sidebar-width: 245px;
-  --sidebar-width-collapsed: 80px;
 
   /* Typography */
   --font-sans: 'Archivo Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  /* Misma familia que --font-sans; los contextos numéricos (montos, tablas)
-     además agregan font-variant-numeric: tabular-nums en su propio selector. */
-  --font-numeric: 'Archivo Variable', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  /* Escala tipográfica: tamaño / leading / tracking apareados. La raíz está al
+     110 %, así que cada escalón renderiza un 15 % más grande que en aplicacion. */
+  --text-display: 2.25rem;  --leading-display: 1.05; --tracking-display: -0.03em;
+  --text-title: 1.65rem;    --leading-title: 1.15;   --tracking-title: -0.02em;
+  --text-heading: 1.15rem;  --leading-heading: 1.25; --tracking-heading: -0.01em;
+  --text-body: 1rem;        --leading-body: 1.5;     --tracking-body: 0;
+  --text-secondary: 0.875rem; --leading-secondary: 1.45; --tracking-secondary: 0;
+  --text-caption: 0.78rem;  --leading-caption: 1.4;  --tracking-caption: 0.01em;
+  --text-label: 0.7rem;     --leading-label: 1.2;    --tracking-label: 0.06em;
+  --text-micro: 0.65rem;    --leading-micro: 1.2;    --tracking-micro: 0.04em;
 }
 
 /* Modo oscuro — activado por ThemeContext seteando data-theme en <html>.
@@ -111,6 +128,7 @@
 
   --color-text-primary: #f5f5f5;
   --color-text-secondary: #b0b0b0;
+  --color-text-placeholder: #8f8f8f;
   --color-bg: #121212;
   --color-surface: #1e1e1e;
   --color-border: #2e2e2e;
@@ -119,9 +137,17 @@
   --color-border-light: #262626;
   --color-danger: #f87171;
   --color-danger-hover: #ef4444;
+  --color-danger-fill: #dc2626;
+  --color-danger-fill-hover: #b91c1c;
   --color-row-hover: #232323;
   --color-bg-subtle: #1a1a1a;
   --color-overlay: rgba(0, 0, 0, 0.6);
+  --color-scrim: rgba(0, 0, 0, 0.6);
+  --scrim-blur: blur(4px);
+  /* Sombras claras desaparecen sobre superficies oscuras; se redefinen con
+     más opacidad para seguir marcando la elevación. */
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.35), 0 1px 4px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 28px rgba(0, 0, 0, 0.5), 0 2px 6px rgba(0, 0, 0, 0.3);
 
   --status-success-bg: #1c3a26;
   --status-success-border: #4ade80;
@@ -136,4 +162,15 @@
 
   --surface-success-bg: #16241c;
   --surface-success-border: #2f5d43;
+}
+
+/* Preferencias de accesibilidad del sistema operativo. */
+@media (prefers-reduced-transparency: reduce) {
+  :root, :root[data-theme="dark"] { --scrim-blur: none; }
+  :root { --color-scrim: rgba(0, 0, 0, 0.55); }
+  :root[data-theme="dark"] { --color-scrim: rgba(0, 0, 0, 0.75); }
+}
+@media (prefers-contrast: more) {
+  :root { --color-border: #9a9a9a; --color-border-medium: #7a7a7a; --color-border-light: #b0b0b0; --color-text-secondary: #2e2e2e; --color-text-placeholder: #4a4a4a; }
+  :root[data-theme="dark"] { --color-border: #6a6a6a; --color-border-medium: #8a8a8a; --color-border-light: #555555; --color-text-secondary: #d8d8d8; --color-text-placeholder: #b8b8b8; }
 }

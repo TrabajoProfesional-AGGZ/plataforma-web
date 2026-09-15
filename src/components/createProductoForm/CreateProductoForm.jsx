@@ -26,7 +26,7 @@ const TEXTO_ESTADO_IMAGEN = {
  * @param {{ onSuccess: (payload: object) => void, onCancel: () => void }} props
  */
 export function CreateProductoForm({ onSuccess, onCancel }) {
-  const { step, direction, submitted, setSubmitted, navGuard } = useMultiStepFormState();
+  const { step, direction, submitted, setSubmitted, navGuard, finNavGuard } = useMultiStepFormState();
   const {
     fileInputRef, imagenPreview, estadoImagen, errorImagen,
     handleArchivoSeleccionado, subirSiCorresponde,
@@ -47,7 +47,6 @@ export function CreateProductoForm({ onSuccess, onCancel }) {
     if (imagenUrl) setValue('imagen_url', imagenUrl, { shouldValidate: true });
 
     setSubmitted(true);
-    await new Promise((r) => setTimeout(r, 1800));
     onSuccess({
       nombre: data.nombre.trim(),
       descripcion: data.descripcion?.trim() || null,
@@ -63,6 +62,7 @@ export function CreateProductoForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Nuevo producto"
       successTitle="¡Producto creado!"
@@ -93,8 +93,7 @@ export function CreateProductoForm({ onSuccess, onCancel }) {
             })}
             placeholder="Describí el producto..."
             rows={4}
-            className={`csf-input${errors.descripcion ? ' csf-input--error' : ''}`}
-            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: '0.875rem' }}
+            className={`csf-input csf-textarea${errors.descripcion ? ' csf-input--error' : ''}`}
           />
         </Field>
         <Field label="Precio ($)" icon={DollarSign} error={errors.precio?.message}>

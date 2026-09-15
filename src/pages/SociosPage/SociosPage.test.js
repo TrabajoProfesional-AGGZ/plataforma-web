@@ -80,12 +80,17 @@ const socioMock2 = {
   estado: { nombre: 'Moroso' },
 };
 
+/** El buscador arranca colapsado en una lupa: hay que abrirlo antes de escribir. */
+function abrirBuscador() {
+  fireEvent.click(screen.getByRole('button', { name: /abrir búsqueda/i }));
+}
+
 async function buscarYAbrirCard() {
   getSocios.mockResolvedValue([socioMock]);
   render(<SociosPage />);
   await waitFor(() => expect(getSocios).toHaveBeenCalled());
-  fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), { target: { value: '1001' } });
-  fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
+  abrirBuscador();
+  fireEvent.change(screen.getByPlaceholderText(/buscar por n°/i), { target: { value: '1001' } });
   await waitFor(() => expect(screen.getByText('1001')).toBeInTheDocument());
   fireEvent.click(screen.getByText('1001'));
 }
@@ -101,17 +106,19 @@ describe('SociosPage', () => {
   test('renderiza el título, el campo de búsqueda y los botones', async () => {
     render(<SociosPage />);
     expect(screen.getByRole('heading', { name: /socios/i })).toBeInTheDocument();
-    expect(screen.getByPlaceholderText(/buscar por n° de socio/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /buscar/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /ver todos/i })).toBeInTheDocument();
+    expect(screen.queryByPlaceholderText(/buscar por n°/i)).not.toBeInTheDocument();
+    abrirBuscador();
+    expect(screen.getByPlaceholderText(/buscar por n°/i)).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /crear socio/i })).toBeInTheDocument();
     await waitFor(() => expect(getSocios).toHaveBeenCalled());
   });
 
-  test('el botón buscar está deshabilitado si el campo está vacío', async () => {
+  test('la búsqueda es en vivo: no hay botón Buscar ni Ver todos', async () => {
     render(<SociosPage />);
     await waitFor(() => expect(getSocios).toHaveBeenCalled());
-    expect(screen.getByRole('button', { name: /buscar/i })).toBeDisabled();
+    abrirBuscador();
+    expect(screen.queryByRole('button', { name: /^buscar$/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /ver todos/i })).not.toBeInTheDocument();
   });
 
   test('despliega el listado de socios al montar la página', async () => {
@@ -137,15 +144,83 @@ describe('SociosPage', () => {
     render(<SociosPage />);
     await waitFor(() => expect(getSocios).toHaveBeenCalled());
 
-    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+    abrirBuscador();
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n°/i), {
       target: { value: '1001' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
 
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText('García')).not.toBeInTheDocument());
+    expect(screen.getByRole('table')).toBeInTheDocument();
     expect(screen.getAllByText('Pérez').length).toBeGreaterThan(0);
-    expect(screen.queryByText('García')).not.toBeInTheDocument();
     expect(screen.queryByText('12345678')).not.toBeInTheDocument();
+  });
+
+  test('un N° de socio se busca por coincidencia exacta, no por prefijo', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    abrirBuscador();
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n°/i), { target: { value: '100' } });
+
+    await waitFor(() => expect(screen.getByText(/no se encontró ningún socio con ese n°/i)).toBeInTheDocument());
+    expect(screen.queryByText('Pérez')).not.toBeInTheDocument();
+    expect(screen.queryByText('García')).not.toBeInTheDocument();
+  });
+
+  test('busca por apellido en vivo sin distinguir mayúsculas ni tildes', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    abrirBuscador();
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n°/i), { target: { value: 'perez' } });
+
+    await waitFor(() => expect(screen.queryByText('García')).not.toBeInTheDocument());
+    expect(screen.getByText('Pérez')).toBeInTheDocument();
+  });
+
+  test('busca por nombre y por "apellido nombre"', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    abrirBuscador();
+    const input = screen.getByPlaceholderText(/buscar por n°/i);
+    fireEvent.change(input, { target: { value: 'marí' } });
+    await waitFor(() => expect(screen.queryByText('Pérez')).not.toBeInTheDocument());
+    expect(screen.getByText('García')).toBeInTheDocument();
+
+    fireEvent.change(input, { target: { value: 'garcia maria' } });
+    await waitFor(() => expect(screen.getByText('García')).toBeInTheDocument());
+    expect(screen.queryByText('Pérez')).not.toBeInTheDocument();
+  });
+
+  test('sin coincidencias por apellido o nombre muestra el mensaje específico', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    abrirBuscador();
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n°/i), { target: { value: 'zzz' } });
+
+    await waitFor(() => expect(screen.getByText(/no se encontró ningún socio con ese apellido o nombre/i)).toBeInTheDocument());
+  });
+
+  test('cerrar el buscador limpia la búsqueda y vuelve a mostrar la lista completa', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+
+    abrirBuscador();
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n°/i), { target: { value: '1001' } });
+    await waitFor(() => expect(screen.queryByText('García')).not.toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /abrir búsqueda/i }));
+    await waitFor(() => expect(screen.getByText('García')).toBeInTheDocument());
+    expect(screen.getByText('Pérez')).toBeInTheDocument();
+    expect(getSocios).toHaveBeenCalledTimes(1);
   });
 
   test('muestra botones de editar y eliminar en la card del socio', async () => {
@@ -154,6 +229,16 @@ describe('SociosPage', () => {
       expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument();
       expect(screen.getByRole('button', { name: /eliminar/i })).toBeInTheDocument();
     });
+  });
+
+  test('Volver desde el detalle muestra la lista', async () => {
+    await buscarYAbrirCard();
+    await waitFor(() => expect(screen.getByRole('button', { name: /volver/i })).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /volver/i }));
+
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(screen.queryByRole('button', { name: /volver/i })).not.toBeInTheDocument();
   });
 
   test('muestra la foto de perfil del socio en la card cuando foto_url está presente', async () => {
@@ -177,47 +262,14 @@ describe('SociosPage', () => {
     render(<SociosPage />);
     await waitFor(() => expect(getSocios).toHaveBeenCalled());
 
-    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
+    abrirBuscador();
+
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n°/i), {
       target: { value: '9999' },
     });
-    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
 
     await waitFor(() => {
       expect(screen.getByText(/no se encontró ningún socio/i)).toBeInTheDocument();
-    });
-  });
-
-  test('muestra mensaje de error ante un fallo inesperado en la búsqueda cuando no hay caché', async () => {
-    getSocios
-      .mockRejectedValueOnce(new Error('fallo inicial'))
-      .mockRejectedValueOnce(new Error('Error al obtener socios'));
-    render(<SociosPage />);
-    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
-
-    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
-      target: { value: '1001' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
-
-    await waitFor(() => {
-      expect(screen.getByText(/error al buscar el socio/i)).toBeInTheDocument();
-    });
-  });
-
-  test('muestra mensaje de servicio no disponible en la búsqueda cuando no hay caché', async () => {
-    getSocios
-      .mockRejectedValueOnce(new Error('fallo inicial'))
-      .mockRejectedValueOnce(new Error('servicio-no-disponible'));
-    render(<SociosPage />);
-    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
-
-    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
-      target: { value: '1001' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
-
-    await waitFor(() => {
-      expect(screen.getByText(/el servicio no está disponible/i)).toBeInTheDocument();
     });
   });
 
@@ -226,19 +278,6 @@ describe('SociosPage', () => {
     render(<SociosPage />);
     await waitFor(() => {
       expect(screen.getByText(/el servicio no está disponible/i)).toBeInTheDocument();
-    });
-  });
-
-  test('muestra la lista de socios al hacer click en Ver todos', async () => {
-    getSocios.mockResolvedValue([socioMock]);
-    render(<SociosPage />);
-    await waitFor(() => expect(getSocios).toHaveBeenCalled());
-
-    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
-
-    await waitFor(() => {
-      expect(screen.getAllByText('Pérez').length).toBeGreaterThan(0);
-      expect(screen.getByRole('table')).toBeInTheDocument();
     });
   });
 
@@ -300,15 +339,44 @@ describe('SociosPage', () => {
     });
   });
 
-  test('hacer click en Ver todos usa la caché y no vuelve a llamar al servidor', async () => {
-    getSocios.mockResolvedValue([socioMock]);
+  test('Reintentar tras un fallo inicial vuelve a pedir la lista y la muestra a medida que llegan páginas', async () => {
+    getSocios
+      .mockRejectedValueOnce(new Error('fallo inicial'))
+      .mockImplementationOnce(async ({ onPage } = {}) => { onPage?.([socioMock]); return [socioMock]; });
     render(<SociosPage />);
-    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
+    await waitFor(() => expect(screen.getByText(/error al obtener los socios/i)).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
+    fireEvent.click(screen.getByRole('button', { name: /reintentar/i }));
 
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-    expect(getSocios).toHaveBeenCalledTimes(1);
+    expect(getSocios).toHaveBeenCalledTimes(2);
+    expect(screen.getByText('Pérez')).toBeInTheDocument();
+    expect(screen.queryByText(/error al obtener los socios/i)).not.toBeInTheDocument();
+  });
+
+  test('Reintentar muestra el error genérico si la recarga vuelve a fallar', async () => {
+    getSocios
+      .mockRejectedValueOnce(new Error('fallo inicial'))
+      .mockRejectedValueOnce(new Error('otro fallo'));
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByText(/error al obtener los socios/i)).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /reintentar/i }));
+
+    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(2));
+    expect(await screen.findByText(/error al obtener los socios/i)).toBeInTheDocument();
+  });
+
+  test('Reintentar muestra servicio no disponible si la recarga falla por ese motivo', async () => {
+    getSocios
+      .mockRejectedValueOnce(new Error('fallo inicial'))
+      .mockRejectedValueOnce(new Error('servicio-no-disponible'));
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByText(/error al obtener los socios/i)).toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: /reintentar/i }));
+
+    expect(await screen.findByText(/el servicio no está disponible/i)).toBeInTheDocument();
   });
 
   // --- Modal crear ---
@@ -395,30 +463,49 @@ describe('SociosPage', () => {
 
   // --- Filtro por categoría ---
 
-  test('muestra el botón Filtrar por en la vista de lista', async () => {
-    getSocios.mockResolvedValue([socioMock]);
-    render(<SociosPage />);
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-    expect(screen.getByRole('button', { name: /filtrar por/i })).toBeInTheDocument();
-  });
-
-  test('al hacer click en Filtrar por aparecen los selectores de categoría y estado', async () => {
+  test('los selectores de categoría y estado están visibles sin abrir nada', async () => {
     getSocios.mockResolvedValue([socioMock, socioMock2]);
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
+    expect(screen.queryByRole('button', { name: /filtrar por/i })).not.toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Filtrar por categoría' })).toHaveDisplayValue('Categoría: Todas');
+    expect(screen.getByRole('combobox', { name: 'Filtrar por estado' })).toHaveDisplayValue('Estado: Todos');
+  });
 
-    expect(screen.getByDisplayValue('Categoría: Todas')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Estado: Todos')).toBeInTheDocument();
+  test('no muestra los filtros hasta tener la lista cargada', async () => {
+    getSocios.mockResolvedValue([socioMock]);
+    render(<SociosPage />);
+    expect(screen.queryByRole('combobox', { name: 'Filtrar por categoría' })).not.toBeInTheDocument();
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(screen.getByRole('combobox', { name: 'Filtrar por categoría' })).toBeInTheDocument();
+  });
+
+  test('muestra el contador de filtros activos y Limpiar los resetea sin recargar', async () => {
+    getSocios.mockResolvedValue([socioMock, socioMock2]);
+    render(<SociosPage />);
+    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(screen.queryByText(/filtros? activos?/)).not.toBeInTheDocument();
+
+    fireEvent.change(screen.getByDisplayValue('Categoría: Todas'), { target: { value: 'Senior' } });
+    expect(screen.getByText('1 filtro activo')).toBeInTheDocument();
+
+    fireEvent.change(screen.getByDisplayValue('Estado: Todos'), { target: { value: 'Moroso' } });
+    expect(screen.getByText('2 filtros activos')).toBeInTheDocument();
+    expect(screen.queryByText('Pérez')).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Limpiar' }));
+
+    expect(screen.queryByText(/filtros? activos?/)).not.toBeInTheDocument();
+    expect(screen.getByText('Pérez')).toBeInTheDocument();
+    expect(screen.getByText('García')).toBeInTheDocument();
+    expect(getSocios).toHaveBeenCalledTimes(1);
   });
 
   test('el selector de categoría muestra las opciones únicas disponibles', async () => {
     getSocios.mockResolvedValue([socioMock, socioMock2]);
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
 
     expect(screen.getByRole('option', { name: 'Activo' })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: 'Senior' })).toBeInTheDocument();
@@ -429,7 +516,6 @@ describe('SociosPage', () => {
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
     fireEvent.change(screen.getByDisplayValue('Categoría: Todas'), { target: { value: 'Senior' } });
 
     expect(screen.getByText('García')).toBeInTheDocument();
@@ -442,7 +528,6 @@ describe('SociosPage', () => {
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
     fireEvent.change(screen.getByDisplayValue('Categoría: Todas'), { target: { value: 'Senior' } });
     fireEvent.change(screen.getByDisplayValue('Estado: Todos'), { target: { value: 'Moroso' } });
 
@@ -451,20 +536,19 @@ describe('SociosPage', () => {
     expect(screen.queryByText('López')).not.toBeInTheDocument();
   });
 
-  test('los filtros se limpian al hacer click en Ver todos', async () => {
+  test('la búsqueda se combina con los filtros del listado', async () => {
     getSocios.mockResolvedValue([socioMock, socioMock2]);
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
     fireEvent.change(screen.getByDisplayValue('Categoría: Todas'), { target: { value: 'Senior' } });
     expect(screen.queryByText('Pérez')).not.toBeInTheDocument();
+    expect(screen.getByText('García')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
-    await waitFor(() => {
-      expect(screen.getByText('Pérez')).toBeInTheDocument();
-      expect(screen.getByText('García')).toBeInTheDocument();
-    });
+    abrirBuscador();
+    fireEvent.change(screen.getByPlaceholderText(/buscar por n°/i), { target: { value: 'perez' } });
+    await waitFor(() => expect(screen.queryByText('García')).not.toBeInTheDocument());
+    expect(screen.getByText(/no se encontró ningún socio con ese apellido o nombre/i)).toBeInTheDocument();
   });
 
   // --- Filtro por disciplina (Feedback: se quitó la vista de socios inscriptos de Disciplinas) ---
@@ -475,8 +559,6 @@ describe('SociosPage', () => {
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
-
     expect(screen.queryByDisplayValue('Disciplina: Todas')).not.toBeInTheDocument();
   });
 
@@ -485,8 +567,6 @@ describe('SociosPage', () => {
     getDisciplinas.mockResolvedValue([{ id: 'disc-1', nombre: 'Natación' }]);
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
 
     expect(screen.getByDisplayValue('Disciplina: Todas')).toBeInTheDocument();
     expect(screen.getByRole('option', { name: 'Natación' })).toBeInTheDocument();
@@ -499,7 +579,6 @@ describe('SociosPage', () => {
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
     fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
 
     await waitFor(() => expect(getSociosByDisciplina).toHaveBeenCalledWith('disc-1'));
@@ -516,7 +595,6 @@ describe('SociosPage', () => {
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
     fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
 
     await waitFor(() => {
@@ -531,7 +609,6 @@ describe('SociosPage', () => {
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
     fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
 
     await waitFor(() => expect(screen.getByText('Extender suscripcion')).toBeInTheDocument());
@@ -545,7 +622,6 @@ describe('SociosPage', () => {
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
     fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
     await waitFor(() => expect(screen.getByText('Extender suscripcion')).toBeInTheDocument());
 
@@ -564,7 +640,6 @@ describe('SociosPage', () => {
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
     fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
     await waitFor(() => expect(screen.getByText('Extender suscripcion')).toBeInTheDocument());
 
@@ -573,23 +648,19 @@ describe('SociosPage', () => {
     await waitFor(() => expect(screen.getByText('Error, reintentar')).toBeInTheDocument());
   });
 
-  test('el filtro de disciplina se limpia al hacer click en Ver todos', async () => {
+  test('muestra un caption con la disciplina filtrada sobre la tabla', async () => {
     getSocios.mockResolvedValue([socioMock, socioMock2]);
     getDisciplinas.mockResolvedValue([{ id: 'disc-1', nombre: 'Natación' }]);
     getSociosByDisciplina.mockResolvedValue([{ id: socioMock.id, nro_socio: socioMock.nro_socio }]);
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
+    expect(screen.queryByText(/mostrando inscriptos/i)).not.toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
-    fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
-    await waitFor(() => expect(screen.queryByText('García')).not.toBeInTheDocument());
+    fireEvent.change(screen.getByRole('combobox', { name: 'Filtrar por disciplina' }), { target: { value: 'disc-1' } });
 
-    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
-
-    await waitFor(() => {
-      expect(screen.getByText('Pérez')).toBeInTheDocument();
-      expect(screen.getByText('García')).toBeInTheDocument();
-    });
+    await waitFor(() => expect(screen.getByText('Mostrando inscriptos en Natación')).toBeInTheDocument());
+    fireEvent.click(screen.getByRole('button', { name: 'Limpiar' }));
+    expect(screen.queryByText(/mostrando inscriptos/i)).not.toBeInTheDocument();
   });
 
   test('un socio en_espera muestra el botón "Quitar de lista de espera" en vez de extender', async () => {
@@ -601,7 +672,6 @@ describe('SociosPage', () => {
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
     fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
 
     expect(await screen.findByText('Quitar de lista de espera')).toBeInTheDocument();
@@ -618,7 +688,6 @@ describe('SociosPage', () => {
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
     fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
     fireEvent.click(await screen.findByText('Quitar de lista de espera'));
 
@@ -641,7 +710,6 @@ describe('SociosPage', () => {
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
     fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
     fireEvent.click(await screen.findByText('Quitar de lista de espera'));
 
@@ -661,7 +729,6 @@ describe('SociosPage', () => {
     render(<SociosPage />);
     await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
     fireEvent.change(screen.getByDisplayValue('Disciplina: Todas'), { target: { value: 'disc-1' } });
     fireEvent.click(await screen.findByText('Quitar de lista de espera'));
 
@@ -835,125 +902,6 @@ describe('SociosPage', () => {
     await waitFor(() => expect(screen.getByRole('button', { name: /editar/i })).toBeInTheDocument());
   });
 
-  // --- Búsqueda sin caché (ruta no-cache en handleBuscar) ---
-
-  test('muestra el socio en la tabla al buscarlo cuando la caché está vacía', async () => {
-    getSocios
-      .mockRejectedValueOnce(new Error('fallo inicial'))
-      .mockResolvedValueOnce([socioMock]);
-    render(<SociosPage />);
-    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
-
-    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
-      target: { value: '1001' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
-
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-    expect(screen.getAllByText('Pérez').length).toBeGreaterThan(0);
-  });
-
-  test('muestra no encontrado al buscar sin caché cuando el socio no existe', async () => {
-    getSocios
-      .mockRejectedValueOnce(new Error('fallo inicial'))
-      .mockResolvedValueOnce([socioMock]);
-    render(<SociosPage />);
-    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
-
-    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
-      target: { value: '9999' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
-
-    await waitFor(() => {
-      expect(screen.getByText(/no se encontró ningún socio/i)).toBeInTheDocument();
-    });
-  });
-
-  test('Ver todos cancela el timeout de búsqueda pendiente y muestra la lista', async () => {
-    getSocios.mockResolvedValue([socioMock]);
-    render(<SociosPage />);
-    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
-
-    fireEvent.change(screen.getByPlaceholderText(/buscar por n° de socio/i), {
-      target: { value: '1001' },
-    });
-    fireEvent.click(screen.getByRole('button', { name: /buscar/i }));
-    // buscarTimeoutRef.current queda pendiente (400ms), no ha disparado aún
-
-    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
-
-    await waitFor(() => expect(screen.getByRole('table')).toBeInTheDocument());
-    expect(getSocios).toHaveBeenCalledTimes(1);
-  });
-
-  test('Ver todos recarga del servidor cuando no hay caché', async () => {
-    getSocios
-      .mockRejectedValueOnce(new Error('fallo inicial'))
-      .mockResolvedValueOnce([socioMock]);
-    render(<SociosPage />);
-    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
-
-    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
-
-    await waitFor(() => {
-      expect(getSocios).toHaveBeenCalledTimes(2);
-      expect(screen.getByRole('table')).toBeInTheDocument();
-    });
-  });
-
-  test('Ver todos actualiza la tabla incrementalmente a medida que llegan páginas del reintento', async () => {
-    let onPageCb;
-    let resolveGetSocios;
-    getSocios
-      .mockRejectedValueOnce(new Error('fallo inicial'))
-      .mockImplementationOnce(({ onPage } = {}) => {
-        onPageCb = onPage;
-        return new Promise((resolve) => { resolveGetSocios = resolve; });
-      });
-    render(<SociosPage />);
-    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
-
-    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
-
-    await waitFor(() => expect(onPageCb).toBeDefined());
-    act(() => { onPageCb([socioMock]); });
-    await waitFor(() => expect(screen.getByText('1001')).toBeInTheDocument());
-
-    act(() => { onPageCb([socioMock, socioMock2]); });
-    await waitFor(() => expect(screen.getByText('1002')).toBeInTheDocument());
-
-    await act(async () => { resolveGetSocios([socioMock, socioMock2]); });
-  });
-
-  test('Ver todos muestra error de servicio no disponible cuando falla el reintento', async () => {
-    getSocios
-      .mockRejectedValueOnce(new Error('fallo inicial'))
-      .mockRejectedValueOnce(new Error('servicio-no-disponible'));
-    render(<SociosPage />);
-    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
-
-    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
-
-    await waitFor(() => {
-      expect(screen.getByText(/el servicio no está disponible en este momento/i)).toBeInTheDocument();
-    });
-  });
-
-  test('Ver todos muestra error genérico cuando falla el reintento con un error inesperado', async () => {
-    getSocios
-      .mockRejectedValueOnce(new Error('fallo inicial'))
-      .mockRejectedValueOnce(new Error('otro error'));
-    render(<SociosPage />);
-    await waitFor(() => expect(getSocios).toHaveBeenCalledTimes(1));
-
-    fireEvent.click(screen.getByRole('button', { name: /ver todos/i }));
-
-    await waitFor(() => {
-      expect(screen.getByText(/error al obtener los socios\. intentá de nuevo\./i)).toBeInTheDocument();
-    });
-  });
-
   // --- Paginación ---
 
   function crearSocios(cantidad) {
@@ -1030,7 +978,6 @@ describe('SociosPage', () => {
     fireEvent.click(screen.getByRole('button', { name: /página siguiente/i }));
     expect(screen.getByText('Página 2 de 2')).toBeInTheDocument();
 
-    fireEvent.click(screen.getByRole('button', { name: /filtrar por/i }));
     fireEvent.change(screen.getByDisplayValue('Estado: Todos'), { target: { value: 'Moroso' } });
 
     await waitFor(() => {

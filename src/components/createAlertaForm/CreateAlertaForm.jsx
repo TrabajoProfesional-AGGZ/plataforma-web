@@ -24,7 +24,7 @@ const STEPS = [{ id: 1, label: 'Datos', icon: MessageSquare }];
  */
 export function CreateAlertaForm({ onSuccess, onCancel }) {
   const { logoSocio: logo } = useTheme();
-  const { step, direction, submitted, setSubmitted, navGuard } = useMultiStepFormState();
+  const { step, direction, submitted, setSubmitted, navGuard, finNavGuard } = useMultiStepFormState();
 
   const {
     register,
@@ -81,7 +81,6 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
     }
 
     setSubmitted(true);
-    await new Promise((resolve) => setTimeout(resolve, 1800));
     onSuccess(
       modo === 'socios'
         ? { mensaje: data.mensaje.trim(), ids_socios: sociosAgregados.map((s) => s.id) }
@@ -99,6 +98,7 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
       step={step}
       submitted={submitted}
       navGuard={navGuard}
+      onStepEntered={finNavGuard}
       isSubmitting={isSubmitting}
       title="Nueva alerta"
       successTitle="¡Alerta enviada!"
@@ -118,8 +118,7 @@ export function CreateAlertaForm({ onSuccess, onCancel }) {
             })}
             placeholder="Redactá el mensaje de la alerta..."
             rows={5}
-            className={`csf-input${errors.mensaje ? ' csf-input--error' : ''}`}
-            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: '0.875rem' }}
+            className={`csf-input csf-textarea${errors.mensaje ? ' csf-input--error' : ''}`}
           />
         </Field>
 

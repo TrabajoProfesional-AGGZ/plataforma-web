@@ -72,7 +72,7 @@ const EVENTO_LISTA = {
 async function renderPage() {
   render(<EventosPage />);
   await waitFor(() =>
-    expect(document.querySelector('.list-loading')).not.toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   );
 }
 

@@ -3,7 +3,6 @@ import { MotionConfig } from 'framer-motion';
 import LoginPage from './pages/LoginPage/LoginPage';
 import DashboardPage from './pages/DashboardPage/DashboardPage';
 import SociosPage from './pages/SociosPage/SociosPage';
-import CambiarContrasenaPage from './pages/CambiarContrasenaPage/CambiarContrasenaPage';
 import PerfilPage from './pages/PerfilPage/PerfilPage';
 import UsuariosPage from './pages/UsuariosPage/UsuariosPage';
 import InstalacionesPage from './pages/InstalacionesPage/InstalacionesPage';
@@ -18,8 +17,8 @@ import TiendaPage from './pages/TiendaPage/TiendaPage';
 
 /**
  * Componente raíz de la aplicación. Define el árbol de rutas: login público,
- * rutas comunes a cualquier usuario autenticado (dashboard, perfil, cambiar
- * contraseña, tienda) y rutas gateadas por permiso específico mediante
+ * rutas comunes a cualquier usuario autenticado (dashboard, perfil, tienda)
+ * y rutas gateadas por permiso específico mediante
  * `PrivateRoute`. Cualquier ruta no reconocida redirige a `/dashboard`.
  */
 function App() {
@@ -33,7 +32,6 @@ function App() {
             <Route element={<AppLayout />}>
               <Route path="/dashboard" element={<DashboardPage />} />
               <Route path="/perfil" element={<PerfilPage />} />
-              <Route path="/cambiar-contrasena" element={<CambiarContrasenaPage />} />
             </Route>
           </Route>
 

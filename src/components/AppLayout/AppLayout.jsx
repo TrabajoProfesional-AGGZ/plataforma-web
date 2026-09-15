@@ -1,30 +1,13 @@
-import { useRef, useEffect, useLayoutEffect, useState } from 'react';
+import { useRef, useEffect, useLayoutEffect, useState, useCallback } from 'react';
 import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
-import { LayoutDashboard, Users, ShieldCheck, Building2, Trophy, Newspaper, Ticket, Settings, BarChart3, Bell, Menu, Moon, Sun } from 'lucide-react';
+import { Menu, Moon, Sun } from 'lucide-react';
 import { logout } from '../../services/authService';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../hooks/useTheme';
 import { useBackToRoot } from '../../hooks/useBackToRoot';
-import { ShoppingBag } from 'lucide-react';
+import { useDocumentTitle } from '../../hooks/useDocumentTitle';
+import { SECCIONES, seccionPorRuta } from '../../navigation';
 import './AppLayout.css';
-
-
-// Ítems de navegación de la sidebar. `permiso: null` (o vacío) significa
-// visible para cualquier usuario autenticado; si no, se filtra según los
-// permisos devueltos por el login (ver `navItems` más abajo).
-const NAV_ITEMS_BASE = [
-  { to: '/dashboard', label: 'Dashboard', Icon: LayoutDashboard, permiso: null },
-  { to: '/socios', label: 'Socios', Icon: Users, permiso: 'ver_socios' },
-  { to: '/usuarios', label: 'Usuarios', Icon: ShieldCheck, permiso: 'ver_usuarios' },
-  { to: '/instalaciones', label: 'Reservas e Instalaciones', Icon: Building2, permiso: 'ver_instalaciones' },
-  { to: '/disciplinas', label: 'Disciplinas', Icon: Trophy, permiso: 'ver_disciplinas' },
-  { to: '/noticias', label: 'Noticias', Icon: Newspaper, permiso: 'ver_noticias' },
-  { to: '/eventos', label: 'Eventos', Icon: Ticket, permiso: 'ver_eventos' },
-  { to: '/metricas', label: 'Métricas', Icon: BarChart3, permiso: 'ver_metricas' },
-  { to: '/alertas', label: 'Alertas', Icon: Bell, permiso: 'ver_alertas' },
-  { to: '/perfil', label: 'Perfil', Icon: Settings, permiso: ''},
-  { to: '/tienda', label: 'Tienda', Icon: ShoppingBag, permiso: null },
-];
 
 /**
  * Layout principal de la aplicación autenticada: sidebar de navegación
@@ -38,92 +21,79 @@ function AppLayout() {
   const location = useLocation();
   const navRef = useRef(null);
   const indicatorRef = useRef(null);
-  const prevActiveIndexRef = useRef(-1);
-  const animTimersRef = useRef([]);
+  const indicadorSinPosicionRef = useRef(true);
+  const snapFrameRef = useRef(null);
+  const contentRef = useRef(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   useBackToRoot(drawerOpen, false, () => setDrawerOpen(false));
+  useDocumentTitle(seccionPorRuta(location.pathname)?.label);
 
-  // Anima el fondo del ítem activo (`.sidebar-active-bg`) para que se
-  // deslice de un link al siguiente en vez de saltar directo. En la
-  // primera carga (no hay posición previa) se ubica sin animar ("snap");
-  // al navegar entre links no adyacentes, avanza de a un ítem por vez
-  // cada 50ms hasta llegar al destino, en lugar de animar directo de
-  // origen a destino, para que el desplazamiento se sienta continuo.
-  useLayoutEffect(() => {
+  // Ubica el fondo del ítem activo (`.sidebar-active-bg`) sobre el link
+  // actual. El deslizamiento lo hace la `transition` de CSS en una sola
+  // pasada, sin importar cuántos ítems haya entre origen y destino. Con
+  // `snap` se agrega `--snap` (transition: none) para que el cambio sea
+  // instantáneo, y se la quita en el siguiente frame para que la próxima
+  // navegación vuelva a animar.
+  const posicionarIndicador = useCallback((snap) => {
     if (!navRef.current || !indicatorRef.current) return;
-
-    const linkEls = Array.from(navRef.current.querySelectorAll('.sidebar-link'));
-    const to = linkEls.findIndex(el => el.classList.contains('active'));
-    if (to === -1) return;
-
-    const from = prevActiveIndexRef.current;
+    const activo = navRef.current.querySelector('.sidebar-link.active');
+    if (!activo) return;
     const el = indicatorRef.current;
-
-    animTimersRef.current.forEach(clearTimeout);
-    animTimersRef.current = [];
-
-    const snap = (idx) => {
-      el.style.transition = 'none';
-      el.style.transform = `translateY(${linkEls[idx].offsetTop}px)`;
-      el.style.height = `${linkEls[idx].offsetHeight}px`;
-      el.style.opacity = '1';
-    };
-
-    const slide = (idx) => {
-      el.style.transition = 'transform 0.05s ease-out';
-      el.style.transform = `translateY(${linkEls[idx].offsetTop}px)`;
-      el.style.height = `${linkEls[idx].offsetHeight}px`;
-    };
-
-    if (from === -1) {
-      snap(to);
-      prevActiveIndexRef.current = to;
-      return;
+    if (snap) {
+      el.classList.add('sidebar-active-bg--snap');
+      if (snapFrameRef.current) cancelAnimationFrame(snapFrameRef.current);
     }
-
-    if (from === to) return;
-
-    const step = from < to ? 1 : -1;
-    let current = from + step;
-
-    const doStep = () => {
-      slide(current);
-      if (current !== to) {
-        current += step;
-        const t = setTimeout(doStep, 50);
-        animTimersRef.current.push(t);
-      } else {
-        prevActiveIndexRef.current = to;
-      }
-    };
-
-    doStep();
-  }, [location.pathname]);
-
-  // Limpia los timeouts de la animación por pasos si el componente se
-  // desmonta a mitad de una animación en curso.
-  useEffect(() => {
-    return () => { animTimersRef.current.forEach(clearTimeout); };
+    el.style.transform = `translateY(${activo.offsetTop}px)`;
+    el.style.height = `${activo.offsetHeight}px`;
+    el.style.opacity = '1';
+    indicadorSinPosicionRef.current = false;
+    if (snap) {
+      snapFrameRef.current = requestAnimationFrame(() => {
+        el.classList.remove('sidebar-active-bg--snap');
+        snapFrameRef.current = null;
+      });
+    }
   }, []);
 
-  // Reposiciona el indicador activo sin animar al redimensionar la ventana
-  // (o hacer zoom), ya que `offsetTop`/`offsetHeight` de los links cambian
-  // con el layout y la posición calculada en el último render queda obsoleta.
+  // En el primer render (sin posición previa) se ubica sin animar; en cada
+  // cambio de ruta, la transición de CSS lo desliza al link nuevo.
+  useLayoutEffect(() => {
+    posicionarIndicador(indicadorSinPosicionRef.current);
+  }, [location.pathname, posicionarIndicador]);
+
+  // Reposiciona el indicador sin animar al redimensionar la ventana (o
+  // hacer zoom): `offsetTop`/`offsetHeight` de los links cambian con el
+  // layout y la posición calculada en el último render queda obsoleta.
   useEffect(() => {
-    function handleResize() {
-      if (!navRef.current || !indicatorRef.current) return;
-      const linkEls = Array.from(navRef.current.querySelectorAll('.sidebar-link'));
-      const idx = linkEls.findIndex(el => el.classList.contains('active'));
-      if (idx === -1) return;
-      const el = indicatorRef.current;
-      el.style.transition = 'none';
-      el.style.transform = `translateY(${linkEls[idx].offsetTop}px)`;
-      el.style.height = `${linkEls[idx].offsetHeight}px`;
-      el.style.opacity = '1';
-    }
+    const handleResize = () => posicionarIndicador(true);
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (snapFrameRef.current) cancelAnimationFrame(snapFrameRef.current);
+    };
+  }, [posicionarIndicador]);
+
+  // Marca el header con --scrolled cuando el contenido dejó de estar al tope
+  // (borde + sombra recién ahí). Se lee el scrollTop en un rAF para no hacer
+  // trabajo en cada evento de scroll.
+  useEffect(() => {
+    const contenido = contentRef.current;
+    if (!contenido) return;
+    let frame = null;
+    const handleScroll = () => {
+      if (frame !== null) return;
+      frame = requestAnimationFrame(() => {
+        frame = null;
+        setScrolled(contenido.scrollTop > 4);
+      });
+    };
+    contenido.addEventListener('scroll', handleScroll, { passive: true });
+    return () => {
+      contenido.removeEventListener('scroll', handleScroll);
+      if (frame !== null) cancelAnimationFrame(frame);
+    };
   }, []);
 
   // Cierra el drawer mobile automáticamente al navegar a otra ruta.
@@ -147,7 +117,7 @@ function AppLayout() {
   }
 
   // Filtra los ítems de la sidebar según los permisos del usuario logueado.
-  const navItems = NAV_ITEMS_BASE.filter(n => !n.permiso || permisos.includes(n.permiso));
+  const navItems = SECCIONES.filter(n => !n.permiso || permisos.includes(n.permiso));
 
   return (
     <div className="app-layout">
@@ -173,7 +143,7 @@ function AppLayout() {
           </button>
         </div>
 
-        <nav className="sidebar-nav" ref={navRef}>
+        <nav className="sidebar-nav" aria-label="Principal" ref={navRef}>
           <div ref={indicatorRef} className="sidebar-active-bg" />
           {navItems.map(({ to, label, Icon }) => (
             <NavLink
@@ -194,7 +164,7 @@ function AppLayout() {
       </aside>
 
       <div className="app-main">
-        <header className="app-header">
+        <header className={`app-header${scrolled ? ' app-header--scrolled' : ''}`}>
           <button
             className="app-header-menu-btn"
             aria-label="Abrir menú"
@@ -213,7 +183,7 @@ function AppLayout() {
           </div>
         </header>
 
-        <main className="app-content">
+        <main className="app-content" ref={contentRef}>
           <Outlet />
         </main>
       </div>

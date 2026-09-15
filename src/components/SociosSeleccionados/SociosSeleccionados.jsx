@@ -29,7 +29,7 @@ export function SociosSeleccionados({
               <span>{socio.nro_socio} — {socio.apellido} {socio.nombre}</span>
               <button
                 type="button"
-                className="csf-socio-chip-remove"
+                className="icon-btn csf-socio-chip-remove"
                 onClick={() => removerSocio(socio.id)}
                 aria-label={`Quitar socio ${socio.nro_socio}`}
               >

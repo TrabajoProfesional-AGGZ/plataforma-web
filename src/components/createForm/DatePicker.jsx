@@ -56,7 +56,7 @@ function buildGridDays(viewDate) {
 export function DatePicker({ error, className, style, min, max, disabled, placeholder, ref: forwardedRef, ...props }) {
   const inputRef = useRef(null);
   const {
-    open, toggle, closePopover, position, triggerRef, popoverRef,
+    open, closing, toggle, closePopover, handleClosed, position, triggerRef, popoverRef,
   } = usePickerPopover({ width: 272, height: 336 });
   const [value, setValue] = useState('');
   const [viewDate, setViewDate] = useState(() => parseIso(value) || new Date());
@@ -79,6 +79,7 @@ export function DatePicker({ error, className, style, min, max, disabled, placeh
 
   function selectDay(iso) {
     setNativeValue(inputRef.current, iso);
+    setValue(iso);
     closePopover();
   }
 
@@ -114,13 +115,15 @@ export function DatePicker({ error, className, style, min, max, disabled, placeh
         <span className={selectedIso ? '' : 'csf-picker-placeholder'}>{label}</span>
       </button>
 
-      {open && createPortal(
+      {(open || closing) && createPortal(
         <div
           ref={popoverRef}
-          className="csf-calendar-popover"
+          className={`csf-calendar-popover${closing ? ' csf-popover--closing' : ''}`}
+          data-placement={position.placement}
           role="dialog"
           aria-label="Elegir fecha"
           style={{ top: position.top, left: position.left }}
+          onAnimationEnd={closing ? handleClosed : undefined}
         >
           <div className="csf-calendar-header">
             <button type="button" className="csf-calendar-nav" onClick={() => changeMonth(-1)} aria-label="Mes anterior">
@@ -128,7 +131,7 @@ export function DatePicker({ error, className, style, min, max, disabled, placeh
             </button>
             <div className="csf-calendar-title-selects">
               <select
-                className="csf-calendar-select"
+                className="csf-calendar-select hit-area"
                 aria-label="Mes"
                 value={viewDate.getMonth()}
                 onChange={(e) => setViewDate(new Date(viewDate.getFullYear(), Number(e.target.value), 1))}
@@ -136,7 +139,7 @@ export function DatePicker({ error, className, style, min, max, disabled, placeh
                 {MESES.map((m, i) => <option key={m} value={i}>{m}</option>)}
               </select>
               <select
-                className="csf-calendar-select"
+                className="csf-calendar-select hit-area"
                 aria-label="Año"
                 value={viewDate.getFullYear()}
                 onChange={(e) => setViewDate(new Date(Number(e.target.value), viewDate.getMonth(), 1))}

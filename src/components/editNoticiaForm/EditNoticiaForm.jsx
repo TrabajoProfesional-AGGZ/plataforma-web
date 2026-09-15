@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { FileText } from 'lucide-react';
 import { editarNoticia } from '../../services/noticiasService';
@@ -17,6 +17,8 @@ const STEPS = [{ id: 1, label: 'Datos', icon: FileText }];
 export function EditNoticiaForm({ noticia, onSuccess, onCancel }) {
   const [submitted, setSubmitted] = useState(false);
   const [formError, setFormError] = useState('');
+  const [resultado, setResultado] = useState(null);
+  const timerRef = useRef(null);
 
   const {
     register,
@@ -37,8 +39,9 @@ export function EditNoticiaForm({ noticia, onSuccess, onCancel }) {
         titulo: data.titulo.trim(),
         cuerpo: data.cuerpo.trim(),
       });
+      setResultado(actualizada);
       setSubmitted(true);
-      setTimeout(() => onSuccess(actualizada), 1800);
+      timerRef.current = setTimeout(() => onSuccess(actualizada), 3000);
     } catch (err) {
       if (err.message === 'servicio-no-disponible') {
         setFormError('El servicio no está disponible. Intentá de nuevo más tarde.');
@@ -58,6 +61,7 @@ export function EditNoticiaForm({ noticia, onSuccess, onCancel }) {
       title="Editar noticia"
       successTitle="¡Noticia actualizada!"
       successMessage="Los cambios fueron guardados correctamente."
+      onSuccessAction={() => { clearTimeout(timerRef.current); onSuccess(resultado); }}
       submitLabel="Guardar cambios"
       submitLoadingLabel="Guardando..."
       onCancel={onCancel}
@@ -85,8 +89,7 @@ export function EditNoticiaForm({ noticia, onSuccess, onCancel }) {
               maxLength: { value: MAX_LEN.CUERPO_NOTICIA, message: `Máximo ${MAX_LEN.CUERPO_NOTICIA} caracteres` },
             })}
             rows={5}
-            className={`csf-input${errors.cuerpo ? ' csf-input--error' : ''}`}
-            style={{ resize: 'vertical', fontFamily: 'inherit', fontSize: '0.875rem' }}
+            className={`csf-input csf-textarea${errors.cuerpo ? ' csf-input--error' : ''}`}
           />
         </Field>
         {formError && (

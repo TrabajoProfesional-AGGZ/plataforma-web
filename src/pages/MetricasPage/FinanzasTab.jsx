@@ -1,12 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { getDashboardFinanzas } from '../../services/metricasService';
 import { DesgloseFinanzasChart } from '../../components/charts/DesgloseFinanzasChart';
-import { useTheme } from '../../hooks/useTheme';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import './FinanzasTab.css';
 
 /** Pestaña "Finanzas" de Métricas: recaudación total y desglose por concepto para un período elegido. */
 function FinanzasTab() {
-  const { logoSocio: logo } = useTheme();
   const [datosFinanzas, setDatosFinanzas] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -17,7 +17,7 @@ function FinanzasTab() {
     return `${hoy.getFullYear()}-${String(hoy.getMonth() + 1).padStart(2, '0')}`;
   });
 
-  useEffect(() => {
+  const cargar = useCallback(() => {
     let cancelled = false;
 
     setLoading(true);
@@ -48,17 +48,21 @@ function FinanzasTab() {
     return () => { cancelled = true; };
   }, [periodoSeleccionado]);
 
+  useEffect(() => cargar(), [cargar]);
+
   function renderContenido() {
     if (loading) {
       return (
-        <div className="finanzas-loading">
-          <img src={logo} alt="" className="loading-logo" />
+        <div className="finanzas-dashboard">
+          <div className="finanzas-kpi-card">
+            <SkeletonRows n={1} altura={120} />
+          </div>
         </div>
       );
     }
 
     if (error) {
-      return <p className="finanzas-error">{error}</p>;
+      return <ErrorBanner mensaje={error} onReintentar={cargar} />;
     }
 
     if (!datosFinanzas) {
@@ -87,7 +91,7 @@ function FinanzasTab() {
   }
 
   return (
-    <div className="finanzas-tab">
+    <div>
       <div className="finanzas-toolbar">
         <div className="finanzas-filter-group">
           <label htmlFor="periodo" className="finanzas-filter-label">Período a consultar:</label>

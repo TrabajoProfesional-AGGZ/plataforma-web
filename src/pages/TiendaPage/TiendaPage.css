@@ -1,3 +1,8 @@
+.tienda-admin-page {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
 /* ── Orden ────────────────────────────────────────────────────── */
 .tienda-orden-select-wrap {
   margin-right: auto;
@@ -8,7 +13,7 @@
 .tienda-td-producto {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     gap: var(--space-3);
   }
   .tienda-thumb {
@@ -23,32 +28,6 @@
   .tienda-detalle-view {
     max-width: 920px;
     margin: 0 auto;
-  }
-
-  .tienda-btn-volver {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: var(--space-6);
-    padding: var(--space-1) var(--space-2);
-    margin-left: calc(var(--space-2) * -1);
-    border: none;
-    background: none;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: var(--color-text-secondary);
-    cursor: pointer;
-    border-radius: var(--radius-sm);
-    transition: color var(--transition-fast), background-color var(--transition-fast);
-  }
-
-  .tienda-btn-volver:hover {
-    color: var(--color-text-primary);
-    background-color: var(--color-bg-subtle);
-  }
-
-  .tienda-detalle-error {
-    color: var(--color-danger);
   }
 
   .tienda-detalle-card {
@@ -90,7 +69,7 @@
   }
 
   .tienda-detalle-img-placeholder span {
-    font-size: 0.8125rem;
+    font-size: var(--text-caption);
     font-weight: 500;
   }
 
@@ -101,25 +80,6 @@
     flex-direction: column;
   }
 
-  .tienda-detalle-eyebrow {
-    font-size: 0.75rem;
-    font-weight: 600;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-text-secondary);
-    margin-bottom: var(--space-2);
-  }
-
-  .tienda-detalle-nombre {
-    margin: 0 0 var(--space-4);
-    font-size: 1.75rem;
-    font-weight: 700;
-    letter-spacing: -0.01em;
-    line-height: 1.2;
-    color: var(--color-text-primary);
-    text-wrap: balance;
-  }
-
   .tienda-detalle-price-row {
     display: flex;
     align-items: center;
@@ -128,7 +88,7 @@
   }
 
   .tienda-detalle-precio {
-    font-size: 1.6rem;
+    font-size: var(--text-title);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
     color: var(--color-text-primary);
@@ -139,7 +99,7 @@
     align-items: center;
     gap: var(--space-2);
     width: fit-content;
-    font-size: 0.875rem;
+    font-size: var(--text-secondary);
     font-weight: 500;
     color: var(--color-text-secondary);
     margin-bottom: var(--space-6);
@@ -167,7 +127,7 @@
 
   .tienda-detalle-desc-label {
     margin: 0 0 var(--space-2);
-    font-size: 0.8125rem;
+    font-size: var(--text-caption);
     font-style: italic;
     font-weight: 500;
     color: var(--color-text-secondary);
@@ -176,39 +136,12 @@
   .tienda-detalle-desc {
     margin: 0;
     max-width: 60ch;
-    line-height: 1.7;
+    line-height: var(--leading-body);
     color: var(--color-text-secondary);
     white-space: pre-wrap;
   }
 
-  .tienda-detalle-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: var(--space-3);
-    margin-top: var(--space-8);
-    padding-top: var(--space-6);
-    border-top: 1px solid var(--color-border);
-  }
-
-  .tienda-btn-editar {
-    padding: var(--space-3) var(--space-6);
-    border: none;
-    border-radius: var(--radius-sm);
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--color-surface);
-    background-color: var(--color-text-primary);
-    cursor: pointer;
-    transition: background-color var(--transition-fast), transform var(--transition-fast);
-  }
-
-  .tienda-btn-editar:hover {
-    background-color: var(--color-text-secondary);
-  }
-
-  .tienda-btn-editar:active {
-    transform: scale(0.98);
-  }
+  /* Acciones del detalle → .btn-outline en src/components/DetailHeader/DetailHeader.css */
 
   @media (max-width: 768px) {
     .tienda-detalle-card {

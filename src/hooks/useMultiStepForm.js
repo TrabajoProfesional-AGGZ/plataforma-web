@@ -17,7 +17,7 @@ const DEFAULT_FORM_OPTIONS = { mode: 'onTouched' };
  * }}
  */
 export function useMultiStepForm(stepFields, useFormOptions = DEFAULT_FORM_OPTIONS) {
-  const { step, direction, submitted, setSubmitted, navGuard, advance, goBack } = useMultiStepFormState();
+  const { step, direction, submitted, setSubmitted, navGuard, finNavGuard, advance, goBack } = useMultiStepFormState();
   const [formError, setFormError] = useState('');
   const {
     register, handleSubmit, trigger, setValue,
@@ -31,7 +31,7 @@ export function useMultiStepForm(stepFields, useFormOptions = DEFAULT_FORM_OPTIO
   };
 
   return {
-    step, direction, submitted, setSubmitted, navGuard,
+    step, direction, submitted, setSubmitted, navGuard, finNavGuard,
     goBack, goNext,
     formError, setFormError,
     register, handleSubmit, setValue, errors, isSubmitting,

@@ -1,4 +1,4 @@
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, waitFor } from '@testing-library/react';
 import { createMemoryRouter, RouterProvider } from 'react-router-dom';
 import AppLayout from './AppLayout';
 
@@ -31,33 +31,48 @@ function buildRouter(initialPath, permisos = []) {
 describe('AppLayout - animación del indicador de navegación', () => {
   beforeEach(() => jest.clearAllMocks());
 
-  test('inicializa el indicador en el link activo al primer render', () => {
+  test('en el primer render ubica el indicador sin animar y suelta el snap al siguiente frame', async () => {
     const router = buildRouter('/dashboard');
-    render(<RouterProvider router={router} />);
+    const { container } = render(<RouterProvider router={router} />);
+    const indicator = container.querySelector('.sidebar-active-bg');
+
     expect(screen.getByRole('link', { name: /dashboard/i })).toHaveClass('active');
+    expect(indicator.style.opacity).toBe('1');
+    expect(indicator).toHaveClass('sidebar-active-bg--snap');
+
+    await waitFor(() => expect(indicator).not.toHaveClass('sidebar-active-bg--snap'));
   });
 
-  test('desliza el indicador al navegar al link adyacente', async () => {
-    const router = buildRouter('/dashboard', ['ver_socios']);
-    render(<RouterProvider router={router} />);
-
-    await act(async () => {
-      await router.navigate('/socios');
-    });
-
-    expect(screen.getByRole('link', { name: /socios/i })).toHaveClass('active');
-  });
-
-  test('anima el indicador en múltiples pasos al saltar links no adyacentes', async () => {
+  test('al navegar posiciona el indicador sobre el link destino sin volver a snapear', async () => {
     const router = buildRouter('/dashboard', ['ver_socios', 'ver_usuarios']);
-    render(<RouterProvider router={router} />);
+    const { container } = render(<RouterProvider router={router} />);
+    const indicator = container.querySelector('.sidebar-active-bg');
+    await waitFor(() => expect(indicator).not.toHaveClass('sidebar-active-bg--snap'));
 
     await act(async () => {
       await router.navigate('/usuarios');
-      // Esperar que los timeouts de 50ms de doStep completen
-      await new Promise(res => setTimeout(res, 200));
     });
 
-    expect(screen.getByRole('link', { name: /usuarios/i })).toHaveClass('active');
+    const destino = screen.getByRole('link', { name: /usuarios/i });
+    expect(destino).toHaveClass('active');
+    expect(indicator.style.transform).toBe(`translateY(${destino.offsetTop}px)`);
+    expect(indicator.style.height).toBe(`${destino.offsetHeight}px`);
+    expect(indicator).not.toHaveClass('sidebar-active-bg--snap');
+    expect(indicator.style.transition).toBe('');
+  });
+
+  test('no toca el indicador si ninguna ruta coincide con un link', async () => {
+    const router = buildRouter('/dashboard');
+    const { container } = render(<RouterProvider router={router} />);
+    const indicator = container.querySelector('.sidebar-active-bg');
+    await waitFor(() => expect(indicator).not.toHaveClass('sidebar-active-bg--snap'));
+    const transformAntes = indicator.style.transform;
+
+    await act(async () => {
+      await router.navigate('/ruta-inexistente');
+    });
+
+    expect(indicator.style.transform).toBe(transformAntes);
+    expect(indicator).not.toHaveClass('sidebar-active-bg--snap');
   });
 });

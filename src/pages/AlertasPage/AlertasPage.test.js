@@ -44,7 +44,7 @@ const ALERTA_MOCK = {
 async function renderPage() {
   render(<AlertasPage />);
   await waitFor(() =>
-    expect(document.querySelector('.list-loading')).not.toBeInTheDocument()
+    expect(screen.queryByRole('status')).not.toBeInTheDocument()
   );
 }
 
@@ -92,6 +92,25 @@ describe('AlertasPage', () => {
     expect(screen.getByText('Juvenil')).toBeInTheDocument();
     expect(screen.getByText('Moroso')).toBeInTheDocument();
     expect(screen.getByText('12')).toBeInTheDocument();
+  });
+
+  test('muestra la fecha corta en la celda y la fecha completa en el tooltip', async () => {
+    getAlertas.mockResolvedValue([ALERTA_MOCK]);
+    await renderPage();
+    const fechaCorta = new Date(ALERTA_MOCK.creado_en).toLocaleDateString('es-AR', { dateStyle: 'medium' });
+    const fechaCompleta = new Date(ALERTA_MOCK.creado_en).toLocaleString('es-AR');
+
+    const celda = await screen.findByText(fechaCorta);
+    expect(celda).toHaveAttribute('title', fechaCompleta);
+  });
+
+  test('muestra "—" como fecha si la alerta no tiene creado_en', async () => {
+    getAlertas.mockResolvedValue([{ ...ALERTA_MOCK, creado_en: null }]);
+    await renderPage();
+
+    const celdas = await screen.findAllByText('—');
+    expect(celdas.length).toBeGreaterThan(0);
+    expect(celdas.some((c) => !c.hasAttribute('title'))).toBe(true);
   });
 
   test('muestra "Todas"/"Todos" cuando la alerta no tiene filtros', async () => {

@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react';
-import { usePermiso } from '../../hooks/usePermiso';
 import ResumenTab from './ResumenTab';
 import FinanzasTab from './FinanzasTab';
 import MorosidadTab from './MorosidadTab';
@@ -19,9 +18,15 @@ const TABS = [
 
 /** Página de métricas con navegación por pestañas (patrón ARIA tablist) accesible por teclado. */
 function MetricasPage() {
-  const puedeVerMetricas = usePermiso('ver_metricas');
   const [activeTab, setActiveTab] = useState(TABS[0].id);
+  const [visitedTabs, setVisitedTabs] = useState(() => new Set([TABS[0].id]));
   const tabRefs = useRef({});
+
+  /** Cambia de pestaña sin desmontar las ya visitadas, para no re-fetchear sus datos al volver. */
+  function selectTab(id) {
+    setActiveTab(id);
+    setVisitedTabs((prev) => (prev.has(id) ? prev : new Set(prev).add(id)));
+  }
 
   /** Navega entre pestañas con flechas/Home/End y mueve el foco a la pestaña activa. */
   function handleKeyDown(e) {
@@ -35,57 +40,50 @@ function MetricasPage() {
     if (nextIdx === null) return;
     e.preventDefault();
     const nextId = TABS[nextIdx].id;
-    setActiveTab(nextId);
+    selectTab(nextId);
     tabRefs.current[nextId]?.focus();
   }
 
-  const ActiveComponent = TABS.find((t) => t.id === activeTab).Component;
-
   return (
     <div className="metricas-page">
-      <h1 className="metricas-title">Métricas</h1>
+      <h1 className="page-title">Métricas</h1>
       <p className="metricas-subtitle">Panel financiero, de uso y de riesgo del club</p>
 
-      {!puedeVerMetricas ? (
-        <p className="metricas-error" style={{ marginTop: 'var(--space-6)' }}>
-          No tenés los permisos necesarios para acceder a las métricas del club.
-        </p>
-      ) : (
-        <>
-          <div
-            className="metricas-tablist"
-            role="tablist"
-            aria-label="Secciones de métricas"
-            onKeyDown={handleKeyDown}
+      <div
+        className="metricas-tablist"
+        role="tablist"
+        aria-label="Secciones de métricas"
+        onKeyDown={handleKeyDown}
+      >
+        {TABS.map(({ id, label }) => (
+          <button
+            key={id}
+            ref={(el) => { tabRefs.current[id] = el; }}
+            type="button"
+            role="tab"
+            id={`metricas-tab-${id}`}
+            aria-selected={activeTab === id}
+            aria-controls={`metricas-panel-${id}`}
+            tabIndex={activeTab === id ? 0 : -1}
+            className="metricas-tab"
+            onClick={() => selectTab(id)}
           >
-            {TABS.map(({ id, label }) => (
-              <button
-                key={id}
-                ref={(el) => { tabRefs.current[id] = el; }}
-                type="button"
-                role="tab"
-                id={`metricas-tab-${id}`}
-                aria-selected={activeTab === id}
-                aria-controls={`metricas-panel-${id}`}
-                tabIndex={activeTab === id ? 0 : -1}
-                className="metricas-tab"
-                onClick={() => setActiveTab(id)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+            {label}
+          </button>
+        ))}
+      </div>
 
-          <div
-            className="metricas-panel"
-            role="tabpanel"
-            id={`metricas-panel-${activeTab}`}
-            aria-labelledby={`metricas-tab-${activeTab}`}
-          >
-            <ActiveComponent />
-          </div>
-        </>
-      )}
+      {TABS.map(({ id, Component }) => visitedTabs.has(id) && (
+        <div
+          key={id}
+          role="tabpanel"
+          id={`metricas-panel-${id}`}
+          aria-labelledby={`metricas-tab-${id}`}
+          hidden={activeTab !== id}
+        >
+          <Component />
+        </div>
+      ))}
     </div>
   );
 }

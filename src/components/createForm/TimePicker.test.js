@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import { TimePicker } from './TimePicker';
 
 describe('TimePicker', () => {
@@ -14,14 +14,16 @@ describe('TimePicker', () => {
     expect(screen.getByText('14:30')).toBeInTheDocument();
   });
 
-  test('al elegir el minuto se cierra el selector', () => {
+  test('al elegir el minuto se cierra el selector', async () => {
     render(<TimePicker name="hora_inicio" />);
 
     fireEvent.click(screen.getByRole('button', { name: /seleccionar hora/i }));
     fireEvent.click(screen.getByRole('option', { name: '14' }));
     fireEvent.click(screen.getByRole('option', { name: '30' }));
 
-    expect(screen.queryByRole('dialog', { name: /elegir hora/i })).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(screen.queryByRole('dialog', { name: /elegir hora/i })).not.toBeInTheDocument();
+    });
   });
 
   test('reabrir el selector con el botón permite cambiar la hora/minuto ya elegidos', () => {

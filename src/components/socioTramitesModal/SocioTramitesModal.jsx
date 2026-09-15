@@ -1,9 +1,10 @@
 import { useState, useEffect, useCallback } from 'react';
-import { ChevronLeft } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
 import PropTypes from 'prop-types';
 import { getTramitesPorSocio, getTramite } from '../../services/tramitesService';
 import { TramiteReviewModal } from '../tramiteReviewModal/TramiteReviewModal';
 import { SocioSubModal } from '../socioAccionesExtra/SocioSubModal';
+import { BackButton } from '../BackButton/BackButton';
 import EstadoBadge from '../badge/EstadoBadge';
 import { urlImagenSegura } from '../../utils/utils';
 import { handleActivateKey } from '../../utils/a11y';
@@ -124,7 +125,7 @@ function SocioTramitesModal({ idSocio, onClose }) {
     >
       {vista === 'lista' && (
         loading ? (
-          <div className="socio-modal-loading">
+          <div className="socio-modal-loading" role="status" aria-label="Cargando">
             <img src={logo} alt="" className="loading-logo" />
           </div>
         ) : tramites.length === 0 ? (
@@ -155,14 +156,11 @@ function SocioTramitesModal({ idSocio, onClose }) {
       )}
 
       {vista === 'detalle' && (
-        <div className="socio-tramites-detalle">
-          <button type="button" className="socio-tramites-btn-volver" onClick={handleVolver}>
-            <ChevronLeft size={16} aria-hidden="true" />
-            Volver
-          </button>
+        <div>
+          <BackButton onClick={handleVolver} compacto />
 
           {loadingDetalle && (
-            <div className="socio-modal-loading">
+            <div className="socio-modal-loading" role="status" aria-label="Cargando">
               <img src={logo} alt="" className="loading-logo" />
             </div>
           )}
@@ -206,13 +204,16 @@ function SocioTramitesModal({ idSocio, onClose }) {
         </div>
       )}
 
-      {reviewOpen && tramiteActual && (
-        <TramiteReviewModal
-          tramite={tramiteActual}
-          onSuccess={handleReviewed}
-          onCancel={() => setReviewOpen(false)}
-        />
-      )}
+      <AnimatePresence>
+        {reviewOpen && tramiteActual && (
+          <TramiteReviewModal
+            key="review"
+            tramite={tramiteActual}
+            onSuccess={handleReviewed}
+            onCancel={() => setReviewOpen(false)}
+          />
+        )}
+      </AnimatePresence>
     </SocioSubModal>
   );
 }

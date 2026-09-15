@@ -3,16 +3,6 @@
   margin: 0 auto;
 }
 
-.alertas-title {
-  font-size: 2rem;
-  font-weight: 600;
-  color: var(--color-text-primary);
-  margin: 0 0 var(--space-5) 0;
-  text-align: center;
-  letter-spacing: -0.02em;
-  text-wrap: balance;
-}
-
 .alertas-toolbar {
   display: flex;
   justify-content: flex-end;
@@ -26,7 +16,7 @@
   padding: var(--space-2) var(--space-4);
   border: none;
   border-radius: var(--radius-sm);
-  font-size: 0.875rem;
+  font-size: var(--text-secondary);
   font-weight: 500;
   cursor: pointer;
   background-color: var(--color-text-primary);
@@ -34,17 +24,15 @@
   transition: background-color var(--transition-fast);
 }
 
-.alertas-btn-crear:hover {
-  background-color: var(--color-text-secondary);
+@media (hover: hover) {
+  .alertas-btn-crear:hover {
+    background-color: var(--color-text-secondary);
+  }
 }
 
-/* Loading wrapper → .list-loading en src/styles/ListPage.css */
 
 .alertas-btn-eliminar-fila {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 6px;
+  padding: 0;
   border: none;
   border-radius: var(--radius-sm);
   background: transparent;
@@ -53,13 +41,9 @@
   transition: background-color var(--transition-fast);
 }
 
-.alertas-btn-eliminar-fila:hover {
-  background-color: var(--status-error-surface-bg);
-}
-
-/* ── Responsive (breakpoints: 768px tablet, 480px celular — ver tokens.css) ── */
-@media (max-width: 480px) {
-  .alertas-title {
-    font-size: 1.5rem;
+@media (hover: hover) {
+  .alertas-btn-eliminar-fila:hover {
+    background-color: var(--status-error-surface-bg);
   }
 }
+

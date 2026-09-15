@@ -1,18 +1,19 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { TrendingUp, BarChart3 } from 'lucide-react';
 import { getTopDisciplinas, getOcupacionInstalaciones } from '../../services/metricasService';
-import { useTheme } from '../../hooks/useTheme';
+import ErrorBanner from '../../components/feedback/ErrorBanner';
+import EmptyState from '../../components/feedback/EmptyState';
+import { SkeletonRows } from '../../components/feedback/SkeletonRows';
 import './ResumenTab.css';
 
 /** Pestaña "Instalaciones" de Métricas: ranking de disciplinas por inscriptos y ocupación de instalaciones. */
 function ResumenTab() {
-  const { logoSocio: logo } = useTheme();
   const [disciplinas, setDisciplinas] = useState(null);
   const [ocupacion, setOcupacion] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
-  useEffect(() => {
+  const cargar = useCallback(() => {
     let cancelled = false;
 
     setLoading(true);
@@ -39,16 +40,14 @@ function ResumenTab() {
     return () => { cancelled = true; };
   }, []);
 
+  useEffect(() => cargar(), [cargar]);
+
   if (loading) {
-    return (
-      <div className="resumen-loading">
-        <img src={logo} alt="" className="loading-logo" />
-      </div>
-    );
+    return <SkeletonRows n={6} />;
   }
 
   if (error) {
-    return <p className="resumen-error">{error}</p>;
+    return <ErrorBanner mensaje={error} onReintentar={cargar} />;
   }
 
   return (
@@ -78,7 +77,7 @@ function ResumenTab() {
                     <>
                       <div
                         className="ranking-bar"
-                        style={{ width: `${Math.min(d.porcentaje_cupo, 100)}%` }}
+                        style={{ transform: `scaleX(${Math.min(d.porcentaje_cupo, 100) / 100})` }}
                       />
                       <span className="ranking-porcentaje">{d.porcentaje_cupo}%</span>
                     </>
@@ -90,7 +89,7 @@ function ResumenTab() {
             ))}
           </div>
         ) : (
-          <p className="resumen-empty">No hay disciplinas con inscriptos activos.</p>
+          <EmptyState mensaje="No hay disciplinas con inscriptos activos." />
         )}
       </section>
 
@@ -121,7 +120,7 @@ function ResumenTab() {
                 <div className="ocupacion-bar-container">
                   <div
                     className="ocupacion-bar"
-                    style={{ width: `${Math.min(inst.porcentaje_ocupacion, 100)}%` }}
+                    style={{ transform: `scaleX(${Math.min(inst.porcentaje_ocupacion, 100) / 100})` }}
                   />
                   <span className="ocupacion-porcentaje">{inst.porcentaje_ocupacion}%</span>
                 </div>
@@ -132,7 +131,7 @@ function ResumenTab() {
             ))}
           </div>
         ) : (
-          <p className="resumen-empty">No hay instalaciones activas.</p>
+          <EmptyState mensaje="No hay instalaciones activas." />
         )}
       </section>
 

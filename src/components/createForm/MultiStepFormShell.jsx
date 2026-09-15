@@ -3,7 +3,9 @@ import { CheckCircle2, ChevronLeft, ChevronRight } from 'lucide-react';
 import PropTypes from 'prop-types';
 import logoVerde from '../../assets/logo-verde.png';
 import { ModalOverlay } from './ModalOverlay';
+import { FormStepContext } from './FormStepContext';
 import { useTheme } from '../../hooks/useTheme';
+import { SPRING } from '../../styles/motion';
 import './CreateSocioForm.css';
 
 // framer-motion interpola colores en JS (para animar background/rotate/etc.),
@@ -12,7 +14,7 @@ import './CreateSocioForm.css';
 // mantenerse en sync con --color-text-primary/--color-border-medium/
 // --color-surface/--color-text-secondary/--status-success-border.
 const STEP_COLORS = {
-  light: { bubbleActive: '#111111', bubbleIdle: '#e0e0e0', onBubble: '#ffffff', idleIcon: '#4a4a4a', success: '#0D6E0D' },
+  light: { bubbleActive: '#111111', bubbleIdle: '#e0e0e0', onBubble: '#ffffff', idleIcon: '#4a4a4a', success: '#0b640b' },
   dark: { bubbleActive: '#f5f5f5', bubbleIdle: '#3a3a3a', onBubble: '#1e1e1e', idleIcon: '#b0b0b0', success: '#4ade80' },
 };
 
@@ -22,16 +24,23 @@ const STEP_COLORS = {
  * progreso (ocultos si `steps` tiene un solo elemento), los botones de
  * navegación (Atrás/Siguiente/Cancelar/Confirmar según el paso) y, cuando
  * `submitted` es `true`, una pantalla de éxito animada en su lugar.
+ *
+ * `onStepEntered` (normalmente `finNavGuard` del hook) llega a cada `FormStep`
+ * hijo vía `FormStepContext` y se dispara al terminar la animación de entrada
+ * del paso: libera `navGuard` justo cuando el botón de submit ya está quieto.
  */
 export function MultiStepFormShell({
   steps,
   step,
   submitted,
   navGuard,
+  onStepEntered,
   isSubmitting = false,
   title,
   successTitle,
   successMessage,
+  onSuccessAction,
+  successActionLabel = 'Listo',
   submitLabel,
   submitLoadingLabel,
   onCancel,
@@ -55,21 +64,21 @@ export function MultiStepFormShell({
               key="success"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              transition={{ type: 'spring', stiffness: 180 }}
+              transition={SPRING.default}
               className="csf-outer-card csf-success"
             >
               <motion.div
                 className="csf-success-logo-circle"
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 220, delay: 0.1 }}
+                transition={{ ...SPRING.celebrate, delay: 0.1 }}
               >
                 <img src={logoVerde} alt="SocioUnido" className="csf-success-logo" />
               </motion.div>
               <motion.div
                 initial={{ scale: 0, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 260, delay: 0.4 }}
+                transition={{ ...SPRING.celebrate, delay: 0.4 }}
               >
                 <CheckCircle2 size={48} color={colors.success} strokeWidth={1.5} />
               </motion.div>
@@ -77,12 +86,15 @@ export function MultiStepFormShell({
                 <h2>{successTitle}</h2>
                 <p>{successMessage}</p>
               </div>
+              {onSuccessAction && (
+                <button type="button" className="csf-btn-submit" onClick={onSuccessAction}>
+                  {successActionLabel}
+                </button>
+              )}
             </motion.div>
           ) : (
             <motion.div
               key="form"
-              initial={{ opacity: 0, y: 16 }}
-              animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0 }}
               className="csf-outer-card"
             >
@@ -114,7 +126,7 @@ export function MultiStepFormShell({
                                     key="check"
                                     initial={{ scale: 0 }}
                                     animate={{ scale: 1 }}
-                                    transition={{ type: 'spring', stiffness: 300 }}
+                                    transition={SPRING.quick}
                                   >
                                     <CheckCircle2 size={16} color={colors.onBubble} strokeWidth={2.5} />
                                   </motion.span>
@@ -133,8 +145,9 @@ export function MultiStepFormShell({
                             <div className="csf-connector">
                               <motion.div
                                 className="csf-connector-fill"
-                                animate={{ width: step > s.id ? '100%' : '0%' }}
-                                transition={{ duration: 0.4, ease: 'easeInOut' }}
+                                style={{ transformOrigin: 'left', width: '100%' }}
+                                animate={{ scaleX: step > s.id ? 1 : 0 }}
+                                transition={SPRING.default}
                               />
                             </div>
                           )}
@@ -146,8 +159,9 @@ export function MultiStepFormShell({
                   <div className="csf-progress">
                     <motion.div
                       className="csf-progress-fill"
-                      animate={{ width: `${progress}%` }}
-                      transition={{ duration: 0.4, ease: 'easeInOut' }}
+                      style={{ transformOrigin: 'left', width: '100%' }}
+                      animate={{ scaleX: progress / 100 }}
+                      transition={SPRING.default}
                     />
                   </div>
                 </>
@@ -158,11 +172,13 @@ export function MultiStepFormShell({
                   onSubmit={onFormSubmit}
                   onKeyDown={(e) => { if (e.key === 'Enter' && step < steps.length) e.preventDefault(); }}
                 >
-                  {direction !== undefined ? (
-                    <AnimatePresence mode="wait" custom={direction}>
-                      {children}
-                    </AnimatePresence>
-                  ) : children}
+                  <FormStepContext.Provider value={onStepEntered ?? null}>
+                    {direction !== undefined ? (
+                      <AnimatePresence mode="wait" custom={direction}>
+                        {children}
+                      </AnimatePresence>
+                    ) : children}
+                  </FormStepContext.Provider>
 
                   <div className={`csf-nav ${step > 1 ? 'csf-nav--between' : 'csf-nav--end'}`}>
                     {step > 1 && (
@@ -240,10 +256,13 @@ MultiStepFormShell.propTypes = {
   step: PropTypes.number.isRequired,
   submitted: PropTypes.bool.isRequired,
   navGuard: PropTypes.bool,
+  onStepEntered: PropTypes.func,
   isSubmitting: PropTypes.bool,
   title: PropTypes.string,
   successTitle: PropTypes.string,
   successMessage: PropTypes.string,
+  onSuccessAction: PropTypes.func,
+  successActionLabel: PropTypes.string,
   submitLabel: PropTypes.string,
   submitLoadingLabel: PropTypes.string,
   onCancel: PropTypes.func.isRequired,
