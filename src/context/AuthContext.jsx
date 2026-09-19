@@ -1,10 +1,9 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
+import { API_BASE_URL } from '../utils/utils';
 
 const AuthContext = createContext(null);
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL || '';
 
 /**
  * Envía el idToken de Firebase al backend para obtener rol, permisos y datos del usuario.

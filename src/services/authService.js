@@ -7,8 +7,7 @@ import {
   sendPasswordResetEmail,
 } from 'firebase/auth';
 import { auth } from '../firebase';
-
-const API_BASE_URL = process.env.REACT_APP_API_BASE_URL;
+import { API_BASE_URL } from '../utils/utils';
 
 /** Inicia sesión con Firebase y valida el rol contra el backend; si el backend rechaza, cierra la sesión de Firebase y lanza 'unauthorized'. */
 export async function login(email, password) {
