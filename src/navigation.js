@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, ShieldCheck, Building2, Trophy, Newspaper, Ticket, BarChart3, Bell, Settings, ShoppingBag } from 'lucide-react';
+import { LayoutDashboard, Users, ShieldCheck, Building2, Trophy, Newspaper, Ticket, BarChart3, Bell, Settings, ShoppingBag, CreditCard } from 'lucide-react';
 
 /**
  * Fuente única de verdad de las secciones: sidebar, dashboard y título de
@@ -16,6 +16,10 @@ export const SECCIONES = [
   { to: '/metricas', label: 'Métricas', Icon: BarChart3, permiso: 'ver_metricas', descripcion: 'Consultar métricas financieras, de uso y predicción de morosidad.' },
   { to: '/alertas', label: 'Alertas', Icon: Bell, permiso: 'ver_alertas', descripcion: 'Crear alertas para los socios' },
   { to: '/tienda', label: 'Tienda', Icon: ShoppingBag, permiso: null, descripcion: 'Catálogo de productos y compras en caja.' },
+  // El gateway sólo puede gatear esta pantalla por `tipo: admin`, que lo tiene cualquier
+  // usuario del panel. Acá se pide además `ver_pagos_pendientes`: es a propósito más estricto
+  // que la API, porque conectar la cuenta donde entra el dinero del club no es de cualquiera.
+  { to: '/cobros', label: 'Cobros', Icon: CreditCard, permiso: 'ver_pagos_pendientes', descripcion: 'Conectar la cuenta de Mercado Pago con la que cobra el club.' },
   { to: '/perfil', label: 'Perfil', Icon: Settings, permiso: null, enDashboard: false },
 ];
 
