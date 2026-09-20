@@ -1,28 +1,22 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
-import { API_BASE_URL } from '../utils/utils';
+import { loginContraBackend } from '../services/authService';
 
 const AuthContext = createContext(null);
 
 /**
  * Envía el idToken de Firebase al backend para obtener rol, permisos y datos del usuario.
+ * Comparte la petición con `authService.login()` (ver `loginContraBackend`): el
+ * signInWithEmailAndPassword de esa función dispara este mismo `onAuthStateChanged`, así que
+ * sin compartirla las dos pedían /auth/login en paralelo para un solo login.
  * @param {import('firebase/auth').User} currentUser - Usuario autenticado en Firebase.
  * @returns {Promise<Object>} Datos de sesión devueltos por `/api/v1/auth/login`.
  * @throws {Error} Si el backend rechaza al usuario (sin acceso al sistema).
  */
 async function fetchLoginData(currentUser) {
   const idToken = await currentUser.getIdToken();
-  const response = await fetch(`${API_BASE_URL}/api/v1/auth/login`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${idToken}`,
-    },
-    body: JSON.stringify({ id_token: idToken }),
-  });
-  if (!response.ok) throw new Error('unauthorized');
-  return response.json();
+  return loginContraBackend(idToken);
 }
 
 /**
