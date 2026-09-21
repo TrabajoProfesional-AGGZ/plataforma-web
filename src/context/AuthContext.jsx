@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState } from 'react';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../firebase';
-import { loginContraBackend } from '../services/authService';
+import { loginContraBackend, verificarClubDeSesion } from '../services/authService';
 
 const AuthContext = createContext(null);
 
@@ -15,6 +15,7 @@ const AuthContext = createContext(null);
  * @throws {Error} Si el backend rechaza al usuario (sin acceso al sistema).
  */
 async function fetchLoginData(currentUser) {
+  await verificarClubDeSesion(currentUser);
   const idToken = await currentUser.getIdToken();
   return loginContraBackend(idToken);
 }

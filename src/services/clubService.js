@@ -102,6 +102,18 @@ export async function resolverClub() {
   return promesaEnCurso;
 }
 
+/**
+ * El `club_id` de este dominio, sin el resto del branding. Lo usa `authService` para compararlo
+ * contra el claim `club_id` del token en cada login: loguearse con una cuenta de otro club no
+ * debe dejar a nadie operando sobre esos datos mientras la pantalla muestra la marca de este
+ * dominio, que es puramente cosmética.
+ * @throws {Error} 'club-desconocido' | 'servicio-no-disponible'
+ */
+export async function idDeClubActual() {
+  const { club_id: clubId } = await resolverClub();
+  return clubId;
+}
+
 /** El club ya resuelto, sin disparar ningún lookup. Para el estado inicial del provider. */
 export function clubEnMemoria() {
   return clubResuelto;

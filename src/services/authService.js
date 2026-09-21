@@ -5,9 +5,11 @@ import {
   updatePassword,
   EmailAuthProvider,
   sendPasswordResetEmail,
+  getIdTokenResult,
 } from 'firebase/auth';
 import { auth } from '../firebase';
 import { API_BASE_URL } from '../utils/utils';
+import { idDeClubActual } from './clubService';
 
 // El signInWithEmailAndPassword de login() dispara el mismo onAuthStateChanged que escucha
 // AuthContext, así que los dos terminaban pidiendo /api/v1/auth/login en paralelo para el mismo
@@ -44,9 +46,36 @@ export function loginContraBackend(idToken) {
   return loginEnCurso;
 }
 
+/**
+ * Corta la sesión si el club sellado en el token (claim `club_id`) no coincide con el club de
+ * este dominio. Sin este chequeo, loguearse con una cuenta de otro club deja operando sobre los
+ * datos reales de ESE club mientras la pantalla muestra la marca de este dominio: el club que
+ * resuelve `ClubContext` por hostname es puramente cosmético y nada más lo validaba contra la
+ * sesión real.
+ *
+ * Si el club de este dominio no se puede resolver, no bloquea el login: mismo criterio que
+ * `ClubProvider`, que tampoco cae a ningún club por defecto pero tampoco frena el render.
+ * @param {import('firebase/auth').User} user
+ * @throws {Error} 'club-incorrecto' si el claim no coincide con el club de este dominio.
+ */
+export async function verificarClubDeSesion(user) {
+  let clubDelDominio;
+  try {
+    clubDelDominio = await idDeClubActual();
+  } catch {
+    return;
+  }
+  const { claims } = await getIdTokenResult(user);
+  if (claims.club_id && claims.club_id !== clubDelDominio) {
+    await signOut(auth);
+    throw new Error('club-incorrecto');
+  }
+}
+
 /** Inicia sesión con Firebase y valida el rol contra el backend; si el backend rechaza, cierra la sesión de Firebase y lanza 'unauthorized'. */
 export async function login(email, password) {
   const { user } = await signInWithEmailAndPassword(auth, email, password);
+  await verificarClubDeSesion(user);
   const idToken = await user.getIdToken();
 
   try {

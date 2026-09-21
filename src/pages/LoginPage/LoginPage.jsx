@@ -28,6 +28,9 @@ const CODIGOS_CREDENCIALES_INVALIDAS = [
 
 /** Solo credenciales inválidas conocidas dan un mensaje específico; cualquier otro error se trata como servicio caído. */
 function resolverMensajeErrorLogin(err) {
+  if (err.message === 'club-incorrecto') {
+    return 'Credenciales invalidas';
+  }
   if (err.message === 'unauthorized' || CODIGOS_CREDENCIALES_INVALIDAS.includes(err.code)) {
     return 'Credenciales incorrectas';
   }
