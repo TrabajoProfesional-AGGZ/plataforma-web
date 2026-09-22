@@ -6,6 +6,7 @@ import {
   reauthenticateWithCredential,
   updatePassword,
   EmailAuthProvider,
+  getIdTokenResult,
 } from 'firebase/auth';
 
 const mockCurrentUser = { email: 'admin@club.com' };
@@ -16,9 +17,15 @@ jest.mock('firebase/auth', () => ({
   signOut: jest.fn(),
   reauthenticateWithCredential: jest.fn(),
   updatePassword: jest.fn(),
+  getIdTokenResult: jest.fn(),
   EmailAuthProvider: {
     credential: jest.fn(),
   },
+}));
+
+const mockIdDeClubActual = jest.fn();
+jest.mock('./clubService', () => ({
+  idDeClubActual: (...args) => mockIdDeClubActual(...args),
 }));
 
 const mockGetIdToken = jest.fn();
@@ -36,11 +43,13 @@ describe('authService', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     global.fetch = jest.fn();
+    mockIdDeClubActual.mockResolvedValue('club-1');
   });
 
   describe('login', () => {
     test('login exitoso devuelve los datos del usuario con permisos', async () => {
       mockGetIdToken.mockResolvedValueOnce('mock-id-token');
+      getIdTokenResult.mockResolvedValueOnce({ claims: { club_id: 'club-1' } });
       signInWithEmailAndPassword.mockResolvedValueOnce({
         user: { getIdToken: mockGetIdToken },
       });
@@ -67,6 +76,7 @@ describe('authService', () => {
 
     test('login con usuario no autorizado en el backend rechaza y llama a signOut', async () => {
       mockGetIdToken.mockResolvedValueOnce('mock-id-token');
+      getIdTokenResult.mockResolvedValueOnce({ claims: { club_id: 'club-1' } });
       signInWithEmailAndPassword.mockResolvedValueOnce({
         user: { getIdToken: mockGetIdToken },
       });
