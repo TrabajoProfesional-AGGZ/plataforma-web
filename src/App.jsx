@@ -14,6 +14,7 @@ import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 import AppLayout from './components/AppLayout/AppLayout';
 import MetricasPage from './pages/MetricasPage/MetricasPage';
 import TiendaPage from './pages/TiendaPage/TiendaPage';
+import CobrosPage from './pages/CobrosPage/CobrosPage';
 
 /**
  * Componente raíz de la aplicación. Define el árbol de rutas: login público,
@@ -82,6 +83,12 @@ function App() {
           <Route element={<PrivateRoute />}>
             <Route element={<AppLayout />}>
               <Route path="/tienda" element={<TiendaPage />} />
+            </Route>
+          </Route>
+
+          <Route element={<PrivateRoute requiredPermiso="ver_pagos_pendientes" />}>
+            <Route element={<AppLayout />}>
+              <Route path="/cobros" element={<CobrosPage />} />
             </Route>
           </Route>
 

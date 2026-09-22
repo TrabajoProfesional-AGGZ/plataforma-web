@@ -6,9 +6,16 @@ jest.mock('../firebase', () => ({ auth: {} }));
 const mockOnAuthStateChanged = jest.fn();
 const mockSignOut = jest.fn();
 
+const mockGetIdTokenResult = jest.fn();
+
 jest.mock('firebase/auth', () => ({
   onAuthStateChanged: (...args) => mockOnAuthStateChanged(...args),
   signOut: (...args) => mockSignOut(...args),
+  getIdTokenResult: (...args) => mockGetIdTokenResult(...args),
+}));
+
+jest.mock('../services/clubService', () => ({
+  idDeClubActual: jest.fn(),
 }));
 
 global.fetch = jest.fn();
@@ -37,6 +44,7 @@ function renderProvider() {
 describe('AuthContext', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockGetIdTokenResult.mockResolvedValue({ claims: {} });
   });
 
   test('muestra loading mientras onAuthStateChanged no dispara', () => {
