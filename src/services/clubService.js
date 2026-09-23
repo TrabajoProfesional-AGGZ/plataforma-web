@@ -1,4 +1,5 @@
 import { fetchWithOutAuth, urlImagenSegura } from '../utils/utils';
+import { logger } from '../utils/logger';
 
 /**
  * De qué club es este panel, resuelto por hostname.
@@ -77,7 +78,7 @@ async function pedirClub() {
 
   const deDesarrollo = clubDeDesarrollo();
   if (deDesarrollo) {
-    console.warn(`No se pudo resolver el club de "${host}" (${fallo.message}); se usa REACT_APP_CLUB_ID.`);
+    logger.warn(`No se pudo resolver el club de "${host}" (${fallo.message}); se usa REACT_APP_CLUB_ID.`);
     clubResuelto = deDesarrollo;
     return clubResuelto;
   }
