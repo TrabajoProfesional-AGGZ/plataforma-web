@@ -44,7 +44,7 @@
   },
   "devDependencies": {
     "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-sonarjs": "^4.1.0",
+    "eslint-plugin-sonarjs": "^4.2.0",
     "react-scripts": "5.0.1"
   },
   "jest": {
