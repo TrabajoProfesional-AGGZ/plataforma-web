@@ -8,7 +8,7 @@ nav_order: 2
 
 Aquí se documentan las pantallas principales del Panel de Administración Web de SocioUnido. 
 
-Para demostrar la flexibilidad de la plataforma y su capacidad de personalización (marca blanca), se exponen dos variantes para cada vista: el **Esquema Neutro** (base por defecto de SocioUnido) y el **Esquema Personalizado**, aplicado a modo de ejemplo utilizando la identidad institucional del **Mamelodi Sundowns** de Sudáfrica.
+Para demostrar la flexibilidad de la plataforma y su capacidad de personalización (marca blanca), se exponen dos variantes para cada vista: el **Esquema Neutro** (base por defecto de SocioUnido) y el **Esquema Personalizado**, aplicado a modo de ejemplo utilizando la identidad institucional del **Inter Miami CF** de Estados Unidos.
 
 ## Login
 
@@ -20,8 +20,8 @@ La puerta de entrada segura para el personal administrativo y directivo del club
     <img src="img/login_neutro.jpeg" alt="Login Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
-    <h4>Mamelodi Sundowns</h4>
-    <img src="img/login_mamelodi.jpeg" alt="Login Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <h4>Inter Miami CF</h4>
+    <img src="img/login_miami.jpeg" alt="Login Inter Miami CF" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
 
@@ -37,8 +37,8 @@ El panel principal que ofrece un resumen operativo rápido y accesos directos a 
     <img src="img/home_neutro.jpeg" alt="Home Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
-    <h4>Mamelodi Sundowns</h4>
-    <img src="img/home_mamelodi.jpeg" alt="Home Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <h4>Inter Miami CF</h4>
+    <img src="img/home_miami.jpeg" alt="Home Inter Miami CF" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
 
@@ -54,8 +54,8 @@ Vista detallada de los KPIs del club, incluyendo recaudación, tendencias de pag
     <img src="img/metricas_neutro.jpeg" alt="Métricas Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
-    <h4>Mamelodi Sundowns</h4>
-    <img src="img/metricas_mamelodi.jpeg" alt="Métricas Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <h4>Inter Miami CF</h4>
+    <img src="img/metricas_miami.jpeg" alt="Métricas Inter Miami CF" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
 
@@ -71,8 +71,8 @@ Módulo para la creación, configuración (cupos, aranceles, sedes) y seguimient
     <img src="img/disciplinas_neutro.jpeg" alt="Disciplinas Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
-    <h4>Mamelodi Sundowns</h4>
-    <img src="img/disciplinas_mamelodi.jpeg" alt="Disciplinas Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <h4>Inter Miami CF</h4>
+    <img src="img/disciplinas_miami.jpeg" alt="Disciplinas Inter Miami CF" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
 
@@ -88,8 +88,8 @@ Directorio centralizado para la administración de la masa societaria, revisión
     <img src="img/socios_neutro.jpeg" alt="Socios Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
-    <h4>Mamelodi Sundowns</h4>
-    <img src="img/socios_mamelodi.jpeg" alt="Socios Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <h4>Inter Miami CF</h4>
+    <img src="img/socios_miami.jpeg" alt="Socios Inter Miami CF" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
 
@@ -105,7 +105,7 @@ Interfaz para la gestión del inventario, actualización de precios, control de 
     <img src="img/tienda_neutro.jpeg" alt="Tienda Neutro" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
   <div style="text-align: center;">
-    <h4>Mamelodi Sundowns</h4>
-    <img src="img/tienda_mamelodi.jpeg" alt="Tienda Mamelodi Sundowns" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
+    <h4>Inter Miami CF</h4>
+    <img src="img/tienda_miami.jpeg" alt="Tienda Inter Miami CF" style="max-width: 400px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);" />
   </div>
 </div>
