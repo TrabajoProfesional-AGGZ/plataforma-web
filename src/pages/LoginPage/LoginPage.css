@@ -75,6 +75,13 @@
   border-color: var(--color-border-strong);
 }
 
+/* En oscuro --color-text-primary es el celeste del club (pensado para texto
+   sobre fondo oscuro); dentro del input, sobre --color-surface, se pidió
+   blanco en su lugar. */
+:root[data-theme="dark"] .login-field input {
+  color: #ffffff;
+}
+
 .login-password-wrapper {
   position: relative;
   display: flex;

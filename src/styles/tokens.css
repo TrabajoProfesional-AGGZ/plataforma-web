@@ -11,25 +11,31 @@
      declaración individual — todo font-size del proyecto está en rem. */
   font-size: 110%;
 
-  /* Colors */
-  --color-text-primary: #111111;
+  /* Colors — paleta Club Ciudad de Buenos Aires (rama demo "ciudad"):
+     celeste #4b9cd3, blanco #ffffff, azul #0d2040, negro #111111. */
+  --color-text-primary: #0d2040;
   --color-text-secondary: #4a4a4a;
   /* Placeholders y texto atenuado que igual debe leerse (≥ 4.5:1 sobre --color-bg). */
   --color-text-placeholder: #707070;
-  --color-bg: #f5f5f5;
+  --color-bg: #e0e5ee;
   --color-surface: #ffffff;
-  --color-border: #e8e8e8;
-  --color-border-medium: #d0d0d0;
-  --color-border-strong: #111111;
-  --color-border-light: #efefef;
+  --color-border: #e6e9ef;
+  --color-border-medium: #ced6e3;
+  --color-border-strong: #0d2040;
+  --color-border-light: #eef0f3;
   --color-danger: #c0392b;
   --color-danger-hover: #96281b;
   /* Relleno de botones destructivos. Separado de --color-danger (texto/borde)
      porque en oscuro el rojo de texto es claro y el blanco encima no contrasta. */
   --color-danger-fill: #c0392b;
   --color-danger-fill-hover: #96281b;
-  --color-row-hover: #f8f8f8;
-  --color-bg-subtle: #f0f0f0;
+  --color-row-hover: #f0f2f5;
+  --color-bg-subtle: #d8dfeb;
+  /* Acento celeste del club — highlights/foco. En claro el color institucional
+     fuerte (texto/bordes/botones sólidos) es el azul, no el celeste: celeste
+     solo da 3:1 sobre blanco (insuficiente para texto AA, ok para UI/foco). */
+  --color-accent: #4b9cd3;
+  --color-accent-hover: #2873a5;
   --color-overlay: rgba(0, 0, 0, 0.4);
   /* Scrim de modales (material sobre el contenido). */
   --color-scrim: rgba(0, 0, 0, 0.38);
@@ -126,21 +132,27 @@
 :root[data-theme="dark"] {
   color-scheme: dark;
 
-  --color-text-primary: #f5f5f5;
+  /* Familia navy derivada del azul institucional (#0d2040, H≈218°/S≈66%):
+     misma progresión de luminosidad que el neutro de `main`, pero anclada
+     al hue del club para que el fondo oscuro se lea "azul club", no negro
+     puro. El celeste como texto primario da 5.8:1/5.2:1 sobre bg/surface. */
+  --color-text-primary: #4b9cd3;
   --color-text-secondary: #b0b0b0;
   --color-text-placeholder: #8f8f8f;
-  --color-bg: #121212;
-  --color-surface: #1e1e1e;
-  --color-border: #2e2e2e;
-  --color-border-medium: #3a3a3a;
-  --color-border-strong: #f5f5f5;
-  --color-border-light: #262626;
+  --color-bg: #0a1933;
+  --color-surface: #0e2346;
+  --color-border: #143264;
+  --color-border-medium: #193d7b;
+  --color-border-strong: #4b9cd3;
+  --color-border-light: #102851;
   --color-danger: #f87171;
   --color-danger-hover: #ef4444;
   --color-danger-fill: #dc2626;
   --color-danger-fill-hover: #b91c1c;
-  --color-row-hover: #232323;
-  --color-bg-subtle: #1a1a1a;
+  --color-row-hover: #10274e;
+  --color-bg-subtle: #0c1f3d;
+  --color-accent: #4b9cd3;
+  --color-accent-hover: #8ebede;
   --color-overlay: rgba(0, 0, 0, 0.6);
   --color-scrim: rgba(0, 0, 0, 0.6);
   --scrim-blur: blur(4px);
