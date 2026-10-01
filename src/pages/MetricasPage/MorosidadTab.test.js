@@ -66,6 +66,39 @@ describe('MorosidadTab', () => {
     expect(screen.getByText('—')).toBeInTheDocument();
   });
 
+  test('muestra los días promedio redondeados a un entero', async () => {
+    getDashboardFidelizacion.mockResolvedValueOnce({
+      ...mockDatos,
+      prediccion_morosidad: [
+        { socio_id: 4, nombre_completo: 'Con decimales', probabilidad_atraso: 0.5, dias_promedio_historico: 12.1281982712129, nivel_riesgo: 'Medio' },
+      ],
+    });
+
+    render(<MorosidadTab />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Con decimales')).toBeInTheDocument();
+    });
+    expect(screen.getByText('12 días')).toBeInTheDocument();
+    expect(screen.queryByText(/12\.128/)).not.toBeInTheDocument();
+  });
+
+  test('muestra un guion cuando los días promedio vienen nulos', async () => {
+    getDashboardFidelizacion.mockResolvedValueOnce({
+      ...mockDatos,
+      prediccion_morosidad: [
+        { socio_id: 5, nombre_completo: 'Sin días', probabilidad_atraso: 0.5, dias_promedio_historico: null, nivel_riesgo: 'Medio' },
+      ],
+    });
+
+    render(<MorosidadTab />);
+
+    await waitFor(() => {
+      expect(screen.getByText('Sin días')).toBeInTheDocument();
+    });
+    expect(screen.getByText('—')).toBeInTheDocument();
+  });
+
   test('muestra estado vacío cuando no hay predicciones de morosidad', async () => {
     getDashboardFidelizacion.mockResolvedValueOnce({ ...mockDatos, prediccion_morosidad: [] });
 

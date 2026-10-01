@@ -18,6 +18,12 @@ function formatearPorcentaje(valor) {
   return `${Math.round(valor * 100)}%`;
 }
 
+/** Formatea una cantidad de días redondeada al entero más cercano, o '—' si no hay valor. */
+function formatearDias(valor) {
+  if (valor == null) return '—';
+  return `${Math.round(valor)} días`;
+}
+
 /** Select de mes reutilizado por los filtros "Desde"/"Hasta" de tendencias de pago. */
 function SelectorMes({ id, label, value, onChange, opciones }) {
   return (
@@ -134,7 +140,7 @@ function MorosidadTab() {
                     <tr key={p.socio_id}>
                       <td>{p.nombre_completo}</td>
                       <td className="td-num">{formatearPorcentaje(p.probabilidad_atraso)}</td>
-                      <td className="td-num">{p.dias_promedio_historico} días</td>
+                      <td className="td-num">{formatearDias(p.dias_promedio_historico)}</td>
                       <td className="td-center">
                         <span
                           className="disciplinas-badge"
