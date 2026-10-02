@@ -143,7 +143,7 @@ function LoginPage() {
           animate={exiting ? 'exiting' : 'visible'}
         >
           <motion.p className="login-tagline" variants={formItemVariants}>
-            Porque el club es de los socios, y la gestión es de <strong>SocioUnido</strong>
+            Plataforma administrativa del <strong>Inter Miami CF</strong>
           </motion.p>
           <motion.form onSubmit={handleSubmit} className="login-form" variants={formItemVariants}>
             <div className="login-field">

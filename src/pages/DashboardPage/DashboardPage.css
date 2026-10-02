@@ -93,9 +93,9 @@
 }
 
 .dashboard-card-descripcion {
-  font-size: var(--text-caption);
+  font-size: var(--text-body);
   color: var(--color-text-secondary);
-  line-height: var(--leading-caption);
+  line-height: var(--leading-body);
   transition: color var(--transition-normal);
 }
 
@@ -112,7 +112,7 @@
 
   .dashboard-card:hover .dashboard-card-descripcion {
     color: var(--color-surface);
-    opacity: 0.65;
+    opacity: 0.85;
   }
 
   .dashboard-card:hover .dashboard-card-arrow {
@@ -136,7 +136,7 @@
 
 .dashboard-card:active .dashboard-card-descripcion {
   color: var(--color-surface);
-  opacity: 0.65;
+  opacity: 0.85;
 }
 
 .dashboard-card:active .dashboard-card-arrow {
