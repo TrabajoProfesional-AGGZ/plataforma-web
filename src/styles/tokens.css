@@ -7,9 +7,10 @@
   color-scheme: light;
 
   /* Tamaño base para el cálculo de rem (16px default del navegador).
-     110% = fuentes ~10% más grandes en toda la app sin tocar cada
-     declaración individual — todo font-size del proyecto está en rem. */
-  font-size: 110%;
+     115.5% = 110% × 1.05: fuentes ~15% más grandes en toda la app sin tocar
+     cada declaración individual — todo font-size del proyecto está en rem.
+     El último +5% es feedback de la demo (legibilidad desde el fondo). */
+  font-size: 115.5%;
 
   /* Colors */
   /* Paleta de club (rama demo): Inter Miami CF — #231F20 / #F7B5CD / #FFFFFF.
@@ -23,7 +24,9 @@
   --color-text-secondary: #5c7285;
   /* Placeholders y texto atenuado que igual debe leerse (≥ 4.5:1 sobre --color-bg). */
   --color-text-placeholder: #707070;
-  --color-bg: #f1dfe7;
+  /* Más saturado que el #f1dfe7 original: feedback de la demo, desde lejos
+     en un proyector el rosa pálido se veía blanco. */
+  --color-bg: #ecc3d4;
   --color-surface: #fdfcfc;
   --color-border: #ebe5e7;
   --color-border-medium: #e4d8dc;
@@ -38,7 +41,7 @@
   --color-danger-fill: #c0392b;
   --color-danger-fill-hover: #96281b;
   --color-row-hover: #f8f6f7;
-  --color-bg-subtle: #edd9e0;
+  --color-bg-subtle: #e5b6c9;
   --color-overlay: rgba(0, 0, 0, 0.4);
   /* Scrim de modales (material sobre el contenido). */
   --color-scrim: rgba(0, 0, 0, 0.38);

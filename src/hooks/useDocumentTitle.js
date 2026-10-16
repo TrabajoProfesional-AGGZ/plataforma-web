@@ -1,8 +1,8 @@
 import { useEffect } from 'react';
 
-/** Setea document.title a partir del título de sección activo. */
+/** Fija document.title con el nombre del club (demo); `titulo` se ignora. */
 export function useDocumentTitle(titulo) {
   useEffect(() => {
-    document.title = titulo ? `${titulo} · SocioUnido` : 'SocioUnido Admin';
+    document.title = 'Inter Miami CF - Admin';
   }, [titulo]);
 }
